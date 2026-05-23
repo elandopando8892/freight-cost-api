@@ -1,0 +1,267 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  OPERATOR
+  VIEWER
+}
+
+enum Section {
+  GENERAL_BASE
+  FUEL
+  LABOR
+  FINANCE
+  UTILIZATION
+  BORDER
+  RISK
+  CONFIG
+  TECHNICAL_MARGIN
+}
+
+enum QuoteStatus {
+  DRAFT
+  CONFIRMED
+  ARCHIVED
+}
+
+enum MarketDataType {
+  DIESEL_MX
+  DIESEL_US
+  FX_RATE
+  FSC
+}
+
+// ─────────────────────────────────────────────
+// MULTI-TENANCY & AUTH
+// ─────────────────────────────────────────────
+
+model Organization {
+  id         String   @id @default(cuid())
+  name       String
+  country    String   @default("MX")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  users          User[]
+  assumptionSets AssumptionSet[]
+  lanes          Lane[]
+  quotes         Quote[]
+  marketData     MarketData[]
+}
+
+model User {
+  id           String   @id @default(cuid())
+  orgId        String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(OPERATOR)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────────
+// ASSUMPTIONS
+// ─────────────────────────────────────────────
+
+model AssumptionSet {
+  id        String   @id @default(cuid())
+  orgId     String
+  name      String
+  version   Int      @default(1)
+  isActive  Boolean  @default(false)
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  org    Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  params AssumptionParam[]
+  quotes Quote[]
+
+  @@unique([orgId, name, version])
+}
+
+model AssumptionParam {
+  id              String   @id @default(cuid())
+  setId           String
+  section         Section
+  field           String
+  value           Float
+  unit            String
+  low             Float?
+  high            Float?
+  updateFrequency String?
+  costBehavior    String?
+  activation      String?
+  purpose         String?
+  notes           String?
+  updatedAt       DateTime @updatedAt
+
+  set AssumptionSet @relation(fields: [setId], references: [id], onDelete: Cascade)
+
+  @@unique([setId, section, field])
+}
+
+// ─────────────────────────────────────────────
+// CATALOG (global, shared across all orgs)
+// ─────────────────────────────────────────────
+
+model EquipmentConfig {
+  id                   String  @id @default(cuid())
+  truckType            String
+  trailerType          String
+  config               String  // "Single" | "Tandem"
+  operationType        String
+  serviceType          String
+  driverType           String
+  dispatchService      String?
+  fuelEfficiencyFactor Float   @default(1.0)
+  fixedCostFactor      Float   @default(1.0)
+  maintTiresFactor     Float   @default(1.0)
+  driverFactor         Float   @default(1.0)
+
+  lanes Lane[]
+
+  @@unique([truckType, trailerType, config, operationType, serviceType, driverType])
+}
+
+model CityMX {
+  id           String @id @default(cuid())
+  production   String @unique
+  homologation String
+  stateCode    String
+}
+
+model ZipMarket {
+  id        String @id @default(cuid())
+  zipCode   String @unique
+  metroZip  String
+  metroCity String
+  market    String
+}
+
+// ─────────────────────────────────────────────
+// MARKET DATA (manual, per org)
+// ─────────────────────────────────────────────
+
+model MarketData {
+  id      String         @id @default(cuid())
+  orgId   String
+  type    MarketDataType
+  region  String?
+  state   String?
+  value   Float
+  unit    String
+  date    DateTime
+  source  String?
+  createdAt DateTime     @default(now())
+
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId, type, date])
+}
+
+// ─────────────────────────────────────────────
+// LANES
+// ─────────────────────────────────────────────
+
+model Lane {
+  id            String   @id @default(cuid())
+  orgId         String
+  laneKey       String
+  origin        String
+  destination   String
+  equipmentId   String?
+  operationType String
+  serviceType   String
+  config        String   @default("Single")
+  isD2D         Boolean  @default(false)
+  isDrayage     Boolean  @default(false)
+  isRoundtrip   Boolean  @default(false)
+  isBackhaul    Boolean  @default(false)
+  baseKm        Float?
+  returnKm      Float?
+  loadedMiles   Float?
+  transitDays   Float?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  org       Organization    @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  equipment EquipmentConfig? @relation(fields: [equipmentId], references: [id])
+  quotes    Quote[]
+
+  @@unique([orgId, laneKey])
+}
+
+// ─────────────────────────────────────────────
+// QUOTES (saved calculations)
+// ─────────────────────────────────────────────
+
+model Quote {
+  id              String      @id @default(cuid())
+  orgId           String
+  laneId          String
+  assumptionSetId String
+  label           String?
+  version         Int         @default(1)
+  status          QuoteStatus @default(DRAFT)
+  createdAt       DateTime    @default(now())
+
+  // CVU breakdown (USD)
+  fuelUsd        Float
+  maintTiresUsd  Float
+  driverUsd      Float
+  borderUsd      Float
+  routeBufferUsd Float
+  totalCvuUsd    Float
+
+  // CFU breakdown (USD)
+  fixedCostPerKm  Float
+  cfuByDistance   Float
+  cfuByTime       Float
+  totalCfuUsd     Float
+
+  // Technical tariff
+  productionCostUsd  Float
+  utMargin           Float
+  technicalTariffUsd Float
+
+  // Risk adjustments (USD)
+  routeRiskUsd         Float @default(0)
+  securityRiskUsd      Float @default(0)
+  operationRiskUsd     Float @default(0)
+  flatbedComplexityUsd Float @default(0)
+  tandemRiskUsd        Float @default(0)
+  weatherBufferUsd     Float @default(0)
+  totalRiskAdjUsd      Float
+
+  // Final output
+  requiredTariffUsd   Float
+  requiredTariffMxn   Float
+  tariffPerLoadedMile Float
+  carrierMargin       Float
+  fxRateUsed          Float
+
+  // Distances used in calculation
+  loadedKm   Float
+  emptyKm    Float
+  totalKm    Float
+  loadedMiles Float
+  cycleDays   Float
+
+  org  Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  lane Lane          @relation(fields: [laneId], references: [id])
+  set  AssumptionSet @relation(fields: [assumptionSetId], references: [id])
+}
