@@ -27,6 +27,7 @@ enum Section {
   RISK
   CONFIG
   TECHNICAL_MARGIN
+  FACTORS
 }
 
 enum QuoteStatus {
@@ -219,47 +220,60 @@ model Quote {
   status          QuoteStatus @default(DRAFT)
   createdAt       DateTime    @default(now())
 
-  // CVU breakdown (USD)
-  fuelUsd        Float
-  maintTiresUsd  Float
-  driverUsd      Float
-  borderUsd      Float
-  routeBufferUsd Float
-  totalCvuUsd    Float
+  // ── Distances & timing ───────────────────────────────────────────────
+  totalKms    Float
+  loadedMiles Float
+  litros      Float
+  transitHrs  Float
+  fracTransit Float
+  fracWait    Float
+  fracViaje   Float
 
-  // CFU breakdown (USD)
-  fixedCostPerKm  Float
-  cfuByDistance   Float
-  cfuByTime       Float
-  totalCfuUsd     Float
+  // ── CBTT base cost ───────────────────────────────────────────────────
+  cbfa Float
+  cbvr Float
+  ut   Float
+  cbtt Float
 
-  // Technical tariff
-  productionCostUsd  Float
-  utMargin           Float
-  technicalTariffUsd Float
+  // ── ITA trip additions ───────────────────────────────────────────────
+  cagr Float
+  cagv Float
+  ita  Float
 
-  // Risk adjustments (USD)
-  routeRiskUsd         Float @default(0)
-  securityRiskUsd      Float @default(0)
-  operationRiskUsd     Float @default(0)
-  flatbedComplexityUsd Float @default(0)
-  tandemRiskUsd        Float @default(0)
-  weatherBufferUsd     Float @default(0)
-  totalRiskAdjUsd      Float
+  // ── Production cost ──────────────────────────────────────────────────
+  cit Float
 
-  // Final output
+  // ── Margin & base tariff ─────────────────────────────────────────────
+  margenPct     Float
+  margenContrib Float
+  tbt           Float
+
+  // ── Market effects (ICEM) ────────────────────────────────────────────
+  trailerFactor   Float
+  emtr            Float
+  operationFactor Float
+  emto            Float
+  configFactor    Float
+  eact            Float
+  driverFactor    Float
+  eaeo            Float
+  icem            Float
+  serviceFactor   Float
+
+  // ── Fuel ─────────────────────────────────────────────────────────────
+  icc Float
+
+  // ── Final price ──────────────────────────────────────────────────────
+  pvt Float
+  ubt Float
+  mct Float
+
+  // ── Legacy / derived ─────────────────────────────────────────────────
   requiredTariffUsd   Float
   requiredTariffMxn   Float
+  productionCostUsd   Float
   tariffPerLoadedMile Float
-  carrierMargin       Float
   fxRateUsed          Float
-
-  // Distances used in calculation
-  loadedKm   Float
-  emptyKm    Float
-  totalKm    Float
-  loadedMiles Float
-  cycleDays   Float
 
   org  Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
   lane Lane          @relation(fields: [laneId], references: [id])

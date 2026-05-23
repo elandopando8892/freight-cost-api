@@ -40,11 +40,11 @@ export async function quotesRoutes(app: FastifyInstance) {
     const params = buildParamMap(assumptionSet.params)
     const market = {
       dieselMxMxnL: dieselMxEntry?.value ?? 28,
-      dieselUsUsdL: dieselUsEntry?.value ?? 1.49,
+      dieselUsUsdL: dieselUsEntry?.value ?? 0.95,
       fxRate: fxEntry?.value ?? 17.5,
     }
 
-    const result = calculate({ lane, params, equipment, market })
+    const r = calculate({ lane, params, equipment, market })
 
     const quote = await prisma.quote.create({
       data: {
@@ -52,42 +52,52 @@ export async function quotesRoutes(app: FastifyInstance) {
         laneId: lane.id,
         assumptionSetId: assumptionSet.id,
         label: input.label,
-        // CVU
-        fuelUsd: result.cvu.fuelUsd,
-        maintTiresUsd: result.cvu.maintTiresUsd,
-        driverUsd: result.cvu.driverUsd,
-        borderUsd: result.cvu.borderUsd,
-        routeBufferUsd: result.cvu.routeBufferUsd,
-        totalCvuUsd: result.cvu.totalCvuUsd,
-        // CFU
-        fixedCostPerKm: result.cfu.fixedCostPerKm,
-        cfuByDistance: result.cfu.cfuByDistance,
-        cfuByTime: result.cfu.cfuByTime,
-        totalCfuUsd: result.cfu.totalCfuUsd,
-        // Tariffs
-        productionCostUsd: result.productionCostUsd,
-        utMargin: result.utMargin,
-        technicalTariffUsd: result.technicalTariffUsd,
-        // Risk
-        routeRiskUsd: result.risk.routeRiskUsd,
-        securityRiskUsd: result.risk.securityRiskUsd,
-        operationRiskUsd: result.risk.operationRiskUsd,
-        flatbedComplexityUsd: result.risk.flatbedComplexityUsd,
-        tandemRiskUsd: result.risk.tandemRiskUsd,
-        weatherBufferUsd: result.risk.weatherBufferUsd,
-        totalRiskAdjUsd: result.risk.totalRiskAdjUsd,
-        // Final
-        requiredTariffUsd: result.requiredTariffUsd,
-        requiredTariffMxn: result.requiredTariffMxn,
-        tariffPerLoadedMile: result.tariffPerLoadedMile,
-        carrierMargin: result.carrierMargin,
-        fxRateUsed: result.fxRateUsed,
-        // Distances
-        loadedKm: result.loadedKm,
-        emptyKm: result.emptyKm,
-        totalKm: result.totalKm,
-        loadedMiles: result.loadedMiles,
-        cycleDays: result.cycleDays,
+        // Distances & timing
+        totalKms: r.totalKms,
+        loadedMiles: r.loadedMiles,
+        litros: r.litros,
+        transitHrs: r.transitHrs,
+        fracTransit: r.fracTransit,
+        fracWait: r.fracWait,
+        fracViaje: r.fracViaje,
+        // CBTT base cost
+        cbfa: r.cbfa,
+        cbvr: r.cbvr,
+        ut: r.ut,
+        cbtt: r.cbtt,
+        // ITA trip additions
+        cagr: r.cagr,
+        cagv: r.cagv,
+        ita: r.ita,
+        // Production cost
+        cit: r.cit,
+        // Margin & base tariff
+        margenPct: r.margenPct,
+        margenContrib: r.margenContrib,
+        tbt: r.tbt,
+        // Market effects (ICEM)
+        trailerFactor: r.trailerFactor,
+        emtr: r.emtr,
+        operationFactor: r.operationFactor,
+        emto: r.emto,
+        configFactor: r.configFactor,
+        eact: r.eact,
+        driverFactor: r.driverFactor,
+        eaeo: r.eaeo,
+        icem: r.icem,
+        serviceFactor: r.serviceFactor,
+        // Fuel
+        icc: r.icc,
+        // Final price
+        pvt: r.pvt,
+        ubt: r.ubt,
+        mct: r.mct,
+        // Legacy / derived
+        requiredTariffUsd: r.requiredTariffUsd,
+        requiredTariffMxn: r.requiredTariffMxn,
+        productionCostUsd: r.productionCostUsd,
+        tariffPerLoadedMile: r.tariffPerLoadedMile,
+        fxRateUsed: r.fxRateUsed,
       },
     })
 
@@ -125,7 +135,6 @@ export async function quotesRoutes(app: FastifyInstance) {
     const { id } = request.params as { id: string }
     const quote = await prisma.quote.findFirstOrThrow({ where: { id, orgId } })
 
-    // Re-run engine using the same lane but active set + latest market
     const lane = await prisma.lane.findFirstOrThrow({ where: { id: quote.laneId } })
     const assumptionSet = await getActiveSet(orgId)
     if (!assumptionSet) throw Object.assign(new Error('No active assumption set'), { statusCode: 422 })
@@ -143,7 +152,7 @@ export async function quotesRoutes(app: FastifyInstance) {
     const params = buildParamMap(assumptionSet.params)
     const market = {
       dieselMxMxnL: dieselMxEntry?.value ?? 28,
-      dieselUsUsdL: dieselUsEntry?.value ?? 1.49,
+      dieselUsUsdL: dieselUsEntry?.value ?? 0.95,
       fxRate: fxEntry?.value ?? 17.5,
     }
 
