@@ -17,11 +17,14 @@ export function calculateCfu(input: CfuInput): CfuBreakdown {
 
   const fleetSize = getParam(params, 'GENERAL_BASE', 'Tamaño de Flota', 50)
   const operativity = getParam(params, 'GENERAL_BASE', 'Índice de Operatividad', 0.9)
+  const operators = getParam(params, 'GENERAL_BASE', 'Operadores', 52)
   const avgKmPerOperator = getParam(params, 'GENERAL_BASE', 'Kilómetros promedio x operador', 22000)
-  const truckUtilizationDays = getParam(params, 'UTILIZATION', 'Truck Utilization Days', 23)
+  const operatingDays = getParam(params, 'GENERAL_BASE', 'Periodo de Operación', 26)
 
-  const monthlyFleetKm = round4(fleetSize * operativity * avgKmPerOperator)
-  const productiveTruckDays = round4(fleetSize * operativity * truckUtilizationDays)
+  // Sheet formula: Operadores × km/operator (productivity basis)
+  const monthlyFleetKm = round4(operators * avgKmPerOperator)
+  // Sheet formula: fleetSize × operativity × Periodo de Operación (asset availability basis)
+  const productiveTruckDays = round4(fleetSize * operativity * operatingDays)
 
   const tandemCfuFactor = isTandem ? getParam(params, 'CONFIG', 'Tandem CFU Factor', 1.2) : 1
 

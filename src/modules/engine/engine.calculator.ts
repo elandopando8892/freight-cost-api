@@ -6,10 +6,6 @@ import { calculateCfu } from './engine.cfu.js'
 import { calculateRisk } from './engine.risk.js'
 import type { EngineInput, EngineOutput } from './engine.types.js'
 
-// Monthly fixed cost per truck in USD — derived from fleet overhead assumptions
-// In a full implementation this would be seeded as an assumption param
-const MONTHLY_FIXED_COST_PER_TRUCK_USD = 2800
-
 export function calculate(input: EngineInput): EngineOutput {
   const { lane, equipment, market } = input
   // Merge base params with any overrides
@@ -30,16 +26,20 @@ export function calculate(input: EngineInput): EngineOutput {
   const avgSpeedKmH = 65
   const loadTime = getParam(params, 'UTILIZATION', 'Load Time', 2)
   const unloadTime = getParam(params, 'UTILIZATION', 'Unload Time', 2)
-  const borderFrictionDays = lane.isD2D
+
+  // Detect D2D from either the flag or the operationType name
+  const isD2D = lane.isD2D || ['D2D Export', 'D2D Import'].includes(lane.operationType)
+  const borderFrictionDays = isD2D
     ? getParam(params, 'BORDER', 'Border Friction Time', 0.75)
     : 0
 
   const driveHours = totalKm / avgSpeedKmH
   const cycleDays = round4((driveHours + loadTime + unloadTime) / 24 + borderFrictionDays)
 
-  // ── Config flags ──────────────────────────────────────────────────────
+  // ── Config flags & fleet fixed cost ──────────────────────────────────
   const isTandem = equipment.config === 'Tandem'
-  const monthlyFixedCostUsd = MONTHLY_FIXED_COST_PER_TRUCK_USD
+  // Total monthly fleet fixed cost (insurance + payroll + capital + crossborder infra)
+  const monthlyFixedCostUsd = getParam(params, 'FINANCE', 'Monthly Fixed Cost', 381384)
 
   // ── CVU ───────────────────────────────────────────────────────────────
   const cvu = calculateCvu({
@@ -51,6 +51,7 @@ export function calculate(input: EngineInput): EngineOutput {
     equipment,
     market,
     isTandem,
+    isD2D,
   })
 
   // ── CFU ───────────────────────────────────────────────────────────────
@@ -73,7 +74,8 @@ export function calculate(input: EngineInput): EngineOutput {
   // ── Risk ──────────────────────────────────────────────────────────────
   const risk = calculateRisk({
     technicalTariffUsd,
-    mxLinehaulUsd: cvu.fuelUsd + cvu.driverUsd,  // proxy for MX linehaul exposure
+    // MX linehaul = fuel + driver + maint (excludes border and route buffer)
+    mxLinehaulUsd: cvu.fuelUsd + cvu.driverUsd + cvu.maintTiresUsd,
     params,
     trailerType: equipment.trailerType,
     config: equipment.config,

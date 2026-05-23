@@ -27,24 +27,32 @@ export const DEFAULT_ASSUMPTIONS = [
   { section: 'LABOR', field: 'Hazmat Driver Premium',   value: 0.35, unit: '% labor uplift', low: 0.05, high: 0.2, updateFrequency: 'Quarterly', costBehavior: 'Labor premium', activation: 'By Shipment' },
 
   // ── FINANCE ──────────────────────────────────────────────────────────
-  { section: 'FINANCE', field: 'Tipo de Cambio',            value: 17.5, unit: 'MXN/USD',    low: 0,    high: 0,    updateFrequency: 'Weekly',    costBehavior: 'Currency conversion', activation: 'Always' },
-  { section: 'FINANCE', field: 'Cost of Capital MX',        value: 0.14, unit: 'annual rate', low: 0.12, high: 0.18, updateFrequency: 'Monthly',   costBehavior: 'Finance cost',        activation: 'By Country' },
-  { section: 'FINANCE', field: 'Cost of Capital US',        value: 0.1,  unit: 'annual rate', low: 0.08, high: 0.14, updateFrequency: 'Monthly',   costBehavior: 'Finance cost',        activation: 'By Country' },
-  { section: 'FINANCE', field: 'Carrier Payment Days',      value: 14,   unit: 'days',        low: 7,    high: 30,   updateFrequency: 'Monthly',   costBehavior: 'AP timing',           activation: 'By Customer' },
-  { section: 'FINANCE', field: 'Customer Collection Days',  value: 30,   unit: 'days',        low: 21,   high: 60,   updateFrequency: 'Monthly',   costBehavior: 'AR timing',           activation: 'By Customer' },
-  { section: 'FINANCE', field: 'Inflation Buffer',          value: 0.04, unit: 'annual rate', low: 0.02, high: 0.08, updateFrequency: 'Quarterly', costBehavior: 'Cost escalation',     activation: 'Always' },
+  { section: 'FINANCE', field: 'Tipo de Cambio',            value: 17.5,   unit: 'MXN/USD',    low: 0,    high: 0,    updateFrequency: 'Weekly',    costBehavior: 'Currency conversion', activation: 'Always' },
+  { section: 'FINANCE', field: 'Cost of Capital MX',        value: 0.14,   unit: 'annual rate', low: 0.12, high: 0.18, updateFrequency: 'Monthly',   costBehavior: 'Finance cost',        activation: 'By Country' },
+  { section: 'FINANCE', field: 'Cost of Capital US',        value: 0.1,    unit: 'annual rate', low: 0.08, high: 0.14, updateFrequency: 'Monthly',   costBehavior: 'Finance cost',        activation: 'By Country' },
+  { section: 'FINANCE', field: 'Carrier Payment Days',      value: 14,     unit: 'days',        low: 7,    high: 30,   updateFrequency: 'Monthly',   costBehavior: 'AP timing',           activation: 'By Customer' },
+  { section: 'FINANCE', field: 'Customer Collection Days',  value: 30,     unit: 'days',        low: 21,   high: 60,   updateFrequency: 'Monthly',   costBehavior: 'AR timing',           activation: 'By Customer' },
+  { section: 'FINANCE', field: 'Inflation Buffer',          value: 0.04,   unit: 'annual rate', low: 0.02, high: 0.08, updateFrequency: 'Quarterly', costBehavior: 'Cost escalation',     activation: 'Always' },
+  // Monthly fleet fixed cost: insurance ($50k) + admin payroll w/burden ($33.4k) + company expenses ($15.5k)
+  // + equipment capital/depreciation ($242.7k) + crossborder compliance ($28.4k) + infrastructure ($9.95k)
+  { section: 'FINANCE', field: 'Monthly Fixed Cost',        value: 381384, unit: 'USD/month',   low: 250000, high: 600000, updateFrequency: 'Quarterly', costBehavior: 'Fixed cost allocation', activation: 'Always' },
 
   // ── UTILIZATION ──────────────────────────────────────────────────────
-  { section: 'UTILIZATION', field: 'Deadhead Base',       value: 0.15, unit: '% loaded miles',         low: 0.08, high: 0.3,  updateFrequency: 'Monthly',   costBehavior: 'Empty repositioning', activation: 'By Lane' },
-  { section: 'UTILIZATION', field: 'Trailer Utilization', value: 0.85, unit: 'ratio',                  low: 0.75, high: 0.95, updateFrequency: 'Monthly',   costBehavior: 'Trailer productivity', activation: 'By Equipment' },
-  { section: 'UTILIZATION', field: 'Truck Utilization Days', value: 23, unit: 'productive days/month', low: 18,   high: 26,   updateFrequency: 'Monthly',   costBehavior: 'Asset utilization',    activation: 'Always' },
-  { section: 'UTILIZATION', field: 'Load Time',           value: 2,    unit: 'hours',                  low: 1,    high: 6,    updateFrequency: 'Quarterly', costBehavior: 'Operational cycle',   activation: 'By Shipment' },
-  { section: 'UTILIZATION', field: 'Unload Time',         value: 2,    unit: 'hours',                  low: 1,    high: 6,    updateFrequency: 'Quarterly', costBehavior: 'Operational cycle',   activation: 'By Shipment' },
-  { section: 'UTILIZATION', field: 'Free Time',           value: 2,    unit: 'hours/event',            low: 1,    high: 4,    updateFrequency: 'Quarterly', costBehavior: 'Detention threshold', activation: 'By Contract' },
-  { section: 'UTILIZATION', field: 'Detention Rate',      value: 85,   unit: 'USD/hour',               low: 60,   high: 125,  updateFrequency: 'Quarterly', costBehavior: 'Delay pricing',       activation: 'By Contract' },
+  { section: 'UTILIZATION', field: 'Deadhead Base',            value: 0.15, unit: '% loaded miles',         low: 0.08, high: 0.3,  updateFrequency: 'Monthly',   costBehavior: 'Empty repositioning',  activation: 'By Lane' },
+  { section: 'UTILIZATION', field: 'Trailer Utilization',      value: 0.85, unit: 'ratio',                  low: 0.75, high: 0.95, updateFrequency: 'Monthly',   costBehavior: 'Trailer productivity', activation: 'By Equipment' },
+  { section: 'UTILIZATION', field: 'Truck Utilization Days',   value: 23,   unit: 'productive days/month',  low: 18,   high: 26,   updateFrequency: 'Monthly',   costBehavior: 'Asset utilization',    activation: 'Always' },
+  { section: 'UTILIZATION', field: 'Load Time',                value: 2,    unit: 'hours',                  low: 1,    high: 6,    updateFrequency: 'Quarterly', costBehavior: 'Operational cycle',   activation: 'By Shipment' },
+  { section: 'UTILIZATION', field: 'Unload Time',              value: 2,    unit: 'hours',                  low: 1,    high: 6,    updateFrequency: 'Quarterly', costBehavior: 'Operational cycle',   activation: 'By Shipment' },
+  { section: 'UTILIZATION', field: 'Free Time',                value: 2,    unit: 'hours/event',            low: 1,    high: 4,    updateFrequency: 'Quarterly', costBehavior: 'Detention threshold', activation: 'By Contract' },
+  { section: 'UTILIZATION', field: 'Detention Rate',           value: 85,   unit: 'USD/hour',               low: 60,   high: 125,  updateFrequency: 'Quarterly', costBehavior: 'Delay pricing',       activation: 'By Contract' },
+  // Maint+Tires: PM 10k/100k/250k ($0.10/km) + reserves DEF/DPF/PM-unsched/lubs ($0.08/km) + tires ($0.05/km)
+  { section: 'UTILIZATION', field: 'Maint and Tires Rate per KM', value: 0.23, unit: 'USD/km',            low: 0.15, high: 0.35, updateFrequency: 'Quarterly', costBehavior: 'Maintenance + tires',  activation: 'By Equipment' },
 
   // ── BORDER ───────────────────────────────────────────────────────────
-  { section: 'BORDER', field: 'Border Friction Time', value: 0.75, unit: 'days/trip', low: 0.25, high: 2, updateFrequency: 'Monthly', costBehavior: 'Cross-border delay', activation: 'By Border' },
+  { section: 'BORDER', field: 'Border Friction Time',       value: 0.75, unit: 'days/trip',  low: 0.25, high: 2,    updateFrequency: 'Monthly',   costBehavior: 'Cross-border delay',    activation: 'By Border' },
+  // Transactional: Border Crossing Fee $175 + ACE/eManifest $25 + Yard Transfer $150 = $350/trip
+  { section: 'BORDER', field: 'Border Transactional Cost',  value: 350,  unit: 'USD/trip',   low: 200,  high: 600,  updateFrequency: 'Monthly',   costBehavior: 'Per-trip border cost',  activation: 'By Border' },
+  { section: 'BORDER', field: 'Inspection Delay Reserve',   value: 0.02, unit: '% linehaul', low: 0,    high: 0.08, updateFrequency: 'Monthly',   costBehavior: 'Inspection risk',       activation: 'By Border' },
 
   // ── RISK ─────────────────────────────────────────────────────────────
   { section: 'RISK', field: 'MX Security Risk Reserve',  value: 0.03, unit: '% MX linehaul', low: 0,    high: 0.08, updateFrequency: 'Monthly',    costBehavior: 'Risk reserve',     activation: 'By Lane' },

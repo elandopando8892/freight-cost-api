@@ -13,10 +13,11 @@ interface CvuInput {
   equipment: EquipmentConfig
   market: MarketSnapshot
   isTandem: boolean
+  isD2D: boolean
 }
 
 export function calculateCvu(input: CvuInput): CvuBreakdown {
-  const { loadedKm, emptyKm, cycleDays, baseMxKm, params, equipment, market, isTandem } = input
+  const { loadedKm, emptyKm, cycleDays, baseMxKm, params, equipment, market, isTandem, isD2D } = input
   const totalKm = loadedKm + emptyKm
   const loadedMiles = kmToMiles(loadedKm)
   const fxRate = market.fxRate
@@ -54,16 +55,20 @@ export function calculateCvu(input: CvuInput): CvuBreakdown {
   const driverUsd = round4(variableDriverUsd + fixedDriverUsd)
 
   // ── Maintenance & Tires ───────────────────────────────────────────────
-  // maintRatePerKm is embedded as a fixed assumption; here we derive from monthly fixed cost proxy
-  // Using a standard 0.04 USD/km rate scaled by equipment factor
-  const maintRatePerKm = 0.04
+  // Sheet breakdown: PM 10k/100k/250k ($0.10/km) + DEF/DPF/reserves ($0.08/km) + tires ($0.05/km) = $0.23/km
+  const maintRatePerKm = getParam(params, 'UTILIZATION', 'Maint and Tires Rate per KM', 0.23)
   const tandemMaintFactor = isTandem ? getParam(params, 'CONFIG', 'Tandem Maint/Tires Factor', 1.35) : 1
   const maintTiresUsd = round4(totalKm * maintRatePerKm * equipment.maintTiresFactor * tandemMaintFactor)
 
   // ── Border ────────────────────────────────────────────────────────────
-  const borderFrictionDays = getParam(params, 'BORDER', 'Border Friction Time', 0.75)
-  const borderDailyCostUsd = 150  // standard border processing cost
-  const borderUsd = round4(borderFrictionDays * borderDailyCostUsd)
+  // For D2D lanes: transactional cost per crossing (Border Crossing Fee + ACE + Yard = $350)
+  // Border Friction Time only affects cycle days (→ CFU time-based), not a direct per-trip cost
+  const borderTransactionalCost = getParam(params, 'BORDER', 'Border Transactional Cost', 350)
+  const inspectionReserve = getParam(params, 'BORDER', 'Inspection Delay Reserve', 0.02)
+  const mxLinehaulForBorder = fuelUsd + driverUsd
+  const borderUsd = isD2D
+    ? round4(borderTransactionalCost + mxLinehaulForBorder * inspectionReserve)
+    : 0
 
   // ── Route buffer ──────────────────────────────────────────────────────
   const gastoAdicional = getParam(params, 'GENERAL_BASE', 'Gasto Adicional sobre Ruta', 0.05)
