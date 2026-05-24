@@ -3,9 +3,11 @@
 export const DEFAULT_ASSUMPTIONS = [
   // ── GENERAL_BASE ──────────────────────────────────────────────────────
   { section: 'GENERAL_BASE', field: 'Rendimiento',             value: 3,        unit: 'km/L',            low: 2.5,   high: 3.5,   updateFrequency: 'Quarterly', costBehavior: 'Fuel efficiency (km per liter)',    activation: 'Always' },
-  { section: 'GENERAL_BASE', field: 'CBVR Rate per KM',        value: 0.6676,   unit: 'USD/km',          low: 0.55,  high: 0.85,  updateFrequency: 'Monthly',   costBehavior: 'Variable route cost per km',        activation: 'Always' },
+  // CVU Base per KM = mxCVUTotal (d2dCostCards B64): sum of all variable cost items per km.
+  // MEX CBVR rate effective = CVU − tarifaUS + tarifaMX = 0.9176 − 0.4 + 0.15 = 0.6676; also the USA haulage rate per mile.
+  { section: 'GENERAL_BASE', field: 'CVU Base per KM',         value: 0.9176159091, unit: 'USD/km',      low: 0.75,  high: 1.20,  updateFrequency: 'Monthly',   costBehavior: 'Variable cost base per km/mile',    activation: 'Always' },
   { section: 'GENERAL_BASE', field: 'UT Per Trip',             value: 80,       unit: 'USD/trip',        low: 60,    high: 110,   updateFrequency: 'Quarterly', costBehavior: 'Per-trip overhead (Utilidad Det.)',  activation: 'Always' },
-  { section: 'GENERAL_BASE', field: 'Gasto Adicional sobre Ruta', value: 0.05,  unit: '% route expenses', low: 0,    high: 0.1,   updateFrequency: 'Quarterly', costBehavior: 'Operational contingency',           activation: 'Always' },
+  { section: 'GENERAL_BASE', field: 'Gasto Adicional sobre Ruta', value: 0,     unit: 'USD/trip',        low: 0,     high: 200,   updateFrequency: 'Quarterly', costBehavior: 'CAGV add-on for long routes',       activation: 'Always' },
   { section: 'GENERAL_BASE', field: 'Periodo de Operación',    value: 26,       unit: 'days/month',      low: 24,    high: 28,    updateFrequency: 'Semiannual', costBehavior: 'Fixed cost allocation',            activation: 'Always' },
   { section: 'GENERAL_BASE', field: 'Tamaño de Flota',         value: 50,       unit: 'tractors',        low: 25,    high: 100,   updateFrequency: 'Semiannual', costBehavior: 'Scale allocation',                 activation: 'Always' },
   { section: 'GENERAL_BASE', field: 'Índice de Operatividad',  value: 0.9,      unit: 'ratio',           low: 0.85,  high: 0.93,  updateFrequency: 'Monthly',   costBehavior: 'Fleet utilization',                activation: 'Always' },
@@ -23,9 +25,9 @@ export const DEFAULT_ASSUMPTIONS = [
   { section: 'FUEL', field: 'Fuel Escalation Buffer', value: 0.05,  unit: '% fuel cost', low: 0,    high: 0.15, updateFrequency: 'Monthly',   costBehavior: 'Fuel volatility reserve',         activation: 'By Market' },
 
   // ── LABOR ─────────────────────────────────────────────────────────────
-  { section: 'LABOR', field: 'Sueldo Base Operador MX', value: 500,  unit: 'MXN/day',     low: 350,  high: 650,  updateFrequency: 'Quarterly', costBehavior: 'Fixed labor',    activation: 'By Country' },
-  { section: 'LABOR', field: 'Tarifa Operador MX',      value: 0.18, unit: 'USD/mile',    low: 0.15, high: 0.22, updateFrequency: 'Quarterly', costBehavior: 'Variable labor', activation: 'By Country' },
-  { section: 'LABOR', field: 'Tarifa Operador US',      value: 0.6,  unit: 'USD/mile',    low: 0.55, high: 0.7,  updateFrequency: 'Quarterly', costBehavior: 'Variable labor', activation: 'By Country' },
+  { section: 'LABOR', field: 'Sueldo Base Operador MX', value: 350,  unit: 'MXN/day',     low: 300,  high: 650,  updateFrequency: 'Quarterly', costBehavior: 'Fixed labor',    activation: 'By Country' },
+  { section: 'LABOR', field: 'Tarifa Operador MX',      value: 0.15, unit: 'USD/mile',    low: 0.12, high: 0.22, updateFrequency: 'Quarterly', costBehavior: 'Variable labor (CBVR + deadhead)', activation: 'By Country' },
+  { section: 'LABOR', field: 'Tarifa Operador US',      value: 0.4,  unit: 'USD/mile',    low: 0.35, high: 0.7,  updateFrequency: 'Quarterly', costBehavior: 'Variable labor (deadhead fees)',  activation: 'By Country' },
   { section: 'LABOR', field: 'Carga Social',            value: 0.3,  unit: '% payroll',   low: 0.25, high: 0.35, updateFrequency: 'Annual',    costBehavior: 'Payroll burden', activation: 'By Country' },
   { section: 'LABOR', field: 'Viáticos MX',             value: 350,  unit: 'MXN/day',     low: 250,  high: 500,  updateFrequency: 'Quarterly', costBehavior: 'Driver travel cost', activation: 'By Country' },
   { section: 'LABOR', field: 'Team Driver Premium',     value: 0.35, unit: '% labor uplift', low: 0.25, high: 0.5, updateFrequency: 'Quarterly', costBehavior: 'Labor premium', activation: 'By Shipment' },
@@ -84,9 +86,11 @@ export const DEFAULT_ASSUMPTIONS = [
   { section: 'TECHNICAL_MARGIN', field: 'Tier KM 2 Margin', value: 0.35,  unit: 'ratio', low: 0.20, high: 0.55, updateFrequency: 'Annual', costBehavior: 'Margin % for mid-range routes',   activation: 'Always' },
   { section: 'TECHNICAL_MARGIN', field: 'Tier KM 3 Max',    value: 1501,  unit: 'km', low: 0, high: 0, updateFrequency: 'Annual', costBehavior: 'Upper bound for Tier 3 (≤1501 km)', activation: 'Always' },
   { section: 'TECHNICAL_MARGIN', field: 'Tier KM 3 Margin', value: 0.30,  unit: 'ratio', low: 0.15, high: 0.50, updateFrequency: 'Annual', costBehavior: 'Margin % for long routes',        activation: 'Always' },
-  { section: 'TECHNICAL_MARGIN', field: 'Tier KM 4 Max',    value: 2001,  unit: 'km', low: 0, high: 0, updateFrequency: 'Annual', costBehavior: 'Upper bound for Tier 4 (≤2001 km)', activation: 'Always' },
+  { section: 'TECHNICAL_MARGIN', field: 'Tier KM 4 Max',    value: 2001,  unit: 'km', low: 0, high: 0, updateFrequency: 'Annual', costBehavior: 'Upper bound for Tier 4 (<2001 km)', activation: 'Always' },
   { section: 'TECHNICAL_MARGIN', field: 'Tier KM 4 Margin', value: 0.25,  unit: 'ratio', low: 0.10, high: 0.45, updateFrequency: 'Annual', costBehavior: 'Margin % for extra-long routes',  activation: 'Always' },
-  { section: 'TECHNICAL_MARGIN', field: 'Tier KM 5 Margin', value: 0.20,  unit: 'ratio', low: 0.10, high: 0.40, updateFrequency: 'Annual', costBehavior: 'Margin % for transcontinental',   activation: 'Always' },
+  { section: 'TECHNICAL_MARGIN', field: 'Tier KM 5 Max',    value: 3001,  unit: 'km', low: 0, high: 0, updateFrequency: 'Annual', costBehavior: 'Upper bound for Tier 5 (<3001 km)', activation: 'Always' },
+  { section: 'TECHNICAL_MARGIN', field: 'Tier KM 5 Margin', value: 0.20,  unit: 'ratio', low: 0.10, high: 0.40, updateFrequency: 'Annual', costBehavior: 'Margin % for long-haul routes',   activation: 'Always' },
+  { section: 'TECHNICAL_MARGIN', field: 'Tier KM 6 Margin', value: 0.15,  unit: 'ratio', low: 0.10, high: 0.35, updateFrequency: 'Annual', costBehavior: 'Margin % for transcontinental (≥3001 km)', activation: 'Always' },
 
   // ── FACTORS — multiplier table from d2dFactors sheet ─────────────────
   // Trailer type factors
@@ -114,6 +118,19 @@ export const DEFAULT_ASSUMPTIONS = [
   { section: 'FACTORS', field: 'Config Factor Single', value: 1.00, unit: 'factor', low: 0, high: 0, updateFrequency: 'Annual', costBehavior: 'Config ICEM multiplier', activation: 'By Equipment' },
   { section: 'FACTORS', field: 'Config Factor Tandem', value: 1.30, unit: 'factor', low: 0, high: 0, updateFrequency: 'Annual', costBehavior: 'Config ICEM multiplier', activation: 'By Equipment' },
   // Driver type factors
-  { section: 'FACTORS', field: 'Driver Factor B1',         value: 1.00, unit: 'factor', low: 0, high: 0, updateFrequency: 'Annual', costBehavior: 'Driver ICEM multiplier', activation: 'By Equipment' },
-  { section: 'FACTORS', field: 'Driver Factor Licencia E', value: 1.25, unit: 'factor', low: 0, high: 0, updateFrequency: 'Annual', costBehavior: 'Driver ICEM multiplier', activation: 'By Equipment' },
+  { section: 'FACTORS', field: 'Driver Factor B1',         value: 1.00, unit: 'factor', low: 0, high: 0, updateFrequency: 'Annual', costBehavior: 'Driver EAEO multiplier', activation: 'By Equipment' },
+  { section: 'FACTORS', field: 'Driver Factor Licencia E', value: 1.25, unit: 'factor', low: 0, high: 0, updateFrequency: 'Annual', costBehavior: 'Driver EAEO multiplier', activation: 'By Equipment' },
+  // Performance factor = km/L by truck type (PERFORMANCE FACTOR in d2dFactors)
+  { section: 'FACTORS', field: 'Perf Factor Truck Trailer', value: 3,    unit: 'km/L', low: 0, high: 0, updateFrequency: 'Annual', costBehavior: 'Fuel efficiency by truck type', activation: 'By Equipment' },
+  { section: 'FACTORS', field: 'Perf Factor Thorton',       value: 4,    unit: 'km/L', low: 0, high: 0, updateFrequency: 'Annual', costBehavior: 'Fuel efficiency by truck type', activation: 'By Equipment' },
+  { section: 'FACTORS', field: 'Perf Factor Rabon',         value: 5,    unit: 'km/L', low: 0, high: 0, updateFrequency: 'Annual', costBehavior: 'Fuel efficiency by truck type', activation: 'By Equipment' },
+  { section: 'FACTORS', field: 'Perf Factor 3.5 tons',      value: 10,   unit: 'km/L', low: 0, high: 0, updateFrequency: 'Annual', costBehavior: 'Fuel efficiency by truck type', activation: 'By Equipment' },
+  { section: 'FACTORS', field: 'Perf Factor 1.5 tons',      value: 12.5, unit: 'km/L', low: 0, high: 0, updateFrequency: 'Annual', costBehavior: 'Fuel efficiency by truck type', activation: 'By Equipment' },
+  // Lane factor = route geometry/danger (LANE FACTOR in d2dFactors) — multiplies CBVR via EAFR
+  { section: 'FACTORS', field: 'Lane Factor Straight', value: 1.00, unit: 'factor', low: 0, high: 0, updateFrequency: 'Annual', costBehavior: 'Route geometry EAFR multiplier', activation: 'By Lane' },
+  { section: 'FACTORS', field: 'Lane Factor Mixed',    value: 1.25, unit: 'factor', low: 0, high: 0, updateFrequency: 'Annual', costBehavior: 'Route geometry EAFR multiplier', activation: 'By Lane' },
+  { section: 'FACTORS', field: 'Lane Factor Curvy',    value: 1.50, unit: 'factor', low: 0, high: 0, updateFrequency: 'Annual', costBehavior: 'Route geometry EAFR multiplier', activation: 'By Lane' },
+
+  // ── BORDER ───────────────────────────────────────────────────────────
+  { section: 'BORDER', field: 'Border Crossing Fee', value: 150, unit: 'USD/trip', low: 0, high: 350, updateFrequency: 'Quarterly', costBehavior: 'Cross-border transfer fee', activation: 'By Border' },
 ] as const

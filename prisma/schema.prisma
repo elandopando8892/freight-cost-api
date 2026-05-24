@@ -213,69 +213,38 @@ model Lane {
 model Quote {
   id              String      @id @default(cuid())
   orgId           String
-  laneId          String
-  assumptionSetId String
+  laneId          String?
+  assumptionSetId String?
   label           String?
   version         Int         @default(1)
   status          QuoteStatus @default(DRAFT)
   createdAt       DateTime    @default(now())
 
-  // ── Distances & timing ───────────────────────────────────────────────
-  totalKms    Float
-  loadedMiles Float
-  litros      Float
-  transitHrs  Float
-  fracTransit Float
-  fracWait    Float
-  fracViaje   Float
+  // ── Routing context ──────────────────────────────────────────────────
+  operationType String
+  serviceType   String
 
-  // ── CBTT base cost ───────────────────────────────────────────────────
-  cbfa Float
-  cbvr Float
-  ut   Float
-  cbtt Float
+  // ── Cross-border assembly (quickRate) ────────────────────────────────
+  freightPrice    Float     // PVT_mex + FreightSale_usa
+  borderFee       Float
+  crossborderRate Float     // freightPrice + borderFee
+  cogs            Float     // CVT_mex + FreightCost_usa + borderFee
+  grossProfit     Float
+  grossMargin     Float
+  marketRefPrice  Float     // PVT_mex + MarketRate_usa (DAT)
+  totalMiles      Float
 
-  // ── ITA trip additions ───────────────────────────────────────────────
-  cagr Float
-  cagv Float
-  ita  Float
+  // ── Derived / aliases ────────────────────────────────────────────────
+  requiredTariffUsd Float
+  requiredTariffMxn Float
+  productionCostUsd Float
+  fxRateUsed        Float
 
-  // ── Production cost ──────────────────────────────────────────────────
-  cit Float
+  // ── Full per-leg breakdowns ──────────────────────────────────────────
+  mexLeg Json?
+  usaLeg Json?
 
-  // ── Margin & base tariff ─────────────────────────────────────────────
-  margenPct     Float
-  margenContrib Float
-  tbt           Float
-
-  // ── Market effects (ICEM) ────────────────────────────────────────────
-  trailerFactor   Float
-  emtr            Float
-  operationFactor Float
-  emto            Float
-  configFactor    Float
-  eact            Float
-  driverFactor    Float
-  eaeo            Float
-  icem            Float
-  serviceFactor   Float
-
-  // ── Fuel ─────────────────────────────────────────────────────────────
-  icc Float
-
-  // ── Final price ──────────────────────────────────────────────────────
-  pvt Float
-  ubt Float
-  mct Float
-
-  // ── Legacy / derived ─────────────────────────────────────────────────
-  requiredTariffUsd   Float
-  requiredTariffMxn   Float
-  productionCostUsd   Float
-  tariffPerLoadedMile Float
-  fxRateUsed          Float
-
-  org  Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  lane Lane          @relation(fields: [laneId], references: [id])
-  set  AssumptionSet @relation(fields: [assumptionSetId], references: [id])
+  org  Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  lane Lane?          @relation(fields: [laneId], references: [id])
+  set  AssumptionSet? @relation(fields: [assumptionSetId], references: [id])
 }

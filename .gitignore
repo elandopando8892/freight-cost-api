@@ -1,6 +1,11 @@
 node_modules/
 dist/
+dist-api/
 .env
 *.env.local
 prisma/migrations/*.sql
+prisma/*.db
+prisma/*.db-journal
 .DS_Store
+
+.vercel

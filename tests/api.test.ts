@@ -378,67 +378,80 @@ describe('Lanes', () => {
 // ENGINE CALCULATE (HTTP layer)
 // ─────────────────────────────────────────────────────────────────────────────
 describe('Engine /calculate', () => {
-  it('POST /engine/calculate → 200 with full cost breakdown', async () => {
+  const crossborderPayload = {
+    operationType: 'D2D Export',
+    serviceType: 'One Way',
+    equipment: { truckType: 'Truck Trailer', trailerType: 'Flatbed', config: 'Single', driverType: 'B1' },
+    market: { fxRate: 1, dieselUsUsdL: 0.95 },
+    mexLane: { km: 225, transitHrs: 4, driverExpenses: 142.8571, routeType: 'Straight & Danger' },
+    usaLane: {
+      miles: 435, routeExpenses: 0, marketRpm: 2.33,
+      outboundCondition: 'Moderately Tight', fscOriginUsdMile: 0.41, fscDestUsdMile: 0.41,
+    },
+    borderCrossing: true,
+  }
+
+  it('POST /engine/calculate → 200 with two-leg breakdown', async () => {
     const res = await app.inject({
       method: 'POST',
       url: '/engine/calculate',
       headers: { authorization: `Bearer ${token}` },
-      payload: { laneId: 'lane-1' },
+      payload: crossborderPayload,
     })
     expect(res.statusCode).toBe(200)
     const body = res.json()
-
-    // Verify structure
-    expect(body.requiredTariffUsd).toBeGreaterThan(0)
-    expect(body.requiredTariffMxn).toBeGreaterThan(0)
-    expect(body.technicalTariffUsd).toBeGreaterThan(0)
-    expect(body.productionCostUsd).toBeGreaterThan(0)
-    expect(body.cvu).toBeDefined()
-    expect(body.cfu).toBeDefined()
-    expect(body.risk).toBeDefined()
-    expect(body.tariffPerLoadedMile).toBeGreaterThan(0)
-    expect(body.carrierMargin).toBeGreaterThan(0)
+    expect(body.mexLeg.pvt).toBeCloseTo(595.02, 0)
+    expect(body.usaLeg.freightSale).toBeCloseTo(979.01, 0)
+    expect(body.freightPrice).toBeCloseTo(1574.03, 0)
+    expect(body.crossborderRate).toBeCloseTo(1724.03, 0)
+    expect(body.requiredTariffUsd).toBe(body.crossborderRate)
   })
 
-  it('POST /engine/calculate uses default assumptions when none active', async () => {
+  it('POST /engine/calculate MX-only lane runs only MEX leg', async () => {
     const res = await app.inject({
       method: 'POST',
       url: '/engine/calculate',
       headers: { authorization: `Bearer ${token}` },
-      payload: { laneId: 'lane-1' },
+      payload: {
+        operationType: 'Intra-Mex',
+        equipment: { trailerType: 'Dry Van' },
+        market: { fxRate: 1, dieselUsUsdL: 0.95 },
+        mexLane: { km: 300, transitHrs: 6, driverExpenses: 214.2857 },
+      },
     })
-    // Uses fallback diesel/FX defaults, still produces valid output
     expect(res.statusCode).toBe(200)
-    expect(res.json().fxRateUsed).toBe(17.5)  // default FX
-  })
-
-  it('POST /engine/calculate with overrides changes tariff', async () => {
-    const base = await app.inject({
-      method: 'POST',
-      url: '/engine/calculate',
-      headers: { authorization: `Bearer ${token}` },
-      payload: { laneId: 'lane-1' },
-    })
-    // Not testing overrides at route level here (they go to engine directly)
-    expect(base.statusCode).toBe(200)
+    const body = res.json()
+    expect(body.mexLeg).not.toBeNull()
+    expect(body.usaLeg).toBeNull()
+    expect(body.borderFee).toBe(0)
   })
 
   it('POST /engine/calculate without token → 401', async () => {
     const res = await app.inject({
       method: 'POST',
       url: '/engine/calculate',
-      payload: { laneId: 'lane-1' },
+      payload: crossborderPayload,
     })
     expect(res.statusCode).toBe(401)
   })
 
-  it('POST /engine/calculate missing laneId → 400', async () => {
+  it('POST /engine/calculate missing operationType → 400', async () => {
     const res = await app.inject({
       method: 'POST',
       url: '/engine/calculate',
       headers: { authorization: `Bearer ${token}` },
-      payload: {},
+      payload: { mexLane: { km: 225, transitHrs: 4 } },
     })
     expect(res.statusCode).toBe(400)
+  })
+
+  it('POST /engine/calculate with no legs → 422', async () => {
+    const res = await app.inject({
+      method: 'POST',
+      url: '/engine/calculate',
+      headers: { authorization: `Bearer ${token}` },
+      payload: { operationType: 'D2D Export' },
+    })
+    expect(res.statusCode).toBe(422)
   })
 })

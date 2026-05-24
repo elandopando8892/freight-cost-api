@@ -1,127 +1,124 @@
 import { describe, it, expect } from 'vitest'
 import { calculate } from '../src/modules/engine/engine.calculator.js'
-import { buildParamMap } from '../src/modules/assumptions/assumptions.service.js'
-import { DEFAULT_ASSUMPTIONS } from '../prisma/seed/assumptions.seed.js'
-import { EQUIPMENT_CATALOG } from '../prisma/seed/equipment.seed.js'
-import type { Lane, EquipmentConfig } from '@prisma/client'
+import { calculateMexLeg } from '../src/modules/engine/engine.mex.js'
+import { calculateUsaLeg } from '../src/modules/engine/engine.usa.js'
+import type { EquipmentSpec, MarketSnapshot } from '../src/modules/engine/engine.types.js'
 
-const params = buildParamMap(
-  DEFAULT_ASSUMPTIONS.map((a) => ({ section: a.section, field: a.field, value: a.value })),
-)
+// Empty param map → engine falls back to the verified spreadsheet defaults.
+const params = {}
+// Spreadsheet base model: FX = 1, US border diesel = 0.95 USD/L
+const market: MarketSnapshot = { fxRate: 1, dieselUsUsdL: 0.95 }
 
-const market = { dieselMxMxnL: 28, dieselUsUsdL: 1.49, fxRate: 17.5 }
+const dryVan: EquipmentSpec = { truckType: 'Truck Trailer', trailerType: 'Dry Van', config: 'Single', driverType: 'B1' }
+const flatbed: EquipmentSpec = { truckType: 'Truck Trailer', trailerType: 'Flatbed', config: 'Single', driverType: 'B1' }
 
-const baseLane: Lane = {
-  id: 'test-lane-1',
-  orgId: 'test-org',
-  laneKey: 'abc123',
-  origin: 'Monterrey, NL',
-  destination: 'Laredo, TX',
-  equipmentId: 'eq-1',
-  operationType: 'D2D Export',
-  serviceType: 'One Way',
-  config: 'Single',
-  isD2D: true,
-  isDrayage: false,
-  isRoundtrip: false,
-  isBackhaul: false,
-  baseKm: 250,
-  returnKm: null,
-  loadedMiles: null,
-  transitDays: null,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-}
-
-const baseEquipment = EQUIPMENT_CATALOG.find(
-  (e) => e.truckType === 'Truck Trailer' && e.trailerType === 'Dry Van' && e.config === 'Single',
-) as EquipmentConfig & { id: string }
-
-const equipment: EquipmentConfig = { id: 'eq-1', dispatchService: null, ...baseEquipment }
-
-describe('Engine Calculator', () => {
-  it('produces a positive required tariff for a basic D2D Export lane', () => {
-    const result = calculate({ lane: baseLane, params, equipment, market })
-    expect(result.requiredTariffUsd).toBeGreaterThan(0)
-    expect(result.cvu.totalCvuUsd).toBeGreaterThan(0)
-    expect(result.cfu.totalCfuUsd).toBeGreaterThan(0)
+describe('MEX leg — d2d_mexRateProduction', () => {
+  it('Mexico DF → Nuevo Laredo, 1120km, Dry Van, D2D Export → PVT 1803.04', () => {
+    const leg = calculateMexLeg(
+      { km: 1120, transitHrs: 27, driverExpenses: 964.2857, routeType: 'Straight & Danger' },
+      dryVan, 'D2D Export', 'One Way', params, market,
+    )
+    expect(leg.cbtt).toBeCloseTo(901.29, 1)
+    expect(leg.cit).toBeCloseTo(997.72, 1)
+    expect(leg.tbt).toBeCloseTo(1268.11, 1)
+    expect(leg.pvt).toBeCloseTo(1803.04, 1)
   })
 
-  it('CVU > 0 and all components are non-negative', () => {
-    const result = calculate({ lane: baseLane, params, equipment, market })
-    expect(result.cvu.fuelUsd).toBeGreaterThan(0)
-    expect(result.cvu.driverUsd).toBeGreaterThan(0)
-    expect(result.cvu.maintTiresUsd).toBeGreaterThan(0)
-    expect(result.cvu.borderUsd).toBeGreaterThan(0)
-    expect(result.cvu.routeBufferUsd).toBeGreaterThan(0)
+  it('MTY → Nuevo Laredo, 225km, Flatbed, D2D Export → PVT 595.02', () => {
+    const leg = calculateMexLeg(
+      { km: 225, transitHrs: 4, driverExpenses: 142.8571, routeType: 'Straight & Danger' },
+      flatbed, 'D2D Export', 'One Way', params, market,
+    )
+    expect(leg.cbfa).toBeCloseTo(49.04, 1)
+    expect(leg.cbvr).toBeCloseTo(150.21, 1)
+    expect(leg.cbtt).toBeCloseTo(279.26, 1)
+    expect(leg.cagv).toBe(0)              // route < 251 km → no travel per-diem
+    expect(leg.margenPct).toBe(0.4)       // route < 501 km
+    expect(leg.emtr).toBeCloseTo(69.81, 1) // Flatbed +25%
+    expect(leg.emto).toBeCloseTo(55.85, 1) // D2D Export +20%
+    expect(leg.pvt).toBeCloseTo(595.02, 1)
   })
 
-  it('technical tariff = production cost × (1 + UT rate)', () => {
-    const result = calculate({ lane: baseLane, params, equipment, market })
-    const utRate = 0.3  // One Way default
-    const expected = result.productionCostUsd * (1 + utRate)
-    expect(result.technicalTariffUsd).toBeCloseTo(expected, 1)
+  it('Aguascalientes → Nuevo Laredo, 787km, Dry Van → PVT 1380.20', () => {
+    const leg = calculateMexLeg(
+      { km: 787, transitHrs: 22, driverExpenses: 785.7142, routeType: 'Straight & Danger' },
+      dryVan, 'D2D Export', 'One Way', params, market,
+    )
+    expect(leg.margenPct).toBe(0.35)      // 501 ≤ km < 1001
+    expect(leg.pvt).toBeCloseTo(1380.2, 0)
+  })
+})
+
+describe('USA leg — d2d_usaRateProduction', () => {
+  it('St Johns → Laredo, 3681mi, Dry Van, D2D Import → FreightSale 4564.41', () => {
+    const leg = calculateUsaLeg(
+      {
+        miles: 3681, routeExpenses: 600, marketRpm: 1.58,
+        outboundCondition: 'Very Loose', fscOriginUsdMile: 0, fscDestUsdMile: 0.41,
+      },
+      dryVan, 'D2D Import', params,
+    )
+    expect(leg.haulage).toBeCloseTo(3377.74, 1)
+    expect(leg.linehaulSale).toBeCloseTo(3884.41, 1)
+    expect(leg.odhFee).toBeCloseTo(80, 1)   // import: ODH from Very Loose DryVan = 200 × 0.4
+    expect(leg.idhFee).toBe(0)              // import → IDH = 0
+    expect(leg.freightSale).toBeCloseTo(4564.41, 1)
   })
 
-  it('required tariff >= technical tariff (risk adds to cost)', () => {
-    const result = calculate({ lane: baseLane, params, equipment, market })
-    expect(result.requiredTariffUsd).toBeGreaterThanOrEqual(result.technicalTariffUsd)
+  it('Laredo → Dallas, 435mi, Flatbed, D2D Export → FreightSale 979.01', () => {
+    const leg = calculateUsaLeg(
+      {
+        miles: 435, routeExpenses: 0, marketRpm: 2.33,
+        outboundCondition: 'Moderately Tight', fscOriginUsdMile: 0.41, fscDestUsdMile: 0.41,
+      },
+      flatbed, 'D2D Export', params,
+    )
+    expect(leg.haulage).toBeCloseTo(399.16, 1)
+    expect(leg.markup).toBe(0.6)            // < 501 mi
+    expect(leg.linehaulSale).toBeCloseTo(638.66, 1)
+    expect(leg.odhFee).toBe(0)             // export → ODH = 0
+    expect(leg.idhFee).toBeCloseTo(162, 1) // Flatbed Moderately Tight = 200 × (0.4+0.41)
+    expect(leg.freightSale).toBeCloseTo(979.01, 1)
+    expect(leg.marketRate).toBeCloseTo(1191.9, 1)
   })
+})
 
-  it('MXN tariff equals USD tariff × FX rate', () => {
-    const result = calculate({ lane: baseLane, params, equipment, market })
-    expect(result.requiredTariffMxn).toBeCloseTo(result.requiredTariffUsd * 17.5, 0)
-  })
-
-  it('tariff per loaded mile is reasonable (between $1 and $15 USD/mi for 250km lane)', () => {
-    const result = calculate({ lane: baseLane, params, equipment, market })
-    expect(result.tariffPerLoadedMile).toBeGreaterThan(1)
-    expect(result.tariffPerLoadedMile).toBeLessThan(15)
-  })
-
-  it('carrier margin is between 0% and 50%', () => {
-    const result = calculate({ lane: baseLane, params, equipment, market })
-    expect(result.carrierMargin).toBeGreaterThan(0)
-    expect(result.carrierMargin).toBeLessThan(0.5)
-  })
-
-  it('backhaul has lower tariff than one-way for same lane', () => {
-    const backhaulLane: Lane = { ...baseLane, serviceType: 'Backhaul', isBackhaul: true }
-    const oneWayResult = calculate({ lane: baseLane, params, equipment, market })
-    const backhaulResult = calculate({ lane: backhaulLane, params, equipment, market })
-    expect(backhaulResult.requiredTariffUsd).toBeLessThan(oneWayResult.requiredTariffUsd)
-  })
-
-  it('tandem config produces higher tariff than single', () => {
-    const tandemEquipment: EquipmentConfig = {
-      ...equipment,
-      config: 'Tandem',
-      fuelEfficiencyFactor: 0.9,
-      fixedCostFactor: 1.2,
-      maintTiresFactor: 1.35,
-    }
-    const tandemLane: Lane = { ...baseLane, config: 'Tandem' }
-    const singleResult = calculate({ lane: baseLane, params, equipment, market })
-    const tandemResult = calculate({ lane: tandemLane, params, equipment: tandemEquipment, market })
-    expect(tandemResult.requiredTariffUsd).toBeGreaterThan(singleResult.requiredTariffUsd)
-  })
-
-  it('overrides change the result predictably (higher diesel → higher tariff)', () => {
-    const result = calculate({ lane: baseLane, params, equipment, market })
-    const resultHighDiesel = calculate({
-      lane: baseLane,
+describe('Cross-border assembly — quickRate', () => {
+  it('MTY → Dallas, Flatbed, D2D Export → CrossborderRate 1724.03', () => {
+    const r = calculate({
+      operationType: 'D2D Export',
+      serviceType: 'One Way',
+      equipment: flatbed,
       params,
-      equipment,
-      market: { ...market, dieselMxMxnL: 35 },
+      market,
+      mexLane: { km: 225, transitHrs: 4, driverExpenses: 142.8571, routeType: 'Straight & Danger' },
+      usaLane: {
+        miles: 435, routeExpenses: 0, marketRpm: 2.33,
+        outboundCondition: 'Moderately Tight', fscOriginUsdMile: 0.41, fscDestUsdMile: 0.41,
+      },
+      borderCrossing: true,
     })
-    expect(resultHighDiesel.requiredTariffUsd).toBeGreaterThan(result.requiredTariffUsd)
+    expect(r.mexLeg?.pvt).toBeCloseTo(595.02, 1)
+    expect(r.usaLeg?.freightSale).toBeCloseTo(979.01, 1)
+    expect(r.freightPrice).toBeCloseTo(1574.03, 1)
+    expect(r.borderFee).toBe(150)
+    expect(r.crossborderRate).toBeCloseTo(1724.03, 1)
+    expect(r.grossMargin).toBeGreaterThan(0)
+    expect(r.grossMargin).toBeLessThan(1)
   })
 
-  it('longer lane has higher absolute tariff', () => {
-    const shortLane: Lane = { ...baseLane, baseKm: 150 }
-    const longLane: Lane = { ...baseLane, baseKm: 1000 }
-    const shortResult = calculate({ lane: shortLane, params, equipment, market })
-    const longResult = calculate({ lane: longLane, params, equipment, market })
-    expect(longResult.requiredTariffUsd).toBeGreaterThan(shortResult.requiredTariffUsd)
+  it('MX-only lane (Intra-Mex) runs only the MEX leg', () => {
+    const r = calculate({
+      operationType: 'Intra-Mex',
+      serviceType: 'One Way',
+      equipment: dryVan,
+      params,
+      market,
+      mexLane: { km: 300, transitHrs: 6, driverExpenses: 214.2857, routeType: 'Straight & Danger' },
+    })
+    expect(r.mexLeg).not.toBeNull()
+    expect(r.usaLeg).toBeNull()
+    expect(r.borderFee).toBe(0)
+    expect(r.crossborderRate).toBeCloseTo(r.mexLeg!.pvt, 4)
   })
 })

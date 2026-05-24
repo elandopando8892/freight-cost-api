@@ -1,86 +1,153 @@
-import type { EquipmentConfig, Lane } from '@prisma/client'
 import type { ParamMap } from '../assumptions/assumptions.service.js'
 
+/**
+ * Freight Cost Engine — two-leg cross-border model.
+ *
+ * A cross-border lane is split into two legs priced by two different engines
+ * (per the spreadsheet's `quickRate` sheet):
+ *
+ *   • MEX leg  (origin → border)  → d2d_mexRateProduction  → cost-plus PVT
+ *   • USA leg  (border → dest)    → d2d_usaRateProduction  → market FreightSale
+ *
+ *   FreightPrice = PVT_mex + FreightSale_usa  (+ border fee + accessorials)
+ *
+ * Operation type decides which legs run:
+ *   D2D Export     → MEX (origin→border) + USA (border→dest)
+ *   D2D Import     → USA (origin→border) + MEX (border→dest)
+ *   Intra-Mex / MX Northbound / MX Southbound / Local → MEX only
+ *   Drayage / USA domestic                            → USA only
+ */
+
+export type MarketCondition =
+  | 'Very Tight'
+  | 'Moderately Tight'
+  | 'Slightly Tight'
+  | 'Neutral'
+  | 'Slightly Loose'
+  | 'Moderately Loose'
+  | 'Very Loose'
+
 export interface MarketSnapshot {
-  dieselMxMxnL: number    // MXN per liter (used if dieselBlended not provided)
-  dieselUsUsdL: number    // USD per liter (US border diesel)
-  fxRate: number          // MXN per USD
+  fxRate: number          // MXN per USD (spreadsheet base model uses 1.0)
+  dieselUsUsdL: number    // USD per liter, US border diesel (default 0.95)
+}
+
+export interface EquipmentSpec {
+  truckType: string       // "Truck Trailer" | "Rabon" | "Thorton" | "3.5 tons" | "1.5 tons" — drives km/L
+  trailerType: string     // "Dry Van" | "Flatbed" | "Reefer" | "Hazmat" | "Chassis" | "Power Only" | "Overdim"
+  config: string          // "Single" | "Tandem"
+  driverType: string      // "B1" | "Licencia E" | "Interstate" | "Intrastate"
+}
+
+/** Resolved MEX-route facts (from mexLaneExpenses in the sheet). */
+export interface MexLaneData {
+  km: number              // route kilometres (mexLaneExpenses col B)
+  transitHrs: number      // hours en route        (col H)
+  driverExpenses: number  // driver expenses MXN    (col D) — CAGR = driverExpenses / 20
+  routeType: string       // lane factor key, e.g. "Straight & Danger" (d2dFactors LANE FACTOR)
+}
+
+/** Resolved USA-route facts (from usaLaneData + usaLaneMktPrice + usaMktCondition + d2d_usaFuel). */
+export interface UsaLaneData {
+  miles: number             // route miles (usaLaneData col C)
+  routeExpenses: number     // route expenses USD (usaLaneData col E)
+  marketRpm: number         // DAT benchmark $/mile (usaLaneMktPrice col C)
+  outboundCondition: MarketCondition  // origin market condition for trailer type (usaMktCondition)
+  fscOriginUsdMile: number  // fuel surcharge $/mile at origin state (d2d_usaFuel col D)
+  fscDestUsdMile: number    // fuel surcharge $/mile at destination state
 }
 
 export interface EngineInput {
-  lane: Lane
+  operationType: string
+  serviceType: string
+  equipment: EquipmentSpec
   params: ParamMap
-  equipment: EquipmentConfig
   market: MarketSnapshot
+  mexLane?: MexLaneData
+  usaLane?: UsaLaneData
+  borderCrossing?: boolean   // apply border crossing fee when assembling
   overrides?: Partial<ParamMap>
 }
 
-// ── New output structure matching the spreadsheet exactly ──────────────────
+// ── MEX leg breakdown (d2d_mexRateProduction columns) ──────────────────────
+export interface MexLegOutput {
+  km: number
+  litros: number          // N / performanceFactor(truckType)
+  fracTransit: number     // transitHrs / 12
+  fracWait: number        // (load+unload) / 12
+  fracViaje: number       // fracTransit + fracWait
 
-/**
- * Full breakdown of the tariff calculation as per d2d_mexRateProduction logic.
- *
- * Formula flow:
- *   CBFA + CBVR + UT = CBTT
- *   CBTT + ITA (CAGR+CAGV) = CIT          ← production cost
- *   CIT + MARGEN (CBTT × margenPct) = TBT   ← base tariff
- *   TBT + ICEM (EMTR+EMTO+EACT+EAEO) + ICC = PVT  ← required tariff
- */
+  cbfa: number            // CBFA = B63 × min(fracViaje, 1)
+  serviceFactor: number
+  cbvr: number            // CBVR = svcFactor × (B64 − tarifaUS + tarifaMX) × km
+  ut: number              // UT (B65)
+  cbtt: number            // CBFA + CBVR + UT
+
+  configFactor: number
+  eact: number            // CBTT × (configFactor − 1)
+  driverFactor: number
+  eaeo: number            // km × tarifaMX × (driverFactor − 1)
+  laneFactor: number
+  eafr: number            // CBVR × (laneFactor − 1)
+  cagr: number            // driverExpenses / 20
+  cagv: number            // km < 251 ? 0 : CAGR + gastoAdicional
+  ita: number             // CAGV + EAFR + EAEO + EACT + CAGR
+
+  cit: number             // CBTT + ITA
+  margenPct: number
+  margen: number          // CBTT × margenPct
+  tbt: number             // CIT + margen
+
+  trailerFactor: number
+  emtr: number            // CBTT × (trailerFactor − 1)
+  operationFactor: number
+  emto: number            // CBTT × (operationFactor − 1)
+  icem: number            // EMTR + EMTO
+  icc: number             // litros × dieselUsdL
+
+  pvt: number             // TBT + ICEM + ICC  (sale price, this leg)
+  cvt: number             // CIT − EACT − UT − CBFA + ICC  (cost of sale)
+}
+
+// ── USA leg breakdown (d2d_usaRateProduction columns) ──────────────────────
+export interface UsaLegOutput {
+  miles: number
+  haulage: number         // B64 × miles
+  markup: number          // by mileage tier
+  linehaulSale: number    // haulage × (1 + markup)
+  ofsc: number            // origin fuel surcharge $/mile
+  fuel: number            // ofsc × miles
+  odhRule: number         // origin deadhead miles
+  odhFee: number          // odhRule × (tarifaUS + ofsc)
+  ifsc: number            // dest fuel surcharge $/mile
+  idhRule: number         // inbound deadhead miles (by market condition)
+  idhFee: number          // idhRule × (tarifaUS + ifsc)
+  tdhFee: number          // odhFee + idhFee
+  routeExpenses: number
+  addlFees: number        // routeExpenses + tdhFee
+  freightSale: number     // linehaulSale + fuel + addlFees  (sale price, this leg)
+  freightCost: number     // haulage + fuel + addlFees       (cost of sale)
+  marketRate: number      // marketRpm × miles + fuel         (DAT benchmark)
+}
+
+// ── Cross-border assembly (quickRate) ──────────────────────────────────────
 export interface EngineOutput {
-  // ── Distances & timing ────────────────────────────────────────────────
-  totalKms: number          // total route km
-  loadedMiles: number       // loaded miles
-  litros: number            // liters consumed (km / rendimiento)
-  transitHrs: number        // hours driving
-  fracTransit: number       // transitHrs / 12
-  fracWait: number          // (loadTime + unloadTime) / 12
-  fracViaje: number         // fracTransit + fracWait
+  operationType: string
+  mexLeg: MexLegOutput | null
+  usaLeg: UsaLegOutput | null
 
-  // ── Cost base (CBTT) ─────────────────────────────────────────────────
-  cbfa: number              // Fixed asset base cost = CBFA_rate × MIN(fracViaje,1)
-  cbvr: number              // Variable route base cost = CBVR_rate × km × svcFactor
-  ut: number                // Per-trip overhead (Utilidad Determinada)
-  cbtt: number              // CBFA + CBVR + UT
+  freightPrice: number      // PVT_mex + FreightSale_usa (legs that apply)
+  borderFee: number
+  crossborderRate: number   // freightPrice + borderFee
+  cogs: number              // CVT_mex + FreightCost_usa + borderFee
+  grossProfit: number       // crossborderRate − cogs
+  grossMargin: number       // grossProfit / crossborderRate
+  marketRefPrice: number    // market reference (DAT for USA, PVT for MX)
 
-  // ── Trip additions (ITA) ─────────────────────────────────────────────
-  cagr: number              // Route/toll expenses = CAGR_rate × fracTransit
-  cagv: number              // Travel expenses (per diem when transitHrs > 4)
-  ita: number               // ITA = CAGR + CAGV
-
-  // ── Production cost ───────────────────────────────────────────────────
-  cit: number               // CIT = CBTT + ITA  (Costo Integral de Transporte)
-
-  // ── Margin & base tariff ──────────────────────────────────────────────
-  margenPct: number         // km-tier margin %
-  margenContrib: number     // CBTT × margenPct
-  tbt: number               // TBT = CIT + margenContrib
-
-  // ── Market effects (ICEM) ─────────────────────────────────────────────
-  trailerFactor: number     // from d2dFactors
-  emtr: number              // CBTT × (trailerFactor - 1)
-  operationFactor: number   // from d2dFactors
-  emto: number              // CBTT × (operationFactor - 1)
-  configFactor: number      // Single=1.0, Tandem=1.3
-  eact: number              // CBTT × (configFactor - 1)
-  driverFactor: number      // B1=1.0, LicenciaE=1.25, etc.
-  eaeo: number              // CBTT × (driverFactor - 1)
-  icem: number              // EMTR + EMTO + EACT + EAEO
-
-  // ── Fuel ─────────────────────────────────────────────────────────────
-  icc: number               // ICC = litros × dieselUsdL
-
-  // ── Final price ───────────────────────────────────────────────────────
-  pvt: number               // PVT = TBT + ICEM + ICC  (required tariff USD)
-  ubt: number               // Gross profit = PVT - CIT
-  mct: number               // Margin % = UBT / PVT
-
-  // ── Legacy aliases (for API compatibility) ────────────────────────────
-  requiredTariffUsd: number   // = pvt
-  requiredTariffMxn: number   // = pvt × fxRate
-  productionCostUsd: number   // = cit
-  tariffPerLoadedMile: number // = pvt / loadedMiles
+  // ── Legacy aliases (API compatibility) ──
+  requiredTariffUsd: number   // = crossborderRate
+  requiredTariffMxn: number   // = crossborderRate × fxRate
+  productionCostUsd: number   // = cogs
+  totalMiles: number
   fxRateUsed: number
-
-  // ── Service & config metadata ─────────────────────────────────────────
-  serviceFactor: number       // One Way=1.0, Backhaul=0.4, Roundtrip=1.5
 }

@@ -2,14 +2,57 @@ import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import { authenticate } from '../../middleware/authenticate.js'
 import type { JwtPayload } from '../auth/auth.schema.js'
+import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/prisma.js'
-import { getActiveSet, buildParamMap } from '../assumptions/assumptions.service.js'
+import { getActiveSet, buildParamMap, type ParamMap } from '../assumptions/assumptions.service.js'
 import { calculate } from '../engine/engine.calculator.js'
+import type { EngineInput, MarketCondition } from '../engine/engine.types.js'
+
+const MarketConditionEnum = z.enum([
+  'Very Tight', 'Moderately Tight', 'Slightly Tight', 'Neutral',
+  'Slightly Loose', 'Moderately Loose', 'Very Loose',
+])
+
+const EquipmentSchema = z.object({
+  truckType: z.string().default('Truck Trailer'),
+  trailerType: z.string().default('Dry Van'),
+  config: z.string().default('Single'),
+  driverType: z.string().default('B1'),
+})
+
+const MexLaneSchema = z.object({
+  km: z.number().nonnegative(),
+  transitHrs: z.number().nonnegative(),
+  driverExpenses: z.number().nonnegative().default(0),
+  routeType: z.string().default('Straight & Danger'),
+})
+
+const UsaLaneSchema = z.object({
+  miles: z.number().nonnegative(),
+  routeExpenses: z.number().nonnegative().default(0),
+  marketRpm: z.number().nonnegative().default(0),
+  outboundCondition: MarketConditionEnum.default('Neutral'),
+  fscOriginUsdMile: z.number().nonnegative().default(0),
+  fscDestUsdMile: z.number().nonnegative().default(0),
+})
+
+const MarketSchema = z.object({
+  fxRate: z.number().positive().default(1),
+  dieselUsUsdL: z.number().nonnegative().default(0.95),
+})
 
 const CreateQuoteSchema = z.object({
-  laneId: z.string().min(1),
-  assumptionSetId: z.string().min(1).optional(),
   label: z.string().optional(),
+  laneId: z.string().min(1).optional(),
+  assumptionSetId: z.string().min(1).optional(),
+  overrides: z.record(z.number()).optional(),
+  operationType: z.string(),
+  serviceType: z.string().default('One Way'),
+  equipment: EquipmentSchema.default({}),
+  market: MarketSchema.default({}),
+  mexLane: MexLaneSchema.optional(),
+  usaLane: UsaLaneSchema.optional(),
+  borderCrossing: z.boolean().default(true),
 })
 
 export async function quotesRoutes(app: FastifyInstance) {
@@ -17,87 +60,56 @@ export async function quotesRoutes(app: FastifyInstance) {
 
   app.post('/quotes', async (request, reply) => {
     const { orgId } = request.user as JwtPayload
-    const input = CreateQuoteSchema.parse(request.body)
+    const body = CreateQuoteSchema.parse(request.body)
 
-    const lane = await prisma.lane.findFirstOrThrow({ where: { id: input.laneId, orgId } })
-
-    const assumptionSet = input.assumptionSetId
-      ? await prisma.assumptionSet.findFirstOrThrow({ where: { id: input.assumptionSetId, orgId }, include: { params: true } })
-      : await getActiveSet(orgId)
-
-    if (!assumptionSet) return reply.status(422).send({ error: 'No active assumption set found.' })
-
-    const equipment = lane.equipmentId
-      ? await prisma.equipmentConfig.findUniqueOrThrow({ where: { id: lane.equipmentId } })
-      : await prisma.equipmentConfig.findFirstOrThrow()
-
-    const [dieselMxEntry, dieselUsEntry, fxEntry] = await Promise.all([
-      prisma.marketData.findFirst({ where: { orgId, type: 'DIESEL_MX' }, orderBy: { date: 'desc' } }),
-      prisma.marketData.findFirst({ where: { orgId, type: 'DIESEL_US' }, orderBy: { date: 'desc' } }),
-      prisma.marketData.findFirst({ where: { orgId, type: 'FX_RATE' }, orderBy: { date: 'desc' } }),
-    ])
-
-    const params = buildParamMap(assumptionSet.params)
-    const market = {
-      dieselMxMxnL: dieselMxEntry?.value ?? 28,
-      dieselUsUsdL: dieselUsEntry?.value ?? 0.95,
-      fxRate: fxEntry?.value ?? 17.5,
+    if (!body.mexLane && !body.usaLane) {
+      return reply.status(422).send({ error: 'Provide at least one of mexLane or usaLane.' })
     }
 
-    const r = calculate({ lane, params, equipment, market })
+    let params: ParamMap = {}
+    const set = body.assumptionSetId
+      ? await prisma.assumptionSet.findFirst({ where: { id: body.assumptionSetId, orgId }, include: { params: true } })
+      : await getActiveSet(orgId)
+    if (set) params = buildParamMap(set.params)
+
+    const input: EngineInput = {
+      operationType: body.operationType,
+      serviceType: body.serviceType,
+      equipment: body.equipment,
+      params,
+      market: body.market,
+      mexLane: body.mexLane,
+      usaLane: body.usaLane
+        ? { ...body.usaLane, outboundCondition: body.usaLane.outboundCondition as MarketCondition }
+        : undefined,
+      borderCrossing: body.borderCrossing,
+      overrides: body.overrides,
+    }
+
+    const r = calculate(input)
 
     const quote = await prisma.quote.create({
       data: {
         orgId,
-        laneId: lane.id,
-        assumptionSetId: assumptionSet.id,
-        label: input.label,
-        // Distances & timing
-        totalKms: r.totalKms,
-        loadedMiles: r.loadedMiles,
-        litros: r.litros,
-        transitHrs: r.transitHrs,
-        fracTransit: r.fracTransit,
-        fracWait: r.fracWait,
-        fracViaje: r.fracViaje,
-        // CBTT base cost
-        cbfa: r.cbfa,
-        cbvr: r.cbvr,
-        ut: r.ut,
-        cbtt: r.cbtt,
-        // ITA trip additions
-        cagr: r.cagr,
-        cagv: r.cagv,
-        ita: r.ita,
-        // Production cost
-        cit: r.cit,
-        // Margin & base tariff
-        margenPct: r.margenPct,
-        margenContrib: r.margenContrib,
-        tbt: r.tbt,
-        // Market effects (ICEM)
-        trailerFactor: r.trailerFactor,
-        emtr: r.emtr,
-        operationFactor: r.operationFactor,
-        emto: r.emto,
-        configFactor: r.configFactor,
-        eact: r.eact,
-        driverFactor: r.driverFactor,
-        eaeo: r.eaeo,
-        icem: r.icem,
-        serviceFactor: r.serviceFactor,
-        // Fuel
-        icc: r.icc,
-        // Final price
-        pvt: r.pvt,
-        ubt: r.ubt,
-        mct: r.mct,
-        // Legacy / derived
+        laneId: body.laneId ?? undefined,
+        assumptionSetId: set?.id ?? undefined,
+        label: body.label,
+        operationType: r.operationType,
+        serviceType: body.serviceType,
+        freightPrice: r.freightPrice,
+        borderFee: r.borderFee,
+        crossborderRate: r.crossborderRate,
+        cogs: r.cogs,
+        grossProfit: r.grossProfit,
+        grossMargin: r.grossMargin,
+        marketRefPrice: r.marketRefPrice,
+        totalMiles: r.totalMiles,
         requiredTariffUsd: r.requiredTariffUsd,
         requiredTariffMxn: r.requiredTariffMxn,
         productionCostUsd: r.productionCostUsd,
-        tariffPerLoadedMile: r.tariffPerLoadedMile,
         fxRateUsed: r.fxRateUsed,
+        mexLeg: (r.mexLeg ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
+        usaLeg: (r.usaLeg ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
       },
     })
 
@@ -128,35 +140,5 @@ export async function quotesRoutes(app: FastifyInstance) {
     await prisma.quote.findFirstOrThrow({ where: { id, orgId } })
     await prisma.quote.delete({ where: { id } })
     return reply.status(204).send()
-  })
-
-  app.post('/quotes/:id/recalculate', async (request) => {
-    const { orgId } = request.user as JwtPayload
-    const { id } = request.params as { id: string }
-    const quote = await prisma.quote.findFirstOrThrow({ where: { id, orgId } })
-
-    const lane = await prisma.lane.findFirstOrThrow({ where: { id: quote.laneId } })
-    const assumptionSet = await getActiveSet(orgId)
-    if (!assumptionSet) throw Object.assign(new Error('No active assumption set'), { statusCode: 422 })
-
-    const equipment = lane.equipmentId
-      ? await prisma.equipmentConfig.findUniqueOrThrow({ where: { id: lane.equipmentId } })
-      : await prisma.equipmentConfig.findFirstOrThrow()
-
-    const [dieselMxEntry, dieselUsEntry, fxEntry] = await Promise.all([
-      prisma.marketData.findFirst({ where: { orgId, type: 'DIESEL_MX' }, orderBy: { date: 'desc' } }),
-      prisma.marketData.findFirst({ where: { orgId, type: 'DIESEL_US' }, orderBy: { date: 'desc' } }),
-      prisma.marketData.findFirst({ where: { orgId, type: 'FX_RATE' }, orderBy: { date: 'desc' } }),
-    ])
-
-    const params = buildParamMap(assumptionSet.params)
-    const market = {
-      dieselMxMxnL: dieselMxEntry?.value ?? 28,
-      dieselUsUsdL: dieselUsEntry?.value ?? 0.95,
-      fxRate: fxEntry?.value ?? 17.5,
-    }
-
-    const result = calculate({ lane, params, equipment, market })
-    return { original: quote, recalculated: result }
   })
 }
