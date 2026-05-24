@@ -9,6 +9,7 @@ import { getParam, type ParamMap } from '../assumptions/assumptions.service.js'
 import {
   laneFactor, operationFactor, trailerFactor, driverFactor, equipmentFactors,
 } from './engine.factors.js'
+import { deriveMonthlyFixedCost, deriveMaintTiresPerKm } from './engine.outputs.js'
 import type { MexLegInput, MexLegOutput } from './engine.types.js'
 
 const MI_PER_KM = 1 / 1.60934
@@ -35,9 +36,9 @@ export function calculateMexLeg(lane: MexLegInput, params: ParamMap): MexLegOutp
   const tc = getParam(params, 'FINANCE', 'Tipo de Cambio', 17.5)
   const tarifaMx = getParam(params, 'LABOR', 'Tarifa Operador MX', 0.18)
   const gastoAdicional = getParam(params, 'GENERAL_BASE', 'Gasto Adicional sobre Ruta', 0.05)
-  const maintTiresPerKm = getParam(params, 'UTILIZATION', 'Maint and Tires Rate per KM', 0.2348384848)
+  const maintTiresPerKm = deriveMaintTiresPerKm(params)          // derived from editable cost cards
   const borderTransactional = getParam(params, 'BORDER', 'Border Transactional Cost', 200)
-  const monthlyFixedCost = getParam(params, 'FINANCE', 'Monthly Fixed Cost', 381384.0354)
+  const monthlyFixedCost = deriveMonthlyFixedCost(params)        // derived from editable cost cards
   const operadores = getParam(params, 'GENERAL_BASE', 'Operadores', 52)
   const kmPerOperator = getParam(params, 'GENERAL_BASE', 'Kilómetros promedio x operador', 22000)
   const flota = getParam(params, 'GENERAL_BASE', 'Tamaño de Flota', 50)

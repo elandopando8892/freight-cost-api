@@ -75,6 +75,19 @@ describe('MEX leg — Freight Cost Model V3.0 (mexLaneProd)', () => {
     const fb = calculateMexLeg(mty, params)
     expect(dv.requiredTariffUsd).toBeLessThan(fb.requiredTariffUsd)
   })
+
+  it('carrier edits a cost card → cost moves (their own economics)', () => {
+    const base = calculateMexLeg(mty, params)
+    // Carrier raises tractor value $220k → $400k (more depreciation/finance → higher fixed cost)
+    const pricier = calculateMexLeg(mty, { 'COST_CAPITAL__PU Tracto': 400000 })
+    expect(pricier.cfuUsd).toBeGreaterThan(base.cfuUsd)
+    // Carrier raises their insurance premium → fixed cost up
+    const moreInsurance = calculateMexLeg(mty, { 'COST_INSURANCE__Poliza x Vehiculo': 24000 })
+    expect(moreInsurance.cfuUsd).toBeGreaterThan(base.cfuUsd)
+    // Carrier buys cheaper tires → maint/tires down
+    const cheaperTires = calculateMexLeg(mty, { 'COST_TIRES__PU Traccion': 300 })
+    expect(cheaperTires.maintTiresUsd).toBeLessThan(base.maintTiresUsd)
+  })
 })
 
 describe('USA leg — Freight Cost Model V3.0 (usaLaneProd)', () => {

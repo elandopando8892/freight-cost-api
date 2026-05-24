@@ -15,6 +15,7 @@ import {
   trailerFactor, operationFactor, serviceFactor, driverFactor,
   equipmentFactors, repositionPct,
 } from './engine.factors.js'
+import { deriveMonthlyFixedCost, deriveMaintTiresPerMile } from './engine.outputs.js'
 import type { UsaLegInput, UsaLegOutput } from './engine.types.js'
 
 const KML_TO_MPG = 2.3521458
@@ -31,8 +32,8 @@ export function calculateUsaLeg(lane: UsaLegInput, params: ParamMap): UsaLegOutp
   const deadheadBase = getParam(params, 'UTILIZATION', 'Deadhead Base', 0.15)
   const loadTime = getParam(params, 'UTILIZATION', 'Load Time', 2)
   const unloadTime = getParam(params, 'UTILIZATION', 'Unload Time', 2)
-  const maintTiresPerMile = getParam(params, 'UTILIZATION', 'Maint and Tires Rate per Mile', 0.3779349672)
-  const monthlyFixedCost = getParam(params, 'FINANCE', 'Monthly Fixed Cost', 381384.0354)
+  const maintTiresPerMile = deriveMaintTiresPerMile(params)      // derived from editable cost cards
+  const monthlyFixedCost = deriveMonthlyFixedCost(params)        // derived from editable cost cards
   const flota = getParam(params, 'GENERAL_BASE', 'Tamaño de Flota', 50)
   const periodo = getParam(params, 'GENERAL_BASE', 'Periodo de Operación', 26)
   const kmPerOperator = getParam(params, 'GENERAL_BASE', 'Kilómetros promedio x operador', 22000)
