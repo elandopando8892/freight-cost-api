@@ -39,6 +39,8 @@ type DatRow = {
   rpm: number; fsc: number; allInUsd: number; companies: number; reports: number; stdDev: number
   equipment: string; origin: string; dest: string
 }
+type RegionRow = { region: string; dieselUsdGal: number }
+type FscRow = { fromDiesel: number; toDiesel: number; ltlPct: number; truckloadFscPerMile: number }
 
 export async function seedReferenceTables() {
   console.log('Seeding engine reference tables from Freight Cost Model V3.0…')
@@ -64,6 +66,19 @@ export async function seedReferenceTables() {
   await upsertAll('usaDatBenchmark', load<DatRow>('usa-dat-benchmark.json'), (r) =>
     prisma.usaDatBenchmark.upsert({ where: { laneKeyNorm: r.laneKeyNorm }, create: r, update: r }),
   )
+  await upsertAll('regionDiesel', load<RegionRow>('region-diesel.json'), (r) =>
+    prisma.regionDiesel.upsert({ where: { region: r.region }, create: r, update: r }),
+  )
+  // FscIndex is a static schedule with no natural unique key.
+  const fscRows = load<FscRow>('fsc-index.json')
+  const fscCount = await prisma.fscIndex.count()
+  if (fscCount === 0) {
+    await prisma.fscIndex.createMany({ data: fscRows })
+  } else if (fscCount !== fscRows.length) {
+    await prisma.fscIndex.deleteMany({})
+    await prisma.fscIndex.createMany({ data: fscRows })
+  }
+  console.log(`  fscIndex: ${fscRows.length} brackets (db had ${fscCount})`)
 
   console.log('Reference tables seeded (V3.0).')
 }

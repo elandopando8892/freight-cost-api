@@ -235,13 +235,32 @@ model UsaMktCondition {
   region      String?
 }
 
-// d2d_usaFuel — fuel surcharge by US state
+// d2d_usaFuel — fuel surcharge by US state (DERIVED: region diesel → FSC index)
 model UsaFuel {
   id             String  @id @default(cuid())
   state          String  @unique // "TX"
   region         String?
   pricePerGallon Float   @default(0)
   fsc            Float   @default(0) // USD/mile fuel surcharge
+}
+
+// usaFuelcurrent — current diesel $/gal by EIA region (the updatable live input)
+model RegionDiesel {
+  id           String   @id @default(cuid())
+  region       String   @unique // "Gulf Coast"
+  dieselUsdGal Float    @default(0)
+  updatedAt    DateTime @updatedAt
+}
+
+// usaFSCindex — fuel-surcharge schedule: diesel-price bracket → FSC per mile
+model FscIndex {
+  id                  String @id @default(cuid())
+  fromDiesel          Float  // bracket lower bound ($/gal)
+  toDiesel            Float  // bracket upper bound ($/gal)
+  ltlPct              Float  @default(0)
+  truckloadFscPerMile Float  @default(0)
+
+  @@index([fromDiesel])
 }
 
 // ─────────────────────────────────────────────

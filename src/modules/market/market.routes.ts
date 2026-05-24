@@ -1,9 +1,11 @@
 import { FastifyInstance } from 'fastify'
+import { z } from 'zod'
 import { authenticate } from '../../middleware/authenticate.js'
 import type { JwtPayload } from '../auth/auth.schema.js'
 import { CreateMarketDataSchema } from './market.schema.js'
 import { prisma } from '../../config/prisma.js'
 import { MarketDataType } from '@prisma/client'
+import { getFuelStatus, refreshFuelSurcharge } from './fuel.service.js'
 
 export async function marketRoutes(app: FastifyInstance) {
   app.addHook('preHandler', authenticate)
@@ -58,4 +60,28 @@ export async function marketRoutes(app: FastifyInstance) {
       take: 200,
     })
   })
+
+  // ── Fuel surcharge pipeline (region diesel → FSC index → state FSC) ───────
+  // Current region diesel + FSC index summary + sample derived state.
+  app.get('/market/fuel', async () => getFuelStatus())
+
+  // Update one or more region diesel prices (e.g. weekly EIA refresh).
+  const UpdateRegionsSchema = z.object({
+    regions: z.array(z.object({ region: z.string().min(1), dieselUsdGal: z.number().nonnegative() })).min(1),
+  })
+  app.put('/market/fuel/regions', async (request, reply) => {
+    const body = UpdateRegionsSchema.parse(request.body)
+    for (const r of body.regions) {
+      await prisma.regionDiesel.upsert({
+        where: { region: r.region },
+        create: { region: r.region, dieselUsdGal: r.dieselUsdGal },
+        update: { dieselUsdGal: r.dieselUsdGal },
+      })
+    }
+    const refresh = await refreshFuelSurcharge()
+    return reply.send({ updatedRegions: body.regions.length, ...refresh })
+  })
+
+  // Recompute every state's diesel + FSC from current region diesel + FSC index.
+  app.post('/market/fuel/refresh', async () => refreshFuelSurcharge())
 }

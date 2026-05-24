@@ -20,8 +20,8 @@
 | 11 | usaLaneMktPrice | A1:B19844 | market RPM | ✅ seeded usaLaneMktPrice |
 | 12 | usaDATbenchmark | A1:AI13584 | DAT spot market | ✅ seeded UsaDatBenchmark |
 | 13 | usaMktCondition | A1:G1000 | market condition by trailer | ✅ seeded usaMktCondition |
-| 14 | usaFSCindex | A1:D1000 | FSC by diesel price | ❌ not mapped |
-| 15 | usaFuelcurrent | A1:B12 | current diesel by region | ❌ not mapped |
+| 14 | usaFSCindex | A1:D1000 | FSC by diesel price | ✅ seeded FscIndex |
+| 15 | usaFuelcurrent | A1:B12 | current diesel by region | ✅ seeded RegionDiesel |
 | 16 | usaFuelpast | A1:K837 | EIA diesel history | ❌ historical |
 | 17 | usaFSCtrend | A1:E837 | diesel/FSC trend | ❌ historical |
 | 18 | usaFuel | A1:D993 | state diesel/FSC | ✅ seeded UsaFuel |
@@ -539,8 +539,8 @@ Cost build-up + commercial (COGS…Commercial) ✅ implemented · Validations �
 | usaFuel | 993 | UsaFuel | ✅ |
 | cusCatalog | 9336 | ZipMarket | ✅ |
 | usaDATbenchmark | 13584 | UsaDatBenchmark | ✅ |
-| usaFSCindex | 1000 | — | ❌ pending |
-| usaFuelcurrent | 12 | — | ❌ pending |
+| usaFSCindex | 1000 | FscIndex | ✅ |
+| usaFuelcurrent | 12 | RegionDiesel | ✅ |
 | usaFuelpast | 837 | — | ❌ historical |
 | usaFSCtrend | 837 | — | ❌ historical |
 
@@ -549,6 +549,6 @@ Cost build-up + commercial (COGS…Commercial) ✅ implemented · Validations �
 **✅ Done — full carrier model:** Assumptions, Inputs/cost cards (editable), Factors, Equipments, Outputs cost build-up + commercial layer (cost floor → sell tiers → margin → flags), per-lane production (MX+USA), DAT market reference. Validated $1,200 / $2,600.
 
 **❌ Pending:**
-1. usaFSCindex (FSC-by-diesel-price table) + fuel auto-update (usaFuelcurrent/past/trend) — operational.
+1. EIA live auto-fetch (usaFuelpast/usaFSCtrend history) — manual region-diesel update + refresh is wired; live EIA pull is the remaining nicety.
 2. 13 "extra" inputs (advanced insurance, profit determination, finance flags) not yet consumed by base derivation.
 3. Validation rules (fuel-mix is wired; low/high range + double-count checks pending).
