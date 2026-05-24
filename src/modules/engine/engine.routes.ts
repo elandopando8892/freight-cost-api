@@ -5,6 +5,7 @@ import type { JwtPayload } from '../auth/auth.schema.js'
 import { getActiveSet, buildParamMap, type ParamMap } from '../assumptions/assumptions.service.js'
 import { prisma } from '../../config/prisma.js'
 import { calculate } from './engine.calculator.js'
+import { resolveRoute } from './lane-resolver.service.js'
 import type { EngineInput, EquipmentSpec, MarketCondition } from './engine.types.js'
 
 const MarketConditionEnum = z.enum([
@@ -90,5 +91,64 @@ export async function engineRoutes(app: FastifyInstance) {
 
     const result = calculate(input)
     return reply.send({ ...result, assumptionSetId: set?.id ?? null })
+  })
+
+  // ── Quote by route name — resolves leg facts from V3.0 reference tables ───
+  const ByRouteSchema = z.object({
+    assumptionSetId: z.string().min(1).optional(),
+    overrides: z.record(z.number()).optional(),
+    outboundLocation: z.string().min(1),
+    inboundLocation: z.string().min(1),
+    mexBorder: z.string().default('Nuevo Laredo, Tamaulipas'),
+    usBorder: z.string().default('Laredo, TX'),
+    operation: z.string(),
+    service: z.string().default('One Way'),
+    route: z.string().default('Straight & Danger'),
+    equipment: EquipmentSchema.default({}),
+    fxRate: z.number().positive().optional(),
+  })
+
+  app.post('/engine/quote-by-route', async (request, reply) => {
+    const { orgId } = request.user as JwtPayload
+    const body = ByRouteSchema.parse(request.body)
+
+    const resolved = await resolveRoute({
+      outboundLocation: body.outboundLocation,
+      inboundLocation: body.inboundLocation,
+      mexBorder: body.mexBorder,
+      usBorder: body.usBorder,
+      equipment: body.equipment,
+      operation: body.operation,
+      service: body.service,
+      route: body.route,
+    })
+
+    if (!resolved.mexLeg && !resolved.usaLeg) {
+      return reply.status(422).send({ error: 'Could not resolve any leg for this route.', warnings: resolved.warnings })
+    }
+
+    let params: ParamMap = {}
+    const set = body.assumptionSetId
+      ? await prisma.assumptionSet.findFirst({ where: { id: body.assumptionSetId, orgId }, include: { params: true } })
+      : await getActiveSet(orgId)
+    if (set) params = buildParamMap(set.params)
+
+    const result = calculate({
+      operation: body.operation,
+      service: body.service,
+      equipment: body.equipment,
+      params,
+      fxRate: body.fxRate,
+      overrides: body.overrides,
+      mexLeg: resolved.mexLeg,
+      usaLeg: resolved.usaLeg,
+    })
+
+    return reply.send({
+      ...result,
+      resolved: { mexLeg: resolved.mexLeg ?? null, usaLeg: resolved.usaLeg ?? null },
+      warnings: resolved.warnings,
+      assumptionSetId: set?.id ?? null,
+    })
   })
 }

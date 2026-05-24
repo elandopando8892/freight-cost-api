@@ -1,8 +1,8 @@
 /**
- * Seed the engine's reference lookup tables from the spreadsheet extracts.
- * Idempotent: uses createMany({ skipDuplicates }) so re-runs are safe.
+ * Seed the engine's reference lookup tables from the Freight Cost Model V3.0 extracts.
+ * Upsert-based so re-runs UPDATE existing rows to current values (idempotent).
  *
- * Run: npx tsx prisma/seed/reference.seed.ts
+ * Run: npx tsx prisma/seed/run-reference.ts
  */
 import { PrismaClient } from '@prisma/client'
 import { readFileSync } from 'node:fs'
@@ -15,41 +15,47 @@ export const prisma = new PrismaClient()
 const load = <T>(file: string): T[] =>
   JSON.parse(readFileSync(join(__dirname, 'data', file), 'utf8')) as T[]
 
-async function chunked<T>(
+// Upsert rows in concurrent batches (keeps Neon round-trips reasonable).
+async function upsertAll<T>(
   label: string,
   rows: T[],
-  create: (batch: T[]) => Promise<{ count: number }>,
-  size = 1000,
+  upsert: (row: T) => Promise<unknown>,
+  batch = 50,
 ) {
-  let inserted = 0
-  for (let i = 0; i < rows.length; i += size) {
-    const res = await create(rows.slice(i, i + size))
-    inserted += res.count
+  for (let i = 0; i < rows.length; i += batch) {
+    await Promise.all(rows.slice(i, i + batch).map(upsert))
   }
-  console.log(`  ${label}: ${inserted}/${rows.length} inserted (rest already present)`)
+  console.log(`  ${label}: ${rows.length} upserted`)
 }
 
+type MexRow = { laneKey: string; laneKeyNorm: string; km: number; tolls: number; driverExpenses: number; pension: number; sumaViaje: number; diasViaje: number; horasRuta: number }
+type UsaRow = { laneKey: string; outState: string; miles: number; truckDays: number; routeExpenses: number }
+type FuelRow = { state: string; region: string | null; pricePerGallon: number; fsc: number }
+type CondRow = { market: string; dryVanCond: string; flatbedCond: string; reeferCond: string; region: string | null }
+type MktRow = { laneKey: string; laneKeyNorm: string; rpm: number }
+type ZipRow = { zipCode: string; metroZip: string; metroCity: string; market: string }
+
 export async function seedReferenceTables() {
-  console.log('Seeding engine reference tables…')
+  console.log('Seeding engine reference tables from Freight Cost Model V3.0…')
 
-  await chunked('mexLaneExpense', load('mex-lane-expenses.json'), (data) =>
-    prisma.mexLaneExpense.createMany({ data: data as never, skipDuplicates: true }),
+  await upsertAll('mexLaneExpense', load<MexRow>('mex-lane-expenses.json'), (r) =>
+    prisma.mexLaneExpense.upsert({ where: { laneKeyNorm: r.laneKeyNorm }, create: r, update: r }),
   )
-  await chunked('usaLaneData', load('usa-lane-data.json'), (data) =>
-    prisma.usaLaneData.createMany({ data: data as never, skipDuplicates: true }),
+  await upsertAll('usaLaneData', load<UsaRow>('usa-lane-data.json'), (r) =>
+    prisma.usaLaneData.upsert({ where: { laneKey: r.laneKey }, create: r, update: r }),
   )
-  await chunked('usaLaneMktPrice', load('usa-lane-mkt-price.json'), (data) =>
-    prisma.usaLaneMktPrice.createMany({ data: data as never, skipDuplicates: true }),
+  await upsertAll('usaLaneMktPrice', load<MktRow>('usa-lane-mkt-price.json'), (r) =>
+    prisma.usaLaneMktPrice.upsert({ where: { laneKeyNorm: r.laneKeyNorm }, create: r, update: r }),
   )
-  await chunked('usaMktCondition', load('usa-mkt-condition.json'), (data) =>
-    prisma.usaMktCondition.createMany({ data: data as never, skipDuplicates: true }),
+  await upsertAll('usaMktCondition', load<CondRow>('usa-mkt-condition.json'), (r) =>
+    prisma.usaMktCondition.upsert({ where: { market: r.market }, create: r, update: r }),
   )
-  await chunked('usaFuel', load('usa-fuel.json'), (data) =>
-    prisma.usaFuel.createMany({ data: data as never, skipDuplicates: true }),
+  await upsertAll('usaFuel', load<FuelRow>('usa-fuel.json'), (r) =>
+    prisma.usaFuel.upsert({ where: { state: r.state }, create: r, update: r }),
   )
-  await chunked('zipMarket', load('zip-markets.json'), (data) =>
-    prisma.zipMarket.createMany({ data: data as never, skipDuplicates: true }),
+  await upsertAll('zipMarket', load<ZipRow>('zip-markets.json'), (r) =>
+    prisma.zipMarket.upsert({ where: { zipCode: r.zipCode }, create: r, update: r }),
   )
 
-  console.log('Reference tables seeded.')
+  console.log('Reference tables seeded (V3.0).')
 }
