@@ -282,24 +282,14 @@ model Quote {
   createdAt       DateTime    @default(now())
 
   // ── Routing context ──────────────────────────────────────────────────
-  operationType String
-  serviceType   String
+  operation String
+  service   String
 
-  // ── Cross-border assembly (quickRate) ────────────────────────────────
-  freightPrice    Float     // PVT_mex + FreightSale_usa
-  borderFee       Float
-  crossborderRate Float     // freightPrice + borderFee
-  cogs            Float     // CVT_mex + FreightCost_usa + borderFee
-  grossProfit     Float
-  grossMargin     Float
-  marketRefPrice  Float     // PVT_mex + MarketRate_usa (DAT)
-  totalMiles      Float
-
-  // ── Derived / aliases ────────────────────────────────────────────────
-  requiredTariffUsd Float
-  requiredTariffMxn Float
-  productionCostUsd Float
-  fxRateUsed        Float
+  // ── Freight Cost Model V3.0 result ───────────────────────────────────
+  freightBaselineUsd Float   // Σ leg flats (MROUND 100)
+  requiredTariffUsd  Float
+  requiredTariffMxn  Float
+  fxRateUsed         Float
 
   // ── Full per-leg breakdowns ──────────────────────────────────────────
   mexLeg Json?

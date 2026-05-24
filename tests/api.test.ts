@@ -379,19 +379,17 @@ describe('Lanes', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 describe('Engine /calculate', () => {
   const crossborderPayload = {
-    operationType: 'D2D Export',
-    serviceType: 'One Way',
-    equipment: { truckType: 'Truck Trailer', trailerType: 'Flatbed', config: 'Single', driverType: 'B1' },
-    market: { fxRate: 1, dieselUsUsdL: 0.95 },
-    mexLane: { km: 225, transitHrs: 4, driverExpenses: 142.8571, routeType: 'Straight & Danger' },
-    usaLane: {
-      miles: 435, routeExpenses: 0, marketRpm: 2.33,
-      outboundCondition: 'Moderately Tight', fscOriginUsdMile: 0.41, fscDestUsdMile: 0.41,
+    operation: 'D2D Export',
+    service: 'One Way',
+    equipment: { truckType: 'Truck Trailer', trailer: 'Flatbed', config: 'Single', driver: 'B1' },
+    mex: { baseKm: 225, routeExpensesMxn: 0, baseHours: 0, route: 'Straight & Danger' },
+    usa: {
+      loadedMiles: 435, dieselUsdGal: 5.152, fscUsdMile: 0.8,
+      originCondition: 'Very Tight', destCondition: 'Very Tight',
     },
-    borderCrossing: true,
   }
 
-  it('POST /engine/calculate → 200 with two-leg breakdown', async () => {
+  it('POST /engine/calculate → 200, Monterrey→Dallas Flatbed = $2,600', async () => {
     const res = await app.inject({
       method: 'POST',
       url: '/engine/calculate',
@@ -400,11 +398,9 @@ describe('Engine /calculate', () => {
     })
     expect(res.statusCode).toBe(200)
     const body = res.json()
-    expect(body.mexLeg.pvt).toBeCloseTo(595.02, 0)
-    expect(body.usaLeg.freightSale).toBeCloseTo(979.01, 0)
-    expect(body.freightPrice).toBeCloseTo(1574.03, 0)
-    expect(body.crossborderRate).toBeCloseTo(1724.03, 0)
-    expect(body.requiredTariffUsd).toBe(body.crossborderRate)
+    expect(body.mexLeg.requiredTariffUsd).toBe(1200)
+    expect(body.usaLeg.flatUsd).toBeCloseTo(1391, 0)
+    expect(body.freightBaselineUsd).toBe(2600)
   })
 
   it('POST /engine/calculate MX-only lane runs only MEX leg', async () => {
@@ -413,34 +409,28 @@ describe('Engine /calculate', () => {
       url: '/engine/calculate',
       headers: { authorization: `Bearer ${token}` },
       payload: {
-        operationType: 'Intra-Mex',
-        equipment: { trailerType: 'Dry Van' },
-        market: { fxRate: 1, dieselUsUsdL: 0.95 },
-        mexLane: { km: 300, transitHrs: 6, driverExpenses: 214.2857 },
+        operation: 'Intra-Mex',
+        equipment: { trailer: 'Dry Van' },
+        mex: { baseKm: 300, baseHours: 0 },
       },
     })
     expect(res.statusCode).toBe(200)
     const body = res.json()
     expect(body.mexLeg).not.toBeNull()
     expect(body.usaLeg).toBeNull()
-    expect(body.borderFee).toBe(0)
   })
 
   it('POST /engine/calculate without token → 401', async () => {
-    const res = await app.inject({
-      method: 'POST',
-      url: '/engine/calculate',
-      payload: crossborderPayload,
-    })
+    const res = await app.inject({ method: 'POST', url: '/engine/calculate', payload: crossborderPayload })
     expect(res.statusCode).toBe(401)
   })
 
-  it('POST /engine/calculate missing operationType → 400', async () => {
+  it('POST /engine/calculate missing operation → 400', async () => {
     const res = await app.inject({
       method: 'POST',
       url: '/engine/calculate',
       headers: { authorization: `Bearer ${token}` },
-      payload: { mexLane: { km: 225, transitHrs: 4 } },
+      payload: { mex: { baseKm: 225 } },
     })
     expect(res.statusCode).toBe(400)
   })
@@ -450,7 +440,7 @@ describe('Engine /calculate', () => {
       method: 'POST',
       url: '/engine/calculate',
       headers: { authorization: `Bearer ${token}` },
-      payload: { operationType: 'D2D Export' },
+      payload: { operation: 'D2D Export' },
     })
     expect(res.statusCode).toBe(422)
   })

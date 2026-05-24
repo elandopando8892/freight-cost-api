@@ -1,96 +1,56 @@
 /**
- * Freight Cost Engine — orchestrator.
+ * Freight Cost Model V3.0 — orchestrator.
  *
- * Reproduces the spreadsheet's `quickRate` assembly: run the MEX and/or USA
- * leg engines depending on operation type, then combine.
+ * Runs the MEX and/or USA leg cost engines by operation type and sums the
+ * leg "flats" the way the QuoteDesk consumes the ReferenceKeys:
+ *   leg flat = loadedMiles × (RPM + FSC)
+ *   Freight Baseline = MROUND(Σ leg flats, 100)
  *
- *   FreightPrice    = PVT_mex + FreightSale_usa
- *   CrossborderRate = FreightPrice + BorderFee
- *   COGS            = CVT_mex + FreightCost_usa + BorderFee
- *   GrossProfit     = CrossborderRate − COGS
- *   MarketRef       = PVT_mex + MarketRate_usa (DAT)
- *
- * Validated end-to-end vs quickRate:
- *   Mexico DF→Memphis D2D Export: FreightPrice 3505.52, +border = 3655.52 ✓
- *   MTY→Dallas Flatbed D2D Export: FreightPrice 1574.03, +border = 1724.03 ✓
+ * Validated end-to-end: Monterrey→Dallas Flatbed D2D Export
+ *   MX flat 1200 + USA flat 1391 → Freight Baseline 2600 ✓
  */
-import { getParam, type ParamMap } from '../assumptions/assumptions.service.js'
-import { round2, round4, usdToMxn } from '../../utils/currency.js'
-import { kmToMiles } from '../../utils/units.js'
+import { type ParamMap } from '../assumptions/assumptions.service.js'
 import { calculateMexLeg } from './engine.mex.js'
 import { calculateUsaLeg } from './engine.usa.js'
-import type {
-  EngineInput, EngineOutput, MexLegOutput, UsaLegOutput,
-} from './engine.types.js'
+import type { EngineInput, EngineOutput, MexLegOutput, UsaLegOutput } from './engine.types.js'
 
-/** Which legs an operation type requires. */
-function legsFor(operationType: string): { mex: boolean; usa: boolean } {
-  switch (operationType) {
-    case 'D2D Export':       // origin(MX) → border → dest(US)
-    case 'D2D Import':       // origin(US) → border → dest(MX)
+const mround = (x: number, m: number) => Math.round(x / m) * m
+
+function legsFor(operation: string): { mex: boolean; usa: boolean } {
+  switch (operation) {
+    case 'D2D Export':
+    case 'D2D Import':
       return { mex: true, usa: true }
-    case 'Drayage':          // short cross-dock haul, priced US-side
+    case 'Drayage':
       return { mex: false, usa: true }
-    case 'Intra-Mex':
-    case 'MX Northbound':
-    case 'MX Southbound':
-    case 'Local':
-      return { mex: true, usa: false }
-    default:
+    default: // Intra-Mex, MX Northbound, MX Southbound, Local
       return { mex: true, usa: false }
   }
 }
 
 export function calculate(input: EngineInput): EngineOutput {
   const params: ParamMap = Object.assign({}, input.params, input.overrides ?? {})
-  const { equipment, market, operationType, serviceType } = input
-  const fxRate = market.fxRate > 0 ? market.fxRate : 1
-
-  const need = legsFor(operationType)
+  const { operation } = input
+  const fxRate = input.fxRate && input.fxRate > 0 ? input.fxRate : 17.5
+  const need = legsFor(operation)
 
   let mexLeg: MexLegOutput | null = null
-  if (need.mex && input.mexLane) {
-    mexLeg = calculateMexLeg(input.mexLane, equipment, operationType, serviceType, params, market)
-  }
+  if (need.mex && input.mexLeg) mexLeg = calculateMexLeg(input.mexLeg, params)
 
   let usaLeg: UsaLegOutput | null = null
-  if (need.usa && input.usaLane) {
-    usaLeg = calculateUsaLeg(input.usaLane, equipment, operationType, params)
-  }
+  if (need.usa && input.usaLeg) usaLeg = calculateUsaLeg(input.usaLeg, params)
 
-  // ── Assembly (quickRate) ──────────────────────────────────────────────
-  const freightPrice = round4((mexLeg?.pvt ?? 0) + (usaLeg?.freightSale ?? 0))
-
-  const isCrossborder = !!(mexLeg && usaLeg)
-  const borderFee = input.borderCrossing && isCrossborder
-    ? getParam(params, 'BORDER', 'Border Crossing Fee', 150)
-    : 0
-
-  const crossborderRate = round4(freightPrice + borderFee)
-  const cogs = round4((mexLeg?.cvt ?? 0) + (usaLeg?.freightCost ?? 0) + borderFee)
-  const grossProfit = round4(crossborderRate - cogs)
-  const grossMargin = crossborderRate > 0 ? round4(grossProfit / crossborderRate) : 0
-  const marketRefPrice = round4((mexLeg?.pvt ?? 0) + (usaLeg?.marketRate ?? 0) + borderFee)
-
-  // Total distance in miles (MEX km → miles + USA miles)
-  const mexMiles = mexLeg ? kmToMiles(mexLeg.km) : 0
-  const totalMiles = round4(mexMiles + (usaLeg?.miles ?? 0))
+  // Leg flats (what the quote sums). MX flat = required tariff; USA flat = miles×(RPM+FSC).
+  const mexFlat = mexLeg ? mexLeg.requiredTariffUsd : 0
+  const usaFlat = usaLeg ? usaLeg.flatUsd : 0
+  const freightBaselineUsd = mround(mexFlat + usaFlat, 100)
 
   return {
-    operationType,
+    operation,
     mexLeg,
     usaLeg,
-    freightPrice,
-    borderFee,
-    crossborderRate,
-    cogs,
-    grossProfit,
-    grossMargin,
-    marketRefPrice,
-    requiredTariffUsd: crossborderRate,
-    requiredTariffMxn: round2(usdToMxn(crossborderRate, fxRate)),
-    productionCostUsd: cogs,
-    totalMiles,
+    freightBaselineUsd,
+    requiredTariffUsd: freightBaselineUsd,
     fxRateUsed: fxRate,
   }
 }

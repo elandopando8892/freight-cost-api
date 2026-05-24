@@ -1,122 +1,134 @@
 /**
- * MEX leg — exact reproduction of d2d_mexRateProduction (columns L..BC).
+ * MEX leg — exact reproduction of Freight Cost Model V3.0 `mexLaneProd`.
  *
- *   CBFA = B63 × MIN(fracViaje, 1)                         (V)
- *   CBVR = svcFactor × (B64 − tarifaUS + tarifaMX) × km    (X)
- *   UT   = B65                                             (Y)
- *   CBTT = CBFA + CBVR + UT                                (Z)
- *   EACT = CBTT × (configFactor − 1)                       (AB)
- *   EAEO = km × tarifaMX × (driverFactor − 1)             (AD)
- *   EAFR = CBVR × (laneFactor − 1)                         (AF)
- *   CAGR = driverExpenses / 20                             (AG)
- *   CAGV = km < 251 ? 0 : CAGR + gastoAdicional            (AH)
- *   ITA  = CAGV + EAFR + EAEO + EACT + CAGR                (AI)
- *   CIT  = CBTT + ITA                                      (AJ)
- *   MARGEN = CBTT × kmTierMargin                           (AS)
- *   TBT  = CIT + MARGEN                                    (AT)
- *   EMTR = CBTT × (trailerFactor − 1)                      (AV)
- *   EMTO = CBTT × (operationFactor − 1)                    (AX)
- *   ICEM = EMTR + EMTO                                     (AY)
- *   ICC  = litros × dieselUsdL                             (AZ)
- *   PVT  = TBT + ICEM + ICC                                (BA)
- *   CVT  = CIT − EACT − UT − CBFA + ICC                    (BB)
- *
- * Validated vs production rows:
- *   Mexico DF→NLaredo 1120km DryVan D2DExport: PVT 1803.04 ✓
- *   MTY→NLaredo        225km Flatbed D2DExport: PVT  595.02 ✓
+ * Validated vs MX-RATE-PROD-2026-Q2-01 (Monterrey→Nuevo Laredo Flatbed D2D Export):
+ *   CVU 439.42, CFU 107.57, Production 546.98, Technical Tariff 781.41,
+ *   Risk Adj 406.87, Required Tariff MROUND(1188.28,100)=1200 ✓
  */
 import { getParam, type ParamMap } from '../assumptions/assumptions.service.js'
-import { round4 } from '../../utils/currency.js'
 import {
-  performanceFactor, trailerFactor, operationFactor, serviceFactor,
-  configFactor, driverFactor, laneFactor, kmTierMargin,
+  laneFactor, operationFactor, trailerFactor, driverFactor, equipmentFactors,
 } from './engine.factors.js'
-import type { EquipmentSpec, MarketSnapshot, MexLaneData, MexLegOutput } from './engine.types.js'
+import type { MexLegInput, MexLegOutput } from './engine.types.js'
 
-const LOAD_HOURS = 2
-const UNLOAD_HOURS = 2
-const CAGV_MIN_KM = 251       // routes shorter than this carry no travel per-diem
-const CAGR_DIVISOR = 20
+const MI_PER_KM = 1 / 1.60934
+const mround = (x: number, m: number) => Math.round(x / m) * m
 
-export function calculateMexLeg(
-  lane: MexLaneData,
-  equipment: EquipmentSpec,
-  operationType: string,
-  serviceType: string,
-  params: ParamMap,
-  market: MarketSnapshot,
-): MexLegOutput {
-  // Base rates from d2dCostCards totals
-  const cbfaRate = getParam(params, 'FINANCE', 'CBFA Daily Rate', 73.5648)        // B63
-  const cvuPerKm = getParam(params, 'GENERAL_BASE', 'CVU Base per KM', 0.9176159091) // B64
-  const ut       = getParam(params, 'GENERAL_BASE', 'UT Per Trip', 80)            // B65
-  const tarifaUS = getParam(params, 'LABOR', 'Tarifa Operador US', 0.4)           // D9
-  const tarifaMX = getParam(params, 'LABOR', 'Tarifa Operador MX', 0.15)          // D10
-  const gastoAdic = getParam(params, 'GENERAL_BASE', 'Gasto Adicional sobre Ruta', 0) // D2
-  const dieselUsdL = market.dieselUsUsdL > 0
-    ? market.dieselUsUsdL
-    : getParam(params, 'FUEL', 'Diesel US Border', 0.95)                          // B13
+export function calculateMexLeg(lane: MexLegInput, params: ParamMap): MexLegOutput {
+  const { equipment } = lane
+  const isD2D = lane.operation === 'D2D Export' || lane.operation === 'D2D Import'
+  const isRoundtrip = lane.service === 'Roundtrip'
+  const isBackhaul = lane.service === 'Backhaul'
+  const isTandem = equipment.config === 'Tandem'
 
-  const km = lane.km
+  // Assumptions
+  const deadheadBase = getParam(params, 'UTILIZATION', 'Deadhead Base', 0.15)
+  const loadTime = getParam(params, 'UTILIZATION', 'Load Time', 2)
+  const unloadTime = getParam(params, 'UTILIZATION', 'Unload Time', 2)
+  const rendCargado = getParam(params, 'FUEL', 'Rendimiento Cargado', 2.8)
+  const rendVacio = getParam(params, 'FUEL', 'Rendimiento Vacío', 3.2)
+  const dieselMx = getParam(params, 'FUEL', 'Diesel MX', 28)
+  const dieselUs = getParam(params, 'FUEL', 'Diesel US Border', 1.49)
+  const mixMx = getParam(params, 'FUEL', 'Fuel Purchase Mix MX', 0.3)
+  const mixUs = getParam(params, 'FUEL', 'Fuel Purchase Mix US', 0.7)
+  const fuelEscalation = getParam(params, 'FUEL', 'Fuel Escalation Buffer', 0.05)
+  const tc = getParam(params, 'FINANCE', 'Tipo de Cambio', 17.5)
+  const tarifaMx = getParam(params, 'LABOR', 'Tarifa Operador MX', 0.18)
+  const gastoAdicional = getParam(params, 'GENERAL_BASE', 'Gasto Adicional sobre Ruta', 0.05)
+  const maintTiresPerKm = getParam(params, 'UTILIZATION', 'Maint and Tires Rate per KM', 0.2348384848)
+  const borderTransactional = getParam(params, 'BORDER', 'Border Transactional Cost', 200)
+  const monthlyFixedCost = getParam(params, 'FINANCE', 'Monthly Fixed Cost', 381384.0354)
+  const operadores = getParam(params, 'GENERAL_BASE', 'Operadores', 52)
+  const kmPerOperator = getParam(params, 'GENERAL_BASE', 'Kilómetros promedio x operador', 22000)
+  const flota = getParam(params, 'GENERAL_BASE', 'Tamaño de Flota', 50)
+  const operatividad = getParam(params, 'GENERAL_BASE', 'Índice de Operatividad', 0.9)
+  const periodo = getParam(params, 'GENERAL_BASE', 'Periodo de Operación', 26)
+  const tandemFuelPenalty = getParam(params, 'CONFIG', 'Tandem Fuel Penalty', 0.12)
+  const tandemTollPremium = getParam(params, 'CONFIG', 'Tandem Toll Premium', 0.3)
+  const tandemMaintFactor = getParam(params, 'CONFIG', 'Tandem Maint/Tires Factor', 1.35)
+  const tandemCfuFactor = getParam(params, 'CONFIG', 'Tandem CFU Factor', 1.2)
+  const flatbedComplexity = getParam(params, 'RISK', 'Flatbed Complexity Factor', 0.25)
+  const mxSecurityRisk = getParam(params, 'RISK', 'MX Security Risk Reserve', 0.025)
+  const configRiskTandem = getParam(params, 'RISK', 'Config Risk Premium Tandem', 0.1)
 
-  // Fuel: km / performance(truckType)
-  const perf = performanceFactor(equipment.truckType, params)
-  const litros = round4(km / perf)
+  const eq = equipmentFactors(equipment.truckType)
 
-  // Timing (12-hour working-day model)
-  const fracTransit = round4(lane.transitHrs / 12)
-  const fracWait = round4((LOAD_HOURS + UNLOAD_HOURS) / 12)
-  const fracViaje = round4(fracTransit + fracWait)
+  // ── Distances ────────────────────────────────────────────────────────
+  const emptyPct = isRoundtrip ? 0.03 : isBackhaul ? 0 : deadheadBase
+  const returnKm = isRoundtrip ? lane.baseKm : 0
+  const loadedKm = lane.baseKm + returnKm
+  const emptyKm = lane.baseKm * emptyPct
+  const totalKm = loadedKm + emptyKm
+  const loadedMiles = loadedKm * MI_PER_KM
+  const emptyMiles = emptyKm * MI_PER_KM
+  const totalMiles = loadedMiles + emptyMiles
 
-  // CBFA — fixed asset cost, capped at one productive day
-  const cbfa = round4(fracViaje < 1 ? fracViaje * cbfaRate : cbfaRate)
+  // ── Timing ───────────────────────────────────────────────────────────
+  const baseHours = lane.baseHours ?? 0
+  const cycleDays = Math.max((baseHours + loadTime + unloadTime) / 24, 0.33)
 
-  // CBVR — variable route cost
-  const svc = serviceFactor(serviceType, params)
-  const cbvr = round4(svc * (cvuPerKm - tarifaUS + tarifaMX) * km)
+  // ── UT margin / border ───────────────────────────────────────────────
+  const utMargin = isBackhaul
+    ? getParam(params, 'TECHNICAL_MARGIN', 'UT Rate Backhaul', 0.1)
+    : isRoundtrip
+      ? getParam(params, 'TECHNICAL_MARGIN', 'UT Rate Roundtrip', 0.2)
+      : getParam(params, 'TECHNICAL_MARGIN', 'UT Rate One Way', 0.3)
+  const borderUsd = isD2D ? borderTransactional : 0
 
-  const cbtt = round4(cbfa + cbvr + ut)
+  // ── CVU ──────────────────────────────────────────────────────────────
+  const adjLoadedKmL = rendCargado * eq.fuel * (1 - (isTandem ? tandemFuelPenalty : 0))
+  const adjEmptyKmL = rendVacio * eq.fuel * (1 - (isTandem ? tandemFuelPenalty : 0))
+  const blendedDieselUsdL = (dieselMx / tc) * mixMx + dieselUs * mixUs
+  const fuelUsd = (loadedKm / adjLoadedKmL + emptyKm / adjEmptyKmL) * blendedDieselUsdL * (1 + fuelEscalation)
+  const routeExpensesUsd = ((lane.routeExpensesMxn ?? 0) / tc) * (1 + (isTandem ? tandemTollPremium : 0))
+  const routeBufferUsd = routeExpensesUsd * gastoAdicional
+  const maintTiresUsd = totalKm * maintTiresPerKm * eq.maint * (isTandem ? tandemMaintFactor : 1)
+  const driverUsd = totalMiles * tarifaMx * driverFactor(equipment.driver, params) * eq.driver
+  const cvuUsd = fuelUsd + routeExpensesUsd + routeBufferUsd + maintTiresUsd + driverUsd + borderUsd
 
-  // Added-effect terms that belong to ITA
-  const cfgF = configFactor(equipment.config, params)
-  const eact = round4(cbtt * (cfgF - 1))
+  // ── CFU ──────────────────────────────────────────────────────────────
+  const monthlyFleetKm = operadores * kmPerOperator
+  const productiveTruckDays = flota * operatividad * periodo
+  const fixedCostPerKm = monthlyFixedCost / monthlyFleetKm
+  const fixedCostPerDay = monthlyFixedCost / productiveTruckDays
+  const configCfu = isTandem ? tandemCfuFactor : 1
+  const cfuByDistanceUsd = totalKm * fixedCostPerKm * configCfu * eq.fixed
+  const cfuByTimeUsd = cycleDays * fixedCostPerDay * eq.fixed * configCfu
+  const cfuUsd = isBackhaul ? 0 : Math.max(cfuByDistanceUsd, cfuByTimeUsd)
 
-  const drvF = driverFactor(equipment.driverType, params)
-  const eaeo = round4(km * tarifaMX * (drvF - 1))
+  // ── Production & technical tariff ────────────────────────────────────
+  const productionCostUsd = cvuUsd + cfuUsd
+  const technicalTariffUsd = productionCostUsd / (1 - utMargin)
+  const technicalUtilityUsd = technicalTariffUsd - productionCostUsd
 
-  const laneF = laneFactor(lane.routeType, params)
-  const eafr = round4(cbvr * (laneF - 1))
+  // ── Risk ─────────────────────────────────────────────────────────────
+  const routeFactor = laneFactor(lane.route, params)
+  const routeRiskUsd = (routeFactor - 1) * (fuelUsd + routeExpensesUsd + maintTiresUsd)
+  const trailerFac = trailerFactor(equipment.trailer, params)
+  const trailerRiskUsd = (trailerFac - 1) * productionCostUsd
+  const flatbedComplexityUsd = equipment.trailer === 'Flatbed' ? productionCostUsd * flatbedComplexity : 0
+  const securityRiskUsd = productionCostUsd * mxSecurityRisk
+  const tandemRiskUsd = isTandem ? productionCostUsd * configRiskTandem : 0
+  const operationFac = operationFactor(lane.operation, params)
+  const operationRiskUsd = (operationFac - 1) * productionCostUsd
+  const totalRiskAdjUsd =
+    routeRiskUsd + trailerRiskUsd + flatbedComplexityUsd + securityRiskUsd + tandemRiskUsd + operationRiskUsd
 
-  const cagr = round4(lane.driverExpenses / CAGR_DIVISOR)
-  const cagv = km < CAGV_MIN_KM ? 0 : round4(cagr + gastoAdic)
-  const ita = round4(cagv + eafr + eaeo + eact + cagr)
-
-  const cit = round4(cbtt + ita)
-
-  // Margin by km tier
-  const margenPct = kmTierMargin(km, params)
-  const margen = round4(cbtt * margenPct)
-  const tbt = round4(cit + margen)
-
-  // Market effects — ICEM is only trailer + operation
-  const trlF = trailerFactor(equipment.trailerType, params)
-  const emtr = round4(cbtt * (trlF - 1))
-  const opF = operationFactor(operationType, params)
-  const emto = round4(cbtt * (opF - 1))
-  const icem = round4(emtr + emto)
-
-  const icc = round4(litros * dieselUsdL)
-
-  const pvt = round4(tbt + icem + icc)
-  const cvt = round4(cit - eact - ut - cbfa + icc)
+  // ── Required tariff ──────────────────────────────────────────────────
+  const requiredTariffUsd = mround(technicalTariffUsd + totalRiskAdjUsd, 100)
+  const operatingProfitUsd = requiredTariffUsd - productionCostUsd
+  const operatingMargin = requiredTariffUsd > 0 ? operatingProfitUsd / requiredTariffUsd : 0
+  const rpm = totalMiles > 0 ? (requiredTariffUsd - fuelUsd) / totalMiles : 0
+  const fsc = totalMiles > 0 ? fuelUsd / totalMiles : 0
 
   return {
-    km, litros, fracTransit, fracWait, fracViaje,
-    cbfa, serviceFactor: svc, cbvr, ut, cbtt,
-    configFactor: cfgF, eact, driverFactor: drvF, eaeo, laneFactor: laneF, eafr,
-    cagr, cagv, ita,
-    cit, margenPct, margen, tbt,
-    trailerFactor: trlF, emtr, operationFactor: opF, emto, icem, icc,
-    pvt, cvt,
+    loadedKm, emptyKm, totalKm, loadedMiles, emptyMiles, totalMiles, cycleDays,
+    blendedDieselUsdL, fuelUsd, routeExpensesUsd, routeBufferUsd, maintTiresUsd, driverUsd, borderUsd,
+    cvuUsd,
+    fixedCostPerKm, fixedCostPerDay, cfuByDistanceUsd, cfuByTimeUsd, cfuUsd,
+    productionCostUsd, utMargin, technicalUtilityUsd, technicalTariffUsd,
+    routeFactor, routeRiskUsd, trailerFactor: trailerFac, trailerRiskUsd, flatbedComplexityUsd,
+    securityRiskUsd, tandemRiskUsd, operationFactor: operationFac, operationRiskUsd, totalRiskAdjUsd,
+    requiredTariffUsd, operatingProfitUsd, operatingMargin, rpm, fsc,
   }
 }

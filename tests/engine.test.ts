@@ -1,124 +1,133 @@
 import { describe, it, expect } from 'vitest'
-import { calculate } from '../src/modules/engine/engine.calculator.js'
 import { calculateMexLeg } from '../src/modules/engine/engine.mex.js'
 import { calculateUsaLeg } from '../src/modules/engine/engine.usa.js'
-import type { EquipmentSpec, MarketSnapshot } from '../src/modules/engine/engine.types.js'
+import { calculate } from '../src/modules/engine/engine.calculator.js'
+import type { MexLegInput, UsaLegInput } from '../src/modules/engine/engine.types.js'
 
-// Empty param map → engine falls back to the verified spreadsheet defaults.
+// Empty param map → engine uses the verified Freight Cost Model V3.0 defaults.
 const params = {}
-// Spreadsheet base model: FX = 1, US border diesel = 0.95 USD/L
-const market: MarketSnapshot = { fxRate: 1, dieselUsUsdL: 0.95 }
 
-const dryVan: EquipmentSpec = { truckType: 'Truck Trailer', trailerType: 'Dry Van', config: 'Single', driverType: 'B1' }
-const flatbed: EquipmentSpec = { truckType: 'Truck Trailer', trailerType: 'Flatbed', config: 'Single', driverType: 'B1' }
+describe('MEX leg — Freight Cost Model V3.0 (mexLaneProd)', () => {
+  // MX-RATE-PROD-2026-Q2-01: Monterrey → Nuevo Laredo, Flatbed, D2D Export, One Way, B1
+  const mty: MexLegInput = {
+    baseKm: 225,
+    routeExpensesMxn: 0,
+    baseHours: 0,
+    operation: 'D2D Export',
+    service: 'One Way',
+    route: 'Straight & Danger',
+    equipment: { truckType: 'Truck Trailer', trailer: 'Flatbed', config: 'Single', driver: 'B1' },
+  }
 
-describe('MEX leg — d2d_mexRateProduction', () => {
-  it('Mexico DF → Nuevo Laredo, 1120km, Dry Van, D2D Export → PVT 1803.04', () => {
-    const leg = calculateMexLeg(
-      { km: 1120, transitHrs: 27, driverExpenses: 964.2857, routeType: 'Straight & Danger' },
-      dryVan, 'D2D Export', 'One Way', params, market,
-    )
-    expect(leg.cbtt).toBeCloseTo(901.29, 1)
-    expect(leg.cit).toBeCloseTo(997.72, 1)
-    expect(leg.tbt).toBeCloseTo(1268.11, 1)
-    expect(leg.pvt).toBeCloseTo(1803.04, 1)
+  it('distances & timing', () => {
+    const r = calculateMexLeg(mty, params)
+    expect(r.loadedKm).toBe(225)
+    expect(r.emptyKm).toBeCloseTo(33.75, 2)
+    expect(r.totalKm).toBeCloseTo(258.75, 2)
+    expect(r.loadedMiles).toBeCloseTo(139.81, 1)
+    expect(r.totalMiles).toBeCloseTo(160.78, 1)
+    expect(r.cycleDays).toBeCloseTo(0.33, 2)
   })
 
-  it('MTY → Nuevo Laredo, 225km, Flatbed, D2D Export → PVT 595.02', () => {
-    const leg = calculateMexLeg(
-      { km: 225, transitHrs: 4, driverExpenses: 142.8571, routeType: 'Straight & Danger' },
-      flatbed, 'D2D Export', 'One Way', params, market,
-    )
-    expect(leg.cbfa).toBeCloseTo(49.04, 1)
-    expect(leg.cbvr).toBeCloseTo(150.21, 1)
-    expect(leg.cbtt).toBeCloseTo(279.26, 1)
-    expect(leg.cagv).toBe(0)              // route < 251 km → no travel per-diem
-    expect(leg.margenPct).toBe(0.4)       // route < 501 km
-    expect(leg.emtr).toBeCloseTo(69.81, 1) // Flatbed +25%
-    expect(leg.emto).toBeCloseTo(55.85, 1) // D2D Export +20%
-    expect(leg.pvt).toBeCloseTo(595.02, 1)
+  it('CVU components', () => {
+    const r = calculateMexLeg(mty, params)
+    expect(r.blendedDieselUsdL).toBeCloseTo(1.523, 2)
+    expect(r.fuelUsd).toBeCloseTo(145.37, 0)
+    expect(r.maintTiresUsd).toBeCloseTo(60.76, 0)
+    expect(r.driverUsd).toBeCloseTo(33.28, 1)   // B1 driver factor 1.15
+    expect(r.borderUsd).toBe(200)
+    expect(r.cvuUsd).toBeCloseTo(439.42, 0)
   })
 
-  it('Aguascalientes → Nuevo Laredo, 787km, Dry Van → PVT 1380.20', () => {
-    const leg = calculateMexLeg(
-      { km: 787, transitHrs: 22, driverExpenses: 785.7142, routeType: 'Straight & Danger' },
-      dryVan, 'D2D Export', 'One Way', params, market,
-    )
-    expect(leg.margenPct).toBe(0.35)      // 501 ≤ km < 1001
-    expect(leg.pvt).toBeCloseTo(1380.2, 0)
-  })
-})
-
-describe('USA leg — d2d_usaRateProduction', () => {
-  it('St Johns → Laredo, 3681mi, Dry Van, D2D Import → FreightSale 4564.41', () => {
-    const leg = calculateUsaLeg(
-      {
-        miles: 3681, routeExpenses: 600, marketRpm: 1.58,
-        outboundCondition: 'Very Loose', fscOriginUsdMile: 0, fscDestUsdMile: 0.41,
-      },
-      dryVan, 'D2D Import', params,
-    )
-    expect(leg.haulage).toBeCloseTo(3377.74, 1)
-    expect(leg.linehaulSale).toBeCloseTo(3884.41, 1)
-    expect(leg.odhFee).toBeCloseTo(80, 1)   // import: ODH from Very Loose DryVan = 200 × 0.4
-    expect(leg.idhFee).toBe(0)              // import → IDH = 0
-    expect(leg.freightSale).toBeCloseTo(4564.41, 1)
+  it('CFU (max of distance/time)', () => {
+    const r = calculateMexLeg(mty, params)
+    expect(r.cfuByDistanceUsd).toBeCloseTo(86.26, 0)
+    expect(r.cfuByTimeUsd).toBeCloseTo(107.57, 0)
+    expect(r.cfuUsd).toBeCloseTo(107.57, 0)
   })
 
-  it('Laredo → Dallas, 435mi, Flatbed, D2D Export → FreightSale 979.01', () => {
-    const leg = calculateUsaLeg(
-      {
-        miles: 435, routeExpenses: 0, marketRpm: 2.33,
-        outboundCondition: 'Moderately Tight', fscOriginUsdMile: 0.41, fscDestUsdMile: 0.41,
-      },
-      flatbed, 'D2D Export', params,
-    )
-    expect(leg.haulage).toBeCloseTo(399.16, 1)
-    expect(leg.markup).toBe(0.6)            // < 501 mi
-    expect(leg.linehaulSale).toBeCloseTo(638.66, 1)
-    expect(leg.odhFee).toBe(0)             // export → ODH = 0
-    expect(leg.idhFee).toBeCloseTo(162, 1) // Flatbed Moderately Tight = 200 × (0.4+0.41)
-    expect(leg.freightSale).toBeCloseTo(979.01, 1)
-    expect(leg.marketRate).toBeCloseTo(1191.9, 1)
+  it('production → technical tariff', () => {
+    const r = calculateMexLeg(mty, params)
+    expect(r.productionCostUsd).toBeCloseTo(546.98, 0)
+    expect(r.utMargin).toBe(0.3)
+    expect(r.technicalTariffUsd).toBeCloseTo(781.41, 0)
+  })
+
+  it('risk adjustments', () => {
+    const r = calculateMexLeg(mty, params)
+    expect(r.routeRiskUsd).toBeCloseTo(10.31, 0)
+    expect(r.trailerRiskUsd).toBeCloseTo(164.10, 0)
+    expect(r.flatbedComplexityUsd).toBeCloseTo(136.75, 0)
+    expect(r.securityRiskUsd).toBeCloseTo(13.67, 0)
+    expect(r.operationRiskUsd).toBeCloseTo(82.05, 0)
+    expect(r.totalRiskAdjUsd).toBeCloseTo(406.87, 0)
+  })
+
+  it('Carrier Required Tariff = MROUND(1188.28, 100) = $1,200', () => {
+    const r = calculateMexLeg(mty, params)
+    expect(r.requiredTariffUsd).toBe(1200)
+    expect(r.rpm).toBeCloseTo(6.56, 1)
+    expect(r.fsc).toBeCloseTo(0.90, 1)
+  })
+
+  it('Dry Van variant lands below Flatbed', () => {
+    const dv = calculateMexLeg({ ...mty, equipment: { ...mty.equipment, trailer: 'Dry Van' } }, params)
+    const fb = calculateMexLeg(mty, params)
+    expect(dv.requiredTariffUsd).toBeLessThan(fb.requiredTariffUsd)
   })
 })
 
-describe('Cross-border assembly — quickRate', () => {
-  it('MTY → Dallas, Flatbed, D2D Export → CrossborderRate 1724.03', () => {
-    const r = calculate({
-      operationType: 'D2D Export',
-      serviceType: 'One Way',
-      equipment: flatbed,
-      params,
-      market,
-      mexLane: { km: 225, transitHrs: 4, driverExpenses: 142.8571, routeType: 'Straight & Danger' },
-      usaLane: {
-        miles: 435, routeExpenses: 0, marketRpm: 2.33,
-        outboundCondition: 'Moderately Tight', fscOriginUsdMile: 0.41, fscDestUsdMile: 0.41,
-      },
-      borderCrossing: true,
-    })
-    expect(r.mexLeg?.pvt).toBeCloseTo(595.02, 1)
-    expect(r.usaLeg?.freightSale).toBeCloseTo(979.01, 1)
-    expect(r.freightPrice).toBeCloseTo(1574.03, 1)
-    expect(r.borderFee).toBe(150)
-    expect(r.crossborderRate).toBeCloseTo(1724.03, 1)
-    expect(r.grossMargin).toBeGreaterThan(0)
-    expect(r.grossMargin).toBeLessThan(1)
+describe('USA leg — Freight Cost Model V3.0 (usaLaneProd)', () => {
+  // US-RATE-PROD-2026-Q2-520: Laredo → Dallas, Flatbed, D2D Export, One Way, B1
+  const lrd: UsaLegInput = {
+    loadedMiles: 435,
+    transitDaysRaw: 0,
+    driverExpenses: 0,
+    outState: 'TX',
+    dieselUsdGal: 5.152,
+    fscUsdMile: 0.8,
+    originCondition: 'Very Tight',
+    destCondition: 'Very Tight',
+    operation: 'D2D Export',
+    service: 'One Way',
+    equipment: { truckType: 'Truck Trailer', trailer: 'Flatbed', config: 'Single', driver: 'B1' },
+  }
+
+  it('CVU / CFU / technical', () => {
+    const r = calculateUsaLeg(lrd, params)
+    expect(r.totalOperationalMiles).toBeCloseTo(461.1, 0)
+    expect(r.fuelCostUsd).toBeCloseTo(358.15, 0)
+    expect(r.driverCostUsd).toBeCloseTo(318.16, 0)
+    expect(r.maintTiresUsd).toBeCloseTo(174.27, 0)
+    expect(r.cvuInclFuelUsd).toBeCloseTo(850.57, 0)
+    expect(r.cfuUsd).toBeCloseTo(48.90, 0)
+    expect(r.technicalTariffInclFuelUsd).toBeCloseTo(1284.96, 0)
   })
 
-  it('MX-only lane (Intra-Mex) runs only the MEX leg', () => {
+  it('risk → required ex-fuel → RPM/FSC → flat 1391', () => {
+    const r = calculateUsaLeg(lrd, params)
+    expect(r.trailerRiskUsd).toBeCloseTo(269.84, 0)
+    expect(r.requiredTariffExFuelUsd).toBeCloseTo(1043.16, 0)
+    expect(r.rpm).toBeCloseTo(2.398, 1)
+    expect(r.fsc).toBe(0.8)
+    expect(r.flatUsd).toBeCloseTo(1391, 0)
+  })
+})
+
+describe('Cross-border assembly — Monterrey → Dallas Flatbed D2D Export = $2,600', () => {
+  const equipment = { truckType: 'Truck Trailer', trailer: 'Flatbed', config: 'Single', driver: 'B1' }
+  it('sums MX flat 1200 + USA flat 1391 → MROUND 2600', () => {
     const r = calculate({
-      operationType: 'Intra-Mex',
-      serviceType: 'One Way',
-      equipment: dryVan,
-      params,
-      market,
-      mexLane: { km: 300, transitHrs: 6, driverExpenses: 214.2857, routeType: 'Straight & Danger' },
+      operation: 'D2D Export', service: 'One Way', equipment, params,
+      mexLeg: { baseKm: 225, routeExpensesMxn: 0, baseHours: 0, operation: 'D2D Export', service: 'One Way', route: 'Straight & Danger', equipment },
+      usaLeg: {
+        loadedMiles: 435, transitDaysRaw: 0, driverExpenses: 0, outState: 'TX',
+        dieselUsdGal: 5.152, fscUsdMile: 0.8, originCondition: 'Very Tight', destCondition: 'Very Tight',
+        operation: 'D2D Export', service: 'One Way', equipment,
+      },
     })
-    expect(r.mexLeg).not.toBeNull()
-    expect(r.usaLeg).toBeNull()
-    expect(r.borderFee).toBe(0)
-    expect(r.crossborderRate).toBeCloseTo(r.mexLeg!.pvt, 4)
+    expect(r.mexLeg?.requiredTariffUsd).toBe(1200)
+    expect(r.usaLeg?.flatUsd).toBeCloseTo(1391, 0)
+    expect(r.freightBaselineUsd).toBe(2600)
   })
 })
