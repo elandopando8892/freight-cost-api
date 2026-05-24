@@ -203,6 +203,28 @@ model UsaLaneMktPrice {
   @@index([laneKeyNorm])
 }
 
+// usaDATbenchmark — raw DAT spot market, keyed "ORIGIN - DEST TRUCK TRAILER EQUIPMENT"
+model UsaDatBenchmark {
+  id          String  @id @default(cuid())
+  laneKey     String  @unique
+  laneKeyNorm String  @unique
+  miles       Float   @default(0)
+  avgRpm      Float   @default(0)
+  lowRpm      Float   @default(0)
+  highRpm     Float   @default(0)
+  rpm         Float   @default(0) // avg of avg/low/high (DAT AE)
+  fsc         Float   @default(0)
+  allInUsd    Float   @default(0)
+  companies   Int     @default(0)
+  reports     Int     @default(0)
+  stdDev      Float   @default(0)
+  equipment   String?
+  origin      String?
+  dest        String?
+
+  @@index([laneKeyNorm])
+}
+
 // usaMktCondition — market condition by trailer type, per market
 model UsaMktCondition {
   id          String  @id @default(cuid())

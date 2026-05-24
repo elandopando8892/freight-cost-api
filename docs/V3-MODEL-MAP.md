@@ -10,7 +10,7 @@
 | 1 | cusCatalog | A1:AB9336 | zip→location→market catalog | ✅ seeded ZipMarket |
 | 2 | Assumptions | A1:M54 | high-level params | ✅ implemented + seeded |
 | 3 | Inputs | A1:J147 | editable cost cards (Qty/PU) | ✅ 134 seeded · ⚠️ 13 extra |
-| 4 | Outputs | A1:M219 | derivations (cost + commercial) | ⚠️ cost ✅ / commercial ❌ |
+| 4 | Outputs | A1:M219 | derivations (cost + commercial) | ✅ cost + commercial |
 | 5 | Factors | A1:F47 | factor tables | ✅ engine.factors |
 | 6 | Equipments | A1:F6 | equipment factors | ✅ engine.factors |
 | 7 | mexLaneProd | A1:CP25138 | MX per-lane calc | ✅ formula engine.mex |
@@ -18,7 +18,7 @@
 | 9 | mexLaneData | A1:H3225 | MX lane km/expenses | ✅ seeded mexLaneExpense |
 | 10 | usaLaneData | A1:E27169 | USA lane miles | ✅ seeded usaLaneData |
 | 11 | usaLaneMktPrice | A1:B19844 | market RPM | ✅ seeded usaLaneMktPrice |
-| 12 | usaDATbenchmark | A1:AI13584 | DAT spot market | ❌ not mapped |
+| 12 | usaDATbenchmark | A1:AI13584 | DAT spot market | ✅ seeded UsaDatBenchmark |
 | 13 | usaMktCondition | A1:G1000 | market condition by trailer | ✅ seeded usaMktCondition |
 | 14 | usaFSCindex | A1:D1000 | FSC by diesel price | ❌ not mapped |
 | 15 | usaFuelcurrent | A1:B12 | current diesel by region | ❌ not mapped |
@@ -295,7 +295,7 @@ Engine derives Monthly Fixed Cost & Maint/Tires from these (engine.outputs.ts).
 
 ## 6. Outputs — derivations (218)
 
-Cost build-up (Operating…Fixed Cost) ✅ implemented · Commercial (COGS…Validation) ❌ pending.
+Cost build-up + commercial (COGS…Commercial) ✅ implemented · Validations ⚠️ partial.
 
 | Section | Field | Formula | Status |
 |---|---|---|---|
@@ -464,50 +464,50 @@ Cost build-up (Operating…Fixed Cost) ✅ implemented · Commercial (COGS…Val
 | Fixed Cost | Trip Fixed Cost by Distance | Total Operational KM * Fixed Cost per KM | ✅ |
 | Fixed Cost | Trip Fixed Cost by Time | Total Cycle Time Days * Fixed Cost per Productive Truck Day | ✅ |
 | Fixed Cost | Trip Fixed Cost | MAX(Trip Fixed Cost by Distance, Trip Fixed Cost by Time) | ✅ |
-| COGS | MX Linehaul COGS | MX Variable Cost + MX Fixed Cost Allocation + MX Route Expenses | ❌ |
-| COGS | US Linehaul COGS | US Variable Cost + US Fixed Cost Allocation + US Route Expenses | ❌ |
-| COGS | CA Linehaul COGS | CA Variable Cost + CA Fixed Cost Allocation + CA Route Expenses | ❌ |
-| COGS | Border COGS | Total Crossborder Variable Cost + Border Delay Cost + Border Fixed Allocation | ❌ |
-| COGS | Deadhead COGS | Empty Variable Cost + Empty Fixed Cost Allocation | ❌ |
-| COGS | Total Direct COGS | MX Linehaul COGS + US Linehaul COGS + CA Linehaul COGS + Border COGS + Deadhead COGS | ❌ |
-| COGS | Total Risk Adjusted COGS | Total Direct COGS + Total Risk Adjustment | ❌ |
-| COGS | COGS per Loaded Mile | Total Risk Adjusted COGS / Loaded Miles | ❌ |
-| COGS | COGS per Total Mile | Total Risk Adjusted COGS / Total Operational Miles | ❌ |
-| Market | Market RPM | Market Rate / Loaded Miles | ❌ |
-| Market | Market All-In Rate | Market Linehaul + Market Fuel + Market Accessorials | ❌ |
-| Market | Market vs COGS Spread | Market All-In Rate - Total Risk Adjusted COGS | ❌ |
-| Market | Market vs COGS Spread % | Market vs COGS Spread / Total Risk Adjusted COGS | ❌ |
-| Market | Market Condition Score | Loose/Balanced/Tight/Very Tight | ❌ |
-| Market | Market Adjustment Factor | Factor from market condition | ❌ |
-| Market | Risk-Adjusted Market Reference | Market All-In Rate * Market Adjustment Factor | ❌ |
-| Buy Rate | Cost-Based Buy Floor | Total Risk Adjusted COGS | ❌ |
-| Buy Rate | Estimated Carrier Buy Rate | MAX(Cost-Based Buy Floor, Risk-Adjusted Market Reference * Buy Market Weight) | ❌ |
-| Buy Rate | Carrier Buy Low | Estimated Carrier Buy Rate * 0.95 | ❌ |
-| Buy Rate | Carrier Buy Target | Estimated Carrier Buy Rate | ❌ |
-| Buy Rate | Carrier Buy High | Estimated Carrier Buy Rate * 1.08 | ❌ |
-| Buy Rate | Buy RPM | Estimated Carrier Buy Rate / Loaded Miles | ❌ |
-| Sell Rate | Minimum Sell Rate | Estimated Carrier Buy Rate / (1 - Minimum Gross Margin) | ❌ |
-| Sell Rate | Target Sell Rate | Estimated Carrier Buy Rate / (1 - Target Gross Margin) | ❌ |
-| Sell Rate | Premium Sell Rate | Estimated Carrier Buy Rate / (1 - Premium Gross Margin) | ❌ |
-| Sell Rate | Aggressive Sell Rate | MAX(Minimum Sell Rate, Risk-Adjusted Market Reference * Aggressive Market Factor) | ❌ |
-| Sell Rate | Recommended Sell Rate | Decision rule: market/cost/risk selected rate | ❌ |
-| Sell Rate | Sell RPM | Recommended Sell Rate / Loaded Miles | ❌ |
-| Margin | Gross Profit | Recommended Sell Rate - Estimated Carrier Buy Rate | ❌ |
-| Margin | Gross Margin | Gross Profit / Recommended Sell Rate | ❌ |
-| Margin | Markup | Gross Profit / Estimated Carrier Buy Rate | ❌ |
-| Margin | Contribution Profit | Recommended Sell Rate - Total Risk Adjusted COGS | ❌ |
-| Margin | Contribution Margin | Contribution Profit / Recommended Sell Rate | ❌ |
-| Margin | GP per Loaded Mile | Gross Profit / Loaded Miles | ❌ |
-| Margin | GP per Day | Gross Profit / Total Cycle Time Days | ❌ |
-| Commercial | Risk Level | Rule based on active risk premiums | ❌ |
-| Commercial | Confidence Level | Rule based on data completeness and market freshness | ❌ |
-| Commercial | No-Go Flag | TRUE if Sell < Minimum Sell or Margin < Minimum Margin | ❌ |
-| Commercial | Review Flag | TRUE if risk/accessorials/fuel/border exceed threshold | ❌ |
-| Commercial | Market Classification | Loose/Balanced/Tight/Very Tight | ❌ |
-| Commercial | Recommended Strategy | Aggressive / Target / Premium | ❌ |
-| Commercial | Negotiation Floor | Minimum Sell Rate | ❌ |
-| Commercial | Opening Ask | Premium Sell Rate | ❌ |
-| Commercial | Target Close | Target Sell Rate | ❌ |
+| COGS | MX Linehaul COGS | MX Variable Cost + MX Fixed Cost Allocation + MX Route Expenses | ✅ |
+| COGS | US Linehaul COGS | US Variable Cost + US Fixed Cost Allocation + US Route Expenses | ✅ |
+| COGS | CA Linehaul COGS | CA Variable Cost + CA Fixed Cost Allocation + CA Route Expenses | ✅ |
+| COGS | Border COGS | Total Crossborder Variable Cost + Border Delay Cost + Border Fixed Allocation | ✅ |
+| COGS | Deadhead COGS | Empty Variable Cost + Empty Fixed Cost Allocation | ✅ |
+| COGS | Total Direct COGS | MX Linehaul COGS + US Linehaul COGS + CA Linehaul COGS + Border COGS + Deadhead COGS | ✅ |
+| COGS | Total Risk Adjusted COGS | Total Direct COGS + Total Risk Adjustment | ✅ |
+| COGS | COGS per Loaded Mile | Total Risk Adjusted COGS / Loaded Miles | ✅ |
+| COGS | COGS per Total Mile | Total Risk Adjusted COGS / Total Operational Miles | ✅ |
+| Market | Market RPM | Market Rate / Loaded Miles | ✅ |
+| Market | Market All-In Rate | Market Linehaul + Market Fuel + Market Accessorials | ✅ |
+| Market | Market vs COGS Spread | Market All-In Rate - Total Risk Adjusted COGS | ✅ |
+| Market | Market vs COGS Spread % | Market vs COGS Spread / Total Risk Adjusted COGS | ✅ |
+| Market | Market Condition Score | Loose/Balanced/Tight/Very Tight | ✅ |
+| Market | Market Adjustment Factor | Factor from market condition | ✅ |
+| Market | Risk-Adjusted Market Reference | Market All-In Rate * Market Adjustment Factor | ✅ |
+| Buy Rate | Cost-Based Buy Floor | Total Risk Adjusted COGS | ✅ |
+| Buy Rate | Estimated Carrier Buy Rate | MAX(Cost-Based Buy Floor, Risk-Adjusted Market Reference * Buy Market Weight) | ✅ |
+| Buy Rate | Carrier Buy Low | Estimated Carrier Buy Rate * 0.95 | ✅ |
+| Buy Rate | Carrier Buy Target | Estimated Carrier Buy Rate | ✅ |
+| Buy Rate | Carrier Buy High | Estimated Carrier Buy Rate * 1.08 | ✅ |
+| Buy Rate | Buy RPM | Estimated Carrier Buy Rate / Loaded Miles | ✅ |
+| Sell Rate | Minimum Sell Rate | Estimated Carrier Buy Rate / (1 - Minimum Gross Margin) | ✅ |
+| Sell Rate | Target Sell Rate | Estimated Carrier Buy Rate / (1 - Target Gross Margin) | ✅ |
+| Sell Rate | Premium Sell Rate | Estimated Carrier Buy Rate / (1 - Premium Gross Margin) | ✅ |
+| Sell Rate | Aggressive Sell Rate | MAX(Minimum Sell Rate, Risk-Adjusted Market Reference * Aggressive Market Factor) | ✅ |
+| Sell Rate | Recommended Sell Rate | Decision rule: market/cost/risk selected rate | ✅ |
+| Sell Rate | Sell RPM | Recommended Sell Rate / Loaded Miles | ✅ |
+| Margin | Gross Profit | Recommended Sell Rate - Estimated Carrier Buy Rate | ✅ |
+| Margin | Gross Margin | Gross Profit / Recommended Sell Rate | ✅ |
+| Margin | Markup | Gross Profit / Estimated Carrier Buy Rate | ✅ |
+| Margin | Contribution Profit | Recommended Sell Rate - Total Risk Adjusted COGS | ✅ |
+| Margin | Contribution Margin | Contribution Profit / Recommended Sell Rate | ✅ |
+| Margin | GP per Loaded Mile | Gross Profit / Loaded Miles | ✅ |
+| Margin | GP per Day | Gross Profit / Total Cycle Time Days | ✅ |
+| Commercial | Risk Level | Rule based on active risk premiums | ✅ |
+| Commercial | Confidence Level | Rule based on data completeness and market freshness | ✅ |
+| Commercial | No-Go Flag | TRUE if Sell < Minimum Sell or Margin < Minimum Margin | ✅ |
+| Commercial | Review Flag | TRUE if risk/accessorials/fuel/border exceed threshold | ✅ |
+| Commercial | Market Classification | Loose/Balanced/Tight/Very Tight | ✅ |
+| Commercial | Recommended Strategy | Aggressive / Target / Premium | ✅ |
+| Commercial | Negotiation Floor | Minimum Sell Rate | ✅ |
+| Commercial | Opening Ask | Premium Sell Rate | ✅ |
+| Commercial | Target Close | Target Sell Rate | ✅ |
 | Validation | Fuel Mix Check | IF(Fuel Purchase Mix MX + Fuel Purchase Mix US = 1, OK, ERROR) | ❌ |
 | Validation | Low High Check | IF(Low <= Recommended Value <= High, OK, ERROR) | ❌ |
 | Validation | Border Double Count Check | IF(Border Transactional Cost > threshold, REVIEW, OK) | ❌ |
@@ -538,7 +538,7 @@ Cost build-up (Operating…Fixed Cost) ✅ implemented · Commercial (COGS…Val
 | usaMktCondition | 1000 | UsaMktCondition | ✅ |
 | usaFuel | 993 | UsaFuel | ✅ |
 | cusCatalog | 9336 | ZipMarket | ✅ |
-| usaDATbenchmark | 13584 | — | ❌ pending |
+| usaDATbenchmark | 13584 | UsaDatBenchmark | ✅ |
 | usaFSCindex | 1000 | — | ❌ pending |
 | usaFuelcurrent | 12 | — | ❌ pending |
 | usaFuelpast | 837 | — | ❌ historical |
@@ -546,10 +546,9 @@ Cost build-up (Operating…Fixed Cost) ✅ implemented · Commercial (COGS…Val
 
 ## 9. Coverage summary
 
-**✅ Done — carrier cost engine:** Assumptions, Inputs/cost cards (editable), Factors, Equipments, Outputs cost build-up, per-lane production (MX+USA), validated $1,200 / $2,600.
+**✅ Done — full carrier model:** Assumptions, Inputs/cost cards (editable), Factors, Equipments, Outputs cost build-up + commercial layer (cost floor → sell tiers → margin → flags), per-lane production (MX+USA), DAT market reference. Validated $1,200 / $2,600.
 
 **❌ Pending:**
-1. Outputs commercial layer (~120 formulas): COGS, Market Reference, Buy Rate, Sell Rate, Margin, Commercial flags, Validations.
-2. Market data: usaDATbenchmark, usaFSCindex.
-3. Fuel auto-update: usaFuelcurrent, usaFuelpast, usaFSCtrend.
-4. 13 "extra" inputs (advanced insurance, profit determination, finance flags) not yet consumed by base derivation.
+1. usaFSCindex (FSC-by-diesel-price table) + fuel auto-update (usaFuelcurrent/past/trend) — operational.
+2. 13 "extra" inputs (advanced insurance, profit determination, finance flags) not yet consumed by base derivation.
+3. Validation rules (fuel-mix is wired; low/high range + double-count checks pending).

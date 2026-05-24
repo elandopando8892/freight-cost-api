@@ -78,6 +78,10 @@ async function resolveUsaLeg(
   if (!fuel) warnings.push(`No fuel/FSC for state "${row.outState}" (→0)`)
   const originCondition = await conditionOf(origin, eq.trailer, warnings)
   const destCondition = await conditionOf(dest, eq.trailer, warnings)
+  // DAT market benchmark: "{Origin} - {Dest} {TruckType} {Trailer}"
+  const datKey = `${origin} - ${dest} ${eq.truckType} ${eq.trailer}`.toUpperCase()
+  const dat = await prisma.usaDatBenchmark.findFirst({ where: { laneKeyNorm: datKey } })
+  if (!dat) warnings.push(`No DAT benchmark for "${datKey}" (market reference uses cost proxy)`)
   return {
     loadedMiles: row.miles,
     transitDaysRaw: row.truckDays,
@@ -86,6 +90,7 @@ async function resolveUsaLeg(
     dieselUsdGal: fuel?.pricePerGallon ?? 0,
     fscUsdMile: fuel?.fsc ?? 0,
     originCondition, destCondition,
+    marketRpm: dat?.rpm ?? 0,
     operation, service, equipment: eq,
   }
 }

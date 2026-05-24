@@ -99,6 +99,10 @@ export function calculateUsaLeg(lane: UsaLegInput, params: ParamMap): UsaLegOutp
   const fsc = lane.fscUsdMile
   const flatUsd = P * (rpm + fsc)
 
+  // DAT market reference (all-in on production miles): (marketRpm + state FSC) × loaded miles
+  const marketRpm = lane.marketRpm ?? 0
+  const marketRateUsd = marketRpm > 0 ? P * (marketRpm + fsc) : 0
+
   return {
     loadedMiles: P, emptyMiles: totalEmptyMiles, totalOperationalMiles,
     loadedMpg, emptyMpg, fuelGallons, fuelCostUsd, driverCostUsd, maintTiresUsd,
@@ -107,5 +111,6 @@ export function calculateUsaLeg(lane: UsaLegInput, params: ParamMap): UsaLegOutp
     utRate, technicalTariffExFuelUsd, technicalTariffInclFuelUsd,
     trailerFactor: trailerFac, trailerRiskUsd, operationRiskUsd, serviceRiskUsd, totalRiskAdjUsd,
     requiredTariffExFuelUsd, requiredTariffUsd, rpm, fsc, flatUsd,
+    marketRpm, marketRateUsd,
   }
 }

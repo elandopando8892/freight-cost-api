@@ -34,6 +34,11 @@ type FuelRow = { state: string; region: string | null; pricePerGallon: number; f
 type CondRow = { market: string; dryVanCond: string; flatbedCond: string; reeferCond: string; region: string | null }
 type MktRow = { laneKey: string; laneKeyNorm: string; rpm: number }
 type ZipRow = { zipCode: string; metroZip: string; metroCity: string; market: string }
+type DatRow = {
+  laneKey: string; laneKeyNorm: string; miles: number; avgRpm: number; lowRpm: number; highRpm: number
+  rpm: number; fsc: number; allInUsd: number; companies: number; reports: number; stdDev: number
+  equipment: string; origin: string; dest: string
+}
 
 export async function seedReferenceTables() {
   console.log('Seeding engine reference tables from Freight Cost Model V3.0…')
@@ -55,6 +60,9 @@ export async function seedReferenceTables() {
   )
   await upsertAll('zipMarket', load<ZipRow>('zip-markets.json'), (r) =>
     prisma.zipMarket.upsert({ where: { zipCode: r.zipCode }, create: r, update: r }),
+  )
+  await upsertAll('usaDatBenchmark', load<DatRow>('usa-dat-benchmark.json'), (r) =>
+    prisma.usaDatBenchmark.upsert({ where: { laneKeyNorm: r.laneKeyNorm }, create: r, update: r }),
   )
 
   console.log('Reference tables seeded (V3.0).')

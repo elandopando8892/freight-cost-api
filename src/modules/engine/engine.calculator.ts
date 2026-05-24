@@ -54,11 +54,15 @@ export function calculate(input: EngineInput): EngineOutput {
   const cycleDays = (mexLeg ? mexLeg.cycleDays : 0) + (usaLeg ? usaLeg.cycleDays : 0)
   const mixMx = getParam(params, 'FUEL', 'Fuel Purchase Mix MX', 0.3)
   const mixUs = getParam(params, 'FUEL', 'Fuel Purchase Mix US', 0.7)
+  // Market reference: USA leg = DAT all-in; MX leg has no spot market → cost-plus proxy.
+  const marketReferenceUsd =
+    (usaLeg && usaLeg.marketRateUsd > 0 ? usaLeg.marketRateUsd : usaLeg ? usaFlat : 0) +
+    (mexLeg ? mexLeg.requiredTariffUsd : 0)
   const commercial = calculateCommercial({
     productionCostUsd,
     riskAdjUsd,
     recommendedSellUsd: freightBaselineUsd,
-    marketReferenceUsd: 0, // activates once usaDATbenchmark is seeded
+    marketReferenceUsd,
     loadedMiles,
     cycleDays,
     fuelMixOk: Math.abs(mixMx + mixUs - 1) < 1e-6,

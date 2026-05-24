@@ -43,6 +43,7 @@ export interface UsaLegInput {
   fscUsdMile: number              // usaFuel by state
   originCondition: MarketCondition // usaMktCondition (origin market, by trailer)
   destCondition: MarketCondition   // usaMktCondition (dest market, by trailer)
+  marketRpm?: number               // DAT benchmark avg RPM (usaDatBenchmark); 0 if unknown
   operation: string
   service: string
   equipment: EquipmentSpec
@@ -89,6 +90,8 @@ export interface UsaLegOutput {
   requiredTariffUsd: number        // BP — MROUND(incl fuel + risk, 50)
   rpm: number; fsc: number
   flatUsd: number                  // miles × (RPM + FSC) — what the quote sums
+  marketRpm: number                // DAT benchmark RPM (0 if unknown)
+  marketRateUsd: number            // (marketRpm + fsc) × loadedMiles — DAT all-in
 }
 
 // ── Commercial / decision layer ────────────────────────────────────────────
