@@ -28,6 +28,14 @@ enum Section {
   CONFIG
   TECHNICAL_MARGIN
   FACTORS
+  // Editable cost cards (carrier economics) — derived into CVU/CFU by engine.outputs.ts
+  COST_MAINT
+  COST_TIRES
+  COST_INSURANCE
+  COST_PAYROLL
+  COST_COMPANY
+  COST_CAPITAL
+  COST_CROSSBORDER
 }
 
 enum QuoteStatus {

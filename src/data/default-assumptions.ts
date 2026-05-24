@@ -1,7 +1,9 @@
 // Default assumption parameters — Freight Cost Model V3.0 (source of truth).
 // Section/Field/Value mirror the V3.0 "Inputs / Assumptions" sheet exactly.
-// The engine derives all per-km / per-mile costs from these (see engine.cvu/cfu/cogs).
-export const DEFAULT_ASSUMPTIONS = [
+// The engine derives all per-km / per-mile costs from these (see engine.outputs.ts).
+import { COST_CARDS } from './cost-cards.js'
+
+const BASE_ASSUMPTIONS = [
   // ── GENERAL_BASE ──────────────────────────────────────────────────────
   { section: 'GENERAL_BASE', field: 'Gasto Adicional sobre Ruta',     value: 0.05,  unit: '% route expenses',     low: 0,     high: 0.10,  updateFrequency: 'Quarterly',  costBehavior: 'Route expense buffer',     activation: 'Always' },
   { section: 'GENERAL_BASE', field: 'Periodo de Operación',           value: 26,    unit: 'days/month',           low: 24,    high: 28,    updateFrequency: 'Semiannual', costBehavior: 'Fixed cost allocation',    activation: 'Always' },
@@ -35,8 +37,8 @@ export const DEFAULT_ASSUMPTIONS = [
   { section: 'FINANCE', field: 'Carrier Payment Days',     value: 14,     unit: 'days',        low: 7,      high: 30,     updateFrequency: 'Monthly',   costBehavior: 'AP timing',              activation: 'By Customer' },
   { section: 'FINANCE', field: 'Customer Collection Days', value: 30,     unit: 'days',        low: 21,     high: 60,     updateFrequency: 'Monthly',   costBehavior: 'AR timing',              activation: 'By Customer' },
   { section: 'FINANCE', field: 'Inflation Buffer',         value: 0.04,   unit: 'annual rate', low: 0.02,   high: 0.08,   updateFrequency: 'Quarterly', costBehavior: 'Cost escalation',        activation: 'Always' },
-  // Monthly Fixed Cost = Insurance 50000 + Admin Payroll 33410 + Company Exp 15450 + Capital 242708 + Crossborder 38325 + Working Capital 1491
-  { section: 'FINANCE', field: 'Monthly Fixed Cost',       value: 381384, unit: 'USD/month',   low: 250000, high: 600000, updateFrequency: 'Quarterly', costBehavior: 'Total fixed cost (CFU)', activation: 'Always' },
+  // Monthly COGS proxy for working-capital financing (V3.0 Outputs); fixed cost itself is derived from cost cards.
+  { section: 'FINANCE', field: 'Monthly COGS Proxy',       value: 239577, unit: 'USD/month',   low: 100000, high: 600000, updateFrequency: 'Quarterly', costBehavior: 'Working capital base',   activation: 'Always' },
 
   // ── UTILIZATION ──────────────────────────────────────────────────────
   { section: 'UTILIZATION', field: 'Deadhead Base',                value: 0.15, unit: '% loaded miles',        low: 0.08, high: 0.30, updateFrequency: 'Monthly',   costBehavior: 'Empty repositioning',    activation: 'By Lane' },
@@ -46,9 +48,7 @@ export const DEFAULT_ASSUMPTIONS = [
   { section: 'UTILIZATION', field: 'Unload Time',                  value: 2,    unit: 'hours',                 low: 1,    high: 6,    updateFrequency: 'Quarterly', costBehavior: 'Operational cycle',      activation: 'By Shipment' },
   { section: 'UTILIZATION', field: 'Free Time',                    value: 2,    unit: 'hours/event',           low: 1,    high: 4,    updateFrequency: 'Quarterly', costBehavior: 'Detention threshold',    activation: 'By Contract' },
   { section: 'UTILIZATION', field: 'Detention Rate',               value: 85,   unit: 'USD/hour',              low: 60,   high: 125,  updateFrequency: 'Quarterly', costBehavior: 'Delay pricing',          activation: 'By Contract' },
-  // Maint+Tires: scheduled PM + reserves + tires (from V3.0 Outputs cost cards)
-  { section: 'UTILIZATION', field: 'Maint and Tires Rate per KM',   value: 0.2348384848, unit: 'USD/km',  low: 0.15, high: 0.35, updateFrequency: 'Quarterly', costBehavior: 'Maintenance + tires per km',   activation: 'By Equipment' },
-  { section: 'UTILIZATION', field: 'Maint and Tires Rate per Mile', value: 0.3779349672, unit: 'USD/mi',  low: 0.24, high: 0.56, updateFrequency: 'Quarterly', costBehavior: 'Maintenance + tires per mile', activation: 'By Equipment' },
+  // (Maint+Tires per km/mile is DERIVED from COST_MAINT/COST_TIRES cost cards — see engine.outputs.ts)
 
   // ── BORDER ───────────────────────────────────────────────────────────
   { section: 'BORDER', field: 'Border Friction Time',      value: 0.75, unit: 'days/trip',  low: 0.25, high: 2,    updateFrequency: 'Monthly', costBehavior: 'Cross-border delay (CFU time)', activation: 'By Border' },
@@ -76,4 +76,8 @@ export const DEFAULT_ASSUMPTIONS = [
   { section: 'TECHNICAL_MARGIN', field: 'UT Rate One Way',   value: 0.3, unit: '% margin', low: 0.15, high: 0.45, updateFrequency: 'Quarterly', costBehavior: 'Carrier utility margin', activation: 'By Service' },
   { section: 'TECHNICAL_MARGIN', field: 'UT Rate Backhaul',  value: 0.1, unit: '% margin', low: 0.05, high: 0.25, updateFrequency: 'Quarterly', costBehavior: 'Carrier utility margin', activation: 'By Service' },
   { section: 'TECHNICAL_MARGIN', field: 'UT Rate Roundtrip', value: 0.2, unit: '% margin', low: 0.10, high: 0.35, updateFrequency: 'Quarterly', costBehavior: 'Carrier utility margin', activation: 'By Service' },
-] as const
+]
+
+// High-level assumptions + the full editable cost-card detail (engine derives
+// Monthly Fixed Cost & Maint/Tires from the cost cards via engine.outputs.ts).
+export const DEFAULT_ASSUMPTIONS = [...BASE_ASSUMPTIONS, ...COST_CARDS]
