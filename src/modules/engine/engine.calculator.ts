@@ -9,9 +9,10 @@
  * Validated end-to-end: Monterrey→Dallas Flatbed D2D Export
  *   MX flat 1200 + USA flat 1391 → Freight Baseline 2600 ✓
  */
-import { type ParamMap } from '../assumptions/assumptions.service.js'
+import { getParam, type ParamMap } from '../assumptions/assumptions.service.js'
 import { calculateMexLeg } from './engine.mex.js'
 import { calculateUsaLeg } from './engine.usa.js'
+import { calculateCommercial } from './engine.commercial.js'
 import type { EngineInput, EngineOutput, MexLegOutput, UsaLegOutput } from './engine.types.js'
 
 const mround = (x: number, m: number) => Math.round(x / m) * m
@@ -45,11 +46,31 @@ export function calculate(input: EngineInput): EngineOutput {
   const usaFlat = usaLeg ? usaLeg.flatUsd : 0
   const freightBaselineUsd = mround(mexFlat + usaFlat, 100)
 
+  // ── Commercial / decision layer ───────────────────────────────────────
+  const productionCostUsd =
+    (mexLeg ? mexLeg.productionCostUsd : 0) + (usaLeg ? usaLeg.cvuInclFuelUsd + usaLeg.cfuUsd : 0)
+  const riskAdjUsd = (mexLeg ? mexLeg.totalRiskAdjUsd : 0) + (usaLeg ? usaLeg.totalRiskAdjUsd : 0)
+  const loadedMiles = (mexLeg ? mexLeg.loadedMiles : 0) + (usaLeg ? usaLeg.loadedMiles : 0)
+  const cycleDays = (mexLeg ? mexLeg.cycleDays : 0) + (usaLeg ? usaLeg.cycleDays : 0)
+  const mixMx = getParam(params, 'FUEL', 'Fuel Purchase Mix MX', 0.3)
+  const mixUs = getParam(params, 'FUEL', 'Fuel Purchase Mix US', 0.7)
+  const commercial = calculateCommercial({
+    productionCostUsd,
+    riskAdjUsd,
+    recommendedSellUsd: freightBaselineUsd,
+    marketReferenceUsd: 0, // activates once usaDATbenchmark is seeded
+    loadedMiles,
+    cycleDays,
+    fuelMixOk: Math.abs(mixMx + mixUs - 1) < 1e-6,
+    params,
+  })
+
   return {
     operation,
     mexLeg,
     usaLeg,
     freightBaselineUsd,
+    commercial,
     requiredTariffUsd: freightBaselineUsd,
     fxRateUsed: fxRate,
   }

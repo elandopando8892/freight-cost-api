@@ -91,12 +91,32 @@ export interface UsaLegOutput {
   flatUsd: number                  // miles × (RPM + FSC) — what the quote sums
 }
 
+// ── Commercial / decision layer ────────────────────────────────────────────
+export interface CommercialOutput {
+  costFloorUsd: number
+  minSellUsd: number
+  targetSellUsd: number
+  premiumSellUsd: number
+  recommendedSellUsd: number
+  grossProfitUsd: number
+  grossMarginPct: number
+  gpPerLoadedMileUsd: number
+  gpPerDayUsd: number
+  marketReferenceUsd: number
+  marketVsCostSpreadUsd: number
+  marketVsCostSpreadPct: number
+  noGoFlag: boolean
+  reviewFlag: boolean
+  notes: string[]
+}
+
 // ── Cross-border assembly ──────────────────────────────────────────────────
 export interface EngineOutput {
   operation: string
   mexLeg: MexLegOutput | null
   usaLeg: UsaLegOutput | null
   freightBaselineUsd: number       // MX flat + USA flat (MROUND 100)
+  commercial: CommercialOutput     // cost floor → sell tiers → margin → flags
   // legacy aliases
   requiredTariffUsd: number
   fxRateUsed: number

@@ -143,4 +143,27 @@ describe('Cross-border assembly — Monterrey → Dallas Flatbed D2D Export = $2
     expect(r.usaLeg?.flatUsd).toBeCloseTo(1391, 0)
     expect(r.freightBaselineUsd).toBe(2600)
   })
+
+  it('commercial layer: cost floor < sell tiers, margin & flags', () => {
+    const r = calculate({
+      operation: 'D2D Export', service: 'One Way', equipment, params,
+      mexLeg: { baseKm: 225, routeExpensesMxn: 0, baseHours: 0, operation: 'D2D Export', service: 'One Way', route: 'Straight & Danger', equipment },
+      usaLeg: {
+        loadedMiles: 435, transitDaysRaw: 0, driverExpenses: 0, outState: 'TX',
+        dieselUsdGal: 5.152, fscUsdMile: 0.8, originCondition: 'Very Tight', destCondition: 'Very Tight',
+        operation: 'D2D Export', service: 'One Way', equipment,
+      },
+    })
+    const c = r.commercial
+    expect(c.costFloorUsd).toBeGreaterThan(0)
+    expect(c.recommendedSellUsd).toBe(2600)
+    // sell tiers ordered min < target < premium
+    expect(c.minSellUsd).toBeLessThan(c.targetSellUsd)
+    expect(c.targetSellUsd).toBeLessThan(c.premiumSellUsd)
+    // recommended ($2,600) above cost floor → positive margin, no No-Go
+    expect(c.grossProfitUsd).toBeGreaterThan(0)
+    expect(c.grossMarginPct).toBeGreaterThan(0)
+    expect(c.noGoFlag).toBe(false)
+    expect(c.gpPerLoadedMileUsd).toBeGreaterThan(0)
+  })
 })

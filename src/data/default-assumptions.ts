@@ -76,6 +76,11 @@ const BASE_ASSUMPTIONS = [
   { section: 'TECHNICAL_MARGIN', field: 'UT Rate One Way',   value: 0.3, unit: '% margin', low: 0.15, high: 0.45, updateFrequency: 'Quarterly', costBehavior: 'Carrier utility margin', activation: 'By Service' },
   { section: 'TECHNICAL_MARGIN', field: 'UT Rate Backhaul',  value: 0.1, unit: '% margin', low: 0.05, high: 0.25, updateFrequency: 'Quarterly', costBehavior: 'Carrier utility margin', activation: 'By Service' },
   { section: 'TECHNICAL_MARGIN', field: 'UT Rate Roundtrip', value: 0.2, unit: '% margin', low: 0.10, high: 0.35, updateFrequency: 'Quarterly', costBehavior: 'Carrier utility margin', activation: 'By Service' },
+  // ── Commercial layer (V3.0 Buy/Sell blueprint — configurable per carrier) ──
+  { section: 'TECHNICAL_MARGIN', field: 'Minimum Gross Margin', value: 0.12, unit: '% margin', low: 0.05, high: 0.25, updateFrequency: 'Quarterly', costBehavior: 'Sell floor margin',    activation: 'By Customer' },
+  { section: 'TECHNICAL_MARGIN', field: 'Target Gross Margin',  value: 0.18, unit: '% margin', low: 0.10, high: 0.35, updateFrequency: 'Quarterly', costBehavior: 'Sell target margin',   activation: 'By Customer' },
+  { section: 'TECHNICAL_MARGIN', field: 'Premium Gross Margin', value: 0.25, unit: '% margin', low: 0.15, high: 0.45, updateFrequency: 'Quarterly', costBehavior: 'Sell premium margin',  activation: 'By Customer' },
+  { section: 'TECHNICAL_MARGIN', field: 'Buy Market Weight',    value: 0.95, unit: 'factor',   low: 0.80, high: 1.10, updateFrequency: 'Monthly',   costBehavior: 'Market vs cost buy', activation: 'By Market' },
 ]
 
 // High-level assumptions + the full editable cost-card detail (engine derives
