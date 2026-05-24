@@ -5,7 +5,7 @@ import type { JwtPayload } from '../auth/auth.schema.js'
 import { CreateMarketDataSchema } from './market.schema.js'
 import { prisma } from '../../config/prisma.js'
 import { MarketDataType } from '@prisma/client'
-import { getFuelStatus, refreshFuelSurcharge } from './fuel.service.js'
+import { getFuelStatus, refreshFuelSurcharge, syncSetDieselUsBorder } from './fuel.service.js'
 
 export async function marketRoutes(app: FastifyInstance) {
   app.addHook('preHandler', authenticate)
@@ -70,6 +70,7 @@ export async function marketRoutes(app: FastifyInstance) {
     regions: z.array(z.object({ region: z.string().min(1), dieselUsdGal: z.number().nonnegative() })).min(1),
   })
   app.put('/market/fuel/regions', async (request, reply) => {
+    const { orgId } = request.user as JwtPayload
     const body = UpdateRegionsSchema.parse(request.body)
     for (const r of body.regions) {
       await prisma.regionDiesel.upsert({
@@ -79,9 +80,15 @@ export async function marketRoutes(app: FastifyInstance) {
       })
     }
     const refresh = await refreshFuelSurcharge()
-    return reply.send({ updatedRegions: body.regions.length, ...refresh })
+    const dieselSync = await syncSetDieselUsBorder(orgId) // MX leg tracks US diesel too
+    return reply.send({ updatedRegions: body.regions.length, ...refresh, dieselSync })
   })
 
-  // Recompute every state's diesel + FSC from current region diesel + FSC index.
-  app.post('/market/fuel/refresh', async () => refreshFuelSurcharge())
+  // One refresh recomputes USA FSC (all states) AND syncs the MX leg's Diesel US Border.
+  app.post('/market/fuel/refresh', async (request) => {
+    const { orgId } = request.user as JwtPayload
+    const refresh = await refreshFuelSurcharge()
+    const dieselSync = await syncSetDieselUsBorder(orgId)
+    return { ...refresh, dieselSync }
+  })
 }
