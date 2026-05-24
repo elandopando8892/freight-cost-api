@@ -2,6 +2,7 @@ import { PrismaClient, Section } from '@prisma/client'
 import { DEFAULT_ASSUMPTIONS } from './assumptions.seed.js'
 import { EQUIPMENT_CATALOG } from './equipment.seed.js'
 import { CITIES_MX } from './cities-mx.seed.js'
+import { seedReferenceTables } from './reference.seed.js'
 
 const prisma = new PrismaClient()
 
@@ -78,6 +79,10 @@ async function main() {
   } else {
     console.log('     ✓ Default set already exists — skipped')
   }
+
+  // Engine reference lookup tables (mexLaneExpenses, usaLaneData, FSC, etc.)
+  console.log('  → Reference lookup tables...')
+  await seedReferenceTables()
 
   console.log('\n✅ Seed complete!')
 }

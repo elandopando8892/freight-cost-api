@@ -154,6 +154,67 @@ model ZipMarket {
 }
 
 // ─────────────────────────────────────────────
+// REFERENCE TABLES (global lookups for the engine)
+// ─────────────────────────────────────────────
+
+// mexLaneExpenses — MEX leg facts, keyed "Origin - Border TruckType"
+model MexLaneExpense {
+  id             String @id @default(cuid())
+  laneKey        String @unique // "Monterrey, Nuevo Leon - Nuevo Laredo, Tamaulipas Truck Trailer"
+  laneKeyNorm    String @unique // uppercased for case-insensitive lookup
+  km             Float
+  tolls          Float  @default(0)
+  driverExpenses Float  @default(0) // CAGR = driverExpenses / 20
+  pension        Float  @default(0)
+  sumaViaje      Float  @default(0)
+  diasViaje      Float  @default(0)
+  horasRuta      Float  @default(0) // transit hours
+
+  @@index([laneKeyNorm])
+}
+
+// usaLaneData — USA leg facts, keyed "ORIGIN - DEST TRUCK TRAILER" (uppercase)
+model UsaLaneData {
+  id            String @id @default(cuid())
+  laneKey       String @unique
+  outState      String
+  miles         Float
+  truckDays     Float  @default(0)
+  routeExpenses Float  @default(0)
+
+  @@index([laneKey])
+}
+
+// usaLaneMktPrice — DAT benchmark RPM, keyed full business route (dedup by lane)
+model UsaLaneMktPrice {
+  id          String @id @default(cuid())
+  laneKey     String @unique // "ORIGIN - DEST Truck Trailer Dry Van Single D2D Export One Way B1"
+  laneKeyNorm String @unique
+  rpm         Float
+
+  @@index([laneKeyNorm])
+}
+
+// usaMktCondition — market condition by trailer type, per market
+model UsaMktCondition {
+  id          String  @id @default(cuid())
+  market      String  @unique // "Laredo Mkt (TX)"
+  dryVanCond  String
+  flatbedCond String
+  reeferCond  String
+  region      String?
+}
+
+// d2d_usaFuel — fuel surcharge by US state
+model UsaFuel {
+  id             String  @id @default(cuid())
+  state          String  @unique // "TX"
+  region         String?
+  pricePerGallon Float   @default(0)
+  fsc            Float   @default(0) // USD/mile fuel surcharge
+}
+
+// ─────────────────────────────────────────────
 // MARKET DATA (manual, per org)
 // ─────────────────────────────────────────────
 
