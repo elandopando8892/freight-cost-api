@@ -22,8 +22,8 @@
 | 13 | usaMktCondition | A1:G1000 | market condition by trailer | ✅ seeded usaMktCondition |
 | 14 | usaFSCindex | A1:D1000 | FSC by diesel price | ✅ seeded FscIndex |
 | 15 | usaFuelcurrent | A1:B12 | current diesel by region | ✅ seeded RegionDiesel |
-| 16 | usaFuelpast | A1:K837 | EIA diesel history | ❌ historical |
-| 17 | usaFSCtrend | A1:E837 | diesel/FSC trend | ❌ historical |
+| 16 | usaFuelpast | A1:K837 | EIA diesel history | ✅ DieselHistory (EIA API v2) |
+| 17 | usaFSCtrend | A1:E837 | diesel/FSC trend | ✅ getDieselTrend() |
 | 18 | usaFuel | A1:D993 | state diesel/FSC | ✅ seeded UsaFuel |
 
 ## 2. Assumptions (high-level) — ✅ all implemented & seeded
@@ -541,14 +541,14 @@ Cost build-up + commercial (COGS…Commercial) ✅ implemented · Validations �
 | usaDATbenchmark | 13584 | UsaDatBenchmark | ✅ |
 | usaFSCindex | 1000 | FscIndex | ✅ |
 | usaFuelcurrent | 12 | RegionDiesel | ✅ |
-| usaFuelpast | 837 | — | ❌ historical |
-| usaFSCtrend | 837 | — | ❌ historical |
+| usaFuelpast | 837 | DieselHistory | ✅ |
+| usaFSCtrend | 837 | getDieselTrend() | ✅ |
 
 ## 9. Coverage summary
 
 **✅ Done — full carrier model:** Assumptions, Inputs/cost cards (editable), Factors, Equipments, Outputs cost build-up + commercial layer (cost floor → sell tiers → margin → flags), per-lane production (MX+USA), DAT market reference. Validated $1,200 / $2,600.
 
 **❌ Pending:**
-1. EIA historical (usaFuelpast/usaFSCtrend) — needs EIA API v2 key (env); analytics/trend only. Current-diesel EIA RSS auto-fetch is wired (POST /market/fuel/fetch-eia).
+1. (all sheets mapped) EIA current + historical auto-fetch wired; historical needs EIA_API_KEY in env.
 2. 13 "extra" inputs (advanced insurance, profit determination, finance flags) not yet consumed by base derivation.
 3. Validation rules (fuel-mix is wired; low/high range + double-count checks pending).

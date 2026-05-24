@@ -263,6 +263,19 @@ model FscIndex {
   @@index([fromDiesel])
 }
 
+// usaFuelpast — monthly diesel history from EIA API v2 (EPD2D), for FSC trend
+model DieselHistory {
+  id           String @id @default(cuid())
+  period       String // "2026-04"
+  duoarea      String // EIA area code (e.g. "NUS", "R10")
+  areaName     String
+  value        Float  // diesel $/gal
+  units        String @default("$/GAL")
+
+  @@unique([duoarea, period])
+  @@index([period])
+}
+
 // ─────────────────────────────────────────────
 // MARKET DATA (manual, per org)
 // ─────────────────────────────────────────────

@@ -5,7 +5,7 @@ import type { JwtPayload } from '../auth/auth.schema.js'
 import { CreateMarketDataSchema } from './market.schema.js'
 import { prisma } from '../../config/prisma.js'
 import { MarketDataType } from '@prisma/client'
-import { getFuelStatus, refreshFuelSurcharge, syncSetDieselUsBorder, fetchEiaCurrentDiesel } from './fuel.service.js'
+import { getFuelStatus, refreshFuelSurcharge, syncSetDieselUsBorder, fetchEiaCurrentDiesel, fetchEiaHistory, getDieselTrend } from './fuel.service.js'
 
 export async function marketRoutes(app: FastifyInstance) {
   app.addHook('preHandler', authenticate)
@@ -104,5 +104,22 @@ export async function marketRoutes(app: FastifyInstance) {
     } catch (err) {
       return reply.status(502).send({ error: 'EIA fetch failed', detail: (err as Error).message })
     }
+  })
+
+  // Historical diesel (EIA API v2, EPD2D monthly) → DieselHistory. Needs EIA_API_KEY.
+  app.post('/market/fuel/fetch-eia-history', async (request, reply) => {
+    const q = request.query as { start?: string }
+    try {
+      return reply.send(await fetchEiaHistory(q.start ?? '2020-01'))
+    } catch (err) {
+      const msg = (err as Error).message
+      return reply.status(msg.includes('EIA_API_KEY') ? 400 : 502).send({ error: 'EIA history fetch failed', detail: msg })
+    }
+  })
+
+  // Diesel + derived FSC trend for an area (default U.S.).
+  app.get('/market/fuel/history', async (request) => {
+    const q = request.query as { area?: string; months?: string }
+    return getDieselTrend(q.area ?? 'U.S.', Math.min(parseInt(q.months ?? '24') || 24, 120))
   })
 }

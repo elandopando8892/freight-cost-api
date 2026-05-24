@@ -8,6 +8,7 @@
  */
 import { Section } from '@prisma/client'
 import { prisma } from '../../config/prisma.js'
+import { env } from '../../config/env.js'
 import { round4 } from '../../utils/currency.js'
 
 const GAL_TO_L = 3.785411784
@@ -116,6 +117,64 @@ export async function syncSetDieselUsBorder(
     update: { value: usdL },
   })
   return { setId: set.id, dieselUsBorderUsdL: usdL }
+}
+
+// ── EIA historical diesel (API v2, EPD2D monthly) → DieselHistory ──────────
+interface EiaRow { period: string; duoarea: string; 'area-name': string; value: number | string | null; units: string }
+
+/** Pull monthly diesel history from EIA API v2 and upsert DieselHistory. Needs EIA_API_KEY. */
+export async function fetchEiaHistory(start = '2020-01'): Promise<{ upserted: number; from: string; to: string }> {
+  const key = env.EIA_API_KEY
+  if (!key) throw new Error('EIA_API_KEY not configured (set it in env / Vercel)')
+  const url =
+    `https://api.eia.gov/v2/petroleum/pri/gnd/data/?frequency=monthly&data[0]=value` +
+    `&facets[product][]=EPD2D&start=${start}` +
+    `&sort[0][column]=period&sort[0][direction]=desc&offset=0&length=5000&api_key=${key}`
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`EIA API v2 failed: ${res.status}`)
+  const json = (await res.json()) as { response?: { data?: EiaRow[] } }
+  const rows = (json.response?.data ?? []).filter((r) => r.value != null && r.value !== '')
+  if (rows.length === 0) throw new Error('EIA API v2: no rows returned')
+
+  let upserted = 0
+  const size = 50
+  const mapped = rows.map((r) => ({
+    period: String(r.period),
+    duoarea: String(r.duoarea),
+    areaName: String(r['area-name']),
+    value: Number(r.value),
+    units: String(r.units || '$/GAL'),
+  }))
+  for (let i = 0; i < mapped.length; i += size) {
+    await Promise.all(
+      mapped.slice(i, i + size).map((m) =>
+        prisma.dieselHistory.upsert({
+          where: { duoarea_period: { duoarea: m.duoarea, period: m.period } },
+          create: m,
+          update: { value: m.value, areaName: m.areaName, units: m.units },
+        }),
+      ),
+    )
+    upserted += Math.min(size, mapped.length - i)
+  }
+  const periods = mapped.map((m) => m.period).sort()
+  return { upserted, from: periods[0], to: periods[periods.length - 1] }
+}
+
+/** Diesel + derived FSC trend for an area (default U.S.), most-recent first. */
+export async function getDieselTrend(areaName = 'U.S.', months = 24) {
+  const rows = await prisma.dieselHistory.findMany({
+    where: { areaName },
+    orderBy: { period: 'desc' },
+    take: months,
+  })
+  const brackets = await prisma.fscIndex.findMany({ orderBy: { fromDiesel: 'asc' } })
+  const fscFor = (d: number) => {
+    let fsc = 0
+    for (const b of brackets) { if (d >= b.fromDiesel) fsc = b.truckloadFscPerMile; else break }
+    return fsc
+  }
+  return rows.map((r) => ({ period: r.period, areaName: r.areaName, diesel: r.value, fsc: round4(fscFor(r.value)) }))
 }
 
 export async function getFuelStatus() {
