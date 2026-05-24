@@ -5,7 +5,7 @@ import type { JwtPayload } from '../auth/auth.schema.js'
 import { CreateMarketDataSchema } from './market.schema.js'
 import { prisma } from '../../config/prisma.js'
 import { MarketDataType } from '@prisma/client'
-import { getFuelStatus, refreshFuelSurcharge, syncSetDieselUsBorder } from './fuel.service.js'
+import { getFuelStatus, refreshFuelSurcharge, syncSetDieselUsBorder, fetchEiaCurrentDiesel } from './fuel.service.js'
 
 export async function marketRoutes(app: FastifyInstance) {
   app.addHook('preHandler', authenticate)
@@ -90,5 +90,19 @@ export async function marketRoutes(app: FastifyInstance) {
     const refresh = await refreshFuelSurcharge()
     const dieselSync = await syncSetDieselUsBorder(orgId)
     return { ...refresh, dieselSync }
+  })
+
+  // Live EIA pull: fetch diesel-by-region (EIA RSS) → update RegionDiesel →
+  // refresh USA FSC → sync MX Diesel US Border. One call = current fuel everywhere.
+  app.post('/market/fuel/fetch-eia', async (request, reply) => {
+    const { orgId } = request.user as JwtPayload
+    try {
+      const eia = await fetchEiaCurrentDiesel()
+      const refresh = await refreshFuelSurcharge()
+      const dieselSync = await syncSetDieselUsBorder(orgId)
+      return reply.send({ eia, ...refresh, dieselSync })
+    } catch (err) {
+      return reply.status(502).send({ error: 'EIA fetch failed', detail: (err as Error).message })
+    }
   })
 }

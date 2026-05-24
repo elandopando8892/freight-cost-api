@@ -549,6 +549,6 @@ Cost build-up + commercial (COGS…Commercial) ✅ implemented · Validations �
 **✅ Done — full carrier model:** Assumptions, Inputs/cost cards (editable), Factors, Equipments, Outputs cost build-up + commercial layer (cost floor → sell tiers → margin → flags), per-lane production (MX+USA), DAT market reference. Validated $1,200 / $2,600.
 
 **❌ Pending:**
-1. EIA live auto-fetch (usaFuelpast/usaFSCtrend history) — manual region-diesel update + refresh is wired; live EIA pull is the remaining nicety.
+1. EIA historical (usaFuelpast/usaFSCtrend) — needs EIA API v2 key (env); analytics/trend only. Current-diesel EIA RSS auto-fetch is wired (POST /market/fuel/fetch-eia).
 2. 13 "extra" inputs (advanced insurance, profit determination, finance flags) not yet consumed by base derivation.
 3. Validation rules (fuel-mix is wired; low/high range + double-count checks pending).

@@ -12,6 +12,51 @@ import { round4 } from '../../utils/currency.js'
 
 const GAL_TO_L = 3.785411784
 
+const EIA_REGIONS = [
+  'U.S.', 'East Coast', 'New England', 'Central Atlantic', 'Lower Atlantic', 'Midwest',
+  'Gulf Coast', 'Rocky Mountain', 'West Coast', 'West Coast less California', 'California',
+]
+const EIA_DIESEL_RSS = 'https://www.eia.gov/petroleum/gasdiesel/includes/gas_diesel_rss.xml'
+
+/**
+ * Parse the EIA diesel RSS "On-Highway Diesel Fuel Retail Price" section into
+ * region → $/gal. Mirrors the spreadsheet's fetchFuelData() Apps Script:
+ * for each region, take the max numeric price across matching lines (handles
+ * the "West Coast" / "West Coast less California" / "California" substring overlap).
+ */
+export function parseDieselRss(xml: string): Record<string, number> {
+  const idx = xml.indexOf('On-Highway Diesel Fuel Retail Price')
+  const section = idx >= 0 ? xml.slice(idx) : xml
+  const lines = section.split(/<br\s*\/?>/i)
+  const prices: Record<string, number> = {}
+  for (const line of lines.map((l) => l.trim())) {
+    for (const region of EIA_REGIONS) {
+      if (line.includes(region)) {
+        const price = parseFloat(line.replace(region, '').replace(/[^0-9.]/g, ''))
+        if (!isNaN(price)) prices[region] = Math.max(prices[region] ?? -Infinity, price)
+      }
+    }
+  }
+  return prices
+}
+
+/** Fetch live EIA diesel-by-region and upsert RegionDiesel (no API key needed). */
+export async function fetchEiaCurrentDiesel(): Promise<{ updated: number; regions: { region: string; dieselUsdGal: number }[] }> {
+  const res = await fetch(EIA_DIESEL_RSS)
+  if (!res.ok) throw new Error(`EIA RSS fetch failed: ${res.status}`)
+  const prices = parseDieselRss(await res.text())
+  const regions = Object.entries(prices).map(([region, dieselUsdGal]) => ({ region, dieselUsdGal: round4(dieselUsdGal) }))
+  if (regions.length === 0) throw new Error('EIA RSS: no diesel prices parsed')
+  for (const r of regions) {
+    await prisma.regionDiesel.upsert({
+      where: { region: r.region },
+      create: { region: r.region, dieselUsdGal: r.dieselUsdGal },
+      update: { dieselUsdGal: r.dieselUsdGal },
+    })
+  }
+  return { updated: regions.length, regions }
+}
+
 /** Truckload FSC ($/mile) for a diesel price via the V3.0 step schedule. */
 export async function fscForDiesel(dieselUsdGal: number): Promise<number> {
   const bracket = await prisma.fscIndex.findFirst({
