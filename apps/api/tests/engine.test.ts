@@ -76,6 +76,21 @@ describe('MEX leg — Freight Cost Model V3.0 (mexLaneProd)', () => {
     expect(dv.requiredTariffUsd).toBeLessThan(fb.requiredTariffUsd)
   })
 
+  // MEX backhaul KEEPS its CFU (max distance/time) — verified vs V3.0 mexLaneProd row
+  // "Nuevo Laredo, Tamaulipas - Queretaro, Queretaro ... D2D Import Backhaul B1" = $1,400.
+  it('MEX backhaul keeps CFU → Nuevo Laredo→Queretaro D2D Import = $1,400', () => {
+    const r = calculateMexLeg({
+      baseKm: 910, routeExpensesMxn: 0, baseHours: 0,
+      operation: 'D2D Import', service: 'Backhaul', route: 'Straight & Danger',
+      equipment: { truckType: 'Truck Trailer', trailer: 'Dry Van', config: 'Single', driver: 'B1' },
+    }, params)
+    expect(r.cfuUsd).toBeCloseTo(303.37, 0)   // CFU NOT zeroed on backhaul (vs USA leg which is)
+    expect(r.loadedMiles).toBeCloseTo(565.4, 1)
+    expect(r.requiredTariffUsd).toBe(1400)
+    expect(r.rpm).toBeCloseTo(1.56, 1)
+    expect(r.fsc).toBeCloseTo(0.92, 1)
+  })
+
   it('carrier edits a cost card → cost moves (their own economics)', () => {
     const base = calculateMexLeg(mty, params)
     // Carrier raises tractor value $220k → $400k (more depreciation/finance → higher fixed cost)

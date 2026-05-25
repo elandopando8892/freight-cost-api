@@ -95,7 +95,9 @@ export function calculateMexLeg(lane: MexLegInput, params: ParamMap): MexLegOutp
   const configCfu = isTandem ? tandemCfuFactor : 1
   const cfuByDistanceUsd = totalKm * fixedCostPerKm * configCfu * eq.fixed
   const cfuByTimeUsd = cycleDays * fixedCostPerDay * eq.fixed * configCfu
-  const cfuUsd = isBackhaul ? 0 : Math.max(cfuByDistanceUsd, cfuByTimeUsd)
+  // CFU = max(distance, time) for ALL services — V3.0 mexLaneProd does NOT zero it
+  // for backhaul (verified vs row Nuevo Laredo→Queretaro D2D Import Backhaul = $1,400).
+  const cfuUsd = Math.max(cfuByDistanceUsd, cfuByTimeUsd)
 
   // ── Production & technical tariff ────────────────────────────────────
   const productionCostUsd = cvuUsd + cfuUsd
