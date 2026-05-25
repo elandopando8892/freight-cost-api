@@ -1,11 +1,29 @@
+# Dependencies
 node_modules/
+
+# Build output
 dist/
 dist-api/
-.env
-*.env.local
-prisma/migrations/*.sql
-prisma/*.db
-prisma/*.db-journal
-.DS_Store
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
 
+# Turborepo
+.turbo/
+
+# Env / secrets
+.env
+.env.*.local
+*.env.local
+
+# Prisma local artifacts (db push workflow — migrations SQL not committed)
+**/prisma/migrations/*.sql
+**/*.db
+**/*.db-journal
+
+# Vercel
 .vercel
+
+# OS
+.DS_Store
