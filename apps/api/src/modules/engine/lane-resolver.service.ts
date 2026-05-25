@@ -32,9 +32,36 @@ export interface ResolvedRoute {
   warnings: string[]
 }
 
-async function marketOf(location: string): Promise<string | null> {
-  const z = await prisma.zipMarket.findFirst({ where: { metroCity: location } })
-  return z?.market ?? null
+interface UsMetro { metroCity: string; market: string }
+
+/** Extract a 3-digit ZIP prefix from a free-text US location (e.g. "Augusta, GA 30901" → "309"), or null. */
+export function usZipPrefix(input: string): string | null {
+  const digits = (input ?? '').match(/\d{3,}/)?.[0]
+  return digits ? digits.slice(0, 3) : null
+}
+
+/**
+ * Resolve a US shipper/consignee location to its metro market (cusCatalog/ZipMarket).
+ * Accepts a metro city directly, OR a ZIP (5- or 3-digit) → 3-digit prefix → metro.
+ * The V3.0 catalog is keyed by ZIP prefix, not arbitrary city names — so e.g.
+ * "Augusta, GA" only resolves via its ZIP (309xx → Greenville, SC metro).
+ */
+async function resolveUsMetro(input: string, warnings: string[]): Promise<UsMetro | null> {
+  const raw = (input ?? '').trim()
+  if (!raw) return null
+  // 1) already a metro city (case-insensitive)
+  const byCity = await prisma.zipMarket.findFirst({ where: { metroCity: { equals: raw, mode: 'insensitive' } } })
+  if (byCity) return { metroCity: byCity.metroCity, market: byCity.market }
+  // 2) ZIP → 3-digit prefix → metro
+  const prefix = usZipPrefix(raw)
+  if (prefix) {
+    const byZip = await prisma.zipMarket.findFirst({ where: { zipCode: prefix } })
+    if (byZip) {
+      warnings.push(`Resolved "${raw}" → ${byZip.metroCity} via ZIP ${prefix} (${byZip.market})`)
+      return { metroCity: byZip.metroCity, market: byZip.market }
+    }
+  }
+  return null
 }
 
 function conditionByTrailer(
@@ -46,11 +73,12 @@ function conditionByTrailer(
   return cond.dryVanCond as MarketCondition
 }
 
-async function conditionOf(location: string, trailer: string, warnings: string[]): Promise<MarketCondition> {
-  // Missing condition → 'Neutral', which carries 0 reposition (matches the V3.0
-  // sheet's blank-condition behavior: INDEX/MATCH miss → 0 deadhead, flagged).
-  const market = await marketOf(location)
-  if (!market) { warnings.push(`No market for "${location}" (condition→Neutral, 0 reposition)`); return 'Neutral' }
+async function conditionFromMarket(
+  market: string | null, label: string, trailer: string, warnings: string[],
+): Promise<MarketCondition> {
+  // Missing market/condition → 'Neutral' (0 reposition), matching the V3.0 sheet's
+  // blank-condition behavior (INDEX/MATCH miss → 0 deadhead, flagged).
+  if (!market) { warnings.push(`No market for "${label}" (condition→Neutral, 0 reposition)`); return 'Neutral' }
   const cond = await prisma.usaMktCondition.findUnique({ where: { market } })
   if (!cond) { warnings.push(`No condition for "${market}" (→Neutral, 0 reposition)`); return 'Neutral' }
   return conditionByTrailer(cond, trailer)
@@ -71,15 +99,23 @@ async function resolveMexLeg(
 }
 
 async function resolveUsaLeg(
-  origin: string, dest: string, eq: EquipmentSpec, operation: string, service: string, warnings: string[],
+  originIn: string, destIn: string, eq: EquipmentSpec, operation: string, service: string, warnings: string[],
 ): Promise<UsaLegInput | undefined> {
+  // Resolve shipper/consignee (ZIP or metro) → metro city used by the reference lanes.
+  const o = await resolveUsMetro(originIn, warnings)
+  const d = await resolveUsMetro(destIn, warnings)
+  if (!o) warnings.push(`Could not resolve US origin "${originIn}" to a metro (use a ZIP or metro city)`)
+  if (!d) warnings.push(`Could not resolve US dest "${destIn}" to a metro (use a ZIP or metro city)`)
+  const origin = o?.metroCity ?? originIn.trim()
+  const dest = d?.metroCity ?? destIn.trim()
+
   const key = `${origin} - ${dest} ${eq.truckType}`.toUpperCase()
   const row = await prisma.usaLaneData.findFirst({ where: { laneKey: key } })
   if (!row) { warnings.push(`USA lane not found: "${key}"`); return undefined }
   const fuel = await prisma.usaFuel.findUnique({ where: { state: row.outState } })
   if (!fuel) warnings.push(`No fuel/FSC for state "${row.outState}" (→0)`)
-  const originCondition = await conditionOf(origin, eq.trailer, warnings)
-  const destCondition = await conditionOf(dest, eq.trailer, warnings)
+  const originCondition = await conditionFromMarket(o?.market ?? null, origin, eq.trailer, warnings)
+  const destCondition = await conditionFromMarket(d?.market ?? null, dest, eq.trailer, warnings)
   // DAT market benchmark: "{Origin} - {Dest} {TruckType} {Trailer}"
   const datKey = `${origin} - ${dest} ${eq.truckType} ${eq.trailer}`.toUpperCase()
   const dat = await prisma.usaDatBenchmark.findFirst({ where: { laneKeyNorm: datKey } })
