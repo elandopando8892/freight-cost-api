@@ -105,6 +105,8 @@ vi.mock('../src/config/env.js', () => ({
     JWT_EXPIRES_IN: '7d',
     PORT: 3001,
     NODE_ENV: 'test',
+    EIA_API_KEY: '',
+    CRON_SECRET: 'test-cron-secret',
   },
 }))
 
@@ -478,5 +480,24 @@ describe('Engine /calculate', () => {
       payload: { operation: 'D2D Export' },
     })
     expect(res.statusCode).toBe(422)
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CRON (fuel auto-refresh) — auth guard only; success path hits EIA network
+// ─────────────────────────────────────────────────────────────────────────────
+describe('Cron /cron/fuel', () => {
+  it('GET /cron/fuel without secret → 401', async () => {
+    const res = await app.inject({ method: 'GET', url: '/cron/fuel' })
+    expect(res.statusCode).toBe(401)
+  })
+
+  it('GET /cron/fuel with wrong secret → 401', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/cron/fuel',
+      headers: { authorization: 'Bearer wrong-secret' },
+    })
+    expect(res.statusCode).toBe(401)
   })
 })

@@ -13,4 +13,7 @@ export const env = cleanEnv(process.env, {
   NODE_ENV: nodeEnv({ default: 'development' }),
   // EIA API v2 key for historical diesel (optional; set in Vercel env, never commit)
   EIA_API_KEY: str({ default: '' }),
+  // Shared secret Vercel Cron sends as `Authorization: Bearer <CRON_SECRET>`.
+  // Empty → cron endpoints fail closed (401). Set in Vercel env, never commit.
+  CRON_SECRET: str({ default: '' }),
 })

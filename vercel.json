@@ -14,5 +14,11 @@
       "src": "/(.*)",
       "dest": "api/index.ts"
     }
+  ],
+  "crons": [
+    {
+      "path": "/cron/fuel",
+      "schedule": "0 9 * * 2"
+    }
   ]
 }
