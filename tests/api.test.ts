@@ -500,4 +500,9 @@ describe('Cron /cron/fuel', () => {
     })
     expect(res.statusCode).toBe(401)
   })
+
+  it('GET /cron/fuel-history without secret → 401', async () => {
+    const res = await app.inject({ method: 'GET', url: '/cron/fuel-history' })
+    expect(res.statusCode).toBe(401)
+  })
 })
