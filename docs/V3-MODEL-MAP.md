@@ -548,7 +548,7 @@ Cost build-up + commercial (COGS…Commercial) ✅ implemented · Validations �
 
 **✅ Done — full carrier model:** Assumptions, Inputs/cost cards (editable), Factors, Equipments, Outputs cost build-up + commercial layer (cost floor → sell tiers → margin → flags), per-lane production (MX+USA), DAT market reference. Validated $1,200 / $2,600.
 
-**❌ Pending:**
-1. (all sheets mapped) EIA current + historical auto-fetch wired; historical needs EIA_API_KEY in env.
-2. 13 "extra" inputs (advanced insurance, profit determination, finance flags) not yet consumed by base derivation.
-3. Validation rules (fuel-mix is wired; low/high range + double-count checks pending).
+**✅ Refinements (2026-05): all V3.0 inputs + validations wired.**
+1. EIA current + historical auto-fetch wired; historical needs EIA_API_KEY in env.
+2. Advanced insurance (cargo / excess-liability / trailer-physical-damage / deductible allocations, siniestralidad × inflation risk loads, per-shipment cargo rate, hazmat & high-value factors), finance toggles (asset-finance / working-capital on-off), and the profit hurdle (Tasa de Rendimiento Esperado) are seeded and consumed — neutral by default so $1,200 / $2,600 still hold (`engine.outputs.ts`, `cost-cards.ts`, `default-assumptions.ts`).
+3. Validation rules wired in `engine.commercial.ts`: fuel-mix, No-Go (sell < floor), below-min-margin, 15%+ above market, margin-tier range check, expected-return hurdle, cargo-insurance double-count, border / yard double-count, TMS double-count, hazmat consistency, border-presence. All advisory — they raise `reviewFlag`/`notes` and never change the tariff.

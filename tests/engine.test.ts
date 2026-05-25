@@ -165,5 +165,81 @@ describe('Cross-border assembly — Monterrey → Dallas Flatbed D2D Export = $2
     expect(c.grossMarginPct).toBeGreaterThan(0)
     expect(c.noGoFlag).toBe(false)
     expect(c.gpPerLoadedMileUsd).toBeGreaterThan(0)
+    // recommended lane is clean: none of the V3.0 validations fire on defaults
+    expect(c.reviewFlag).toBe(false)
+    expect(c.notes).toHaveLength(0)
+  })
+})
+
+describe('Refinements — advanced insurance / finance toggles (neutral by default)', () => {
+  const mty: MexLegInput = {
+    baseKm: 225, routeExpensesMxn: 0, baseHours: 0,
+    operation: 'D2D Export', service: 'One Way', route: 'Straight & Danger',
+    equipment: { truckType: 'Truck Trailer', trailer: 'Flatbed', config: 'Single', driver: 'B1' },
+  }
+
+  it('default extras do not move the validated tariff ($1,200)', () => {
+    // All new inputs default neutral (allocations 0, factors 1.0, toggles on) → $1,200 holds.
+    expect(calculateMexLeg(mty, {}).requiredTariffUsd).toBe(1200)
+  })
+
+  it('advanced insurance allocations + risk loads raise fixed cost (CFU up)', () => {
+    const base = calculateMexLeg(mty, {})
+    const cargo = calculateMexLeg(mty, { 'COST_INSURANCE__Cargo Insurance Annual Allocation': 20000 })
+    expect(cargo.cfuUsd).toBeGreaterThan(base.cfuUsd)
+    const siniestralidad = calculateMexLeg(mty, { 'COST_INSURANCE__Siniestralidad Factor': 1.5 })
+    expect(siniestralidad.cfuUsd).toBeGreaterThan(base.cfuUsd)
+    const inflation = calculateMexLeg(mty, { 'COST_INSURANCE__Insurance Inflation Factor': 1.2 })
+    expect(inflation.cfuUsd).toBeGreaterThan(base.cfuUsd)
+  })
+
+  it('finance toggles off remove their fixed-cost component (CFU down)', () => {
+    const base = calculateMexLeg(mty, {})
+    const noAssetFin = calculateMexLeg(mty, { 'COST_CAPITAL__Asset Financing Enabled': 0 })
+    expect(noAssetFin.cfuUsd).toBeLessThan(base.cfuUsd)
+    const noWorkingCap = calculateMexLeg(mty, { 'FINANCE__Working Capital Financing Enabled': 0 })
+    expect(noWorkingCap.cfuUsd).toBeLessThan(base.cfuUsd)
+  })
+})
+
+describe('Refinements — V3.0 validation checks (advisory flags)', () => {
+  const equipment = { truckType: 'Truck Trailer', trailer: 'Flatbed', config: 'Single', driver: 'B1' }
+  const baseInput = {
+    operation: 'D2D Export', service: 'One Way', equipment, params: {},
+    mexLeg: { baseKm: 225, routeExpensesMxn: 0, baseHours: 0, operation: 'D2D Export', service: 'One Way', route: 'Straight & Danger', equipment },
+    usaLeg: {
+      loadedMiles: 435, transitDaysRaw: 0, driverExpenses: 0, outState: 'TX',
+      dieselUsdGal: 5.152, fscUsdMile: 0.8, originCondition: 'Very Tight' as const, destCondition: 'Very Tight' as const,
+      operation: 'D2D Export', service: 'One Way', equipment,
+    },
+  }
+
+  it('cargo insurance double-count raises REVIEW', () => {
+    const r = calculate({
+      ...baseInput,
+      overrides: { 'COST_INSURANCE__Cargo Insurance Annual Allocation': 12000, 'COST_INSURANCE__Cargo Insurance Per Shipment Rate': 75 },
+    })
+    expect(r.commercial.reviewFlag).toBe(true)
+    expect(r.commercial.notes.some((n) => n.includes('double-count'))).toBe(true)
+    // per-shipment rate is advisory; annual allocation flows to cost but MROUND keeps baseline at 2600 here
+    expect(r.freightBaselineUsd).toBe(2600)
+  })
+
+  it('expected-return hurdle raises REVIEW when sell margin is below it', () => {
+    const r = calculate({ ...baseInput, overrides: { 'FINANCE__Tasa de Rendimiento Esperado': 0.4 } })
+    expect(r.commercial.reviewFlag).toBe(true)
+    expect(r.commercial.notes.some((n) => n.includes('expected return'))).toBe(true)
+  })
+
+  it('hazmat trailer without hazmat premium raises REVIEW', () => {
+    const hazEquip = { ...equipment, trailer: 'Hazmat' }
+    const r = calculate({
+      ...baseInput, equipment: hazEquip,
+      mexLeg: { ...baseInput.mexLeg, equipment: hazEquip },
+      usaLeg: { ...baseInput.usaLeg, equipment: hazEquip },
+      overrides: { 'RISK__Hazmat Premium': 0 },
+    })
+    expect(r.commercial.reviewFlag).toBe(true)
+    expect(r.commercial.notes.some((n) => n.includes('hazmat'))).toBe(true)
   })
 })
