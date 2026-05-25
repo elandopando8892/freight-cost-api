@@ -63,19 +63,12 @@ export function deriveMonthlyFixedCost(m: ParamMap): number {
   const flota = P(m, 'GENERAL_BASE', 'Tamaño de Flota', 50)
   const cargaSocial = P(m, 'LABOR', 'Carga Social', 0.3)
 
-  // Insurance — fleet base + advanced allocations, risk-adjusted (siniestralidad × inflation).
-  // Defaults keep this == base fleet insurance (allocations 0, factors 1.0).
-  const insuranceBase =
+  // Insurance (fleet base) — matches V3.0 Monthly Fixed Cost. Advanced insurance
+  // (cargo/excess/trailer-physical-damage allocations) is a SEPARATE Outputs layer
+  // in V3.0, NOT part of Monthly Fixed Cost — so it is not included here.
+  const insurance =
     (P(m, 'COST_INSURANCE', 'Prima Anual por Vehiculo', 1) * P(m, 'COST_INSURANCE', 'Poliza x Vehiculo', 12000) * flota) /
     P(m, 'COST_INSURANCE', 'Periodo de Poliza', 12)
-  const insuranceAllocations =
-    P(m, 'COST_INSURANCE', 'Cargo Insurance Annual Allocation', 0) +
-    P(m, 'COST_INSURANCE', 'Excess Umbrella Liability Allocation', 0) +
-    P(m, 'COST_INSURANCE', 'Trailer Physical Damage Insurance', 0) +
-    P(m, 'COST_INSURANCE', 'Deductible Loss Reserve', 0)
-  const insuranceRiskLoad =
-    P(m, 'COST_INSURANCE', 'Siniestralidad Factor', 1) * P(m, 'COST_INSURANCE', 'Insurance Inflation Factor', 1)
-  const insurance = (insuranceBase + insuranceAllocations) * insuranceRiskLoad
 
   // Admin payroll (Σ role Qty×PU) × (1 + burden)
   const payrollBase =
@@ -126,8 +119,7 @@ export function deriveMonthlyFixedCost(m: ParamMap): number {
   const fleetDepreciation = ((assetValue - residual) / depPeriod) * flota
   const ltv = P(m, 'COST_CAPITAL', 'LTV Asset Financing', 0.7)
   const financeRate = P(m, 'COST_CAPITAL', 'Asset Finance Annual Rate', 0.1)
-  const assetFinanceOn = P(m, 'COST_CAPITAL', 'Asset Financing Enabled', 1) !== 0
-  const fleetAssetFinance = assetFinanceOn ? (assetValue * ltv * financeRate / 12) * flota : 0
+  const fleetAssetFinance = (assetValue * ltv * financeRate / 12) * flota
   const capital = fleetDepreciation + fleetAssetFinance
 
   // Crossborder fixed = compliance + infrastructure (monthly)
@@ -150,8 +142,7 @@ export function deriveMonthlyFixedCost(m: ParamMap): number {
     P(m, 'FINANCE', 'Customer Collection Days', 30) - P(m, 'FINANCE', 'Carrier Payment Days', 14), 0)
   const monthlyCogsProxy = P(m, 'FINANCE', 'Monthly COGS Proxy', 239577)
   const wcRate = P(m, 'FINANCE', 'Cost of Capital MX', 0.14)
-  const wcOn = P(m, 'FINANCE', 'Working Capital Financing Enabled', 1) !== 0
-  const workingCapital = wcOn ? (monthlyCogsProxy * gapDays / 30) * wcRate / 12 : 0
+  const workingCapital = (monthlyCogsProxy * gapDays / 30) * wcRate / 12
 
   return insurance + payroll + company + capital + crossborderFixed + workingCapital
 }

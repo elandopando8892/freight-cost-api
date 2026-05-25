@@ -39,10 +39,6 @@ const BASE_ASSUMPTIONS = [
   { section: 'FINANCE', field: 'Inflation Buffer',         value: 0.04,   unit: 'annual rate', low: 0.02,   high: 0.08,   updateFrequency: 'Quarterly', costBehavior: 'Cost escalation',        activation: 'Always' },
   // Monthly COGS proxy for working-capital financing (V3.0 Outputs); fixed cost itself is derived from cost cards.
   { section: 'FINANCE', field: 'Monthly COGS Proxy',       value: 239577, unit: 'USD/month',   low: 100000, high: 600000, updateFrequency: 'Quarterly', costBehavior: 'Working capital base',   activation: 'Always' },
-  // Toggle (1 = on): when off, working-capital financing drops out of fixed cost (self-funded AR/AP gap).
-  { section: 'FINANCE', field: 'Working Capital Financing Enabled', value: 1,    unit: 'flag (0/1)',  low: 0,      high: 1,      updateFrequency: 'Annual',    costBehavior: 'Finance toggle',         activation: 'Always' },
-  // Profit Determination — expected return hurdle the recommended sell must clear (commercial validation).
-  { section: 'FINANCE', field: 'Tasa de Rendimiento Esperado',      value: 0.12, unit: 'annual rate', low: 0.08,   high: 0.25,   updateFrequency: 'Quarterly', costBehavior: 'Profit hurdle',          activation: 'Always' },
 
   // ── UTILIZATION ──────────────────────────────────────────────────────
   { section: 'UTILIZATION', field: 'Deadhead Base',                value: 0.15, unit: '% loaded miles',        low: 0.08, high: 0.30, updateFrequency: 'Monthly',   costBehavior: 'Empty repositioning',    activation: 'By Lane' },

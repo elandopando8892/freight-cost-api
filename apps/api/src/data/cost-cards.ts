@@ -65,19 +65,6 @@ export const COST_CARDS: CC[] = [
   cc('COST_INSURANCE', 'Prima Anual por Vehiculo', 1, 'policy/vehicle', 1, 1, 'Annual', 'Insurance', 'Always'),
   cc('COST_INSURANCE', 'Poliza x Vehiculo', 12000, 'USD/year/tractor', 8000, 20000, 'Annual', 'Insurance', 'Always'),
   cc('COST_INSURANCE', 'Periodo de Poliza', 12, 'months', 12, 12, 'Annual', 'Insurance', 'Always'),
-  // Advanced insurance (V3.0 Inputs) — neutral by default: allocations 0, factors 1.0.
-  // Additive monthly allocations folded into Monthly Fixed Cost (engine.outputs.ts).
-  cc('COST_INSURANCE', 'Cargo Insurance Annual Allocation', 0, 'USD/month', 0, 50000, 'Annual', 'Insurance', 'By Shipment'),
-  cc('COST_INSURANCE', 'Excess Umbrella Liability Allocation', 0, 'USD/month', 0, 25000, 'Annual', 'Insurance', 'Always'),
-  cc('COST_INSURANCE', 'Trailer Physical Damage Insurance', 0, 'USD/month', 0, 20000, 'Annual', 'Insurance', 'By Equipment'),
-  cc('COST_INSURANCE', 'Deductible Loss Reserve', 0, 'USD/month', 0, 15000, 'Quarterly', 'Insurance', 'Always'),
-  // Multiplicative risk loads on the insurance base (1.0 = no change).
-  cc('COST_INSURANCE', 'Insurance Inflation Factor', 1, 'factor', 1, 1.5, 'Annual', 'Insurance', 'Always'),
-  cc('COST_INSURANCE', 'Siniestralidad Factor', 1, 'factor', 0.8, 2, 'Annual', 'Insurance', 'Always'),
-  // Per-shipment cargo insurance (validation layer): rate + hazmat / high-value loads.
-  cc('COST_INSURANCE', 'Cargo Insurance Per Shipment Rate', 0, 'USD/shipment', 0, 500, 'Quarterly', 'Insurance', 'By Shipment'),
-  cc('COST_INSURANCE', 'Hazmat Insurance Factor', 1, 'factor', 1, 2.5, 'Annual', 'Insurance', 'By Shipment'),
-  cc('COST_INSURANCE', 'High Value Cargo Factor', 1, 'factor', 1, 3, 'Quarterly', 'Insurance', 'By Shipment'),
 
   // ── COST_PAYROLL (Qty FTE × PU monthly) ──────────────────────────────────
   cc('COST_PAYROLL', 'Qty Despachador', 2, 'FTE', 1, 4, 'Semiannual', 'Admin payroll', 'Always'),
@@ -157,8 +144,6 @@ export const COST_CARDS: CC[] = [
   cc('COST_CAPITAL', 'Periodo Depreciacion', 60, 'months', 48, 72, 'Annual', 'Capital', 'Always'),
   cc('COST_CAPITAL', 'LTV Asset Financing', 0.7, 'ratio', 0, 1, 'Annual', 'Capital', 'Always'),
   cc('COST_CAPITAL', 'Asset Finance Annual Rate', 0.1, 'annual rate', 0.05, 0.2, 'Annual', 'Capital', 'Always'),
-  // Toggle (1 = on): when off, fleet asset-finance interest drops out of fixed cost (cash-bought fleet).
-  cc('COST_CAPITAL', 'Asset Financing Enabled', 1, 'flag (0/1)', 0, 1, 'Annual', 'Capital', 'Always'),
 
   // ── COST_CROSSBORDER (compliance + infrastructure) ───────────────────────
   cc('COST_CROSSBORDER', 'Registro doble matricula', 3500, 'USD/year/tractor', 1500, 5000, 'Annual', 'Crossborder', 'By Border'),

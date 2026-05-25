@@ -548,7 +548,17 @@ Cost build-up + commercial (COGS…Commercial) ✅ implemented · Validations �
 
 **✅ Done — full carrier model:** Assumptions, Inputs/cost cards (editable), Factors, Equipments, Outputs cost build-up + commercial layer (cost floor → sell tiers → margin → flags), per-lane production (MX+USA), DAT market reference. Validated $1,200 / $2,600.
 
-**✅ Refinements (2026-05): all V3.0 inputs + validations wired.**
-1. EIA current + historical auto-fetch wired; historical needs EIA_API_KEY in env.
-2. Advanced insurance (cargo / excess-liability / trailer-physical-damage / deductible allocations, siniestralidad × inflation risk loads, per-shipment cargo rate, hazmat & high-value factors), finance toggles (asset-finance / working-capital on-off), and the profit hurdle (Tasa de Rendimiento Esperado) are seeded and consumed — neutral by default so $1,200 / $2,600 still hold (`engine.outputs.ts`, `cost-cards.ts`, `default-assumptions.ts`).
-3. Validation rules wired in `engine.commercial.ts`: fuel-mix, No-Go (sell < floor), below-min-margin, 15%+ above market, margin-tier range check, expected-return hurdle, cargo-insurance double-count, border / yard double-count, TMS double-count, hazmat consistency, border-presence. All advisory — they raise `reviewFlag`/`notes` and never change the tariff.
+**✅ Sheet-fidelity audit (2026-05): engine reproduces V3.0 exactly.**
+`tests/sheet-fidelity.test.ts` runs the engine on 90 mexLaneProd + 90 usaLaneProd rows
+and checks every component (miles/fuel/maint/driver/CVU/CFU/production/technical/risk/
+required/RPM/FSC) — **180/180 exact**. Factors (39), Equipments (20), Assumptions (48),
+Monthly Fixed Cost ($381,384.04) and Maint+Tires/km (0.2348385) all verified against
+the workbook. EIA current + historical auto-fetch wired (historical needs EIA_API_KEY).
+
+**❌ Pending (separate layers, NOT in the per-lane production path):**
+1. Advanced-insurance detail layer (V3.0 Outputs: Cargo Insurance Annual Cost = allocation
+   × fleet, Excess Liability, Trailer Physical Damage, deductible, siniestralidad × inflation,
+   per-shipment cargo + hazmat/high-value loads). Real sheet values exist but feed a separate
+   Outputs aggregation, not Monthly Fixed Cost — to be modeled faithfully when needed.
+2. Profit determination (Tasa de Rendimiento Esperado) + extended Validation section.
+3. Commercial flags currently: fuel-mix, No-Go (sell < floor), below-min-margin, 15%+ above market.

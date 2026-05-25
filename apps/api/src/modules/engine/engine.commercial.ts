@@ -18,10 +18,6 @@ export interface CommercialInput {
   cycleDays: number
   fuelMixOk: boolean
   params: ParamMap
-  // ── Validation context (optional; defaults keep the recommended lane clean) ──
-  operation?: string          // cross-border operations expect a border cost
-  trailer?: string            // hazmat consistency
-  borderCounted?: boolean     // MEX leg border charged exactly once
 }
 
 export interface CommercialOutput {
@@ -75,69 +71,6 @@ export function calculateCommercial(input: CommercialInput): CommercialOutput {
     reviewFlag = true; notes.push('REVIEW: 15%+ above market reference')
   }
   if (!input.fuelMixOk) { reviewFlag = true; notes.push('REVIEW: fuel purchase mix MX+US ≠ 1.00') }
-
-  // ── V3.0 "Validation" section (advisory; never alters the tariff) ─────────
-  const v = (s: string, f: string, d: number) => getParam(params, s, f, d)
-
-  // Range/consistency — sell-margin tiers must be strictly increasing within (0,1).
-  if (!(minMargin > 0 && minMargin < targetMargin && targetMargin < premiumMargin && premiumMargin < 1)) {
-    reviewFlag = true
-    notes.push('REVIEW: margin tiers misconfigured (need 0 < min < target < premium < 1)')
-  }
-
-  // Profit Determination — recommended sell must clear the expected-return hurdle.
-  const expectedReturn = v('FINANCE', 'Tasa de Rendimiento Esperado', 0.12)
-  if (recommendedSellUsd > 0 && grossMarginPct < expectedReturn) {
-    reviewFlag = true
-    notes.push(`REVIEW: gross margin ${(grossMarginPct * 100).toFixed(1)}% below expected return ${(expectedReturn * 100).toFixed(0)}%`)
-  }
-
-  // Insurance double-count — cargo covered both as a monthly allocation and per-shipment.
-  if (v('COST_INSURANCE', 'Cargo Insurance Annual Allocation', 0) > 0 &&
-      v('COST_INSURANCE', 'Cargo Insurance Per Shipment Rate', 0) > 0) {
-    reviewFlag = true
-    notes.push('REVIEW: cargo insurance double-counted (annual allocation + per-shipment rate)')
-  }
-  if (v('COST_INSURANCE', 'High Value Cargo Factor', 1) < 1) {
-    notes.push('NOTE: High Value Cargo Factor < 1 reduces cargo insurance — verify')
-  }
-
-  // Border double-count — yard transfer added separately while the transactional already bundles it.
-  if (v('BORDER', 'Yard Transfer Cost', 150) > 0 && v('BORDER', 'Border Transactional Cost', 200) >= 350) {
-    reviewFlag = true
-    notes.push('REVIEW: border cost may double-count yard transfer')
-  }
-
-  // TMS double-count — cross-border TMS plus an oversized company software line.
-  // (Fallbacks mirror the seeded defaults so empty-param behavior == DB-backed.)
-  const tms = v('COST_CROSSBORDER', 'TMS', 2500)
-  const software = v('COST_COMPANY', 'PU Software', 1250) * v('COST_COMPANY', 'Qty Software', 1)
-  if (tms > 0 && software > 0 && tms + software > 6000) {
-    reviewFlag = true
-    notes.push('REVIEW: possible TMS double-count (crossborder TMS + company software)')
-  }
-
-  // Hazmat consistency — a hazmat trailer must carry a hazmat premium (and ideally an insurance load).
-  if (input.trailer === 'Hazmat') {
-    if (v('RISK', 'Hazmat Premium', 0) <= 0) {
-      reviewFlag = true
-      notes.push('REVIEW: hazmat trailer without hazmat premium')
-    } else if (v('COST_INSURANCE', 'Hazmat Insurance Factor', 1) <= 1) {
-      notes.push('NOTE: hazmat lane using base cargo-insurance factor (set Hazmat Insurance Factor > 1 to load risk)')
-    }
-  }
-
-  // Border presence — cross-border operations should charge the border exactly once
-  // and carry an inspection/delay reserve.
-  if (input.operation === 'D2D Export' || input.operation === 'D2D Import') {
-    if (input.borderCounted === false) {
-      reviewFlag = true
-      notes.push('REVIEW: cross-border operation but border cost not counted')
-    }
-    if (v('BORDER', 'Inspection Delay Reserve', 0.02) <= 0) {
-      notes.push('NOTE: no border inspection/delay reserve set for a cross-border lane')
-    }
-  }
 
   return {
     costFloorUsd, minSellUsd, targetSellUsd, premiumSellUsd, recommendedSellUsd,

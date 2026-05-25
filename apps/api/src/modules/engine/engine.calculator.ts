@@ -67,9 +67,6 @@ export function calculate(input: EngineInput): EngineOutput {
     cycleDays,
     fuelMixOk: Math.abs(mixMx + mixUs - 1) < 1e-6,
     params,
-    operation,
-    trailer: input.equipment.trailer,
-    borderCounted: need.mex ? !!(mexLeg && mexLeg.borderUsd > 0) : undefined,
   })
 
   return {
