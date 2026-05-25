@@ -76,14 +76,15 @@ export function driverFactor(driver: string, params: ParamMap): number {
 }
 
 // ── REPOSITION (deadhead %) by market condition — USA leg ──────────────────
+// EXACTLY the V3.0 Factors table (ORIGIN/DESTINATION REPOSITION). Conditions NOT
+// listed — "Neutral", "Slightly Tight", "Moderately Loose", blank — resolve to 0,
+// matching the sheet's INDEX/MATCH miss (verified vs usaLaneProd BC/BD columns).
 const REPOSITION: Record<string, number> = {
   'Very Tight': 0.03, 'Moderately Tight': 0.05, Balanced: 0.1,
   'Slightly Loose': 0.15, 'Very Loose': 0.25,
-  // aliases
-  'Slightly Tight': 0.05, Neutral: 0.1, 'Moderately Loose': 0.15,
 }
 export function repositionPct(condition: string): number {
-  return REPOSITION[condition] ?? 0
+  return REPOSITION[(condition ?? '').trim()] ?? 0
 }
 
 // ── EQUIPMENT factors (Fuel, Fixed, Maint/Tires, Driver/Access) ─────────────

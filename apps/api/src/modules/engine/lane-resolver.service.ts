@@ -47,10 +47,12 @@ function conditionByTrailer(
 }
 
 async function conditionOf(location: string, trailer: string, warnings: string[]): Promise<MarketCondition> {
+  // Missing condition → 'Neutral', which carries 0 reposition (matches the V3.0
+  // sheet's blank-condition behavior: INDEX/MATCH miss → 0 deadhead, flagged).
   const market = await marketOf(location)
-  if (!market) { warnings.push(`No market for "${location}" (condition→Balanced)`); return 'Balanced' }
+  if (!market) { warnings.push(`No market for "${location}" (condition→Neutral, 0 reposition)`); return 'Neutral' }
   const cond = await prisma.usaMktCondition.findUnique({ where: { market } })
-  if (!cond) { warnings.push(`No condition for "${market}" (→Balanced)`); return 'Balanced' }
+  if (!cond) { warnings.push(`No condition for "${market}" (→Neutral, 0 reposition)`); return 'Neutral' }
   return conditionByTrailer(cond, trailer)
 }
 
