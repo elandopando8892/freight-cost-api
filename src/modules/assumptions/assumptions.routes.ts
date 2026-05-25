@@ -5,6 +5,7 @@ import {
   CreateSetSchema,
   UpdateSetSchema,
   BulkUpdateParamsSchema,
+  ResetParamsSchema,
 } from './assumptions.schema.js'
 import {
   listSets,
@@ -15,6 +16,7 @@ import {
   activateSet,
   getParams,
   bulkUpdateParams,
+  resetParams,
 } from './assumptions.service.js'
 
 export async function assumptionsRoutes(app: FastifyInstance) {
@@ -69,5 +71,13 @@ export async function assumptionsRoutes(app: FastifyInstance) {
     const { id } = request.params as { id: string }
     const updates = BulkUpdateParamsSchema.parse(request.body)
     return bulkUpdateParams(orgId, id, updates)
+  })
+
+  // Reset params to V3.0 recommended values (whole set, or only the given fields).
+  app.post('/assumptions/sets/:id/params/reset', async (request) => {
+    const { orgId } = request.user as JwtPayload
+    const { id } = request.params as { id: string }
+    const body = ResetParamsSchema.parse(request.body ?? {})
+    return resetParams(orgId, id, body.fields)
   })
 }

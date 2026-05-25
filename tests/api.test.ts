@@ -269,6 +269,41 @@ describe('Assumptions', () => {
     })
     expect(res.statusCode).toBe(400)
   })
+
+  it('PATCH cost-card section (COST_CAPITAL) → 200 with warnings array', async () => {
+    const res = await app.inject({
+      method: 'PATCH',
+      url: '/assumptions/sets/set-1/params',
+      headers: { authorization: `Bearer ${token}` },
+      payload: [{ section: 'COST_CAPITAL', field: 'PU Tracto', value: 240000 }],
+    })
+    expect(res.statusCode).toBe(200)
+    const body = res.json()
+    expect(body).toHaveProperty('params')
+    expect(Array.isArray(body.warnings)).toBe(true)
+  })
+
+  it('PATCH out-of-range value → 200 but flags a warning', async () => {
+    const res = await app.inject({
+      method: 'PATCH',
+      url: '/assumptions/sets/set-1/params',
+      headers: { authorization: `Bearer ${token}` },
+      payload: [{ section: 'FINANCE', field: 'Tipo de Cambio', value: 999 }], // recommended high is 20
+    })
+    expect(res.statusCode).toBe(200)
+    const body = res.json()
+    expect(body.warnings.some((w: { field: string }) => w.field === 'Tipo de Cambio')).toBe(true)
+  })
+
+  it('POST /assumptions/sets/set-1/params/reset → 200', async () => {
+    const res = await app.inject({
+      method: 'POST',
+      url: '/assumptions/sets/set-1/params/reset',
+      headers: { authorization: `Bearer ${token}` },
+      payload: { fields: [{ section: 'FUEL', field: 'Diesel MX' }] },
+    })
+    expect(res.statusCode).toBe(200)
+  })
 })
 
 // ─────────────────────────────────────────────────────────────────────────────

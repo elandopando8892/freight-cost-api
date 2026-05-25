@@ -357,6 +357,9 @@ model Quote {
   mexLeg Json?
   usaLeg Json?
 
+  // ── Commercial / decision layer (cost floor → sell tiers → margin → flags) ──
+  commercial Json?
+
   org  Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
   lane Lane?          @relation(fields: [laneId], references: [id])
   set  AssumptionSet? @relation(fields: [assumptionSetId], references: [id])

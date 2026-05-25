@@ -98,6 +98,7 @@ export async function quotesRoutes(app: FastifyInstance) {
         fxRateUsed: r.fxRateUsed,
         mexLeg: (r.mexLeg ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
         usaLeg: (r.usaLeg ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
+        commercial: (r.commercial ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
       },
     })
     return reply.status(201).send(quote)
