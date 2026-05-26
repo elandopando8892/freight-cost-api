@@ -185,3 +185,32 @@ describe('Cross-border assembly — Monterrey → Dallas Flatbed D2D Export = $2
     expect(c.notes).toHaveLength(0)
   })
 })
+
+describe('ReferenceKey — byte-exact vs V3.0 (mexLaneProd!CL / usaLaneProd!BV)', () => {
+  const equipment = { truckType: 'Truck Trailer', trailer: 'Flatbed', config: 'Single', driver: 'B1' }
+
+  it('MEX leg homologates MX state + key matches the sheet', () => {
+    const r = calculateMexLeg({
+      baseKm: 225, routeExpensesMxn: 0, baseHours: 0,
+      operation: 'D2D Export', service: 'One Way', route: 'Straight & Danger', equipment,
+      origin: 'Monterrey, Nuevo Leon', dest: 'Nuevo Laredo, Tamaulipas',
+    }, {})
+    expect(r.referenceKey).toBe('MONTERREY, NL - NUEVO LAREDO, TM TRUCK TRAILER FLATBED SINGLE D2D EXPORT ONE WAY B1')
+  })
+
+  it('USA leg key matches the sheet, normalizing Backhaul → One Way', () => {
+    const r = calculateUsaLeg({
+      loadedMiles: 1994, transitDaysRaw: 3, driverExpenses: 300, outState: 'NY',
+      dieselUsdGal: 5.863, fscUsdMile: 0.94, originCondition: 'Neutral', destCondition: 'Very Tight',
+      operation: 'D2D Import', service: 'Backhaul',
+      equipment: { truckType: 'Truck Trailer', trailer: 'Dry Van', config: 'Single', driver: 'B1' },
+      origin: 'Brooklyn, NY', dest: 'Laredo, TX',
+    }, {})
+    expect(r.referenceKey).toBe('BROOKLYN, NY - LAREDO, TX TRUCK TRAILER DRY VAN SINGLE D2D IMPORT ONE WAY B1')
+  })
+
+  it('no origin/dest → empty key (back-compat for direct calls)', () => {
+    const r = calculateMexLeg({ baseKm: 225, operation: 'D2D Export', service: 'One Way', route: 'Straight & Danger', equipment }, {})
+    expect(r.referenceKey).toBe('')
+  })
+})

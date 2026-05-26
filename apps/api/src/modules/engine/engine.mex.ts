@@ -10,6 +10,7 @@ import {
   laneFactor, operationFactor, trailerFactor, driverFactor, equipmentFactors,
 } from './engine.factors.js'
 import { deriveMonthlyFixedCost, deriveMaintTiresPerKm } from './engine.outputs.js'
+import { buildReferenceKey, homologateMx } from './reference-key.js'
 import type { MexLegInput, MexLegOutput } from './engine.types.js'
 
 const MI_PER_KM = 1 / 1.60934
@@ -124,6 +125,13 @@ export function calculateMexLeg(lane: MexLegInput, params: ParamMap): MexLegOutp
   const rpm = totalMiles > 0 ? (requiredTariffUsd - fuelUsd) / totalMiles : 0
   const fsc = totalMiles > 0 ? fuelUsd / totalMiles : 0
 
+  // ReferenceKey (mexLaneProd!CL) — homologated MX names, Backhaul→One Way.
+  const referenceKey = buildReferenceKey(
+    lane.origin ? homologateMx(lane.origin) : undefined,
+    lane.dest ? homologateMx(lane.dest) : undefined,
+    equipment, lane.operation, lane.service,
+  )
+
   return {
     loadedKm, emptyKm, totalKm, loadedMiles, emptyMiles, totalMiles, cycleDays,
     blendedDieselUsdL, fuelUsd, routeExpensesUsd, routeBufferUsd, maintTiresUsd, driverUsd, borderUsd,
@@ -132,6 +140,6 @@ export function calculateMexLeg(lane: MexLegInput, params: ParamMap): MexLegOutp
     productionCostUsd, utMargin, technicalUtilityUsd, technicalTariffUsd,
     routeFactor, routeRiskUsd, trailerFactor: trailerFac, trailerRiskUsd, flatbedComplexityUsd,
     securityRiskUsd, tandemRiskUsd, operationFactor: operationFac, operationRiskUsd, totalRiskAdjUsd,
-    requiredTariffUsd, operatingProfitUsd, operatingMargin, rpm, fsc,
+    requiredTariffUsd, operatingProfitUsd, operatingMargin, rpm, fsc, referenceKey,
   }
 }

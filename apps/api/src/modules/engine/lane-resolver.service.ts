@@ -95,6 +95,7 @@ async function resolveMexLeg(
     routeExpensesMxn: 0,   // V3.0 mexLaneProd uses km only (route-expense refs are #REF→0)
     baseHours: 0,
     operation, service, route, equipment: eq,
+    origin, dest,          // full MX names (engine homologates for the ReferenceKey)
   }
 }
 
@@ -130,6 +131,7 @@ async function resolveUsaLeg(
     originCondition, destCondition,
     marketRpm: dat?.rpm ?? 0,
     operation, service, equipment: eq,
+    origin, dest,          // resolved metro names for the ReferenceKey
   }
 }
 

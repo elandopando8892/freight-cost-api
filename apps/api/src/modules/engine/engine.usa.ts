@@ -16,6 +16,7 @@ import {
   equipmentFactors, repositionPct,
 } from './engine.factors.js'
 import { deriveMonthlyFixedCost, deriveMaintTiresPerMile } from './engine.outputs.js'
+import { buildReferenceKey } from './reference-key.js'
 import type { UsaLegInput, UsaLegOutput } from './engine.types.js'
 
 const KML_TO_MPG = 2.3521458
@@ -103,6 +104,9 @@ export function calculateUsaLeg(lane: UsaLegInput, params: ParamMap): UsaLegOutp
   const marketRpm = lane.marketRpm ?? 0
   const marketRateUsd = marketRpm > 0 ? P * (marketRpm + fsc) : 0
 
+  // ReferenceKey (usaLaneProd!BV) — full metro names, Backhaul→One Way.
+  const referenceKey = buildReferenceKey(lane.origin, lane.dest, equipment, lane.operation, lane.service)
+
   return {
     loadedMiles: P, emptyMiles: totalEmptyMiles, totalOperationalMiles,
     loadedMpg, emptyMpg, fuelGallons, fuelCostUsd, driverCostUsd, maintTiresUsd,
@@ -111,6 +115,6 @@ export function calculateUsaLeg(lane: UsaLegInput, params: ParamMap): UsaLegOutp
     utRate, technicalTariffExFuelUsd, technicalTariffInclFuelUsd,
     trailerFactor: trailerFac, trailerRiskUsd, operationRiskUsd, serviceRiskUsd, totalRiskAdjUsd,
     requiredTariffExFuelUsd, requiredTariffUsd, rpm, fsc, flatUsd,
-    marketRpm, marketRateUsd,
+    marketRpm, marketRateUsd, referenceKey,
   }
 }

@@ -31,6 +31,8 @@ export interface MexLegInput {
   service: string
   route: string              // lane type (e.g. "Straight & Danger")
   equipment: EquipmentSpec
+  origin?: string            // MX "City, State" (homologated for the ReferenceKey)
+  dest?: string
 }
 
 // ── USA leg input (usaLaneProd) ────────────────────────────────────────────
@@ -47,6 +49,8 @@ export interface UsaLegInput {
   operation: string
   service: string
   equipment: EquipmentSpec
+  origin?: string                  // US metro "City, ST" for the ReferenceKey
+  dest?: string
 }
 
 // ── MEX leg output ─────────────────────────────────────────────────────────
@@ -70,6 +74,7 @@ export interface MexLegOutput {
   requiredTariffUsd: number
   operatingProfitUsd: number; operatingMargin: number
   rpm: number; fsc: number       // ReferenceKey: USD = requiredTariff
+  referenceKey: string           // mexLaneProd!CL (Backhaul→One Way, homologated MX names)
 }
 
 // ── USA leg output ─────────────────────────────────────────────────────────
@@ -92,6 +97,7 @@ export interface UsaLegOutput {
   flatUsd: number                  // miles × (RPM + FSC) — what the quote sums
   marketRpm: number                // DAT benchmark RPM (0 if unknown)
   marketRateUsd: number            // (marketRpm + fsc) × loadedMiles — DAT all-in
+  referenceKey: string             // usaLaneProd!BV (Backhaul→One Way)
 }
 
 // ── Commercial / decision layer ────────────────────────────────────────────
