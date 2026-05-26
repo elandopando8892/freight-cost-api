@@ -6,6 +6,7 @@ import { getActiveSet, buildParamMap, type ParamMap } from '../assumptions/assum
 import { prisma } from '../../config/prisma.js'
 import { calculate } from './engine.calculator.js'
 import { resolveRoute } from './lane-resolver.service.js'
+import { defaultService } from './engine.factors.js'
 import type { EngineInput, EquipmentSpec, MarketCondition } from './engine.types.js'
 
 const MarketConditionEnum = z.enum([
@@ -42,7 +43,7 @@ const CalculateSchema = z.object({
   assumptionSetId: z.string().min(1).optional(),
   overrides: z.record(z.number()).optional(),
   operation: z.string(),
-  service: z.string().default('One Way'),
+  service: z.string().optional(), // omitted → defaultService(operation); carrier can override
   equipment: EquipmentSchema.default({}),
   fxRate: z.number().positive().optional(),
   mex: MexSchema.optional(),
@@ -60,6 +61,9 @@ export async function engineRoutes(app: FastifyInstance) {
       return reply.status(422).send({ error: 'Provide at least one of mex or usa leg facts.' })
     }
 
+    // Carrier's choice: explicit service, else the prevailing per-operation default.
+    const service = body.service ?? defaultService(body.operation)
+
     let params: ParamMap = {}
     const set = body.assumptionSetId
       ? await prisma.assumptionSet.findFirst({ where: { id: body.assumptionSetId, orgId }, include: { params: true } })
@@ -69,13 +73,13 @@ export async function engineRoutes(app: FastifyInstance) {
     const equipment: EquipmentSpec = body.equipment
     const input: EngineInput = {
       operation: body.operation,
-      service: body.service,
+      service,
       equipment,
       params,
       fxRate: body.fxRate,
       overrides: body.overrides,
       mexLeg: body.mex
-        ? { ...body.mex, operation: body.operation, service: body.service, equipment }
+        ? { ...body.mex, operation: body.operation, service, equipment }
         : undefined,
       usaLeg: body.usa
         ? {
@@ -83,7 +87,7 @@ export async function engineRoutes(app: FastifyInstance) {
             originCondition: body.usa.originCondition as MarketCondition,
             destCondition: body.usa.destCondition as MarketCondition,
             operation: body.operation,
-            service: body.service,
+            service,
             equipment,
           }
         : undefined,
@@ -102,7 +106,7 @@ export async function engineRoutes(app: FastifyInstance) {
     mexBorder: z.string().default('Nuevo Laredo, Tamaulipas'),
     usBorder: z.string().default('Laredo, TX'),
     operation: z.string(),
-    service: z.string().default('One Way'),
+    service: z.string().optional(), // omitted → defaultService(operation); carrier can override
     route: z.string().default('Straight & Danger'),
     equipment: EquipmentSchema.default({}),
     fxRate: z.number().positive().optional(),
@@ -111,6 +115,7 @@ export async function engineRoutes(app: FastifyInstance) {
   app.post('/engine/quote-by-route', async (request, reply) => {
     const { orgId } = request.user as JwtPayload
     const body = ByRouteSchema.parse(request.body)
+    const service = body.service ?? defaultService(body.operation)
 
     const resolved = await resolveRoute({
       outboundLocation: body.outboundLocation,
@@ -119,7 +124,7 @@ export async function engineRoutes(app: FastifyInstance) {
       usBorder: body.usBorder,
       equipment: body.equipment,
       operation: body.operation,
-      service: body.service,
+      service,
       route: body.route,
     })
 
@@ -135,7 +140,7 @@ export async function engineRoutes(app: FastifyInstance) {
 
     const result = calculate({
       operation: body.operation,
-      service: body.service,
+      service,
       equipment: body.equipment,
       params,
       fxRate: body.fxRate,

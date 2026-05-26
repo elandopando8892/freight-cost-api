@@ -38,6 +38,21 @@ export function operationFactor(operation: string, params: ParamMap): number {
   }
 }
 
+// ── DEFAULT SERVICE by operation (prevailing V3.0 logic; carrier-overridable) ──
+// usaLaneProd is generated southbound/import = Backhaul (the return leg) and
+// northbound/export = One Way (the headhaul). This is only the DEFAULT — the
+// carrier can pass an explicit service to override it when building tariffs.
+export function defaultService(operation: string): string {
+  switch (operation) {
+    case 'D2D Import':
+    case 'MX Southbound':
+    case 'US Southbound':
+      return 'Backhaul'
+    default:
+      return 'One Way'
+  }
+}
+
 // ── SERVICE FACTOR ──────────────────────────────────────────────────────────
 export function serviceFactor(service: string, params: ParamMap): number {
   switch (service) {

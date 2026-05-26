@@ -481,6 +481,24 @@ describe('Engine /calculate', () => {
     })
     expect(res.statusCode).toBe(422)
   })
+
+  it('D2D Import without service defaults to Backhaul (UT 0.10)', async () => {
+    const res = await app.inject({
+      method: 'POST', url: '/engine/calculate', headers: { authorization: `Bearer ${token}` },
+      payload: { operation: 'D2D Import', equipment: { trailer: 'Dry Van' }, mex: { baseKm: 910 } },
+    })
+    expect(res.statusCode).toBe(200)
+    expect(res.json().mexLeg.utMargin).toBe(0.1) // backhaul default applied
+  })
+
+  it('explicit service overrides the default (D2D Import One Way → UT 0.30)', async () => {
+    const res = await app.inject({
+      method: 'POST', url: '/engine/calculate', headers: { authorization: `Bearer ${token}` },
+      payload: { operation: 'D2D Import', service: 'One Way', equipment: { trailer: 'Dry Van' }, mex: { baseKm: 910 } },
+    })
+    expect(res.statusCode).toBe(200)
+    expect(res.json().mexLeg.utMargin).toBe(0.3) // carrier override
+  })
 })
 
 // ─────────────────────────────────────────────────────────────────────────────

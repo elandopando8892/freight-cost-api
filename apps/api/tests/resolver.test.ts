@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { usZipPrefix } from '../src/modules/engine/lane-resolver.service.js'
 import { homologateMx, buildReferenceKey } from '../src/modules/engine/reference-key.js'
+import { defaultService } from '../src/modules/engine/engine.factors.js'
 
 // ZIP → metro resolution: the cusCatalog is keyed by 3-digit ZIP prefix, so the
 // resolver must extract that prefix from a shipper/consignee location string.
@@ -32,5 +33,17 @@ describe('reference-key — MX homologation + key building', () => {
     expect(buildReferenceKey('Brooklyn, NY', 'Laredo, TX', eq, 'D2D Import', 'Backhaul'))
       .toBe('BROOKLYN, NY - LAREDO, TX TRUCK TRAILER DRY VAN SINGLE D2D IMPORT ONE WAY B1')
     expect(buildReferenceKey(undefined, 'Laredo, TX', eq, 'D2D Import', 'One Way')).toBe('')
+  })
+})
+
+describe('default service by operation (prevailing V3.0 logic; overridable)', () => {
+  it('imports/southbound default to Backhaul, everything else One Way', () => {
+    expect(defaultService('D2D Import')).toBe('Backhaul')
+    expect(defaultService('MX Southbound')).toBe('Backhaul')
+    expect(defaultService('US Southbound')).toBe('Backhaul')
+    expect(defaultService('D2D Export')).toBe('One Way')
+    expect(defaultService('MX Northbound')).toBe('One Way')
+    expect(defaultService('Intra-Mex')).toBe('One Way')
+    expect(defaultService('Drayage')).toBe('One Way')
   })
 })

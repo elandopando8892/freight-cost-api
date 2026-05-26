@@ -6,6 +6,7 @@ import type { JwtPayload } from '../auth/auth.schema.js'
 import { prisma } from '../../config/prisma.js'
 import { getActiveSet, buildParamMap, type ParamMap } from '../assumptions/assumptions.service.js'
 import { calculate } from '../engine/engine.calculator.js'
+import { defaultService } from '../engine/engine.factors.js'
 import { usdToMxn, round2 } from '../../utils/currency.js'
 import type { EngineInput, EquipmentSpec, MarketCondition } from '../engine/engine.types.js'
 
@@ -41,7 +42,7 @@ const CreateQuoteSchema = z.object({
   assumptionSetId: z.string().min(1).optional(),
   overrides: z.record(z.number()).optional(),
   operation: z.string(),
-  service: z.string().default('One Way'),
+  service: z.string().optional(), // omitted → defaultService(operation); carrier can override
   equipment: EquipmentSchema.default({}),
   fxRate: z.number().positive().optional(),
   mex: MexSchema.optional(),
@@ -58,6 +59,9 @@ export async function quotesRoutes(app: FastifyInstance) {
       return reply.status(422).send({ error: 'Provide at least one of mex or usa leg facts.' })
     }
 
+    // Carrier's choice: explicit service, else the prevailing per-operation default.
+    const service = body.service ?? defaultService(body.operation)
+
     let params: ParamMap = {}
     const set = body.assumptionSetId
       ? await prisma.assumptionSet.findFirst({ where: { id: body.assumptionSetId, orgId }, include: { params: true } })
@@ -67,18 +71,18 @@ export async function quotesRoutes(app: FastifyInstance) {
     const equipment: EquipmentSpec = body.equipment
     const input: EngineInput = {
       operation: body.operation,
-      service: body.service,
+      service,
       equipment,
       params,
       fxRate: body.fxRate,
       overrides: body.overrides,
-      mexLeg: body.mex ? { ...body.mex, operation: body.operation, service: body.service, equipment } : undefined,
+      mexLeg: body.mex ? { ...body.mex, operation: body.operation, service, equipment } : undefined,
       usaLeg: body.usa
         ? {
             ...body.usa,
             originCondition: body.usa.originCondition as MarketCondition,
             destCondition: body.usa.destCondition as MarketCondition,
-            operation: body.operation, service: body.service, equipment,
+            operation: body.operation, service, equipment,
           }
         : undefined,
     }
@@ -91,7 +95,7 @@ export async function quotesRoutes(app: FastifyInstance) {
         assumptionSetId: set?.id ?? undefined,
         label: body.label,
         operation: r.operation,
-        service: body.service,
+        service,
         freightBaselineUsd: r.freightBaselineUsd,
         requiredTariffUsd: r.requiredTariffUsd,
         requiredTariffMxn: round2(usdToMxn(r.requiredTariffUsd, r.fxRateUsed)),
