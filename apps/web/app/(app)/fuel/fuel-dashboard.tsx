@@ -2,11 +2,13 @@
 
 import { useMemo, useState } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import {
   CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { fetcher } from '@/lib/fetcher'
 
 export interface Region { region: string; dieselUsdGal: number; updatedAt: string }
 export type UsaFuelSample = { state: string; pricePerGallon: number; fsc: number } | null
@@ -26,17 +28,11 @@ export function FuelDashboard({
   initialStatus, initialTrend,
 }: { initialStatus: FuelStatus; initialTrend: TrendPoint[] }) {
   const [area, setArea] = useState('U.S.')
-  const [refreshNote, setRefreshNote] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
 
   // Current fuel — refetched after a successful refresh
   const status = useQuery({
     queryKey: ['fuel-status'],
-    queryFn: async () => {
-      const r = await fetch('/api/v1/market/fuel')
-      if (!r.ok) throw new Error(`status ${r.status}`)
-      return (await r.json()) as FuelStatus
-    },
+    queryFn: () => fetcher<FuelStatus>('/api/v1/market/fuel'),
     initialData: initialStatus,
     staleTime: 60_000,
   })
@@ -44,28 +40,19 @@ export function FuelDashboard({
   // Trend for the selected area
   const trend = useQuery({
     queryKey: ['fuel-trend', area],
-    queryFn: async () => {
-      const r = await fetch(`/api/v1/market/fuel/history?area=${encodeURIComponent(area)}&months=24`)
-      if (!r.ok) throw new Error(`status ${r.status}`)
-      return (await r.json()) as TrendPoint[]
-    },
+    queryFn: () => fetcher<TrendPoint[]>(`/api/v1/market/fuel/history?area=${encodeURIComponent(area)}&months=24`),
     initialData: area === 'U.S.' ? initialTrend : undefined,
     staleTime: 60_000,
   })
 
   // One-click refresh — full EIA pipeline (current diesel → FSC → MX leg sync)
   const refresh = useMutation({
-    mutationFn: async () => {
-      const r = await fetch('/api/v1/market/fuel/fetch-eia', { method: 'POST' })
-      if (!r.ok) throw new Error((await r.json().catch(() => ({})))?.error ?? `Refresh failed (${r.status})`)
-      return (await r.json()) as { eia: { updated: number }; updated: number; syncedOrgs?: number }
-    },
+    mutationFn: () =>
+      fetcher<{ eia: { updated: number }; updated: number; syncedOrgs?: number }>('/api/v1/market/fuel/fetch-eia', { method: 'POST' }),
     onSuccess: async (out) => {
-      setRefreshNote(`Updated ${out.eia.updated} EIA regions · recomputed ${out.updated} state FSC rows`)
-      setError(null)
+      toast.success(`Updated ${out.eia.updated} EIA regions`, { description: `Recomputed ${out.updated} state FSC rows` })
       await Promise.all([status.refetch(), trend.refetch()])
     },
-    onError: (e) => setError(e instanceof Error ? e.message : 'Refresh failed'),
   })
 
   const regions = status.data?.regions ?? []
@@ -99,12 +86,6 @@ export function FuelDashboard({
           </div>
         </CardHeader>
         <CardContent>
-          {(refreshNote || error) && (
-            <div className="mb-3 grid gap-1 rounded-md border bg-muted/30 p-3 text-xs">
-              {refreshNote && <span className="text-emerald-700 dark:text-emerald-400">✓ {refreshNote}</span>}
-              {error && <span className="text-destructive">· {error}</span>}
-            </div>
-          )}
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {regions.map((r) => (
               <div key={r.region} className="flex items-baseline justify-between rounded-md border bg-card/50 px-3 py-2">

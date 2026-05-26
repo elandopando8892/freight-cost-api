@@ -2,10 +2,12 @@
 
 import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { fetcher } from '@/lib/fetcher'
 
 // ── Types (mirror the API engine output we consume) ─────────────────────────
 interface MexLeg {
@@ -67,10 +69,9 @@ export function QuoteForm() {
   })
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [result, setResult] = useState<QuoteResult | null>(null)
-  const [error, setError] = useState<string | null>(null)
 
   const quote = useMutation({
-    mutationFn: async () => {
+    mutationFn: () => {
       const body: Record<string, unknown> = {
         outboundLocation: form.outboundLocation.trim(),
         inboundLocation: form.inboundLocation.trim(),
@@ -78,25 +79,19 @@ export function QuoteForm() {
         usBorder: form.usBorder,
         operation: form.operation,
         route: form.route,
-        equipment: {
-          truckType: form.truckType, trailer: form.trailer, config: form.config, driver: form.driver,
-        },
+        equipment: { truckType: form.truckType, trailer: form.trailer, config: form.config, driver: form.driver },
       }
       if (form.service) body.service = form.service
       if (form.fxRate) body.fxRate = Number(form.fxRate)
-      const res = await fetch('/api/v1/engine/quote-by-route', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(body),
-      })
-      if (!res.ok) {
-        const b = (await res.json().catch(() => ({}))) as { error?: string; warnings?: string[] }
-        throw new Error(b.error ? `${b.error}${b.warnings ? '\n· ' + b.warnings.join('\n· ') : ''}` : `Failed (${res.status})`)
-      }
-      return (await res.json()) as QuoteResult
+      return fetcher<QuoteResult>('/api/v1/engine/quote-by-route', { method: 'POST', json: body })
     },
-    onSuccess: (r) => { setResult(r); setError(null) },
-    onError: (e) => { setResult(null); setError(e instanceof Error ? e.message : 'Quote failed') },
+    onSuccess: (r) => {
+      setResult(r)
+      toast.success(`Baseline ${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(r.freightBaselineUsd)}`, {
+        description: `${r.operation} · ${r.mexLeg ? 'MEX' : ''}${r.mexLeg && r.usaLeg ? ' + ' : ''}${r.usaLeg ? 'USA' : ''}`,
+      })
+    },
+    onError: () => { setResult(null) }, // fetcher already toasted the error
   })
 
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) => setForm((f) => ({ ...f, [k]: v }))
@@ -192,9 +187,6 @@ export function QuoteForm() {
             <Button type="submit" disabled={quote.isPending} className="w-full">
               {quote.isPending ? 'Pricing…' : 'Get quote'}
             </Button>
-            {error && (
-              <pre className="whitespace-pre-wrap rounded-md border border-destructive/40 bg-destructive/5 p-2 text-xs text-destructive">{error}</pre>
-            )}
           </form>
         </CardContent>
       </Card>

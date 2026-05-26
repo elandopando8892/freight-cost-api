@@ -2,9 +2,11 @@
 
 import { useMemo, useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { fetcher } from '@/lib/fetcher'
 
 export interface Param {
   id: string
@@ -30,7 +32,6 @@ export function Editor({ setId, initial, sections }: { setId: string; initial: G
   const [data, setData] = useState<Grouped>(initial)
   const [pending, setPending] = useState<Record<string, number>>({})
   const [warnings, setWarnings] = useState<Warning[]>([])
-  const [error, setError] = useState<string | null>(null)
 
   const pendingCount = Object.keys(pending).length
 
@@ -40,35 +41,26 @@ export function Editor({ setId, initial, sections }: { setId: string; initial: G
         const [section, ...rest] = k.split('__')
         return { section, field: rest.join('__'), value }
       })
-      const res = await fetch(`/api/v1/assumptions/sets/${setId}/params`, {
-        method: 'PATCH',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(updates),
+      return fetcher<{ params: Grouped; warnings: Warning[] }>(`/api/v1/assumptions/sets/${setId}/params`, {
+        method: 'PATCH', json: updates,
       })
-      if (!res.ok) throw new Error((await res.json().catch(() => ({})))?.error ?? `Save failed (${res.status})`)
-      return (await res.json()) as { params: Grouped; warnings: Warning[] }
     },
     onSuccess: (result) => {
+      const n = Object.keys(pending).length
       setData(result.params)
       setPending({})
       setWarnings(result.warnings ?? [])
-      setError(null)
+      if ((result.warnings ?? []).length > 0) {
+        toast.warning(`Saved ${n} change${n === 1 ? '' : 's'} — ${result.warnings.length} value${result.warnings.length === 1 ? '' : 's'} outside recommended range`)
+      } else {
+        toast.success(`Saved ${n} change${n === 1 ? '' : 's'}`)
+      }
     },
-    onError: (e) => setError(e instanceof Error ? e.message : 'Save failed'),
   })
 
   const resetAll = useMutation({
-    mutationFn: async () => {
-      const res = await fetch(`/api/v1/assumptions/sets/${setId}/params/reset`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({}),
-      })
-      if (!res.ok) throw new Error(`Reset failed (${res.status})`)
-      return (await res.json()) as Grouped
-    },
-    onSuccess: (result) => { setData(result); setPending({}); setWarnings([]); setError(null) },
-    onError: (e) => setError(e instanceof Error ? e.message : 'Reset failed'),
+    mutationFn: () => fetcher<Grouped>(`/api/v1/assumptions/sets/${setId}/params/reset`, { method: 'POST', json: {} }),
+    onSuccess: (result) => { setData(result); setPending({}); setWarnings([]); toast.success('All params reset to recommended values') },
   })
 
   return (
@@ -80,7 +72,6 @@ export function Editor({ setId, initial, sections }: { setId: string; initial: G
           ) : (
             <span className="font-medium">{pendingCount} pending change{pendingCount === 1 ? '' : 's'}</span>
           )}
-          {error && <span className="ml-3 text-destructive">· {error}</span>}
         </div>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" onClick={() => setPending({})} disabled={pendingCount === 0 || save.isPending}>
