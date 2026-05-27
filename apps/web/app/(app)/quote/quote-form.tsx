@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -72,6 +73,15 @@ interface FormSnapshot {
   equipment: { truckType: string; trailer: string; config: string; driver: string }
 }
 
+export interface LastQuoteHint {
+  id: string
+  label: string | null
+  operation: string
+  service: string
+  origin: string | null
+  destination: string | null
+}
+
 const OPS = ['D2D Export', 'D2D Import', 'Drayage', 'Intra-Mex', 'MX Northbound', 'MX Southbound', 'Local'] as const
 const SVCS = ['', 'One Way', 'Backhaul', 'Roundtrip', 'Expedited'] as const
 const TRUCKS = ['Truck Trailer', 'Thorton', 'Rabon', '3.5 tons', '1.5 tons'] as const
@@ -114,11 +124,12 @@ function validate(f: FormFields): FormErrors {
   return e
 }
 
-export function QuoteForm() {
+export function QuoteForm({ lastQuote }: { lastQuote?: LastQuoteHint | null }) {
   const [form, setForm] = useState<FormFields>(INITIAL_FORM)
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [result, setResult] = useState<QuoteResult | null>(null)
   const [errors, setErrors] = useState<FormErrors>({})
+  const [usedLast, setUsedLast] = useState(false)
 
   const quote = useMutation({
     mutationFn: () => {
@@ -160,17 +171,55 @@ export function QuoteForm() {
     setResult(null)
     setErrors({})
     setShowAdvanced(false)
+    setUsedLast(false)
+  }
+  const useLast = () => {
+    if (!lastQuote) return
+    setForm((f) => ({
+      ...f,
+      outboundLocation: lastQuote.origin ?? f.outboundLocation,
+      inboundLocation: lastQuote.destination ?? f.inboundLocation,
+      operation: (OPS as readonly string[]).includes(lastQuote.operation)
+        ? (lastQuote.operation as (typeof OPS)[number])
+        : f.operation,
+      service: (SVCS as readonly string[]).includes(lastQuote.service)
+        ? (lastQuote.service as (typeof SVCS)[number])
+        : f.service,
+    }))
+    setErrors({})
+    setUsedLast(true)
+  }
+  const onFormKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+    // Cmd/Ctrl + Enter: submit from any field (incl. <select>, <button type=button>)
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      e.preventDefault()
+      const err = validate(form)
+      setErrors(err)
+      if (Object.keys(err).length === 0) quote.mutate()
+    }
   }
 
   return (
     <div className="grid gap-6 lg:grid-cols-[400px_1fr] lg:items-start">
       <Card className="lg:sticky lg:top-4">
         <CardHeader>
-          <CardTitle>Lane</CardTitle>
-          <CardDescription>ZIP, "City, ST", or a metro city.</CardDescription>
+          <div className="flex items-baseline justify-between gap-2">
+            <CardTitle>Lane</CardTitle>
+            {lastQuote && !usedLast && (
+              <button
+                type="button"
+                onClick={useLast}
+                className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
+                title={`${lastQuote.origin ?? '—'} → ${lastQuote.destination ?? '—'} · ${lastQuote.operation}`}
+              >
+                use last lane
+              </button>
+            )}
+          </div>
+          <CardDescription>ZIP, &ldquo;City, ST&rdquo;, or a metro city.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="grid gap-4" onSubmit={onSubmit} noValidate>
+          <form className="grid gap-4" onSubmit={onSubmit} onKeyDown={onFormKeyDown} noValidate>
             <Field label="Outbound (shipper)" error={errors.outboundLocation}>
               <Input
                 value={form.outboundLocation}
@@ -265,6 +314,12 @@ export function QuoteForm() {
                 Clear
               </Button>
             </div>
+            <p className="text-center text-[11px] text-muted-foreground">
+              <kbd className="rounded border bg-muted px-1 py-0.5 font-mono text-[10px]">⌘</kbd>
+              <span> + </span>
+              <kbd className="rounded border bg-muted px-1 py-0.5 font-mono text-[10px]">↵</kbd>
+              <span> to submit</span>
+            </p>
           </form>
         </CardContent>
       </Card>
@@ -396,9 +451,9 @@ function Result({ r, snapshot }: { r: QuoteResult; snapshot: FormSnapshot }) {
               {save.isPending ? 'Saving…' : savedId ? 'Save again' : 'Save quote'}
             </Button>
             {savedId && (
-              <a href="/quotes" className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2">
+              <Link href="/quotes" className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2">
                 view history →
-              </a>
+              </Link>
             )}
           </form>
         </CardContent>
@@ -431,7 +486,7 @@ function Result({ r, snapshot }: { r: QuoteResult; snapshot: FormSnapshot }) {
       <Card>
         <CardHeader>
           <CardTitle>Commercial</CardTitle>
-          <CardDescription>Cost floor → sell tiers (over the carrier's risk-adjusted COGS).</CardDescription>
+          <CardDescription>Cost floor → sell tiers (over the carrier&apos;s risk-adjusted COGS).</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">

@@ -5,6 +5,7 @@ import { api, ApiError } from '@/lib/api'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { RelativeTime } from '@/components/relative-time'
 import { DeleteQuoteButton } from './delete-button'
+import { ShareButtons } from './share-buttons'
 
 export const dynamic = 'force-dynamic'
 
@@ -114,7 +115,34 @@ export default async function QuoteDetailPage(
             </p>
           )}
         </div>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          <ShareButtons
+            quote={{
+              id: q.id,
+              label: q.label,
+              operation: q.operation,
+              service: q.service,
+              createdAt: q.createdAt,
+              freightBaselineUsd: q.freightBaselineUsd,
+              requiredTariffUsd: q.requiredTariffUsd,
+              requiredTariffMxn: q.requiredTariffMxn,
+              fxRateUsed: q.fxRateUsed,
+              lane: q.lane ? { origin: q.lane.origin, destination: q.lane.destination } : null,
+              set: q.set ? { name: q.set.name, version: q.set.version } : null,
+              mexLeg: q.mexLeg
+                ? {
+                    requiredTariffUsd: q.mexLeg.requiredTariffUsd,
+                    totalKm: q.mexLeg.totalKm,
+                    cycleDays: q.mexLeg.cycleDays,
+                    rpm: q.mexLeg.rpm,
+                  }
+                : null,
+              usaLeg: q.usaLeg
+                ? { flatUsd: q.usaLeg.flatUsd, loadedMiles: q.usaLeg.loadedMiles, rpm: q.usaLeg.rpm }
+                : null,
+              commercial: q.commercial,
+            }}
+          />
           <Link
             href="/quote"
             className="rounded-md border bg-background px-3 py-1.5 text-sm shadow-sm hover:bg-accent"
@@ -239,7 +267,7 @@ function CommercialCard({ c }: { c: Commercial }) {
     <Card>
       <CardHeader>
         <CardTitle>Commercial</CardTitle>
-        <CardDescription>Cost floor → sell tiers (over the carrier's risk-adjusted COGS).</CardDescription>
+        <CardDescription>Cost floor → sell tiers (over the carrier&apos;s risk-adjusted COGS).</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4">
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
