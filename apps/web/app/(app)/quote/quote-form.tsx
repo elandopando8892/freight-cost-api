@@ -27,6 +27,33 @@ interface Commercial {
   recommendedSellUsd: number; grossProfitUsd: number; grossMarginPct: number; gpPerLoadedMileUsd: number
   marketReferenceUsd: number; noGoFlag: boolean; reviewFlag: boolean; notes: string[]
 }
+interface ResolvedMexLeg {
+  baseKm: number
+  routeExpensesMxn?: number
+  baseHours?: number
+  operation: string
+  service: string
+  route: string
+  equipment: { truckType: string; trailer: string; config: string; driver: string }
+  origin?: string
+  dest?: string
+}
+interface ResolvedUsaLeg {
+  loadedMiles: number
+  transitDaysRaw?: number
+  driverExpenses?: number
+  outState: string
+  dieselUsdGal: number
+  fscUsdMile: number
+  originCondition: string
+  destCondition: string
+  marketRpm?: number
+  operation: string
+  service: string
+  equipment: { truckType: string; trailer: string; config: string; driver: string }
+  origin?: string
+  dest?: string
+}
 interface QuoteResult {
   operation: string
   mexLeg: MexLeg | null
@@ -36,6 +63,13 @@ interface QuoteResult {
   fxRateUsed: number
   warnings: string[]
   assumptionSetId: string | null
+  resolved: { mexLeg: ResolvedMexLeg | null; usaLeg: ResolvedUsaLeg | null }
+}
+
+interface FormSnapshot {
+  service: string
+  fxRate: string
+  equipment: { truckType: string; trailer: string; config: string; driver: string }
 }
 
 const OPS = ['D2D Export', 'D2D Import', 'Drayage', 'Intra-Mex', 'MX Northbound', 'MX Southbound', 'Local'] as const
@@ -52,23 +86,39 @@ const pct = (n: number) => `${(n * 100).toFixed(1)}%`
 const selectCls =
   'h-9 w-full rounded-md border border-input bg-background px-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
 
+const INITIAL_FORM = {
+  outboundLocation: '',
+  inboundLocation: '',
+  mexBorder: 'Nuevo Laredo, Tamaulipas',
+  usBorder: 'Laredo, TX',
+  operation: 'D2D Import' as (typeof OPS)[number],
+  service: '' as (typeof SVCS)[number],
+  route: 'Straight & Danger',
+  fxRate: '',
+  truckType: 'Truck Trailer' as (typeof TRUCKS)[number],
+  trailer: 'Dry Van' as (typeof TRAILERS)[number],
+  config: 'Single' as (typeof CONFIGS)[number],
+  driver: 'B1' as (typeof DRIVERS)[number],
+}
+type FormFields = typeof INITIAL_FORM
+type FormErrors = Partial<Record<keyof FormFields, string>>
+
+function validate(f: FormFields): FormErrors {
+  const e: FormErrors = {}
+  if (!f.outboundLocation.trim()) e.outboundLocation = 'Required — ZIP, "City, ST", or a metro city'
+  if (!f.inboundLocation.trim()) e.inboundLocation = 'Required — ZIP, "City, ST", or a metro city'
+  if (f.fxRate) {
+    const n = Number(f.fxRate)
+    if (!Number.isFinite(n) || n <= 0) e.fxRate = 'Must be a positive number'
+  }
+  return e
+}
+
 export function QuoteForm() {
-  const [form, setForm] = useState({
-    outboundLocation: '',
-    inboundLocation: '',
-    mexBorder: 'Nuevo Laredo, Tamaulipas',
-    usBorder: 'Laredo, TX',
-    operation: 'D2D Import' as (typeof OPS)[number],
-    service: '' as (typeof SVCS)[number], // '' = use operation default
-    route: 'Straight & Danger',
-    fxRate: '',
-    truckType: 'Truck Trailer' as (typeof TRUCKS)[number],
-    trailer: 'Dry Van' as (typeof TRAILERS)[number],
-    config: 'Single' as (typeof CONFIGS)[number],
-    driver: 'B1' as (typeof DRIVERS)[number],
-  })
+  const [form, setForm] = useState<FormFields>(INITIAL_FORM)
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [result, setResult] = useState<QuoteResult | null>(null)
+  const [errors, setErrors] = useState<FormErrors>({})
 
   const quote = useMutation({
     mutationFn: () => {
@@ -94,34 +144,47 @@ export function QuoteForm() {
     onError: () => { setResult(null) }, // fetcher already toasted the error
   })
 
-  const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) => setForm((f) => ({ ...f, [k]: v }))
+  const set = <K extends keyof FormFields>(k: K, v: FormFields[K]) => {
+    setForm((f) => ({ ...f, [k]: v }))
+    if (errors[k]) setErrors((e) => ({ ...e, [k]: undefined }))
+  }
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    const err = validate(form)
+    setErrors(err)
+    if (Object.keys(err).length > 0) return
+    quote.mutate()
+  }
+  const clear = () => {
+    setForm(INITIAL_FORM)
+    setResult(null)
+    setErrors({})
+    setShowAdvanced(false)
+  }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[400px_1fr]">
-      <Card>
+    <div className="grid gap-6 lg:grid-cols-[400px_1fr] lg:items-start">
+      <Card className="lg:sticky lg:top-4">
         <CardHeader>
           <CardTitle>Lane</CardTitle>
           <CardDescription>ZIP, "City, ST", or a metro city.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form
-            className="grid gap-4"
-            onSubmit={(e) => { e.preventDefault(); quote.mutate() }}
-          >
-            <Field label="Outbound (shipper)">
+          <form className="grid gap-4" onSubmit={onSubmit} noValidate>
+            <Field label="Outbound (shipper)" error={errors.outboundLocation}>
               <Input
                 value={form.outboundLocation}
                 onChange={(e) => set('outboundLocation', e.target.value)}
                 placeholder="e.g. 30901 or Augusta, GA 30901"
-                required
+                aria-invalid={Boolean(errors.outboundLocation)}
               />
             </Field>
-            <Field label="Inbound (consignee)">
+            <Field label="Inbound (consignee)" error={errors.inboundLocation}>
               <Input
                 value={form.inboundLocation}
                 onChange={(e) => set('inboundLocation', e.target.value)}
                 placeholder="e.g. Queretaro, Queretaro or 78040"
-                required
+                aria-invalid={Boolean(errors.inboundLocation)}
               />
             </Field>
 
@@ -178,32 +241,59 @@ export function QuoteForm() {
                       <option key={r} value={r}>{r}</option>)}
                   </select>
                 </Field>
-                <Field label="FX rate override (MXN/USD)">
-                  <Input type="number" step="any" value={form.fxRate} onChange={(e) => set('fxRate', e.target.value)} placeholder="active set FX" />
+                <Field label="FX rate override (MXN/USD)" error={errors.fxRate}>
+                  <Input
+                    type="number" step="any" value={form.fxRate}
+                    onChange={(e) => set('fxRate', e.target.value)}
+                    placeholder="active set FX"
+                    aria-invalid={Boolean(errors.fxRate)}
+                  />
                 </Field>
               </div>
             )}
 
-            <Button type="submit" disabled={quote.isPending} className="w-full">
-              {quote.isPending ? 'Pricing…' : 'Get quote'}
-            </Button>
+            <div className="flex gap-2">
+              <Button type="submit" disabled={quote.isPending} className="flex-1">
+                {quote.isPending ? 'Pricing…' : 'Get quote'}
+              </Button>
+              <Button
+                type="button" variant="outline"
+                disabled={quote.isPending}
+                onClick={clear}
+                title="Reset form and clear the result"
+              >
+                Clear
+              </Button>
+            </div>
           </form>
         </CardContent>
       </Card>
 
       <div className="grid gap-4">
-        {result ? <Result r={result} /> : <Placeholder />}
+        {result ? (
+          <Result
+            r={result}
+            snapshot={{
+              service: form.service,
+              fxRate: form.fxRate,
+              equipment: { truckType: form.truckType, trailer: form.trailer, config: form.config, driver: form.driver },
+            }}
+          />
+        ) : (
+          <Placeholder />
+        )}
       </div>
     </div>
   )
 }
 
 // ── Sub-components ──────────────────────────────────────────────────────────
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
     <div className="grid gap-1.5">
       <Label className="text-xs text-muted-foreground">{label}</Label>
       {children}
+      {error && <p className="text-xs text-destructive" role="alert">{error}</p>}
     </div>
   )
 }
@@ -213,14 +303,69 @@ function Placeholder() {
     <Card>
       <CardHeader>
         <CardTitle>Result</CardTitle>
-        <CardDescription>Fill in the lane and submit to see the breakdown.</CardDescription>
+        <CardDescription>
+          Submit a lane to see the freight baseline, MEX/USA leg breakdowns, and the commercial sell tiers
+          (cost floor → min/target/premium, with margin and GP / loaded mile).
+        </CardDescription>
       </CardHeader>
+      <CardContent>
+        <ul className="grid gap-1.5 text-sm text-muted-foreground">
+          <li>· Origin/destination resolved via ZIP → metro and MX state homologation</li>
+          <li>· Active assumption set drives all per-leg costs (you can override FX inline)</li>
+          <li>· Service defaults: Import / Southbound → Backhaul; everything else → One Way</li>
+          <li>· Out-of-range warnings surface in the result if any param trips its band</li>
+        </ul>
+      </CardContent>
     </Card>
   )
 }
 
-function Result({ r }: { r: QuoteResult }) {
+function Result({ r, snapshot }: { r: QuoteResult; snapshot: FormSnapshot }) {
   const c = r.commercial
+  const [label, setLabel] = useState('')
+  const [savedId, setSavedId] = useState<string | null>(null)
+
+  const save = useMutation({
+    mutationFn: () => {
+      const body: Record<string, unknown> = {
+        operation: r.operation,
+        equipment: snapshot.equipment,
+      }
+      if (label.trim()) body.label = label.trim()
+      if (snapshot.service) body.service = snapshot.service
+      if (snapshot.fxRate) body.fxRate = Number(snapshot.fxRate)
+      if (r.resolved.mexLeg) {
+        const m = r.resolved.mexLeg
+        body.mex = {
+          baseKm: m.baseKm,
+          routeExpensesMxn: m.routeExpensesMxn ?? 0,
+          baseHours: m.baseHours ?? 0,
+          route: m.route,
+        }
+      }
+      if (r.resolved.usaLeg) {
+        const u = r.resolved.usaLeg
+        body.usa = {
+          loadedMiles: u.loadedMiles,
+          transitDaysRaw: u.transitDaysRaw ?? 0,
+          driverExpenses: u.driverExpenses ?? 0,
+          outState: u.outState,
+          dieselUsdGal: u.dieselUsdGal,
+          fscUsdMile: u.fscUsdMile,
+          originCondition: u.originCondition,
+          destCondition: u.destCondition,
+        }
+      }
+      return fetcher<{ id: string; createdAt: string; label: string | null }>('/api/v1/quotes', {
+        method: 'POST', json: body,
+      })
+    },
+    onSuccess: (q) => {
+      setSavedId(q.id)
+      toast.success('Quote saved', { description: q.label ?? q.id.slice(0, 8) })
+    },
+  })
+
   return (
     <>
       {/* Headline */}
@@ -229,13 +374,52 @@ function Result({ r }: { r: QuoteResult }) {
           <CardDescription>Freight Baseline</CardDescription>
           <CardTitle className="text-4xl tracking-tight">{usd.format(r.freightBaselineUsd)}</CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
-          <Stat label="MXN" value={mxn.format(r.freightBaselineUsd * r.fxRateUsed)} />
-          <Stat label="FX" value={r.fxRateUsed.toFixed(2)} />
-          <Stat label="Operation" value={r.operation} />
-          <Stat label="Margin" value={pct(c.grossMarginPct)} />
+        <CardContent className="grid gap-4">
+          <div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
+            <Stat label="MXN" value={mxn.format(r.freightBaselineUsd * r.fxRateUsed)} />
+            <Stat label="FX" value={r.fxRateUsed.toFixed(2)} />
+            <Stat label="Operation" value={r.operation} />
+            <Stat label="Margin" value={pct(c.grossMarginPct)} />
+          </div>
+          <form
+            className="flex flex-wrap items-center gap-2 border-t pt-3"
+            onSubmit={(e) => { e.preventDefault(); save.mutate() }}
+          >
+            <Input
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              placeholder="Label (optional) — e.g. Acme Q3"
+              className="h-9 flex-1 min-w-[200px]"
+              disabled={save.isPending}
+            />
+            <Button type="submit" size="sm" variant="outline" disabled={save.isPending}>
+              {save.isPending ? 'Saving…' : savedId ? 'Save again' : 'Save quote'}
+            </Button>
+            {savedId && (
+              <a href="/quotes" className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2">
+                view history →
+              </a>
+            )}
+          </form>
         </CardContent>
       </Card>
+
+      {/* Resolver warnings — prominent right under the headline */}
+      {r.warnings.length > 0 && (
+        <Card className="border-amber-500/40 bg-amber-50/40 dark:bg-amber-950/20">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm text-amber-800 dark:text-amber-300">
+              {r.warnings.length} resolver note{r.warnings.length === 1 ? '' : 's'}
+            </CardTitle>
+            <CardDescription>
+              Origin/destination lookups, fallbacks, or assumptions that landed outside the recommended range.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-1 text-xs text-muted-foreground">
+            {r.warnings.map((w, i) => <div key={i}>· {w}</div>)}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Legs */}
       <div className="grid gap-4 md:grid-cols-2">
@@ -272,17 +456,6 @@ function Result({ r }: { r: QuoteResult }) {
         </CardContent>
       </Card>
 
-      {/* Resolver warnings */}
-      {r.warnings.length > 0 && (
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm">Resolver notes</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-1 text-xs text-muted-foreground">
-            {r.warnings.map((w, i) => <div key={i}>· {w}</div>)}
-          </CardContent>
-        </Card>
-      )}
     </>
   )
 }

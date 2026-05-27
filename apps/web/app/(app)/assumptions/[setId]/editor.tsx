@@ -1,11 +1,15 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
+  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { fetcher } from '@/lib/fetcher'
 
 export interface Param {
@@ -32,8 +36,25 @@ export function Editor({ setId, initial, sections }: { setId: string; initial: G
   const [data, setData] = useState<Grouped>(initial)
   const [pending, setPending] = useState<Record<string, number>>({})
   const [warnings, setWarnings] = useState<Warning[]>([])
+  const [search, setSearch] = useState('')
 
   const pendingCount = Object.keys(pending).length
+  const q = search.trim().toLowerCase()
+  const matches = (p: Param) =>
+    q === '' || p.field.toLowerCase().includes(q) || p.unit.toLowerCase().includes(q)
+
+  // Warn before closing tab / refresh when there are pending edits. (In-app navigation
+  // can't be intercepted in App Router without custom Link wrappers — covered by
+  // the sticky Save bar + the pendingCount badge.)
+  useEffect(() => {
+    if (pendingCount === 0) return
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault()
+      e.returnValue = '' // required for the native prompt in some browsers
+    }
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [pendingCount])
 
   const save = useMutation({
     mutationFn: async () => {
@@ -63,23 +84,109 @@ export function Editor({ setId, initial, sections }: { setId: string; initial: G
     onSuccess: (result) => { setData(result); setPending({}); setWarnings([]); toast.success('All params reset to recommended values') },
   })
 
+  // Per-section counts for the side nav: pending edits + out-of-range params + matches.
+  const sectionStats = useMemo(() => {
+    const out: Record<string, { rows: number; pending: number; outOfRange: number; matched: number }> = {}
+    for (const s of sections) {
+      const rows = data[s] ?? []
+      out[s] = {
+        rows: rows.length,
+        pending: Object.keys(pending).filter((k) => k.startsWith(`${s}__`)).length,
+        outOfRange: rows.filter((p) => p.outOfRange).length,
+        matched: q === '' ? rows.length : rows.filter(matches).length,
+      }
+    }
+    return out
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sections, data, pending, q])
+
   return (
-    <>
-      <div className="sticky top-0 z-10 -mx-4 mb-4 flex items-center justify-between border-b bg-background/80 px-4 py-3 backdrop-blur">
-        <div className="text-sm">
+    <div className="grid gap-6 lg:grid-cols-[220px_1fr] lg:items-start">
+      {/* Side nav — desktop only */}
+      <aside className="hidden lg:sticky lg:top-4 lg:block lg:self-start">
+        <nav className="grid gap-0.5 rounded-md border bg-card p-2 text-sm">
+          <div className="px-2 py-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Sections
+          </div>
+          {sections.map((s) => {
+            const st = sectionStats[s]
+            if (!st || st.rows === 0) return null
+            const hidden = q !== '' && st.matched === 0
+            return (
+              <a
+                key={s} href={`#${s}`}
+                aria-disabled={hidden || undefined}
+                className={`group flex items-center justify-between gap-2 rounded px-2 py-1.5 hover:bg-accent ${hidden ? 'opacity-40' : ''}`}
+              >
+                <span className="truncate">{s}</span>
+                <span className="flex shrink-0 items-center gap-1 text-[10px]">
+                  {st.pending > 0 && (
+                    <span
+                      className="rounded-full bg-blue-500/15 px-1.5 py-0.5 font-medium text-blue-700 dark:text-blue-400"
+                      title={`${st.pending} pending edit${st.pending === 1 ? '' : 's'}`}
+                    >
+                      {st.pending}
+                    </span>
+                  )}
+                  {st.outOfRange > 0 && (
+                    <span
+                      className="rounded-full bg-amber-500/15 px-1.5 py-0.5 font-medium text-amber-700 dark:text-amber-400"
+                      title={`${st.outOfRange} out-of-range param${st.outOfRange === 1 ? '' : 's'}`}
+                    >
+                      {st.outOfRange}
+                    </span>
+                  )}
+                  <span className="text-muted-foreground">
+                    {q !== '' ? `${st.matched}/${st.rows}` : st.rows}
+                  </span>
+                </span>
+              </a>
+            )
+          })}
+        </nav>
+      </aside>
+
+      <div>
+      <div className="sticky top-0 z-10 -mx-4 mb-4 flex flex-wrap items-center justify-between gap-3 border-b bg-background/80 px-4 py-3 backdrop-blur">
+        <div className="flex items-center gap-3 text-sm">
           {pendingCount === 0 ? (
             <span className="text-muted-foreground">No pending changes.</span>
           ) : (
             <span className="font-medium">{pendingCount} pending change{pendingCount === 1 ? '' : 's'}</span>
           )}
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Filter params…"
+            className="h-8 w-48"
+          />
         </div>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" onClick={() => setPending({})} disabled={pendingCount === 0 || save.isPending}>
             Discard
           </Button>
-          <Button variant="outline" size="sm" onClick={() => { if (confirm('Reset ALL params to recommended values?')) resetAll.mutate() }} disabled={resetAll.isPending || save.isPending}>
-            {resetAll.isPending ? 'Resetting…' : 'Reset all to recommended'}
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger
+              render={
+                <Button variant="outline" size="sm" disabled={resetAll.isPending || save.isPending}>
+                  {resetAll.isPending ? 'Resetting…' : 'Reset all to recommended'}
+                </Button>
+              }
+            />
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Reset every param to recommended?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This overwrites every value in this assumption set with the V3.0 recommended default. Other carriers
+                  &lsquo; sets are not affected, but this set&rsquo;s edits will be lost.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={() => resetAll.mutate()}>Reset all</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           <Button size="sm" onClick={() => save.mutate()} disabled={pendingCount === 0 || save.isPending}>
             {save.isPending ? 'Saving…' : `Save ${pendingCount || ''}`.trim()}
           </Button>
@@ -102,8 +209,17 @@ export function Editor({ setId, initial, sections }: { setId: string; initial: G
       )}
 
       <div className="grid gap-6">
+        {q !== '' && (
+          <div className="text-xs text-muted-foreground">
+            Filtering by &ldquo;{search}&rdquo; — showing matching params only.
+            {' '}
+            <button type="button" className="underline underline-offset-2 hover:text-foreground" onClick={() => setSearch('')}>
+              clear
+            </button>
+          </div>
+        )}
         {sections.map((section) => {
-          const rows = data[section] ?? []
+          const rows = (data[section] ?? []).filter(matches)
           if (rows.length === 0) return null
           return (
             <SectionCard
@@ -118,7 +234,8 @@ export function Editor({ setId, initial, sections }: { setId: string; initial: G
           )
         })}
       </div>
-    </>
+      </div>
+    </div>
   )
 }
 
@@ -133,7 +250,7 @@ function SectionCard({
   onUndo: (key: string) => void
 }) {
   return (
-    <Card>
+    <Card id={section} className="scroll-mt-20">
       <CardHeader>
         <CardTitle className="text-base">{section}</CardTitle>
       </CardHeader>

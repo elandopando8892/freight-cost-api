@@ -9,6 +9,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { fetcher } from '@/lib/fetcher'
+import { RelativeTime } from '@/components/relative-time'
 
 export interface Region { region: string; dieselUsdGal: number; updatedAt: string }
 export type UsaFuelSample = { state: string; pricePerGallon: number; fsc: number } | null
@@ -69,9 +70,11 @@ export function FuelDashboard({
           <div>
             <CardTitle>Current fuel</CardTitle>
             <CardDescription>
-              {newestAt
-                ? `Last update ${new Date(newestAt).toLocaleString()}`
-                : 'No regions seeded yet.'}
+              {newestAt ? (
+                <>Last update <RelativeTime iso={newestAt} /></>
+              ) : (
+                'No regions seeded yet.'
+              )}
               {' · '}
               {status.data?.fscBrackets ?? 0} FSC brackets
               {status.data?.usBorderDieselUsdL != null && (

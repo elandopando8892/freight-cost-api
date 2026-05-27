@@ -1,8 +1,22 @@
+import type { Metadata } from 'next'
 import { api } from '@/lib/api'
 import { notFound } from 'next/navigation'
 import { Editor, type Param, type Grouped } from './editor'
 
 interface SetMeta { id: string; name: string; version: number; isActive: boolean; notes: string | null }
+
+export async function generateMetadata(
+  { params }: { params: Promise<{ setId: string }> },
+): Promise<Metadata> {
+  try {
+    const { setId } = await params
+    const sets = await api<SetMeta[]>('/assumptions/sets')
+    const set = sets.find((s) => s.id === setId)
+    return { title: set ? `${set.name} · Assumptions` : 'Assumptions' }
+  } catch {
+    return { title: 'Assumptions' }
+  }
+}
 
 export default async function AssumptionsEditorPage(
   { params }: { params: Promise<{ setId: string }> },

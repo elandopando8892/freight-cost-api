@@ -1,5 +1,8 @@
+import type { Metadata } from 'next'
 import { api } from '@/lib/api'
 import { FuelDashboard, type FuelStatus, type TrendPoint } from './fuel-dashboard'
+
+export const metadata: Metadata = { title: 'Fuel & FSC' }
 
 export default async function FuelPage() {
   // Server-side hydration of the current fuel state + a default U.S. trend.

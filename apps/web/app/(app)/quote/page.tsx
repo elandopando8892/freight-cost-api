@@ -1,4 +1,7 @@
+import type { Metadata } from 'next'
 import { QuoteForm } from './quote-form'
+
+export const metadata: Metadata = { title: 'Quote by route' }
 
 export default function QuotePage() {
   return (

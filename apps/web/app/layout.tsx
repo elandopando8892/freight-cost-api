@@ -7,7 +7,10 @@ const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Freight Cost Model',
+  title: {
+    default: 'Freight Cost Model',
+    template: '%s · Freight Cost Model',
+  },
   description: 'Carrier pricing — V3.0 engine',
 }
 
