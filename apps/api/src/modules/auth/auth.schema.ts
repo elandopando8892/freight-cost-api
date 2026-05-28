@@ -1,23 +1,10 @@
-import { z } from 'zod'
-
-export const RegisterSchema = z.object({
-  orgName: z.string().min(2),
-  email: z.string().email(),
-  password: z.string().min(8),
-})
-
-export const LoginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1),
-})
-
-export type RegisterInput = z.infer<typeof RegisterSchema>
-export type LoginInput = z.infer<typeof LoginSchema>
-
+// Identity is handled by Kinde; the API maps the Kinde subject to our User/Org.
+// request.user carries our internal identity in this shape.
 export interface JwtPayload {
-  sub: string       // userId
+  sub: string       // our internal userId
   orgId: string
   role: string
+  kindeId?: string  // Kinde subject (sub)
   iat?: number
   exp?: number
 }

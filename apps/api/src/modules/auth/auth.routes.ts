@@ -1,23 +1,12 @@
 import { FastifyInstance } from 'fastify'
-import { RegisterSchema, LoginSchema, type JwtPayload } from './auth.schema.js'
-import { registerUser, loginUser, getMe } from './auth.service.js'
+import type { JwtPayload } from './auth.schema.js'
+import { getMe } from './auth.service.js'
 import { authenticate } from '../../middleware/authenticate.js'
 
 export async function authRoutes(app: FastifyInstance) {
-  app.post('/auth/register', async (request, reply) => {
-    const input = RegisterSchema.parse(request.body)
-    const { user, org } = await registerUser(input)
-    const token = app.jwt.sign({ sub: user.id, orgId: user.orgId, role: user.role } as JwtPayload)
-    return reply.status(201).send({ token, user: { id: user.id, email: user.email, role: user.role, orgId: org.id } })
-  })
-
-  app.post('/auth/login', async (request, reply) => {
-    const input = LoginSchema.parse(request.body)
-    const user = await loginUser(input)
-    const token = app.jwt.sign({ sub: user.id, orgId: user.orgId, role: user.role } as JwtPayload)
-    return reply.send({ token, user: { id: user.id, email: user.email, role: user.role, orgId: user.orgId } })
-  })
-
+  // Login / register / logout are handled by Kinde on the web side.
+  // The API only needs to resolve "who am I" for the authenticated Kinde token,
+  // which also triggers auto-provisioning of the User/Org on first call.
   app.get('/auth/me', { preHandler: authenticate }, async (request, reply) => {
     const payload = request.user as JwtPayload
     const user = await getMe(payload.sub)

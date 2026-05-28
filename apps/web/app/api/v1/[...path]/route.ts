@@ -1,18 +1,22 @@
 /**
- * Generic BFF proxy — forwards /api/v1/* to the Fastify backend with the
- * user's JWT attached from the httpOnly session cookie. Lets client code call
- * `/api/v1/...` without ever touching the token directly.
+ * Generic BFF proxy — forwards /api/v1/* to the Fastify backend with the user's
+ * Kinde access token attached as Bearer. Client code calls `/api/v1/...` without
+ * ever touching the token directly. Returns JSON 401 (not an HTML redirect) when
+ * there's no session, so the client fetcher can react.
  */
-import { cookies } from 'next/headers'
 import { type NextRequest, NextResponse } from 'next/server'
+import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
 
 const API_URL = process.env.API_URL ?? 'http://localhost:3000'
-const SESSION = process.env.SESSION_COOKIE_NAME ?? 'fcm_session'
 
 async function handle(request: NextRequest, ctx: { params: Promise<{ path: string[] }> }) {
   const { path } = await ctx.params
-  const jar = await cookies()
-  const token = jar.get(SESSION)?.value
+  const { isAuthenticated, getAccessTokenRaw } = getKindeServerSession()
+
+  if (!(await isAuthenticated())) {
+    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
+  }
+  const token = await getAccessTokenRaw()
   const url = `${API_URL}/${path.join('/')}${request.nextUrl.search}`
 
   const headers = new Headers()

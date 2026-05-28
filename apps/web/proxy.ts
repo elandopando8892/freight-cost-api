@@ -1,21 +1,26 @@
-import { type NextRequest, NextResponse } from 'next/server'
-
-const SESSION = process.env.SESSION_COOKIE_NAME ?? 'fcm_session'
+import { withAuth } from '@kinde-oss/kinde-auth-nextjs/middleware'
 
 /**
- * Auth gate — anything matched by `config.matcher` requires a session cookie.
- * Login page + /api/auth/* are excluded so they remain reachable for sign-in/out.
+ * Auth gate via Kinde. Any matched route requires a Kinde session; unauthenticated
+ * users are redirected to /login (which hosts the Kinde Sign in / Sign up links).
+ *
+ * Excluded from the matcher (handled elsewhere):
+ *  - /login            → the public sign-in landing
+ *  - /api/auth/*        → Kinde's own login/logout/callback handler
+ *  - /api/v1/*          → BFF proxy; it self-guards and returns JSON 401 so the
+ *                         client fetcher can react, instead of an HTML redirect
+ *  - Next assets / favicon / svgs
  */
-export function proxy(request: NextRequest) {
-  const token = request.cookies.get(SESSION)?.value
-  if (token) return NextResponse.next()
-  const url = request.nextUrl.clone()
-  url.pathname = '/login'
-  url.searchParams.set('next', request.nextUrl.pathname)
-  return NextResponse.redirect(url)
-}
+export default withAuth(
+  async function proxy() {
+    // No extra logic — withAuth handles the redirect-to-login gate.
+  },
+  {
+    loginPage: '/login',
+    isReturnToCurrentPage: true,
+  },
+)
 
 export const config = {
-  // Protect everything EXCEPT: /login, /api/auth/*, Next assets, and favicon.
-  matcher: ['/((?!login|api/auth|_next/static|_next/image|favicon.ico|.*\\.svg).*)'],
+  matcher: ['/((?!login|api/auth|api/v1|_next/static|_next/image|favicon.ico|.*\\.svg).*)'],
 }

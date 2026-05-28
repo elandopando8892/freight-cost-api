@@ -1,10 +1,9 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { api, ApiError } from '@/lib/api'
-import { SignOutButton } from './sign-out-button'
+import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
+import { LogoutLink } from '@kinde-oss/kinde-auth-nextjs/components'
+import { buttonVariants } from '@/components/ui/button'
 import { NavLink } from './nav-link'
-
-interface Me { id: string; email: string; role: string; orgId: string }
 
 const NAV = [
   { href: '/', label: 'Dashboard' },
@@ -15,13 +14,12 @@ const NAV = [
 ]
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
-  let me: Me
-  try {
-    me = await api<Me>('/auth/me')
-  } catch (err) {
-    if (err instanceof ApiError && err.status === 401) redirect('/login')
-    throw err
-  }
+  const { getUser, isAuthenticated } = getKindeServerSession()
+  // proxy.ts already gates these routes; this is a belt-and-suspenders check.
+  if (!(await isAuthenticated())) redirect('/login')
+  const user = await getUser()
+  const email = user?.email ?? [user?.given_name, user?.family_name].filter(Boolean).join(' ') ?? ''
+
   return (
     <div className="flex min-h-screen flex-col">
       <header className="border-b">
@@ -35,10 +33,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               <nav className="absolute left-0 z-20 mt-2 grid w-44 gap-1 rounded-md border bg-popover p-2 text-sm shadow-md">
                 {NAV.map((n) => <NavLink key={n.href} {...n} variant="mobile" />)}
                 <div className="my-1 border-t" />
-                <div className="px-2 py-1 text-xs text-muted-foreground truncate">{me.email}</div>
-                <div className="px-1">
-                  <SignOutButton />
-                </div>
+                <div className="px-2 py-1 text-xs text-muted-foreground truncate">{email}</div>
+                <LogoutLink className={buttonVariants({ variant: 'ghost', size: 'sm', className: 'justify-start' })}>
+                  Sign out
+                </LogoutLink>
               </nav>
             </details>
             <Link href="/" className="truncate text-sm font-semibold tracking-tight">Freight Cost Model</Link>
@@ -48,8 +46,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             </nav>
           </div>
           <div className="flex items-center gap-2 text-sm">
-            <span className="hidden truncate text-muted-foreground sm:inline">{me.email}</span>
-            <SignOutButton />
+            <span className="hidden truncate text-muted-foreground sm:inline">{email}</span>
+            <LogoutLink className={buttonVariants({ variant: 'outline', size: 'sm' })}>
+              Sign out
+            </LogoutLink>
           </div>
         </div>
       </header>

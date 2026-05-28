@@ -16,4 +16,8 @@ export const env = cleanEnv(process.env, {
   // Shared secret Vercel Cron sends as `Authorization: Bearer <CRON_SECRET>`.
   // Empty → cron endpoints fail closed (401). Set in Vercel env, never commit.
   CRON_SECRET: str({ default: '' }),
+  // Kinde identity — the API verifies access tokens against this issuer's JWKS
+  // and (optionally) checks the audience. Empty issuer → auth fails closed.
+  KINDE_ISSUER_URL: str({ default: '' }),
+  KINDE_AUDIENCE: str({ default: '' }),
 })

@@ -89,12 +89,15 @@ vi.mock('../src/config/prisma.js', () => {
   }
 })
 
-// ── Mock bcryptjs ────────────────────────────────────────────────────────────
-vi.mock('bcryptjs', () => ({
-  default: {
-    hash: vi.fn().mockResolvedValue('$2b$12$hashed'),
-    compare: vi.fn().mockResolvedValue(true),
-  },
+// ── Mock Kinde token verification (no network / JWKS) ────────────────────────
+// `authenticate` calls verifyKindeToken + resolveUser; the mock accepts a single
+// fixed token and maps it to our seeded test user/org.
+vi.mock('../src/modules/auth/kinde.service.js', () => ({
+  verifyKindeToken: vi.fn(async (t: string) => {
+    if (t === 'valid-kinde-token') return { sub: 'kinde-sub-1' }
+    throw new Error('invalid token')
+  }),
+  resolveUser: vi.fn(async () => ({ id: 'user-1', orgId: 'org-1', role: 'ADMIN', kindeId: 'kinde-sub-1' })),
 }))
 
 // ── Mock envalid to avoid needing a real .env ────────────────────────────────
@@ -107,6 +110,8 @@ vi.mock('../src/config/env.js', () => ({
     NODE_ENV: 'test',
     EIA_API_KEY: '',
     CRON_SECRET: 'test-cron-secret',
+    KINDE_ISSUER_URL: 'https://test.kinde.com',
+    KINDE_AUDIENCE: 'https://test-api',
   },
 }))
 
@@ -114,7 +119,8 @@ vi.mock('../src/config/env.js', () => ({
 const { buildApp } = await import('../src/app.js')
 
 let app: FastifyInstance
-let token: string
+// Fixed token recognised by the mocked verifyKindeToken (see vi.mock above).
+const token = 'valid-kinde-token'
 
 beforeAll(async () => {
   app = buildApp()
@@ -141,58 +147,26 @@ describe('Health', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 // AUTH
 // ─────────────────────────────────────────────────────────────────────────────
-describe('Auth', () => {
-  it('POST /auth/register → 201 with token', async () => {
-    const res = await app.inject({
-      method: 'POST',
-      url: '/auth/register',
-      payload: { orgName: 'Test Carrier', email: 'test@carrier.com', password: 'securepass123' },
-    })
-    expect(res.statusCode).toBe(201)
-    const body = res.json()
-    expect(body.token).toBeDefined()
-    expect(typeof body.token).toBe('string')
-    token = body.token
-  })
-
-  it('POST /auth/register with bad email → 400', async () => {
-    const res = await app.inject({
-      method: 'POST',
-      url: '/auth/register',
-      payload: { orgName: 'X', email: 'not-an-email', password: 'pass' },
-    })
-    expect(res.statusCode).toBe(400)
-  })
-
-  it('POST /auth/login → 200 with token', async () => {
-    const { prisma } = await import('../src/config/prisma.js')
-    // Mock findUnique to return a user with a hashed password
-    vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({
-      id: 'user-1', orgId: 'org-1', email: 'test@carrier.com',
-      passwordHash: '$2b$12$hashed', role: 'ADMIN',
-      createdAt: new Date(), updatedAt: new Date(),
-    })
-    const res = await app.inject({
-      method: 'POST',
-      url: '/auth/login',
-      payload: { email: 'test@carrier.com', password: 'securepass123' },
-    })
-    expect(res.statusCode).toBe(200)
-    const body = res.json()
-    expect(body.token).toBeDefined()
-    token = body.token
-  })
-
+describe('Auth (Kinde)', () => {
   it('GET /auth/me without token → 401', async () => {
     const res = await app.inject({ method: 'GET', url: '/auth/me' })
     expect(res.statusCode).toBe(401)
   })
 
-  it('GET /auth/me with token → 200', async () => {
+  it('GET /auth/me with an unrecognised token → 401', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/auth/me',
+      headers: { authorization: 'Bearer not-a-valid-token' },
+    })
+    expect(res.statusCode).toBe(401)
+  })
+
+  it('GET /auth/me with valid Kinde token → 200 (resolved user)', async () => {
     const { prisma } = await import('../src/config/prisma.js')
     vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({
-      id: 'user-1', orgId: 'org-1', email: 'test@carrier.com',
-      passwordHash: '$2b$12$hashed', role: 'ADMIN',
+      id: 'user-1', orgId: 'org-1', kindeId: 'kinde-sub-1', email: 'test@carrier.com',
+      passwordHash: null, role: 'ADMIN',
       createdAt: new Date(), updatedAt: new Date(),
     })
     const res = await app.inject({
@@ -201,6 +175,7 @@ describe('Auth', () => {
       headers: { authorization: `Bearer ${token}` },
     })
     expect(res.statusCode).toBe(200)
+    expect(res.json().id).toBe('user-1')
   })
 })
 

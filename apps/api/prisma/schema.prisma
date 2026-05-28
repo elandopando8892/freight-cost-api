@@ -72,8 +72,9 @@ model Organization {
 model User {
   id           String   @id @default(cuid())
   orgId        String
+  kindeId      String?  @unique               // Kinde subject (sub); null for legacy/local users
   email        String   @unique
-  passwordHash String
+  passwordHash String?                         // null for Kinde-managed identities
   role         Role     @default(OPERATOR)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
