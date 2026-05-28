@@ -1,6 +1,7 @@
 import { createRemoteJWKSet, jwtVerify, type JWTPayload } from 'jose'
+import { Section } from '@prisma/client'
 import { prisma } from '../../config/prisma.js'
-import { createSet, activateSet } from '../assumptions/assumptions.service.js'
+import { DEFAULT_ASSUMPTIONS } from '../../data/default-assumptions.js'
 
 const ISSUER = (process.env.KINDE_ISSUER_URL ?? '').replace(/\/$/, '')
 const AUDIENCE = process.env.KINDE_AUDIENCE ?? ''
@@ -52,6 +53,7 @@ export interface ResolvedUser { id: string; orgId: string; role: string; kindeId
 export async function resolveUser(kindeSub: string, token: string): Promise<ResolvedUser> {
   const existing = await prisma.user.findUnique({ where: { kindeId: kindeSub } })
   if (existing) {
+    await ensureActiveSet(existing.orgId)
     return { id: existing.id, orgId: existing.orgId, role: existing.role, kindeId: kindeSub }
   }
 
@@ -63,33 +65,87 @@ export async function resolveUser(kindeSub: string, token: string): Promise<Reso
   const byEmail = await prisma.user.findUnique({ where: { email } })
   if (byEmail) {
     const linked = await prisma.user.update({ where: { id: byEmail.id }, data: { kindeId: kindeSub } })
+    await ensureActiveSet(linked.orgId)
     return { id: linked.id, orgId: linked.orgId, role: linked.role, kindeId: kindeSub }
   }
 
   try {
+    // Atomic: user + org + active default set + params in one write, so any request
+    // that sees the user also sees an active set (no first-load race window).
     const user = await prisma.user.create({
-      data: { kindeId: kindeSub, email, role: 'ADMIN', org: { create: { name: orgName, country: 'MX' } } },
+      data: {
+        kindeId: kindeSub,
+        email,
+        role: 'ADMIN',
+        org: {
+          create: {
+            name: orgName,
+            country: 'MX',
+            assumptionSets: {
+              create: {
+                name: 'Default — D2D Base',
+                notes: 'Auto-created on sign-up',
+                isActive: true,
+                params: { create: defaultParamsCreate() },
+              },
+            },
+          },
+        },
+      },
     })
-    await seedDefaultSet(user.orgId)
     return { id: user.id, orgId: user.orgId, role: user.role, kindeId: kindeSub }
   } catch {
     // Race: another concurrent request just provisioned this subject — re-read.
     const raced = await prisma.user.findUnique({ where: { kindeId: kindeSub } })
-    if (raced) return { id: raced.id, orgId: raced.orgId, role: raced.role, kindeId: kindeSub }
+    if (raced) {
+      await ensureActiveSet(raced.orgId)
+      return { id: raced.id, orgId: raced.orgId, role: raced.role, kindeId: kindeSub }
+    }
     throw new Error('Failed to provision user')
   }
 }
 
+/** Default assumption params (V3.0) for seeding a fresh set. */
+function defaultParamsCreate() {
+  return DEFAULT_ASSUMPTIONS.map((a) => ({
+    section: a.section as Section,
+    field: a.field,
+    value: a.value,
+    unit: a.unit,
+    low: a.low || null,
+    high: a.high || null,
+    updateFrequency: a.updateFrequency,
+    costBehavior: a.costBehavior,
+    activation: a.activation,
+  }))
+}
+
 /**
- * Give a freshly provisioned org an active default assumption set (same defaults
- * the "New set" button seeds) so it can quote immediately. Best-effort: if it
- * fails the user still exists and can create a set from the UI.
+ * Ensure the org has an active assumption set so it can quote. Common case is a
+ * single cheap SELECT that returns early. Also heals orgs provisioned before
+ * atomic seeding existed: activates an existing set, or creates a default one.
+ * Best-effort — never throws into the auth path.
+ * (Can be dropped from the hot path once all orgs are known-healthy.)
  */
-async function seedDefaultSet(orgId: string): Promise<void> {
+async function ensureActiveSet(orgId: string): Promise<void> {
   try {
-    const set = await createSet(orgId, { name: 'Default — D2D Base', notes: 'Auto-created on first sign-in' })
-    await activateSet(orgId, set.id)
+    const active = await prisma.assumptionSet.findFirst({ where: { orgId, isActive: true }, select: { id: true } })
+    if (active) return
+    const anySet = await prisma.assumptionSet.findFirst({ where: { orgId }, select: { id: true }, orderBy: { createdAt: 'asc' } })
+    if (anySet) {
+      await prisma.assumptionSet.update({ where: { id: anySet.id }, data: { isActive: true } })
+      return
+    }
+    await prisma.assumptionSet.create({
+      data: {
+        orgId,
+        name: 'Default — D2D Base',
+        notes: 'Auto-created on first sign-in',
+        isActive: true,
+        params: { create: defaultParamsCreate() },
+      },
+    })
   } catch {
-    // non-fatal — leave the org without an active set; UI can create one
+    // non-fatal — leave as-is; the UI can create/activate a set
   }
 }
