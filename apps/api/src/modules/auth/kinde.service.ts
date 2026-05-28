@@ -1,5 +1,6 @@
 import { createRemoteJWKSet, jwtVerify, type JWTPayload } from 'jose'
 import { prisma } from '../../config/prisma.js'
+import { createSet, activateSet } from '../assumptions/assumptions.service.js'
 
 const ISSUER = (process.env.KINDE_ISSUER_URL ?? '').replace(/\/$/, '')
 const AUDIENCE = process.env.KINDE_AUDIENCE ?? ''
@@ -69,11 +70,26 @@ export async function resolveUser(kindeSub: string, token: string): Promise<Reso
     const user = await prisma.user.create({
       data: { kindeId: kindeSub, email, role: 'ADMIN', org: { create: { name: orgName, country: 'MX' } } },
     })
+    await seedDefaultSet(user.orgId)
     return { id: user.id, orgId: user.orgId, role: user.role, kindeId: kindeSub }
   } catch {
     // Race: another concurrent request just provisioned this subject — re-read.
     const raced = await prisma.user.findUnique({ where: { kindeId: kindeSub } })
     if (raced) return { id: raced.id, orgId: raced.orgId, role: raced.role, kindeId: kindeSub }
     throw new Error('Failed to provision user')
+  }
+}
+
+/**
+ * Give a freshly provisioned org an active default assumption set (same defaults
+ * the "New set" button seeds) so it can quote immediately. Best-effort: if it
+ * fails the user still exists and can create a set from the UI.
+ */
+async function seedDefaultSet(orgId: string): Promise<void> {
+  try {
+    const set = await createSet(orgId, { name: 'Default — D2D Base', notes: 'Auto-created on first sign-in' })
+    await activateSet(orgId, set.id)
+  } catch {
+    // non-fatal — leave the org without an active set; UI can create one
   }
 }
