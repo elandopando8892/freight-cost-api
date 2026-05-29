@@ -4,6 +4,7 @@ import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
 import { LogoutLink } from '@kinde-oss/kinde-auth-nextjs/components'
 import { buttonVariants } from '@/components/ui/button'
 import { NavLink } from './nav-link'
+import { ThemeToggle } from './theme-toggle'
 
 const NAV = [
   { href: '/', label: 'Dashboard' },
@@ -55,6 +56,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             </nav>
           </div>
           <div className="flex items-center gap-2 text-sm">
+            <ThemeToggle />
             <Link href="/settings" title="Settings" className="flex items-center gap-2 rounded-md px-1.5 py-1 hover:bg-accent">
               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">{init}</span>
               <span className="hidden max-w-[140px] truncate text-muted-foreground sm:inline">{name}</span>

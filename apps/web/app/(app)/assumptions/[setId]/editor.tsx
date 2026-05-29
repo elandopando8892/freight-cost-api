@@ -290,7 +290,7 @@ function Row({
   const out = isOutOfRange(displayValue, lo, hi)
 
   return (
-    <div className={`grid grid-cols-[1fr_180px_220px_90px] items-center gap-3 rounded-md border px-3 py-2 text-sm ${modified ? 'border-blue-500/40 bg-blue-50/30 dark:bg-blue-950/20' : ''}`}>
+    <div className={`grid grid-cols-1 gap-2 rounded-md border px-3 py-2 text-sm sm:grid-cols-[minmax(0,1fr)_150px_minmax(0,1fr)_auto] sm:items-center sm:gap-3 ${modified ? 'border-blue-500/40 bg-blue-50/30 dark:bg-blue-950/20' : ''}`}>
       <div className="min-w-0">
         <div className="truncate font-medium">{p.field}</div>
         <div className="truncate text-xs text-muted-foreground">{p.unit}</div>

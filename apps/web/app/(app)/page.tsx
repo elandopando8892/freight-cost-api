@@ -3,9 +3,31 @@ import type { Metadata } from 'next'
 import { api, ApiError } from '@/lib/api'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { RelativeTime } from '@/components/relative-time'
+import { QuotesChart } from './quotes-chart'
 
 export const metadata: Metadata = { title: 'Dashboard' }
 export const dynamic = 'force-dynamic'
+
+/** Bucket ISO timestamps into per-day counts for the last N days (clock read kept
+ *  out of any component body — this is a module-level helper). */
+function bucketByDay(isoList: string[], days = 14): { label: string; count: number }[] {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const buckets: { key: string; label: string; count: number }[] = []
+  const idx = new Map<string, number>()
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(today)
+    d.setDate(d.getDate() - i)
+    const key = d.toISOString().slice(0, 10)
+    idx.set(key, buckets.length)
+    buckets.push({ key, label: `${d.getMonth() + 1}/${d.getDate()}`, count: 0 })
+  }
+  for (const iso of isoList) {
+    const i = idx.get(new Date(iso).toISOString().slice(0, 10))
+    if (i != null) buckets[i].count++
+  }
+  return buckets.map(({ label, count }) => ({ label, count }))
+}
 
 interface AssumptionSet {
   id: string
@@ -55,6 +77,7 @@ export default async function DashboardPage() {
     ? fuel.regions.reduce((acc, r) => (r.updatedAt > acc ? r.updatedAt : acc), fuel.regions[0].updatedAt)
     : null
   const recent = quotes.slice(0, 5)
+  const quotesByDay = bucketByDay(quotes.map((q) => q.createdAt))
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8">
@@ -191,6 +214,19 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Quote volume */}
+      {quotes.length > 0 && (
+        <Card className="mb-6">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Quote volume</CardTitle>
+            <CardDescription>Saved quotes per day — last 14 days.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <QuotesChart data={quotesByDay} />
+          </CardContent>
+        </Card>
+      )}
 
       {/* Recent quotes */}
       <Card>

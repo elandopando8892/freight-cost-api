@@ -1,6 +1,7 @@
 'use client'
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { ThemeProvider } from 'next-themes'
 import { useState, type ReactNode } from 'react'
 import { Toaster } from 'sonner'
 import { ClientApiError } from '@/lib/fetcher'
@@ -21,10 +22,12 @@ export function Providers({ children }: { children: ReactNode }) {
       }),
   )
   return (
-    <QueryClientProvider client={client}>
-      {children}
-      <Toaster richColors closeButton position="top-right" />
-      {process.env.NODE_ENV === 'development' ? <ReactQueryDevtools initialIsOpen={false} /> : null}
-    </QueryClientProvider>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+      <QueryClientProvider client={client}>
+        {children}
+        <Toaster richColors closeButton position="top-right" />
+        {process.env.NODE_ENV === 'development' ? <ReactQueryDevtools initialIsOpen={false} /> : null}
+      </QueryClientProvider>
+    </ThemeProvider>
   )
 }
