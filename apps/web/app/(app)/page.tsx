@@ -65,6 +65,56 @@ export default async function DashboardPage() {
         </div>
       </header>
 
+      {/* First-run onboarding — only until the first quote is saved */}
+      {quotes.length === 0 && (
+        <Card className="mb-6 border-primary/30 bg-primary/5">
+          <CardHeader>
+            <CardTitle>Welcome to Freight Cost Model</CardTitle>
+            <CardDescription>
+              Price cross-border MX–US lanes against your assumptions in seconds. Three steps to your first quote:
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            <ol className="grid gap-3 text-sm">
+              <li className="flex gap-3">
+                <span className={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-medium ${active ? 'bg-primary text-primary-foreground' : 'bg-primary/10 text-primary'}`}>
+                  {active ? '✓' : '1'}
+                </span>
+                <div>
+                  <div className="font-medium">Assumptions {active ? 'ready' : 'set up'}</div>
+                  <div className="text-muted-foreground">
+                    {active ? (
+                      <>Your active set <strong className="text-foreground">{active.name}</strong> drives every cost. <Link href={`/assumptions/${active.id}`} className="underline underline-offset-2 hover:text-foreground">Review or tweak →</Link></>
+                    ) : (
+                      <>Create a set to drive your costs. <Link href="/assumptions" className="underline underline-offset-2 hover:text-foreground">Go to Assumptions →</Link></>
+                    )}
+                  </div>
+                </div>
+              </li>
+              <li className="flex gap-3">
+                <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary">2</span>
+                <div>
+                  <div className="font-medium">Quote a lane</div>
+                  <div className="text-muted-foreground">Enter origin + destination and get the MEX/USA breakdown plus commercial sell tiers.</div>
+                </div>
+              </li>
+              <li className="flex gap-3">
+                <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary">3</span>
+                <div>
+                  <div className="font-medium">Save &amp; revisit</div>
+                  <div className="text-muted-foreground">Saved quotes land in History — copy a summary to share with a customer.</div>
+                </div>
+              </li>
+            </ol>
+            <div>
+              <Link href="/quote" className="inline-flex rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90">
+                Run your first quote →
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* KPI row */}
       <div className="mb-6 grid gap-4 md:grid-cols-3">
         {/* Active assumption set */}

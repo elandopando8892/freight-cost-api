@@ -1,14 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import Link from 'next/link'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { fetcher } from '@/lib/fetcher'
+import { LocationInput } from './location-input'
 
 // ── Types (mirror the API engine output we consume) ─────────────────────────
 interface MexLeg {
@@ -73,7 +74,7 @@ interface FormSnapshot {
   equipment: { truckType: string; trailer: string; config: string; driver: string }
 }
 
-export interface LastQuoteHint {
+export interface LaneHint {
   id: string
   label: string | null
   operation: string
@@ -124,12 +125,21 @@ function validate(f: FormFields): FormErrors {
   return e
 }
 
-export function QuoteForm({ lastQuote }: { lastQuote?: LastQuoteHint | null }) {
+export function QuoteForm({ recentLanes = [] }: { recentLanes?: LaneHint[] }) {
   const [form, setForm] = useState<FormFields>(INITIAL_FORM)
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [result, setResult] = useState<QuoteResult | null>(null)
   const [errors, setErrors] = useState<FormErrors>({})
-  const [usedLast, setUsedLast] = useState(false)
+  const recentRef = useRef<HTMLDetailsElement>(null)
+
+  // Location suggestions for the autocomplete (progressive enhancement — a fetch
+  // failure just means free-text only, so it's silent).
+  const { data: locData } = useQuery({
+    queryKey: ['catalog-locations'],
+    queryFn: () => fetcher<{ locations: string[] }>('/api/v1/catalog/locations', { silent: true }),
+    staleTime: Infinity,
+  })
+  const locations = locData?.locations ?? []
 
   const quote = useMutation({
     mutationFn: () => {
@@ -171,23 +181,21 @@ export function QuoteForm({ lastQuote }: { lastQuote?: LastQuoteHint | null }) {
     setResult(null)
     setErrors({})
     setShowAdvanced(false)
-    setUsedLast(false)
   }
-  const useLast = () => {
-    if (!lastQuote) return
+  const applyLane = (lane: LaneHint) => {
     setForm((f) => ({
       ...f,
-      outboundLocation: lastQuote.origin ?? f.outboundLocation,
-      inboundLocation: lastQuote.destination ?? f.inboundLocation,
-      operation: (OPS as readonly string[]).includes(lastQuote.operation)
-        ? (lastQuote.operation as (typeof OPS)[number])
+      outboundLocation: lane.origin ?? f.outboundLocation,
+      inboundLocation: lane.destination ?? f.inboundLocation,
+      operation: (OPS as readonly string[]).includes(lane.operation)
+        ? (lane.operation as (typeof OPS)[number])
         : f.operation,
-      service: (SVCS as readonly string[]).includes(lastQuote.service)
-        ? (lastQuote.service as (typeof SVCS)[number])
+      service: (SVCS as readonly string[]).includes(lane.service)
+        ? (lane.service as (typeof SVCS)[number])
         : f.service,
     }))
     setErrors({})
-    setUsedLast(true)
+    if (recentRef.current) recentRef.current.open = false
   }
   const onFormKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
     // Cmd/Ctrl + Enter: submit from any field (incl. <select>, <button type=button>)
@@ -205,45 +213,64 @@ export function QuoteForm({ lastQuote }: { lastQuote?: LastQuoteHint | null }) {
         <CardHeader>
           <div className="flex items-baseline justify-between gap-2">
             <CardTitle>Lane</CardTitle>
-            {lastQuote && !usedLast && (
-              <button
-                type="button"
-                onClick={useLast}
-                className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
-                title={`${lastQuote.origin ?? '—'} → ${lastQuote.destination ?? '—'} · ${lastQuote.operation}`}
-              >
-                use last lane
-              </button>
+            {recentLanes.length > 0 && (
+              <details ref={recentRef} className="relative">
+                <summary className="cursor-pointer list-none text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground">
+                  recent ▾
+                </summary>
+                <div className="absolute right-0 z-30 mt-1 grid w-64 gap-0.5 rounded-md border bg-popover p-1 shadow-md">
+                  {recentLanes.map((lane) => (
+                    <button
+                      key={lane.id}
+                      type="button"
+                      onClick={() => applyLane(lane)}
+                      className="grid gap-0.5 rounded px-2 py-1.5 text-left hover:bg-accent"
+                    >
+                      <span className="truncate text-xs font-medium">
+                        {lane.origin ?? '—'} → {lane.destination ?? '—'}
+                      </span>
+                      <span className="truncate text-[11px] text-muted-foreground">
+                        {lane.operation}{lane.service ? ` · ${lane.service}` : ''}{lane.label ? ` · ${lane.label}` : ''}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </details>
             )}
           </div>
           <CardDescription>ZIP, &ldquo;City, ST&rdquo;, or a metro city.</CardDescription>
         </CardHeader>
         <CardContent>
           <form className="grid gap-4" onSubmit={onSubmit} onKeyDown={onFormKeyDown} noValidate>
-            <Field label="Outbound (shipper)" error={errors.outboundLocation}>
-              <Input
+            <Field label="Outbound (shipper)" error={errors.outboundLocation} hint="Where the load originates. ZIP, 'City, ST', or a metro city — start typing for suggestions.">
+              <LocationInput
                 value={form.outboundLocation}
-                onChange={(e) => set('outboundLocation', e.target.value)}
-                placeholder="e.g. 30901 or Augusta, GA 30901"
-                aria-invalid={Boolean(errors.outboundLocation)}
+                onChange={(v) => set('outboundLocation', v)}
+                suggestions={locations}
+                placeholder="e.g. 30901 or Augusta, GA"
+                ariaInvalid={Boolean(errors.outboundLocation)}
               />
             </Field>
-            <Field label="Inbound (consignee)" error={errors.inboundLocation}>
-              <Input
+            <Field label="Inbound (consignee)" error={errors.inboundLocation} hint="Where the load delivers. Start typing a city or ZIP for suggestions.">
+              <LocationInput
                 value={form.inboundLocation}
-                onChange={(e) => set('inboundLocation', e.target.value)}
-                placeholder="e.g. Queretaro, Queretaro or 78040"
-                aria-invalid={Boolean(errors.inboundLocation)}
+                onChange={(v) => set('inboundLocation', v)}
+                suggestions={locations}
+                placeholder="e.g. Queretaro, Qro or 78040"
+                ariaInvalid={Boolean(errors.inboundLocation)}
               />
             </Field>
 
-            <Field label="Operation">
+            <Field label="Operation" hint="Movement type: D2D Export/Import (cross-border door-to-door), Drayage (port/terminal), Intra-Mex (domestic MX), or Local.">
               <select className={selectCls} value={form.operation} onChange={(e) => set('operation', e.target.value as (typeof OPS)[number])}>
                 {OPS.map((o) => <option key={o} value={o}>{o}</option>)}
               </select>
             </Field>
 
-            <Field label={`Service ${form.service === '' ? '— auto (per operation)' : ''}`}>
+            <Field
+              label={`Service ${form.service === '' ? '— auto (per operation)' : ''}`}
+              hint="Auto uses the operation default (Import/Southbound -> Backhaul, else One Way). Override for Roundtrip or Expedited."
+            >
               <select className={selectCls} value={form.service} onChange={(e) => set('service', e.target.value as (typeof SVCS)[number])}>
                 <option value="">auto (operation default)</option>
                 {SVCS.filter((s) => s !== '').map((s) => <option key={s} value={s}>{s}</option>)}
@@ -325,7 +352,9 @@ export function QuoteForm({ lastQuote }: { lastQuote?: LastQuoteHint | null }) {
       </Card>
 
       <div className="grid gap-4">
-        {result ? (
+        {quote.isPending ? (
+          <ResultSkeleton />
+        ) : result ? (
           <Result
             r={result}
             snapshot={{
@@ -343,12 +372,56 @@ export function QuoteForm({ lastQuote }: { lastQuote?: LastQuoteHint | null }) {
 }
 
 // ── Sub-components ──────────────────────────────────────────────────────────
-function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
+function Field({ label, error, hint, children }: { label: string; error?: string; hint?: string; children: React.ReactNode }) {
   return (
     <div className="grid gap-1.5">
-      <Label className="text-xs text-muted-foreground">{label}</Label>
+      <Label className="flex items-center gap-1 text-xs text-muted-foreground">
+        <span>{label}</span>
+        {hint && (
+          <span className="cursor-help select-none text-muted-foreground/70" title={hint} aria-label={hint}>ⓘ</span>
+        )}
+      </Label>
       {children}
       {error && <p className="text-xs text-destructive" role="alert">{error}</p>}
+    </div>
+  )
+}
+
+function ResultSkeleton() {
+  return (
+    <div className="grid gap-4" aria-busy="true" aria-label="Pricing…">
+      <Card>
+        <CardHeader className="pb-2">
+          <div className="h-3 w-28 animate-pulse rounded bg-muted" />
+          <div className="mt-2 h-9 w-40 animate-pulse rounded bg-muted" />
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="grid gap-1.5">
+                <div className="h-2.5 w-10 animate-pulse rounded bg-muted" />
+                <div className="h-4 w-16 animate-pulse rounded bg-muted" />
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+      <div className="grid gap-4 md:grid-cols-2">
+        {Array.from({ length: 2 }).map((_, i) => (
+          <Card key={i}>
+            <CardHeader><div className="h-4 w-24 animate-pulse rounded bg-muted" /></CardHeader>
+            <CardContent className="grid gap-3">
+              {Array.from({ length: 3 }).map((_, j) => (
+                <div key={j} className="grid grid-cols-4 gap-3">
+                  {Array.from({ length: 4 }).map((_, k) => (
+                    <div key={k} className="h-8 animate-pulse rounded bg-muted/60" />
+                  ))}
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   )
 }

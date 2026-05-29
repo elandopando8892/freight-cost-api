@@ -13,6 +13,19 @@ export async function catalogRoutes(app: FastifyInstance) {
     return prisma.cityMX.findMany({ orderBy: { production: 'asc' } })
   })
 
+  // Flat list of distinct location strings (MX "City, ST" homologations + US/CA
+  // metro cities) for the quote-form autocomplete. Small + cacheable.
+  app.get('/catalog/locations', async () => {
+    const [cities, metros] = await Promise.all([
+      prisma.cityMX.findMany({ select: { homologation: true }, orderBy: { homologation: 'asc' } }),
+      prisma.zipMarket.findMany({ select: { metroCity: true }, distinct: ['metroCity'], orderBy: { metroCity: 'asc' } }),
+    ])
+    const set = new Set<string>()
+    for (const c of cities) if (c.homologation) set.add(c.homologation.trim())
+    for (const m of metros) if (m.metroCity) set.add(m.metroCity.trim())
+    return { locations: [...set].sort((a, b) => a.localeCompare(b)) }
+  })
+
   app.get('/catalog/zip-markets', async (request) => {
     const query = request.query as { page?: string; limit?: string; market?: string }
     const page = Math.max(1, parseInt(query.page ?? '1'))

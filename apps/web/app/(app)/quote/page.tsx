@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { api } from '@/lib/api'
-import { QuoteForm, type LastQuoteHint } from './quote-form'
+import { QuoteForm, type LaneHint } from './quote-form'
 
 export const dynamic = 'force-dynamic'
 export const metadata: Metadata = { title: 'Quote by route' }
@@ -13,26 +13,29 @@ interface RecentQuote {
   lane?: { origin?: string | null; destination?: string | null } | null
 }
 
-async function fetchLast(): Promise<LastQuoteHint | null> {
+/** Most recent distinct lanes (by origin+dest+operation), up to 5, for re-quoting. */
+async function fetchRecentLanes(): Promise<LaneHint[]> {
   try {
-    const recent = await api<RecentQuote[]>('/quotes')
-    const q = recent[0]
-    if (!q) return null
-    return {
-      id: q.id,
-      label: q.label,
-      operation: q.operation,
-      service: q.service,
-      origin: q.lane?.origin ?? null,
-      destination: q.lane?.destination ?? null,
+    const quotes = await api<RecentQuote[]>('/quotes') // most-recent-first
+    const seen = new Set<string>()
+    const lanes: LaneHint[] = []
+    for (const q of quotes) {
+      const origin = q.lane?.origin ?? null
+      const destination = q.lane?.destination ?? null
+      const key = `${origin}|${destination}|${q.operation}`
+      if (seen.has(key)) continue
+      seen.add(key)
+      lanes.push({ id: q.id, label: q.label, operation: q.operation, service: q.service, origin, destination })
+      if (lanes.length >= 5) break
     }
+    return lanes
   } catch {
-    return null
+    return []
   }
 }
 
 export default async function QuotePage() {
-  const lastQuote = await fetchLast()
+  const recentLanes = await fetchRecentLanes()
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8">
       <header className="mb-6">
@@ -42,7 +45,7 @@ export default async function QuotePage() {
           prevailing service default (Import/Southbound → Backhaul) all happen server-side.
         </p>
       </header>
-      <QuoteForm lastQuote={lastQuote} />
+      <QuoteForm recentLanes={recentLanes} />
     </main>
   )
 }
