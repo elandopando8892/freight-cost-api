@@ -71,6 +71,8 @@ interface QuoteResult {
 interface FormSnapshot {
   service: string
   fxRate: string
+  origin: string
+  destination: string
   equipment: { truckType: string; trailer: string; config: string; driver: string }
 }
 
@@ -360,6 +362,8 @@ export function QuoteForm({ recentLanes = [] }: { recentLanes?: LaneHint[] }) {
             snapshot={{
               service: form.service,
               fxRate: form.fxRate,
+              origin: form.outboundLocation.trim(),
+              destination: form.inboundLocation.trim(),
               equipment: { truckType: form.truckType, trailer: form.trailer, config: form.config, driver: form.driver },
             }}
           />
@@ -462,6 +466,8 @@ function Result({ r, snapshot }: { r: QuoteResult; snapshot: FormSnapshot }) {
       if (label.trim()) body.label = label.trim()
       if (snapshot.service) body.service = snapshot.service
       if (snapshot.fxRate) body.fxRate = Number(snapshot.fxRate)
+      if (snapshot.origin) body.origin = snapshot.origin
+      if (snapshot.destination) body.destination = snapshot.destination
       if (r.resolved.mexLeg) {
         const m = r.resolved.mexLeg
         body.mex = {

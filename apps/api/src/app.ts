@@ -5,6 +5,7 @@ import jwt from '@fastify/jwt'
 import { env } from './config/env.js'
 import { errorHandler } from './middleware/error-handler.js'
 import { authRoutes } from './modules/auth/auth.routes.js'
+import { orgRoutes } from './modules/org/org.routes.js'
 import { assumptionsRoutes } from './modules/assumptions/assumptions.routes.js'
 import { catalogRoutes } from './modules/catalog/catalog.routes.js'
 import { marketRoutes } from './modules/market/market.routes.js'
@@ -29,6 +30,7 @@ export function buildApp() {
 
   // Routes
   app.register(authRoutes)
+  app.register(orgRoutes)
   app.register(assumptionsRoutes)
   app.register(catalogRoutes)
   app.register(marketRoutes)

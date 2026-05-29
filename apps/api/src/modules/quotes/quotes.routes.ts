@@ -5,6 +5,7 @@ import { authenticate } from '../../middleware/authenticate.js'
 import type { JwtPayload } from '../auth/auth.schema.js'
 import { prisma } from '../../config/prisma.js'
 import { getActiveSet, buildParamMap, type ParamMap } from '../assumptions/assumptions.service.js'
+import { buildLaneKey } from '../lanes/lanes.schema.js'
 import { calculate } from '../engine/engine.calculator.js'
 import { defaultService } from '../engine/engine.factors.js'
 import { usdToMxn, round2 } from '../../utils/currency.js'
@@ -39,6 +40,8 @@ const UsaSchema = z.object({
 const CreateQuoteSchema = z.object({
   label: z.string().optional(),
   laneId: z.string().min(1).optional(),
+  origin: z.string().min(1).optional(),       // lane endpoints (outbound/inbound the user entered)
+  destination: z.string().min(1).optional(),
   assumptionSetId: z.string().min(1).optional(),
   overrides: z.record(z.number()).optional(),
   operation: z.string(),
@@ -88,10 +91,28 @@ export async function quotesRoutes(app: FastifyInstance) {
     }
 
     const r = calculate(input)
+
+    // Persist the lane (origin → destination) so History + recent-lanes are meaningful.
+    let laneId = body.laneId
+    if (!laneId && body.origin && body.destination) {
+      const laneKey = buildLaneKey(orgId, body.origin, body.destination, undefined, body.operation, service, body.equipment.config)
+      const lane = await prisma.lane.upsert({
+        where: { orgId_laneKey: { orgId, laneKey } },
+        create: {
+          orgId, laneKey,
+          origin: body.origin, destination: body.destination,
+          operationType: body.operation, serviceType: service, config: body.equipment.config,
+        },
+        update: {},
+        select: { id: true },
+      })
+      laneId = lane.id
+    }
+
     const quote = await prisma.quote.create({
       data: {
         orgId,
-        laneId: body.laneId ?? undefined,
+        laneId: laneId ?? undefined,
         assumptionSetId: set?.id ?? undefined,
         label: body.label,
         operation: r.operation,
