@@ -84,6 +84,18 @@ export function Editor({ setId, initial, sections }: { setId: string; initial: G
     onSuccess: (result) => { setData(result); setPending({}); setWarnings([]); toast.success('All params reset to recommended values') },
   })
 
+  // Cmd/Ctrl+S saves pending edits. (Declared after `save` so it's in scope.)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
+        e.preventDefault()
+        if (pendingCount > 0 && !save.isPending) save.mutate()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [pendingCount, save])
+
   // Per-section counts for the side nav: pending edits + out-of-range params + matches.
   const sectionStats = useMemo(() => {
     const out: Record<string, { rows: number; pending: number; outOfRange: number; matched: number }> = {}
@@ -187,7 +199,7 @@ export function Editor({ setId, initial, sections }: { setId: string; initial: G
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-          <Button size="sm" onClick={() => save.mutate()} disabled={pendingCount === 0 || save.isPending}>
+          <Button size="sm" onClick={() => save.mutate()} disabled={pendingCount === 0 || save.isPending} title="Save (⌘S / Ctrl+S)">
             {save.isPending ? 'Saving…' : `Save ${pendingCount || ''}`.trim()}
           </Button>
         </div>

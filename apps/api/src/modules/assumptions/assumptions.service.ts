@@ -38,7 +38,11 @@ export async function listSets(orgId: string) {
   return prisma.assumptionSet.findMany({
     where: { orgId },
     orderBy: [{ isActive: 'desc' }, { createdAt: 'desc' }],
-    select: { id: true, name: true, version: true, isActive: true, notes: true, createdAt: true },
+    select: {
+      id: true, name: true, version: true, isActive: true, notes: true,
+      createdAt: true, updatedAt: true,
+      _count: { select: { params: true } },
+    },
   })
 }
 

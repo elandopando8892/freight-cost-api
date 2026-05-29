@@ -1,13 +1,15 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useMemo, useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { RelativeTime } from '@/components/relative-time'
 import {
   Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from '@/components/ui/dialog'
@@ -24,6 +26,8 @@ export interface AssumptionSet {
   isActive: boolean
   notes: string | null
   createdAt: string
+  updatedAt?: string
+  _count?: { params: number }
 }
 
 type DialogState =
@@ -35,9 +39,25 @@ const selectCls =
   'h-9 w-full rounded-md border border-input bg-background px-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
 
 export function AssumptionsList({ initial }: { initial: AssumptionSet[] }) {
+  const router = useRouter()
   const [items, setItems] = useState(initial)
   const [dialog, setDialog] = useState<DialogState>(null)
+  const [search, setSearch] = useState('')
+  const [selected, setSelected] = useState<Set<string>>(new Set())
   const closeDialog = () => setDialog(null)
+
+  const needle = search.trim().toLowerCase()
+  const filtered = useMemo(
+    () => items.filter((s) => needle === '' || s.name.toLowerCase().includes(needle) || (s.notes ?? '').toLowerCase().includes(needle)),
+    [items, needle],
+  )
+  const toggleSelect = (id: string) => setSelected((prev) => {
+    const next = new Set(prev)
+    if (next.has(id)) { next.delete(id); return next }
+    if (next.size >= 2) { toast.error('Select up to 2 sets to compare'); return prev }
+    next.add(id)
+    return next
+  })
 
   const create = useMutation({
     mutationFn: (body: { name: string; notes?: string; cloneFromId?: string }) =>
@@ -77,22 +97,43 @@ export function AssumptionsList({ initial }: { initial: AssumptionSet[] }) {
     },
     onSuccess: (id) => {
       setItems((prev) => prev.filter((x) => x.id !== id))
+      setSelected((prev) => { const n = new Set(prev); n.delete(id); return n })
       toast.success('Set deleted')
     },
   })
 
   return (
     <>
-      <div className="mb-6 flex items-baseline justify-between gap-3">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Assumptions</h1>
           <p className="text-sm text-muted-foreground">Cost cards, factors, and operating assumptions per set.</p>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-muted-foreground">{items.length} set{items.length === 1 ? '' : 's'}</span>
+        <div className="flex items-center gap-2">
+          {items.length > 1 && (
+            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search sets…" className="h-9 w-40" />
+          )}
+          <span className="whitespace-nowrap text-sm text-muted-foreground">
+            {needle ? `${filtered.length}/${items.length}` : `${items.length} set${items.length === 1 ? '' : 's'}`}
+          </span>
           <Button size="sm" onClick={() => setDialog({ kind: 'create' })}>New set</Button>
         </div>
       </div>
+
+      {selected.size > 0 && (
+        <div className="mb-4 flex items-center justify-between gap-3 rounded-md border bg-muted/40 px-3 py-2 text-sm">
+          <span className="text-muted-foreground">
+            {selected.size} selected{selected.size === 1 ? ' — pick one more to compare' : ''}
+          </span>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={() => setSelected(new Set())}>Clear</Button>
+            <Button size="sm" disabled={selected.size !== 2}
+              onClick={() => { const [a, b] = [...selected]; router.push(`/assumptions/diff?a=${a}&b=${b}`) }}>
+              Compare
+            </Button>
+          </div>
+        </div>
+      )}
 
       {items.length === 0 && (
         <Card>
@@ -106,8 +147,19 @@ export function AssumptionsList({ initial }: { initial: AssumptionSet[] }) {
         </Card>
       )}
 
+      {items.length > 0 && filtered.length === 0 && (
+        <Card>
+          <CardHeader>
+            <CardDescription>
+              No sets match &ldquo;{search}&rdquo;.{' '}
+              <button type="button" onClick={() => setSearch('')} className="underline underline-offset-2 hover:text-foreground">Clear search</button>
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      )}
+
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {items.map((s) => (
+        {filtered.map((s) => (
           <Card key={s.id} className="flex flex-col">
             <Link href={`/assumptions/${s.id}`} className="block flex-1 transition hover:bg-muted/30">
               <CardHeader>
@@ -119,7 +171,9 @@ export function AssumptionsList({ initial }: { initial: AssumptionSet[] }) {
                     </span>
                   )}
                 </CardTitle>
-                <CardDescription>v{s.version} · {new Date(s.createdAt).toLocaleDateString()}</CardDescription>
+                <CardDescription>
+                  v{s.version} · {s._count?.params ?? 0} params · updated <RelativeTime iso={s.updatedAt ?? s.createdAt} />
+                </CardDescription>
               </CardHeader>
               {s.notes && (
                 <CardContent>
@@ -128,6 +182,9 @@ export function AssumptionsList({ initial }: { initial: AssumptionSet[] }) {
               )}
             </Link>
             <div className="flex flex-wrap items-center gap-1 border-t bg-muted/30 px-3 py-2 text-xs">
+              <label className="mr-1 flex cursor-pointer items-center" title="Select to compare">
+                <input type="checkbox" className="h-3.5 w-3.5 accent-primary" checked={selected.has(s.id)} onChange={() => toggleSelect(s.id)} />
+              </label>
               {!s.isActive && (
                 <Button
                   variant="ghost" size="sm"
@@ -158,7 +215,7 @@ export function AssumptionsList({ initial }: { initial: AssumptionSet[] }) {
                   />
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Delete "{s.name}"?</AlertDialogTitle>
+                      <AlertDialogTitle>Delete &ldquo;{s.name}&rdquo;?</AlertDialogTitle>
                       <AlertDialogDescription>
                         {s.isActive
                           ? 'This set is active — activate another set first.'
