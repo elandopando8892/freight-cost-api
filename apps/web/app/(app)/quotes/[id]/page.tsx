@@ -97,7 +97,7 @@ export default async function QuoteDetailPage(
       {/* Header */}
       <div className="mb-6 flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <div className="mb-1 text-xs text-muted-foreground">
+          <div className="mb-1 text-xs text-muted-foreground print:hidden">
             <Link href="/quotes" className="hover:text-foreground">Quote history</Link>
             <span className="mx-1">/</span>
             <span className="font-mono">{q.id.slice(0, 8)}</span>
@@ -115,7 +115,7 @@ export default async function QuoteDetailPage(
             </p>
           )}
         </div>
-        <div className="flex shrink-0 flex-wrap items-center gap-2">
+        <div className="flex shrink-0 flex-wrap items-center gap-2 print:hidden">
           <ShareButtons
             quote={{
               id: q.id,

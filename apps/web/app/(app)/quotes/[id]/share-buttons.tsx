@@ -128,6 +128,9 @@ export function ShareButtons({ quote }: { quote: QuoteSummaryProps }) {
       <Button variant="outline" size="sm" onClick={copySummary} disabled={busy !== null}>
         {busy === 'summary' ? 'Copying…' : 'Copy summary'}
       </Button>
+      <Button variant="outline" size="sm" onClick={() => window.print()} disabled={busy !== null}>
+        Print / PDF
+      </Button>
     </>
   )
 }

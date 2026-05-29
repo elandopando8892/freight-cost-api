@@ -22,7 +22,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="border-b">
+      <header className="border-b print:hidden">
         <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-3 px-4">
           <div className="flex min-w-0 items-center gap-3 sm:gap-6">
             {/* Mobile: hamburger dropdown (zero-JS via <details>) */}
