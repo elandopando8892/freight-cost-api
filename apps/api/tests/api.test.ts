@@ -401,7 +401,7 @@ describe('Engine /calculate', () => {
     },
   }
 
-  it('POST /engine/calculate → 200, Monterrey→Dallas Flatbed = $2,600', async () => {
+  it('POST /engine/calculate → 200, Monterrey→Dallas Flatbed = $2,700 (post-E2)', async () => {
     const res = await app.inject({
       method: 'POST',
       url: '/engine/calculate',
@@ -410,9 +410,9 @@ describe('Engine /calculate', () => {
     })
     expect(res.statusCode).toBe(200)
     const body = res.json()
-    expect(body.mexLeg.requiredTariffUsd).toBe(1200)
+    expect(body.mexLeg.requiredTariffUsd).toBe(1300)
     expect(body.usaLeg.flatUsd).toBeCloseTo(1391, 0)
-    expect(body.freightBaselineUsd).toBe(2600)
+    expect(body.freightBaselineUsd).toBe(2700)
   })
 
   it('POST /engine/calculate MX-only lane runs only MEX leg', async () => {

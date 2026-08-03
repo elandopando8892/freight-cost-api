@@ -48,6 +48,15 @@ const BASE_ASSUMPTIONS = [
   { section: 'UTILIZATION', field: 'Unload Time',                  value: 2,    unit: 'hours',                 low: 1,    high: 6,    updateFrequency: 'Quarterly', costBehavior: 'Operational cycle',      activation: 'By Shipment' },
   { section: 'UTILIZATION', field: 'Free Time',                    value: 2,    unit: 'hours/event',           low: 1,    high: 4,    updateFrequency: 'Quarterly', costBehavior: 'Detention threshold',    activation: 'By Contract' },
   { section: 'UTILIZATION', field: 'Detention Rate',               value: 85,   unit: 'USD/hour',              low: 60,   high: 125,  updateFrequency: 'Quarterly', costBehavior: 'Delay pricing',          activation: 'By Contract' },
+  // Production floors (Freight Cost Model V3.0 finding: distance-based math underprices
+  // local/short-haul because it doesn't recognize the cost of committing a unit for a
+  // full cycle. Classification: baseKm ≤ 100 → local; baseKm ≤ 300 → short-haul.)
+  { section: 'UTILIZATION', field: 'Billable Day Floor Local',     value: 1.0,  unit: 'days',                  low: 0.5,  high: 2.0,  updateFrequency: 'Semiannual', costBehavior: 'Minimum billable cycle', activation: 'By Lane' },
+  { section: 'UTILIZATION', field: 'Billable Day Floor Short-haul', value: 0.5, unit: 'days',                  low: 0.33, high: 1.0,  updateFrequency: 'Semiannual', costBehavior: 'Minimum billable cycle', activation: 'By Lane' },
+  { section: 'UTILIZATION', field: 'Empty KM Min Local',           value: 20,   unit: 'km',                    low: 10,   high: 60,   updateFrequency: 'Semiannual', costBehavior: 'Minimum repositioning',  activation: 'By Lane' },
+  { section: 'UTILIZATION', field: 'Empty KM Min Short-haul',      value: 40,   unit: 'km',                    low: 20,   high: 100,  updateFrequency: 'Semiannual', costBehavior: 'Minimum repositioning',  activation: 'By Lane' },
+  { section: 'UTILIZATION', field: 'Min Trip Cost Local USD',      value: 200,  unit: 'USD',                   low: 100,  high: 500,  updateFrequency: 'Semiannual', costBehavior: 'Minimum production cost', activation: 'By Lane' },
+  { section: 'UTILIZATION', field: 'Min Trip Cost Short-haul USD', value: 150,  unit: 'USD',                   low: 75,   high: 400,  updateFrequency: 'Semiannual', costBehavior: 'Minimum production cost', activation: 'By Lane' },
   // (Maint+Tires per km/mile is DERIVED from COST_MAINT/COST_TIRES cost cards — see engine.outputs.ts)
 
   // ── BORDER ───────────────────────────────────────────────────────────

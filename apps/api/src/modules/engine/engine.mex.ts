@@ -1,9 +1,17 @@
 /**
- * MEX leg — exact reproduction of Freight Cost Model V3.0 `mexLaneProd`.
+ * MEX leg — Freight Cost Model V3.0 `mexLaneProd` + E2 production floors.
  *
- * Validated vs MX-RATE-PROD-2026-Q2-01 (Monterrey→Nuevo Laredo Flatbed D2D Export):
- *   CVU 439.42, CFU 107.57, Production 546.98, Technical Tariff 781.41,
- *   Risk Adj 406.87, Required Tariff MROUND(1188.28,100)=1200 ✓
+ * V3.0 finding #2 fix: distance-based math alone underprices local/short-haul
+ * because it doesn't recognize the cost of committing a unit/operator/cycle.
+ * Three floors kick in by baseKm band (≤100 local, ≤300 short-haul):
+ *   • Billable Day Floor → minimum cycleDays (drives CFU-by-time)
+ *   • Empty KM Minimum   → minimum reposition (drives fuel/maint)
+ *   • Min Trip Cost      → minimum production $ per salida (belt & suspenders)
+ *
+ * MX-RATE-PROD-2026-Q2-01 (Monterrey→Nuevo Laredo Flatbed D2D Export, 225km short-haul):
+ *   emptyKm 40 (floor), cycleDays 0.5 (floor), CVU 444.81, CFU 162.98,
+ *   Production 607.79, Technical Tariff 868.28 (margin, not markup — /(1−UT)),
+ *   Risk Adj 451.19, Required Tariff MROUND(1319.47,100) = $1,300 ✓
  */
 import { getParam, type ParamMap } from '../assumptions/assumptions.service.js'
 import {
@@ -52,6 +60,26 @@ export function calculateMexLeg(lane: MexLegInput, params: ParamMap): MexLegOutp
   const flatbedComplexity = getParam(params, 'RISK', 'Flatbed Complexity Factor', 0.25)
   const mxSecurityRisk = getParam(params, 'RISK', 'MX Security Risk Reserve', 0.025)
   const configRiskTandem = getParam(params, 'RISK', 'Config Risk Premium Tandem', 0.1)
+  // Production floors — the cost of committing a unit/operator/cycle to a short
+  // move. Classify the lane by baseKm; long-haul (>300km) uses no floors (the
+  // distance-based math already captures the real cycle).
+  const isLocal = lane.baseKm <= 100
+  const isShortHaul = !isLocal && lane.baseKm <= 300
+  const billableDayFloor = isLocal
+    ? getParam(params, 'UTILIZATION', 'Billable Day Floor Local', 1.0)
+    : isShortHaul
+      ? getParam(params, 'UTILIZATION', 'Billable Day Floor Short-haul', 0.5)
+      : 0.33
+  const emptyKmFloor = isLocal
+    ? getParam(params, 'UTILIZATION', 'Empty KM Min Local', 20)
+    : isShortHaul
+      ? getParam(params, 'UTILIZATION', 'Empty KM Min Short-haul', 40)
+      : 0
+  const minTripCostFloor = isLocal
+    ? getParam(params, 'UTILIZATION', 'Min Trip Cost Local USD', 200)
+    : isShortHaul
+      ? getParam(params, 'UTILIZATION', 'Min Trip Cost Short-haul USD', 150)
+      : 0
 
   const eq = equipmentFactors(equipment.truckType)
 
@@ -59,7 +87,9 @@ export function calculateMexLeg(lane: MexLegInput, params: ParamMap): MexLegOutp
   const emptyPct = isRoundtrip ? 0.03 : isBackhaul ? 0 : deadheadBase
   const returnKm = isRoundtrip ? lane.baseKm : 0
   const loadedKm = lane.baseKm + returnKm
-  const emptyKm = lane.baseKm * emptyPct
+  const emptyKmComputed = lane.baseKm * emptyPct
+  // Backhaul: return load by design → no forced repositioning floor.
+  const emptyKm = isBackhaul ? emptyKmComputed : Math.max(emptyKmComputed, emptyKmFloor)
   const totalKm = loadedKm + emptyKm
   const loadedMiles = loadedKm * MI_PER_KM
   const emptyMiles = emptyKm * MI_PER_KM
@@ -67,7 +97,7 @@ export function calculateMexLeg(lane: MexLegInput, params: ParamMap): MexLegOutp
 
   // ── Timing ───────────────────────────────────────────────────────────
   const baseHours = lane.baseHours ?? 0
-  const cycleDays = Math.max((baseHours + loadTime + unloadTime) / 24, 0.33)
+  const cycleDays = Math.max((baseHours + loadTime + unloadTime) / 24, billableDayFloor)
 
   // ── UT margin / border ───────────────────────────────────────────────
   const utMargin = isBackhaul
@@ -101,7 +131,9 @@ export function calculateMexLeg(lane: MexLegInput, params: ParamMap): MexLegOutp
   const cfuUsd = Math.max(cfuByDistanceUsd, cfuByTimeUsd)
 
   // ── Production & technical tariff ────────────────────────────────────
-  const productionCostUsd = cvuUsd + cfuUsd
+  // Belt-and-suspenders: after applying day/km floors, the trip production still
+  // has a minimum $ floor (asset commitment + dispatch + admin per salida).
+  const productionCostUsd = Math.max(cvuUsd + cfuUsd, minTripCostFloor)
   const technicalTariffUsd = productionCostUsd / (1 - utMargin)
   const technicalUtilityUsd = technicalTariffUsd - productionCostUsd
 

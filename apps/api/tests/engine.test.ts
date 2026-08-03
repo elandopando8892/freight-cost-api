@@ -19,54 +19,57 @@ describe('MEX leg — Freight Cost Model V3.0 (mexLaneProd)', () => {
     equipment: { truckType: 'Truck Trailer', trailer: 'Flatbed', config: 'Single', driver: 'B1' },
   }
 
+  // Post-E2: short-haul floors (baseKm=225 → short-haul band) push emptyKm to
+  // the 40km min and cycleDays to the 0.5-day billable floor. Numbers shift up
+  // vs the raw sheet (which lacked these floors) — this is the model asenting.
   it('distances & timing', () => {
     const r = calculateMexLeg(mty, params)
     expect(r.loadedKm).toBe(225)
-    expect(r.emptyKm).toBeCloseTo(33.75, 2)
-    expect(r.totalKm).toBeCloseTo(258.75, 2)
+    expect(r.emptyKm).toBeCloseTo(40, 2)
+    expect(r.totalKm).toBeCloseTo(265, 2)
     expect(r.loadedMiles).toBeCloseTo(139.81, 1)
-    expect(r.totalMiles).toBeCloseTo(160.78, 1)
-    expect(r.cycleDays).toBeCloseTo(0.33, 2)
+    expect(r.totalMiles).toBeCloseTo(164.66, 1)
+    expect(r.cycleDays).toBeCloseTo(0.5, 2)   // billable-day floor for short-haul
   })
 
   it('CVU components', () => {
     const r = calculateMexLeg(mty, params)
     expect(r.blendedDieselUsdL).toBeCloseTo(1.523, 2)
-    expect(r.fuelUsd).toBeCloseTo(145.37, 0)
-    expect(r.maintTiresUsd).toBeCloseTo(60.76, 0)
-    expect(r.driverUsd).toBeCloseTo(33.28, 1)   // B1 driver factor 1.15
+    expect(r.fuelUsd).toBeCloseTo(148.49, 0)
+    expect(r.maintTiresUsd).toBeCloseTo(62.23, 0)
+    expect(r.driverUsd).toBeCloseTo(34.09, 1)   // B1 driver factor 1.15
     expect(r.borderUsd).toBe(200)
-    expect(r.cvuUsd).toBeCloseTo(439.42, 0)
+    expect(r.cvuUsd).toBeCloseTo(444.81, 0)
   })
 
   it('CFU (max of distance/time)', () => {
     const r = calculateMexLeg(mty, params)
-    expect(r.cfuByDistanceUsd).toBeCloseTo(86.26, 0)
-    expect(r.cfuByTimeUsd).toBeCloseTo(107.57, 0)
-    expect(r.cfuUsd).toBeCloseTo(107.57, 0)
+    expect(r.cfuByDistanceUsd).toBeCloseTo(88.35, 0)
+    expect(r.cfuByTimeUsd).toBeCloseTo(162.98, 0)   // ↑ vs old 107.57: day floor 0.5 vs 0.33
+    expect(r.cfuUsd).toBeCloseTo(162.98, 0)
   })
 
   it('production → technical tariff', () => {
     const r = calculateMexLeg(mty, params)
-    expect(r.productionCostUsd).toBeCloseTo(546.98, 0)
+    expect(r.productionCostUsd).toBeCloseTo(607.79, 0)
     expect(r.utMargin).toBe(0.3)
-    expect(r.technicalTariffUsd).toBeCloseTo(781.41, 0)
+    expect(r.technicalTariffUsd).toBeCloseTo(868.28, 0)
   })
 
   it('risk adjustments', () => {
     const r = calculateMexLeg(mty, params)
-    expect(r.routeRiskUsd).toBeCloseTo(10.31, 0)
-    expect(r.trailerRiskUsd).toBeCloseTo(164.10, 0)
-    expect(r.flatbedComplexityUsd).toBeCloseTo(136.75, 0)
-    expect(r.securityRiskUsd).toBeCloseTo(13.67, 0)
-    expect(r.operationRiskUsd).toBeCloseTo(82.05, 0)
-    expect(r.totalRiskAdjUsd).toBeCloseTo(406.87, 0)
+    expect(r.routeRiskUsd).toBeCloseTo(10.54, 0)
+    expect(r.trailerRiskUsd).toBeCloseTo(182.34, 0)
+    expect(r.flatbedComplexityUsd).toBeCloseTo(151.95, 0)
+    expect(r.securityRiskUsd).toBeCloseTo(15.19, 0)
+    expect(r.operationRiskUsd).toBeCloseTo(91.17, 0)
+    expect(r.totalRiskAdjUsd).toBeCloseTo(451.19, 0)
   })
 
-  it('Carrier Required Tariff = MROUND(1188.28, 100) = $1,200', () => {
+  it('Carrier Required Tariff (post-E2 floors) = MROUND(1319.47, 100) = $1,300', () => {
     const r = calculateMexLeg(mty, params)
-    expect(r.requiredTariffUsd).toBe(1200)
-    expect(r.rpm).toBeCloseTo(6.56, 1)
+    expect(r.requiredTariffUsd).toBe(1300)
+    expect(r.rpm).toBeCloseTo(6.99, 1)
     expect(r.fsc).toBeCloseTo(0.90, 1)
   })
 
@@ -142,9 +145,9 @@ describe('USA leg — Freight Cost Model V3.0 (usaLaneProd)', () => {
   })
 })
 
-describe('Cross-border assembly — Monterrey → Dallas Flatbed D2D Export = $2,600', () => {
+describe('Cross-border assembly — Monterrey → Dallas Flatbed D2D Export = $2,700 (post-E2)', () => {
   const equipment = { truckType: 'Truck Trailer', trailer: 'Flatbed', config: 'Single', driver: 'B1' }
-  it('sums MX flat 1200 + USA flat 1391 → MROUND 2600', () => {
+  it('sums MX flat 1300 + USA flat 1391 → MROUND 2700', () => {
     const r = calculate({
       operation: 'D2D Export', service: 'One Way', equipment, params,
       mexLeg: { baseKm: 225, routeExpensesMxn: 0, baseHours: 0, operation: 'D2D Export', service: 'One Way', route: 'Straight & Danger', equipment },
@@ -154,9 +157,9 @@ describe('Cross-border assembly — Monterrey → Dallas Flatbed D2D Export = $2
         operation: 'D2D Export', service: 'One Way', equipment,
       },
     })
-    expect(r.mexLeg?.requiredTariffUsd).toBe(1200)
+    expect(r.mexLeg?.requiredTariffUsd).toBe(1300)
     expect(r.usaLeg?.flatUsd).toBeCloseTo(1391, 0)
-    expect(r.freightBaselineUsd).toBe(2600)
+    expect(r.freightBaselineUsd).toBe(2700)
   })
 
   it('commercial layer: cost floor < sell tiers, margin & flags', () => {
@@ -171,7 +174,7 @@ describe('Cross-border assembly — Monterrey → Dallas Flatbed D2D Export = $2
     })
     const c = r.commercial
     expect(c.costFloorUsd).toBeGreaterThan(0)
-    expect(c.recommendedSellUsd).toBe(2600)
+    expect(c.recommendedSellUsd).toBe(2700)
     // sell tiers ordered min < target < premium
     expect(c.minSellUsd).toBeLessThan(c.targetSellUsd)
     expect(c.targetSellUsd).toBeLessThan(c.premiumSellUsd)
@@ -212,5 +215,43 @@ describe('ReferenceKey — byte-exact vs V3.0 (mexLaneProd!CL / usaLaneProd!BV)'
   it('no origin/dest → empty key (back-compat for direct calls)', () => {
     const r = calculateMexLeg({ baseKm: 225, operation: 'D2D Export', service: 'One Way', route: 'Straight & Danger', equipment }, {})
     expect(r.referenceKey).toBe('')
+  })
+})
+
+// Locks Freight Cost Model V3.0 finding #9: UT is a MARGIN OVER PRICE, not a
+// markup over cost. If someone regresses to `cost × (1 + UT)`, realized margin
+// becomes UT / (1 + UT) — e.g. UT=15% would only yield 13.04% real margin. The
+// engine uses `cost / (1 − UT)`, so utility ÷ tariff must equal UT exactly.
+describe('UT semantics — margen sobre precio (no markup sobre costo)', () => {
+  const equipment = { truckType: 'Truck Trailer', trailer: 'Flatbed', config: 'Single', driver: 'B1' }
+
+  it('MEX leg (One Way, UT ~0.30): utility ÷ tariff = utMargin', () => {
+    const r = calculateMexLeg({
+      baseKm: 225, operation: 'D2D Export', service: 'One Way', route: 'Straight & Danger', equipment,
+    }, {})
+    const realMargin = r.technicalUtilityUsd / r.technicalTariffUsd
+    expect(realMargin).toBeCloseTo(r.utMargin, 6)
+    expect(r.technicalTariffUsd).toBeCloseTo(r.productionCostUsd / (1 - r.utMargin), 4)
+  })
+
+  it('MEX leg (Backhaul, UT ~0.10): utility ÷ tariff = utMargin', () => {
+    const r = calculateMexLeg({
+      baseKm: 225, operation: 'D2D Import', service: 'Backhaul', route: 'Straight & Danger', equipment,
+    }, {})
+    const realMargin = r.technicalUtilityUsd / r.technicalTariffUsd
+    expect(realMargin).toBeCloseTo(r.utMargin, 6)
+  })
+
+  it('USA leg: (technicalTariff − (cvu + cfu)) ÷ technicalTariff = utRate', () => {
+    const r = calculateUsaLeg({
+      loadedMiles: 435, dieselUsdGal: 5.152, fscUsdMile: 0.8,
+      originCondition: 'Very Tight', destCondition: 'Very Tight',
+      operation: 'D2D Export', service: 'One Way',
+      equipment: { truckType: 'Truck Trailer', trailer: 'Dry Van', config: 'Single', driver: 'B1' },
+    }, {})
+    const cost = r.cvuInclFuelUsd + r.cfuUsd
+    const utility = r.technicalTariffInclFuelUsd - cost
+    const realMargin = utility / r.technicalTariffInclFuelUsd
+    expect(realMargin).toBeCloseTo(r.utRate, 6)
   })
 })
