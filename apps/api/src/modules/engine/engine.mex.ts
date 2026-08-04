@@ -83,11 +83,17 @@ export function calculateMexLeg(lane: MexLegInput, params: ParamMap): MexLegOutp
 
   const eq = equipmentFactors(equipment.truckType)
 
-  // ── Distances ────────────────────────────────────────────────────────
+  // ── Distances (2 physical legs for roundtrip) ────────────────────────
   const emptyPct = isRoundtrip ? 0.03 : isBackhaul ? 0 : deadheadBase
-  const returnKm = isRoundtrip ? lane.baseKm : 0
-  const loadedKm = lane.baseKm + returnKm
-  const emptyKmComputed = lane.baseKm * emptyPct
+  // Return leg (only when roundtrip). Defaults reproduce a symmetric fully-loaded
+  // return; carrier can override each field per E3.
+  const rtKm = isRoundtrip ? (lane.returnKm ?? lane.baseKm) : 0
+  const returnLoaded = isRoundtrip ? (lane.returnLoaded ?? true) : false
+  const loadedReturnKm = returnLoaded ? rtKm : 0
+  const deadheadReturnKm = returnLoaded ? 0 : rtKm
+  const loadedKm = lane.baseKm + loadedReturnKm
+  // Empty = outbound reposition + loaded-return reposition + full return-if-deadhead
+  const emptyKmComputed = lane.baseKm * emptyPct + loadedReturnKm * emptyPct + deadheadReturnKm
   // Backhaul: return load by design → no forced repositioning floor.
   const emptyKm = isBackhaul ? emptyKmComputed : Math.max(emptyKmComputed, emptyKmFloor)
   const totalKm = loadedKm + emptyKm
@@ -95,9 +101,12 @@ export function calculateMexLeg(lane: MexLegInput, params: ParamMap): MexLegOutp
   const emptyMiles = emptyKm * MI_PER_KM
   const totalMiles = loadedMiles + emptyMiles
 
-  // ── Timing ───────────────────────────────────────────────────────────
+  // ── Timing (roundtrip = 2 load/unload cycles if return is loaded) ────
   const baseHours = lane.baseHours ?? 0
-  const cycleDays = Math.max((baseHours + loadTime + unloadTime) / 24, billableDayFloor)
+  const returnBaseHours = isRoundtrip ? (lane.returnBaseHours ?? baseHours) : 0
+  const loadUnloadCycles = isRoundtrip && returnLoaded ? 2 : 1
+  const cycleHours = baseHours + returnBaseHours + (loadTime + unloadTime) * loadUnloadCycles
+  const cycleDays = Math.max(cycleHours / 24, billableDayFloor)
 
   // ── UT margin / border ───────────────────────────────────────────────
   const utMargin = isBackhaul
@@ -112,7 +121,10 @@ export function calculateMexLeg(lane: MexLegInput, params: ParamMap): MexLegOutp
   const adjEmptyKmL = rendVacio * eq.fuel * (1 - (isTandem ? tandemFuelPenalty : 0))
   const blendedDieselUsdL = (dieselMx / tc) * mixMx + dieselUs * mixUs
   const fuelUsd = (loadedKm / adjLoadedKmL + emptyKm / adjEmptyKmL) * blendedDieselUsdL * (1 + fuelEscalation)
-  const routeExpensesUsd = ((lane.routeExpensesMxn ?? 0) / tc) * (1 + (isTandem ? tandemTollPremium : 0))
+  // Tolls: outbound + return (roundtrip). Return defaults to same as outbound; override with returnRouteExpensesMxn.
+  const outboundTollsMxn = lane.routeExpensesMxn ?? 0
+  const returnTollsMxn = isRoundtrip ? (lane.returnRouteExpensesMxn ?? outboundTollsMxn) : 0
+  const routeExpensesUsd = ((outboundTollsMxn + returnTollsMxn) / tc) * (1 + (isTandem ? tandemTollPremium : 0))
   const routeBufferUsd = routeExpensesUsd * gastoAdicional
   const maintTiresUsd = totalKm * maintTiresPerKm * eq.maint * (isTandem ? tandemMaintFactor : 1)
   const driverUsd = totalMiles * tarifaMx * driverFactor(equipment.driver, params) * eq.driver

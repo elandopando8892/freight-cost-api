@@ -26,6 +26,11 @@ const MexSchema = z.object({
   routeExpensesMxn: z.number().nonnegative().default(0),
   baseHours: z.number().nonnegative().default(0),
   route: z.string().default('Straight & Danger'),
+  // E3 Roundtrip second leg (only used when service === 'Roundtrip'); all optional.
+  returnKm: z.number().nonnegative().optional(),
+  returnLoaded: z.boolean().optional(),
+  returnRouteExpensesMxn: z.number().nonnegative().optional(),
+  returnBaseHours: z.number().nonnegative().optional(),
 })
 const UsaSchema = z.object({
   loadedMiles: z.number().nonnegative(),

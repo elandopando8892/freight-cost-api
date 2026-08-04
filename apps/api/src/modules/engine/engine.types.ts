@@ -33,6 +33,12 @@ export interface MexLegInput {
   equipment: EquipmentSpec
   origin?: string            // MX "City, State" (homologated for the ReferenceKey)
   dest?: string
+  // Roundtrip second leg (all optional — defaults reproduce a symmetric fully-loaded
+  // return, matching pre-E3 behavior). Ignored when service !== 'Roundtrip'.
+  returnKm?: number                 // return distance; default = baseKm
+  returnLoaded?: boolean            // return is loaded (true) or deadhead (false); default true
+  returnRouteExpensesMxn?: number   // return tolls; default = routeExpensesMxn
+  returnBaseHours?: number          // return transit hours; default = baseHours
 }
 
 // ── USA leg input (usaLaneProd) ────────────────────────────────────────────

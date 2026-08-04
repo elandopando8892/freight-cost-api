@@ -255,3 +255,32 @@ describe('UT semantics — margen sobre precio (no markup sobre costo)', () => {
     expect(realMargin).toBeCloseTo(r.utRate, 6)
   })
 })
+
+// E3 finding #6: Roundtrip must be 2 real physical legs, not a multiplier.
+// Loaded return contributes to loadedKm; empty (deadhead) return contributes to
+// emptyKm; the load/unload cycle count doubles when both legs are loaded.
+describe('E3 — Roundtrip 2-leg physics', () => {
+  const equipment = { truckType: 'Truck Trailer', trailer: 'Dry Van', config: 'Single', driver: 'B1' }
+
+  it('Empty return: only outbound is loaded; return adds deadhead; fewer load/unload cycles', () => {
+    const rtLoaded = calculateMexLeg({
+      baseKm: 500, operation: 'D2D Import', service: 'Roundtrip', route: 'Straight & Danger', equipment,
+    }, {})
+    const rtEmpty = calculateMexLeg({
+      baseKm: 500, operation: 'D2D Import', service: 'Roundtrip', route: 'Straight & Danger', equipment,
+      returnLoaded: false,
+    }, {})
+    expect(rtLoaded.loadedKm).toBe(1000)              // 2 × baseKm
+    expect(rtEmpty.loadedKm).toBe(500)                // outbound only
+    expect(rtEmpty.emptyKm).toBeGreaterThan(rtLoaded.emptyKm)  // deadhead return
+    expect(rtLoaded.cycleDays).toBeGreaterThan(rtEmpty.cycleDays)  // 2× load/unload
+  })
+
+  it('Asymmetric distance: loadedKm = baseKm + returnKm when both legs loaded', () => {
+    const r = calculateMexLeg({
+      baseKm: 400, operation: 'D2D Import', service: 'Roundtrip', route: 'Straight & Danger', equipment,
+      returnKm: 350,  // return to a different point
+    }, {})
+    expect(r.loadedKm).toBe(750)   // 400 + 350
+  })
+})
