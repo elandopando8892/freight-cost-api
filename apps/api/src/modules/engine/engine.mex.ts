@@ -33,6 +33,7 @@ export function calculateMexLeg(lane: MexLegInput, params: ParamMap): MexLegOutp
 
   // Assumptions
   const deadheadBase = getParam(params, 'UTILIZATION', 'Deadhead Base', 0.15)
+  const backhaulDeadheadFactor = getParam(params, 'UTILIZATION', 'Backhaul Deadhead Factor', 0.5)
   const loadTime = getParam(params, 'UTILIZATION', 'Load Time', 2)
   const unloadTime = getParam(params, 'UTILIZATION', 'Unload Time', 2)
   const rendCargado = getParam(params, 'FUEL', 'Rendimiento Cargado', 2.8)
@@ -84,7 +85,9 @@ export function calculateMexLeg(lane: MexLegInput, params: ParamMap): MexLegOutp
   const eq = equipmentFactors(equipment.truckType)
 
   // ── Distances (2 physical legs for roundtrip) ────────────────────────
-  const emptyPct = isRoundtrip ? 0.03 : isBackhaul ? 0 : deadheadBase
+  // Backhaul (E6): reduces expected deadhead vs one-way, but doesn't eliminate
+  // residual reposition. The factor (default 0.5) is editable per set/lane.
+  const emptyPct = isRoundtrip ? 0.03 : isBackhaul ? deadheadBase * backhaulDeadheadFactor : deadheadBase
   // Return leg (only when roundtrip). Defaults reproduce a symmetric fully-loaded
   // return; carrier can override each field per E3.
   const rtKm = isRoundtrip ? (lane.returnKm ?? lane.baseKm) : 0
@@ -94,8 +97,8 @@ export function calculateMexLeg(lane: MexLegInput, params: ParamMap): MexLegOutp
   const loadedKm = lane.baseKm + loadedReturnKm
   // Empty = outbound reposition + loaded-return reposition + full return-if-deadhead
   const emptyKmComputed = lane.baseKm * emptyPct + loadedReturnKm * emptyPct + deadheadReturnKm
-  // Backhaul: return load by design → no forced repositioning floor.
-  const emptyKm = isBackhaul ? emptyKmComputed : Math.max(emptyKmComputed, emptyKmFloor)
+  // Empty-KM floor applies universally (E6): even backhaul has residual reposition.
+  const emptyKm = Math.max(emptyKmComputed, emptyKmFloor)
   const totalKm = loadedKm + emptyKm
   const loadedMiles = loadedKm * MI_PER_KM
   const emptyMiles = emptyKm * MI_PER_KM

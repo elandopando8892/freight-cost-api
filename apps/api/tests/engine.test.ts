@@ -81,17 +81,20 @@ describe('MEX leg — Freight Cost Model V3.0 (mexLaneProd)', () => {
 
   // MEX backhaul KEEPS its CFU (max distance/time) — verified vs V3.0 mexLaneProd row
   // "Nuevo Laredo, Tamaulipas - Queretaro, Queretaro ... D2D Import Backhaul B1" = $1,400.
-  it('MEX backhaul keeps CFU → Nuevo Laredo→Queretaro D2D Import = $1,400', () => {
+  // Post-E6: backhaul now carries residual deadhead (default 50% of one-way).
+  // Physical costs stay real; only UT and expected deadhead are backhaul-modified.
+  it('MEX backhaul (post-E6) → Nuevo Laredo→Queretaro D2D Import = $1,500', () => {
     const r = calculateMexLeg({
       baseKm: 910, routeExpensesMxn: 0, baseHours: 0,
       operation: 'D2D Import', service: 'Backhaul', route: 'Straight & Danger',
       equipment: { truckType: 'Truck Trailer', trailer: 'Dry Van', config: 'Single', driver: 'B1' },
     }, params)
-    expect(r.cfuUsd).toBeCloseTo(303.37, 0)   // CFU NOT zeroed on backhaul (vs USA leg which is)
+    expect(r.emptyKm).toBeCloseTo(68.25, 1)   // 910 × 0.15 × 0.5 backhaul factor
+    expect(r.cfuUsd).toBeCloseTo(326.13, 0)   // CFU NOT zeroed on backhaul
     expect(r.loadedMiles).toBeCloseTo(565.4, 1)
-    expect(r.requiredTariffUsd).toBe(1400)
+    expect(r.requiredTariffUsd).toBe(1500)
     expect(r.rpm).toBeCloseTo(1.56, 1)
-    expect(r.fsc).toBeCloseTo(0.92, 1)
+    expect(r.fsc).toBeCloseTo(0.91, 1)
   })
 
   it('carrier edits a cost card → cost moves (their own economics)', () => {
@@ -253,6 +256,34 @@ describe('UT semantics — margen sobre precio (no markup sobre costo)', () => {
     const utility = r.technicalTariffInclFuelUsd - cost
     const realMargin = utility / r.technicalTariffInclFuelUsd
     expect(realMargin).toBeCloseTo(r.utRate, 6)
+  })
+})
+
+// E6 finding: backhaul must not zero physical costs. It reduces expected deadhead
+// (backhaulDeadheadFactor × one-way) and applies a lower UT — but km driven still
+// have real fuel/maint/CFU. Setting the factor to 0 recovers the pre-E6 zero-
+// deadhead behavior for a confirmed same-origin return.
+describe('E6 — Backhaul semantic (deadhead scaled, physical costs preserved)', () => {
+  const equipment = { truckType: 'Truck Trailer', trailer: 'Dry Van', config: 'Single', driver: 'B1' }
+  const base = { baseKm: 910, operation: 'D2D Import', route: 'Straight & Danger', equipment } as const
+
+  it('factor=0 recovers pre-E6 zero-deadhead (confirmed backhaul)', () => {
+    const r = calculateMexLeg({ ...base, service: 'Backhaul' },
+      { 'UTILIZATION__Backhaul Deadhead Factor': 0 })
+    // Long-haul (baseKm 910) → no E2 floor. factor 0 → no deadhead at all.
+    expect(r.emptyKm).toBe(0)
+  })
+
+  it('default factor = 0.5 → backhaul deadhead is half of one-way', () => {
+    const oneWay = calculateMexLeg({ ...base, service: 'One Way' }, {})
+    const backhaul = calculateMexLeg({ ...base, service: 'Backhaul' }, {})
+    // One-way deadhead = 0.15 × 910 = 136.5; backhaul default = 0.5 × 136.5 = 68.25
+    expect(backhaul.emptyKm).toBeCloseTo(oneWay.emptyKm * 0.5, 1)
+    // Backhaul is NOT cheaper because physical costs go away — CFU (time-based)
+    // stays high; only UT drops (0.10 vs 0.30). The required tariff is lower
+    // because of UT, not because we pretended the truck didn't move.
+    expect(backhaul.utMargin).toBeLessThan(oneWay.utMargin)
+    expect(backhaul.cfuUsd).toBeGreaterThan(0)
   })
 })
 

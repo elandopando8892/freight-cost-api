@@ -57,6 +57,11 @@ const BASE_ASSUMPTIONS = [
   { section: 'UTILIZATION', field: 'Empty KM Min Short-haul',      value: 40,   unit: 'km',                    low: 20,   high: 100,  updateFrequency: 'Semiannual', costBehavior: 'Minimum repositioning',  activation: 'By Lane' },
   { section: 'UTILIZATION', field: 'Min Trip Cost Local USD',      value: 200,  unit: 'USD',                   low: 100,  high: 500,  updateFrequency: 'Semiannual', costBehavior: 'Minimum production cost', activation: 'By Lane' },
   { section: 'UTILIZATION', field: 'Min Trip Cost Short-haul USD', value: 150,  unit: 'USD',                   low: 75,   high: 400,  updateFrequency: 'Semiannual', costBehavior: 'Minimum production cost', activation: 'By Lane' },
+  // E6 backhaul semantic: a backhaul opportunity reduces expected deadhead vs a
+  // one-way, but doesn't eliminate residual reposition (patio → pickup, delivery
+  // → next). Factor scales the one-way deadhead. Set to 0 for a confirmed backhaul
+  // where the return load starts exactly at destination.
+  { section: 'UTILIZATION', field: 'Backhaul Deadhead Factor',    value: 0.5,  unit: 'fraction of one-way',   low: 0,    high: 1,    updateFrequency: 'Semiannual', costBehavior: 'Residual reposition',    activation: 'By Lane' },
   // (Maint+Tires per km/mile is DERIVED from COST_MAINT/COST_TIRES cost cards — see engine.outputs.ts)
 
   // ── BORDER ───────────────────────────────────────────────────────────
