@@ -146,6 +146,7 @@ export async function engineRoutes(app: FastifyInstance) {
     const service = body.service ?? defaultService(body.operation)
 
     const resolved = await resolveRoute({
+      orgId,
       outboundLocation: body.outboundLocation,
       inboundLocation: body.inboundLocation,
       mexBorder: body.mexBorder,

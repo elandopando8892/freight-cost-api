@@ -16,6 +16,7 @@ import { prisma } from '../../config/prisma.js'
 import type { EquipmentSpec, MexLegInput, UsaLegInput, MarketCondition } from './engine.types.js'
 
 export interface ResolveInput {
+  orgId: string
   outboundLocation: string
   inboundLocation: string
   mexBorder: string
@@ -98,13 +99,25 @@ async function mxToProduction(loc: string): Promise<string> {
 }
 
 async function resolveMexLeg(
-  origin: string, dest: string, eq: EquipmentSpec, operation: string, service: string, route: string, warnings: string[],
+  orgId: string, origin: string, dest: string, eq: EquipmentSpec, operation: string, service: string, route: string, warnings: string[],
 ): Promise<MexLegInput | undefined> {
+  // 1) Carrier's OWN production matrix (truck-agnostic), raw or homologation-normalized.
+  const carrier = await findCarrierMexLane(orgId, origin, dest)
+  if (carrier) {
+    warnings.push(`MEX lane from your production matrix: "${carrier.origin} - ${carrier.destination}" (${carrier.km} km)`)
+    return {
+      baseKm: carrier.km,
+      routeExpensesMxn: 0, baseHours: 0,
+      operation, service, route, equipment: eq,
+      origin: carrier.origin, dest: carrier.destination,
+    }
+  }
+
+  // 2) Global reference table (truck-specific), with homologation → production retry.
   let o = origin, d = dest
   let key = `${o} - ${d} ${eq.truckType}`
   let row = await prisma.mexLaneExpense.findFirst({ where: { laneKeyNorm: key.toUpperCase() } })
   if (!row) {
-    // Retry after normalizing abbreviated homologations → full production names.
     const [o2, d2] = await Promise.all([mxToProduction(origin), mxToProduction(dest)])
     if (o2 !== o || d2 !== d) {
       o = o2; d = d2
@@ -112,7 +125,7 @@ async function resolveMexLeg(
       row = await prisma.mexLaneExpense.findFirst({ where: { laneKeyNorm: key.toUpperCase() } })
     }
   }
-  if (!row) { warnings.push(`MEX lane not found: "${key}"`); return undefined }
+  if (!row) { warnings.push(`MEX lane not found: "${key}" (add it to your production matrix to quote it)`); return undefined }
   return {
     baseKm: row.km,
     routeExpensesMxn: 0,   // V3.0 mexLaneProd uses km only (route-expense refs are #REF→0)
@@ -122,10 +135,42 @@ async function resolveMexLeg(
   }
 }
 
+/** Look up an org's custom MEX lane by origin→dest, trying raw + homologation-normalized keys. */
+async function findCarrierMexLane(orgId: string, origin: string, dest: string) {
+  const raw = `${origin} - ${dest}`.toUpperCase()
+  let hit = await prisma.carrierMexLane.findUnique({ where: { orgId_laneKeyNorm: { orgId, laneKeyNorm: raw } } })
+  if (hit) return hit
+  const [o2, d2] = await Promise.all([mxToProduction(origin), mxToProduction(dest)])
+  const norm = `${o2} - ${d2}`.toUpperCase()
+  if (norm !== raw) hit = await prisma.carrierMexLane.findUnique({ where: { orgId_laneKeyNorm: { orgId, laneKeyNorm: norm } } })
+  return hit
+}
+
 async function resolveUsaLeg(
-  originIn: string, destIn: string, eq: EquipmentSpec, operation: string, service: string, warnings: string[],
+  orgId: string, originIn: string, destIn: string, eq: EquipmentSpec, operation: string, service: string, warnings: string[],
 ): Promise<UsaLegInput | undefined> {
-  // Resolve shipper/consignee (ZIP or metro) → metro city used by the reference lanes.
+  // 1) Carrier's OWN production matrix first (by the raw origin→dest they entered).
+  const carrierKey = `${originIn.trim()} - ${destIn.trim()}`.toUpperCase()
+  const carrier = await prisma.carrierUsaLane.findUnique({ where: { orgId_laneKeyNorm: { orgId, laneKeyNorm: carrierKey } } })
+  if (carrier) {
+    warnings.push(`USA lane from your production matrix: "${carrier.origin} - ${carrier.destination}" (${carrier.miles} mi)`)
+    const fuel = await prisma.usaFuel.findUnique({ where: { state: carrier.outState } })
+    if (!fuel) warnings.push(`No fuel/FSC for state "${carrier.outState}" (→0)`)
+    return {
+      loadedMiles: carrier.miles,
+      transitDaysRaw: carrier.truckDays,
+      driverExpenses: carrier.routeExpenses,
+      outState: carrier.outState,
+      dieselUsdGal: fuel?.pricePerGallon ?? 0,
+      fscUsdMile: fuel?.fsc ?? 0,
+      originCondition: 'Balanced', destCondition: 'Balanced',
+      marketRpm: 0,
+      operation, service, equipment: eq,
+      origin: carrier.origin, dest: carrier.destination,
+    }
+  }
+
+  // 2) Global reference: resolve shipper/consignee (ZIP or metro) → metro city.
   const o = await resolveUsMetro(originIn, warnings)
   const d = await resolveUsMetro(destIn, warnings)
   if (!o) warnings.push(`Could not resolve US origin "${originIn}" to a metro (use a ZIP or metro city)`)
@@ -159,27 +204,27 @@ async function resolveUsaLeg(
 }
 
 export async function resolveRoute(input: ResolveInput): Promise<ResolvedRoute> {
-  const { outboundLocation, inboundLocation, mexBorder, usBorder, equipment, operation, service } = input
+  const { orgId, outboundLocation, inboundLocation, mexBorder, usBorder, equipment, operation, service } = input
   const route = input.route ?? 'Straight & Danger'
   const warnings: string[] = []
 
   switch (operation) {
     case 'D2D Export': {
-      const mexLeg = await resolveMexLeg(outboundLocation, mexBorder, equipment, operation, service, route, warnings)
-      const usaLeg = await resolveUsaLeg(usBorder, inboundLocation, equipment, operation, service, warnings)
+      const mexLeg = await resolveMexLeg(orgId, outboundLocation, mexBorder, equipment, operation, service, route, warnings)
+      const usaLeg = await resolveUsaLeg(orgId, usBorder, inboundLocation, equipment, operation, service, warnings)
       return { mexLeg, usaLeg, warnings }
     }
     case 'D2D Import': {
-      const usaLeg = await resolveUsaLeg(outboundLocation, usBorder, equipment, operation, service, warnings)
-      const mexLeg = await resolveMexLeg(mexBorder, inboundLocation, equipment, operation, service, route, warnings)
+      const usaLeg = await resolveUsaLeg(orgId, outboundLocation, usBorder, equipment, operation, service, warnings)
+      const mexLeg = await resolveMexLeg(orgId, mexBorder, inboundLocation, equipment, operation, service, route, warnings)
       return { mexLeg, usaLeg, warnings }
     }
     case 'Drayage': {
-      const usaLeg = await resolveUsaLeg(outboundLocation, inboundLocation, equipment, operation, service, warnings)
+      const usaLeg = await resolveUsaLeg(orgId, outboundLocation, inboundLocation, equipment, operation, service, warnings)
       return { usaLeg, warnings }
     }
     default: {
-      const mexLeg = await resolveMexLeg(outboundLocation, inboundLocation, equipment, operation, service, route, warnings)
+      const mexLeg = await resolveMexLeg(orgId, outboundLocation, inboundLocation, equipment, operation, service, route, warnings)
       return { mexLeg, warnings }
     }
   }

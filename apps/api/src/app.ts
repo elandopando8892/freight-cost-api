@@ -12,6 +12,7 @@ import { marketRoutes } from './modules/market/market.routes.js'
 import { lanesRoutes } from './modules/lanes/lanes.routes.js'
 import { engineRoutes } from './modules/engine/engine.routes.js'
 import { quotesRoutes } from './modules/quotes/quotes.routes.js'
+import { productionRoutes } from './modules/production/production.routes.js'
 import { cronRoutes } from './modules/cron/cron.routes.js'
 
 export function buildApp() {
@@ -37,6 +38,7 @@ export function buildApp() {
   app.register(lanesRoutes)
   app.register(engineRoutes)
   app.register(quotesRoutes)
+  app.register(productionRoutes)
   app.register(cronRoutes)
 
   return app
