@@ -62,6 +62,10 @@ const BASE_ASSUMPTIONS = [
   // → next). Factor scales the one-way deadhead. Set to 0 for a confirmed backhaul
   // where the return load starts exactly at destination.
   { section: 'UTILIZATION', field: 'Backhaul Deadhead Factor',    value: 0.5,  unit: 'fraction of one-way',   low: 0,    high: 1,    updateFrequency: 'Semiannual', costBehavior: 'Residual reposition',    activation: 'By Lane' },
+  // E4 Drayage time (port dwell + delivery service feed the billable cycle floor).
+  { section: 'UTILIZATION', field: 'Port Dwell Hours',           value: 2,    unit: 'hours',                 low: 0.5,  high: 8,    updateFrequency: 'Semiannual', costBehavior: 'Terminal dwell',         activation: 'By Lane' },
+  { section: 'UTILIZATION', field: 'Delivery Service Hours',     value: 2,    unit: 'hours',                 low: 0.5,  high: 8,    updateFrequency: 'Semiannual', costBehavior: 'Live unload/strip',      activation: 'By Lane' },
+  { section: 'UTILIZATION', field: 'Billable Day Floor Drayage', value: 1.0,  unit: 'days',                  low: 0.5,  high: 2.0,  updateFrequency: 'Semiannual', costBehavior: 'Minimum billable cycle', activation: 'By Lane' },
   // (Maint+Tires per km/mile is DERIVED from COST_MAINT/COST_TIRES cost cards — see engine.outputs.ts)
 
   // ── BORDER ───────────────────────────────────────────────────────────
@@ -85,6 +89,11 @@ const BASE_ASSUMPTIONS = [
   { section: 'CONFIG', field: 'Tandem Fuel Penalty',       value: 0.12, unit: '% uplift', low: 0, high: 0.3,  updateFrequency: 'Annual', costBehavior: '% efficiency loss', activation: 'By Config' },
   { section: 'CONFIG', field: 'Tandem Maint/Tires Factor', value: 1.35, unit: 'factor',   low: 1, high: 2,    updateFrequency: 'Annual', costBehavior: 'factor',            activation: 'By Config' },
   { section: 'CONFIG', field: 'Tandem CFU Factor',         value: 1.20, unit: 'factor',   low: 1, high: 2,    updateFrequency: 'Annual', costBehavior: 'factor',            activation: 'By Config' },
+  // E4 Drayage cycle (physical legs as fraction of loaded linehaul, + chassis/day).
+  { section: 'CONFIG', field: 'Chassis Day Cost USD',          value: 25,   unit: 'USD/day', low: 0,   high: 80,  updateFrequency: 'Annual',   costBehavior: 'Chassis rental/ownership', activation: 'By Config' },
+  { section: 'CONFIG', field: 'Drayage Port Pickup Factor',    value: 0.20, unit: 'x linehaul', low: 0, high: 1,   updateFrequency: 'Annual',   costBehavior: 'Yard → port deadhead',     activation: 'By Lane' },
+  { section: 'CONFIG', field: 'Drayage Final Reposition Factor', value: 0.10, unit: 'x linehaul', low: 0, high: 1, updateFrequency: 'Annual',  costBehavior: 'Return → yard deadhead',   activation: 'By Lane' },
+  { section: 'CONFIG', field: 'Drayage Drop-Off Factor',       value: 0.40, unit: 'x linehaul', low: 0, high: 1,   updateFrequency: 'Annual',   costBehavior: 'Interior drop-off return',  activation: 'By Lane' },
 
   // ── TECHNICAL_MARGIN — UT (Utility) margin applied as Tariff = Cost / (1 − UT) ──
   { section: 'TECHNICAL_MARGIN', field: 'UT Rate One Way',   value: 0.3, unit: '% margin', low: 0.15, high: 0.45, updateFrequency: 'Quarterly', costBehavior: 'Carrier utility margin', activation: 'By Service' },

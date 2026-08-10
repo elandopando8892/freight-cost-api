@@ -12,10 +12,32 @@
 import { getParam, type ParamMap } from '../assumptions/assumptions.service.js'
 import { calculateMexLeg } from './engine.mex.js'
 import { calculateUsaLeg } from './engine.usa.js'
+import { calculateDrayageLeg } from './engine.drayage.js'
 import { calculateCommercial } from './engine.commercial.js'
-import type { EngineInput, EngineOutput, MexLegOutput, UsaLegOutput } from './engine.types.js'
+import type { EngineInput, EngineOutput, MexLegOutput, UsaLegOutput, DrayageLegInput } from './engine.types.js'
 
 const mround = (x: number, m: number) => Math.round(x / m) * m
+
+// Adapt a resolver-produced USA leg (origin→dest miles) into a drayage cycle
+// input. The cycle's deadhead legs + billable time come from params (defaults),
+// so an unenriched resolver lane still gets correct drayage pricing.
+function usaToDrayage(u: import('./engine.types.js').UsaLegInput): DrayageLegInput {
+  return {
+    loadedMiles: u.loadedMiles,
+    transitDaysRaw: u.transitDaysRaw,
+    driverExpenses: u.driverExpenses,
+    dieselUsdGal: u.dieselUsdGal,
+    fscUsdMile: u.fscUsdMile,
+    outState: u.outState,
+    marketRpm: u.marketRpm,
+    operation: u.operation,
+    service: u.service,
+    equipment: u.equipment,
+    origin: u.origin,
+    dest: u.dest,
+    // Container return unspecified → engine assumes return to port (conservative).
+  }
+}
 
 function legsFor(operation: string): { mex: boolean; usa: boolean } {
   switch (operation) {
@@ -38,8 +60,15 @@ export function calculate(input: EngineInput): EngineOutput {
   let mexLeg: MexLegOutput | null = null
   if (need.mex && input.mexLeg) mexLeg = calculateMexLeg(input.mexLeg, params)
 
+  // Drayage runs its own cycle engine (fills the USA-side slot). It accepts an
+  // explicit drayageLeg, or adapts a resolver-produced usaLeg into one.
   let usaLeg: UsaLegOutput | null = null
-  if (need.usa && input.usaLeg) usaLeg = calculateUsaLeg(input.usaLeg, params)
+  if (operation === 'Drayage') {
+    const dray = input.drayageLeg ?? (input.usaLeg ? usaToDrayage(input.usaLeg) : null)
+    if (dray) usaLeg = calculateDrayageLeg(dray, params)
+  } else if (need.usa && input.usaLeg) {
+    usaLeg = calculateUsaLeg(input.usaLeg, params)
+  }
 
   // Leg flats (what the quote sums). MX flat = required tariff; USA flat = miles×(RPM+FSC).
   const mexFlat = mexLeg ? mexLeg.requiredTariffUsd : 0

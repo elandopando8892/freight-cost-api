@@ -83,6 +83,49 @@ export interface MexLegOutput {
   referenceKey: string           // mexLaneProd!CL (Backhaul→One Way, homologated MX names)
 }
 
+// ── Drayage leg input (engine.drayage.ts) ──────────────────────────────────
+// Drayage is a physical CYCLE, not a point-to-point linehaul. Only loadedMiles
+// is required; the rest of the cycle is derived from params when absent.
+export interface DrayageLegInput {
+  loadedMiles: number                 // port terminal → delivery (container loaded)
+  portPickupMiles?: number            // yard → port terminal (deadhead to grab the box)
+  emptyReturnMiles?: number           // delivery → return location (empty container)
+  finalRepositionMiles?: number       // return location → yard (deadhead)
+  portDwellHours?: number             // dwell retrieving the container at the terminal
+  deliveryServiceHours?: number       // unload / live-strip at destination
+  transitDaysRaw?: number             // linehaul transit (like the USA leg)
+  // Container return conditionality (finding #5): return to port, interior drop-off, or none.
+  emptyReturnRequired?: boolean       // undefined → assume required (conservative) + warn upstream
+  dropOff?: boolean                   // interior drop-off yard (shorter) instead of returning to port
+  chassisReturnRequired?: boolean     // chassis goes back too (extra reposition/day)
+  dieselUsdGal: number
+  fscUsdMile: number
+  outState: string
+  returnTollUsd?: number
+  driverExpenses?: number
+  marketRpm?: number
+  operation: string                   // 'Drayage'
+  service: string
+  equipment: EquipmentSpec
+  origin?: string
+  dest?: string
+}
+
+// How the empty-container return resolved (for transparency / warnings).
+export type DrayageReturnMode = 'port' | 'drop-off' | 'none' | 'assumed-port'
+
+export interface DrayageCycleBreakdown {
+  portPickupMiles: number
+  loadedLinehaulMiles: number
+  emptyReturnMiles: number
+  finalRepositionMiles: number
+  portDwellHours: number
+  deliveryServiceHours: number
+  chassisCostUsd: number
+  returnTollUsd: number
+  returnMode: DrayageReturnMode
+}
+
 // ── USA leg output ─────────────────────────────────────────────────────────
 export interface UsaLegOutput {
   loadedMiles: number; emptyMiles: number; totalOperationalMiles: number
@@ -104,6 +147,7 @@ export interface UsaLegOutput {
   marketRpm: number                // DAT benchmark RPM (0 if unknown)
   marketRateUsd: number            // (marketRpm + fsc) × loadedMiles — DAT all-in
   referenceKey: string             // usaLaneProd!BV (Backhaul→One Way)
+  drayageCycle?: DrayageCycleBreakdown  // present only when produced by the drayage engine
 }
 
 // ── Commercial / decision layer ────────────────────────────────────────────
@@ -145,5 +189,6 @@ export interface EngineInput {
   fxRate?: number
   mexLeg?: MexLegInput
   usaLeg?: UsaLegInput
+  drayageLeg?: DrayageLegInput
   overrides?: Partial<ParamMap>
 }

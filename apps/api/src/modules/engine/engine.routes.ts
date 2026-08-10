@@ -44,6 +44,25 @@ const UsaSchema = z.object({
   destCondition: MarketConditionEnum.default('Balanced'),
 })
 
+const DrayageSchema = z.object({
+  loadedMiles: z.number().nonnegative(),
+  portPickupMiles: z.number().nonnegative().optional(),
+  emptyReturnMiles: z.number().nonnegative().optional(),
+  finalRepositionMiles: z.number().nonnegative().optional(),
+  portDwellHours: z.number().nonnegative().optional(),
+  deliveryServiceHours: z.number().nonnegative().optional(),
+  transitDaysRaw: z.number().nonnegative().default(0),
+  emptyReturnRequired: z.boolean().optional(),
+  dropOff: z.boolean().optional(),
+  chassisReturnRequired: z.boolean().optional(),
+  dieselUsdGal: z.number().nonnegative().default(0),
+  fscUsdMile: z.number().nonnegative().default(0),
+  outState: z.string().default('TX'),
+  returnTollUsd: z.number().nonnegative().optional(),
+  driverExpenses: z.number().nonnegative().optional(),
+  marketRpm: z.number().nonnegative().optional(),
+})
+
 const CalculateSchema = z.object({
   assumptionSetId: z.string().min(1).optional(),
   overrides: z.record(z.number()).optional(),
@@ -53,6 +72,7 @@ const CalculateSchema = z.object({
   fxRate: z.number().positive().optional(),
   mex: MexSchema.optional(),
   usa: UsaSchema.optional(),
+  drayage: DrayageSchema.optional(),
 })
 
 export async function engineRoutes(app: FastifyInstance) {
@@ -62,8 +82,8 @@ export async function engineRoutes(app: FastifyInstance) {
     const { orgId } = request.user as JwtPayload
     const body = CalculateSchema.parse(request.body)
 
-    if (!body.mex && !body.usa) {
-      return reply.status(422).send({ error: 'Provide at least one of mex or usa leg facts.' })
+    if (!body.mex && !body.usa && !body.drayage) {
+      return reply.status(422).send({ error: 'Provide at least one of mex, usa, or drayage leg facts.' })
     }
 
     // Carrier's choice: explicit service, else the prevailing per-operation default.
@@ -95,6 +115,9 @@ export async function engineRoutes(app: FastifyInstance) {
             service,
             equipment,
           }
+        : undefined,
+      drayageLeg: body.drayage
+        ? { ...body.drayage, operation: body.operation, service, equipment }
         : undefined,
     }
 

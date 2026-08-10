@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { calculateMexLeg } from '../src/modules/engine/engine.mex.js'
 import { calculateUsaLeg } from '../src/modules/engine/engine.usa.js'
+import { calculateDrayageLeg } from '../src/modules/engine/engine.drayage.js'
 import { calculate } from '../src/modules/engine/engine.calculator.js'
 import type { MexLegInput, UsaLegInput } from '../src/modules/engine/engine.types.js'
 
@@ -284,6 +285,64 @@ describe('E6 — Backhaul semantic (deadhead scaled, physical costs preserved)',
     // because of UT, not because we pretended the truck didn't move.
     expect(backhaul.utMargin).toBeLessThan(oneWay.utMargin)
     expect(backhaul.cfuUsd).toBeGreaterThan(0)
+  })
+})
+
+// E4 finding #4/#5: drayage is a physical cycle, not FTL + a chassis surcharge.
+// The cost sums real legs (port pickup + loaded linehaul + empty return + final
+// reposition), separate chassis cost, billable time floor, and CONDITIONAL
+// container return (port / interior drop-off / none).
+describe('E4 — Drayage Cycle Engine', () => {
+  const eq = { truckType: 'Truck Trailer', trailer: 'Chassis', config: 'Single', driver: 'Interstate' }
+  const base = { loadedMiles: 40, dieselUsdGal: 5.0, fscUsdMile: 0.5, outState: 'CA', operation: 'Drayage', service: 'One Way', equipment: eq } as const
+
+  it('sums real cycle legs: pickup + loaded + empty return + reposition', () => {
+    const r = calculateDrayageLeg({ ...base }, {})
+    // pickup 40×0.2=8, return-to-port 40, reposition 40×0.1=4 → empty 52; loaded 40; total 92
+    expect(r.loadedMiles).toBe(40)
+    expect(r.emptyMiles).toBeCloseTo(52, 1)
+    expect(r.totalOperationalMiles).toBeCloseTo(92, 1)
+    expect(r.drayageCycle?.portPickupMiles).toBeCloseTo(8, 1)
+    expect(r.drayageCycle?.finalRepositionMiles).toBeCloseTo(4, 1)
+  })
+
+  it('conditional container return: none < drop-off < return-to-port', () => {
+    const noReturn = calculateDrayageLeg({ ...base, emptyReturnRequired: false }, {})
+    const dropOff = calculateDrayageLeg({ ...base, emptyReturnRequired: true, dropOff: true }, {})
+    const toPort = calculateDrayageLeg({ ...base, emptyReturnRequired: true }, {})
+    expect(noReturn.drayageCycle?.returnMode).toBe('none')
+    expect(dropOff.drayageCycle?.returnMode).toBe('drop-off')
+    expect(toPort.drayageCycle?.returnMode).toBe('port')
+    // Physical: no return cheapest, full return to port dearest
+    expect(noReturn.emptyMiles).toBeLessThan(dropOff.emptyMiles)
+    expect(dropOff.emptyMiles).toBeLessThan(toPort.emptyMiles)
+    expect(noReturn.requiredTariffUsd).toBeLessThanOrEqual(toPort.requiredTariffUsd)
+  })
+
+  it('unspecified return is flagged assumed-port (not silently zeroed or doubled)', () => {
+    const r = calculateDrayageLeg({ ...base }, {})
+    expect(r.drayageCycle?.returnMode).toBe('assumed-port')
+    expect(r.emptyMiles).toBeGreaterThan(0)   // NOT zeroed
+  })
+
+  it('chassis is a separate cost line, and the billable-day floor applies', () => {
+    const r = calculateDrayageLeg({ ...base }, {})
+    expect(r.drayageCycle?.chassisCostUsd).toBeGreaterThan(0)  // chassis/day, not a % markup
+    expect(r.cycleDays).toBeGreaterThanOrEqual(1)              // billable floor for the short cycle
+  })
+
+  it('calculator routes Drayage to the cycle engine (usaLeg slot carries drayageCycle)', () => {
+    const r = calculate({
+      operation: 'Drayage', service: 'One Way', equipment: eq, params: {},
+      usaLeg: {
+        loadedMiles: 40, dieselUsdGal: 5.0, fscUsdMile: 0.5, outState: 'CA',
+        originCondition: 'Balanced', destCondition: 'Balanced',
+        operation: 'Drayage', service: 'One Way', equipment: eq,
+      },
+    })
+    expect(r.usaLeg?.drayageCycle).toBeDefined()          // proves the drayage engine ran
+    expect(r.usaLeg?.drayageCycle?.returnMode).toBe('assumed-port')
+    expect(r.freightBaselineUsd).toBeGreaterThan(0)
   })
 })
 
