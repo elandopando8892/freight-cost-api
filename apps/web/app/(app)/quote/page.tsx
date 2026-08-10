@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { api } from '@/lib/api'
-import { QuoteForm, type LaneHint } from './quote-form'
+import type { LaneHint } from './quote-form'
+import { QuoteModes } from './quote-modes'
 
 export const dynamic = 'force-dynamic'
 export const metadata: Metadata = { title: 'Quote by route' }
@@ -45,7 +46,7 @@ export default async function QuotePage() {
           prevailing service default (Import/Southbound → Backhaul) all happen server-side.
         </p>
       </header>
-      <QuoteForm recentLanes={recentLanes} />
+      <QuoteModes recentLanes={recentLanes} />
     </main>
   )
 }
