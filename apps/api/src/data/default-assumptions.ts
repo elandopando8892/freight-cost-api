@@ -68,6 +68,9 @@ const BASE_ASSUMPTIONS = [
   { section: 'UTILIZATION', field: 'Billable Day Floor Drayage', value: 1.0,  unit: 'days',                  low: 0.5,  high: 2.0,  updateFrequency: 'Semiannual', costBehavior: 'Minimum billable cycle', activation: 'By Lane' },
   // E5: tandem hooking/unhooking + inspection of the 2nd trailer + dolly per cycle.
   { section: 'UTILIZATION', field: 'Tandem Maneuver Hours',      value: 1.0,  unit: 'hours',                 low: 0,    high: 4,    updateFrequency: 'Annual',     costBehavior: 'Hook/unhook 2nd unit',   activation: 'By Config' },
+  // E7: previously-hardcoded engine constants, now editable (no silent magic).
+  { section: 'UTILIZATION', field: 'Roundtrip Empty Factor',     value: 0.03, unit: 'fraction',              low: 0,    high: 0.2,  updateFrequency: 'Semiannual', costBehavior: 'Deadhead between RT legs', activation: 'By Lane' },
+  { section: 'UTILIZATION', field: 'Billable Day Floor Long-haul', value: 0.33, unit: 'days',                low: 0.25, high: 1.0,  updateFrequency: 'Semiannual', costBehavior: 'Minimum billable cycle', activation: 'By Lane' },
   // (Maint+Tires per km/mile is DERIVED from COST_MAINT/COST_TIRES cost cards — see engine.outputs.ts)
 
   // ── BORDER ───────────────────────────────────────────────────────────
@@ -110,6 +113,9 @@ const BASE_ASSUMPTIONS = [
   { section: 'TECHNICAL_MARGIN', field: 'Target Gross Margin',  value: 0.18, unit: '% margin', low: 0.10, high: 0.35, updateFrequency: 'Quarterly', costBehavior: 'Sell target margin',   activation: 'By Customer' },
   { section: 'TECHNICAL_MARGIN', field: 'Premium Gross Margin', value: 0.25, unit: '% margin', low: 0.15, high: 0.45, updateFrequency: 'Quarterly', costBehavior: 'Sell premium margin',  activation: 'By Customer' },
   { section: 'TECHNICAL_MARGIN', field: 'Buy Market Weight',    value: 0.95, unit: 'factor',   low: 0.80, high: 1.10, updateFrequency: 'Monthly',   costBehavior: 'Market vs cost buy', activation: 'By Market' },
+  // E7: rate-rounding granularity, previously hardcoded (MROUND) in the engine.
+  { section: 'TECHNICAL_MARGIN', field: 'Rate Rounding MEX USD', value: 100,  unit: 'USD',      low: 1,   high: 250,  updateFrequency: 'Annual',  costBehavior: 'MEX tariff rounding', activation: 'Always' },
+  { section: 'TECHNICAL_MARGIN', field: 'Rate Rounding USA USD', value: 50,   unit: 'USD',      low: 1,   high: 250,  updateFrequency: 'Annual',  costBehavior: 'USA tariff rounding', activation: 'Always' },
 ]
 
 // High-level assumptions + the full editable cost-card detail (engine derives

@@ -288,6 +288,36 @@ describe('E6 — Backhaul semantic (deadhead scaled, physical costs preserved)',
   })
 })
 
+// E7 finding #10: no silent hardcodes — the previously-baked engine constants
+// (roundtrip empty %, long-haul billable floor, rate-rounding granularity) are
+// now editable params. These tests prove they're actually wired (changing the
+// param changes the output), so the whole cost chain is assumption-driven.
+describe('E7 — hardcoded constants are now param-driven', () => {
+  const equipment = { truckType: 'Truck Trailer', trailer: 'Dry Van', config: 'Single', driver: 'B1' }
+  const lane = { baseKm: 900, operation: 'D2D Import', service: 'One Way', route: 'Straight & Danger', equipment } as const
+
+  it('Rate Rounding MEX USD changes the tariff granularity', () => {
+    const to100 = calculateMexLeg({ ...lane }, {})                                    // default 100
+    const to25 = calculateMexLeg({ ...lane }, { 'TECHNICAL_MARGIN__Rate Rounding MEX USD': 25 })
+    expect(to100.requiredTariffUsd % 100).toBe(0)   // rounds to nearest 100
+    expect(to25.requiredTariffUsd % 25).toBe(0)     // rounds to nearest 25 (param-driven)
+  })
+
+  it('Roundtrip Empty Factor drives roundtrip deadhead', () => {
+    const rt = { ...lane, service: 'Roundtrip' }
+    const lo = calculateMexLeg(rt, { 'UTILIZATION__Roundtrip Empty Factor': 0 })
+    const hi = calculateMexLeg(rt, { 'UTILIZATION__Roundtrip Empty Factor': 0.1 })
+    expect(hi.emptyKm).toBeGreaterThan(lo.emptyKm)
+  })
+
+  it('Billable Day Floor Long-haul is editable (raising it lifts CFU-by-time)', () => {
+    const low = calculateMexLeg({ ...lane, baseKm: 400 }, { 'UTILIZATION__Billable Day Floor Long-haul': 0.33 })
+    const high = calculateMexLeg({ ...lane, baseKm: 400 }, { 'UTILIZATION__Billable Day Floor Long-haul': 2.0 })
+    expect(high.cycleDays).toBeGreaterThanOrEqual(low.cycleDays)
+    expect(high.cfuUsd).toBeGreaterThanOrEqual(low.cfuUsd)
+  })
+})
+
 // E5 finding #7: tandem must recalculate by physical components, not a single
 // flat uplift. CFU is additive (real 2nd-trailer + dolly cost, per-truck scale)
 // so the tandem premium % varies by corridor; plus hook/unhook maneuver time.

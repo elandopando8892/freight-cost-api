@@ -95,7 +95,8 @@ export function calculateUsaLeg(lane: UsaLegInput, params: ParamMap): UsaLegOutp
 
   // ── Required tariff ──────────────────────────────────────────────────
   const requiredTariffExFuelUsd = technicalTariffExFuelUsd + totalRiskAdjUsd
-  const requiredTariffUsd = mround(technicalTariffInclFuelUsd + totalRiskAdjUsd, 50)
+  const rateRounding = getParam(params, 'TECHNICAL_MARGIN', 'Rate Rounding USA USD', 50)
+  const requiredTariffUsd = mround(technicalTariffInclFuelUsd + totalRiskAdjUsd, rateRounding)
   const rpm = P > 0 ? requiredTariffExFuelUsd / P : 0
   const fsc = lane.fscUsdMile
   const flatUsd = P * (rpm + fsc)

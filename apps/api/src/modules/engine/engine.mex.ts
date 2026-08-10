@@ -72,7 +72,7 @@ export function calculateMexLeg(lane: MexLegInput, params: ParamMap): MexLegOutp
     ? getParam(params, 'UTILIZATION', 'Billable Day Floor Local', 1.0)
     : isShortHaul
       ? getParam(params, 'UTILIZATION', 'Billable Day Floor Short-haul', 0.5)
-      : 0.33
+      : getParam(params, 'UTILIZATION', 'Billable Day Floor Long-haul', 0.33)
   const emptyKmFloor = isLocal
     ? getParam(params, 'UTILIZATION', 'Empty KM Min Local', 20)
     : isShortHaul
@@ -89,7 +89,8 @@ export function calculateMexLeg(lane: MexLegInput, params: ParamMap): MexLegOutp
   // ── Distances (2 physical legs for roundtrip) ────────────────────────
   // Backhaul (E6): reduces expected deadhead vs one-way, but doesn't eliminate
   // residual reposition. The factor (default 0.5) is editable per set/lane.
-  const emptyPct = isRoundtrip ? 0.03 : isBackhaul ? deadheadBase * backhaulDeadheadFactor : deadheadBase
+  const roundtripEmptyFactor = getParam(params, 'UTILIZATION', 'Roundtrip Empty Factor', 0.03)
+  const emptyPct = isRoundtrip ? roundtripEmptyFactor : isBackhaul ? deadheadBase * backhaulDeadheadFactor : deadheadBase
   // Return leg (only when roundtrip). Defaults reproduce a symmetric fully-loaded
   // return; carrier can override each field per E3.
   const rtKm = isRoundtrip ? (lane.returnKm ?? lane.baseKm) : 0
@@ -175,7 +176,8 @@ export function calculateMexLeg(lane: MexLegInput, params: ParamMap): MexLegOutp
     routeRiskUsd + trailerRiskUsd + flatbedComplexityUsd + securityRiskUsd + tandemRiskUsd + operationRiskUsd
 
   // ── Required tariff ──────────────────────────────────────────────────
-  const requiredTariffUsd = mround(technicalTariffUsd + totalRiskAdjUsd, 100)
+  const rateRounding = getParam(params, 'TECHNICAL_MARGIN', 'Rate Rounding MEX USD', 100)
+  const requiredTariffUsd = mround(technicalTariffUsd + totalRiskAdjUsd, rateRounding)
   const operatingProfitUsd = requiredTariffUsd - productionCostUsd
   const operatingMargin = requiredTariffUsd > 0 ? operatingProfitUsd / requiredTariffUsd : 0
   const rpm = totalMiles > 0 ? (requiredTariffUsd - fuelUsd) / totalMiles : 0
