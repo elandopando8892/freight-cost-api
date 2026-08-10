@@ -13,15 +13,17 @@ export async function catalogRoutes(app: FastifyInstance) {
     return prisma.cityMX.findMany({ orderBy: { production: 'asc' } })
   })
 
-  // Flat list of distinct location strings (MX "City, ST" homologations + US/CA
-  // metro cities) for the quote-form autocomplete. Small + cacheable.
+  // Flat list of distinct location strings for the quote-form autocomplete.
+  // MX cities use the FULL production name ("Manzanillo, Colima") — that's the
+  // exact form resolveMexLeg looks up in mexLaneExpense; the abbreviated
+  // homologation ("Manzanillo, CL") would NOT resolve. US/CA use metro cities.
   app.get('/catalog/locations', async () => {
     const [cities, metros] = await Promise.all([
-      prisma.cityMX.findMany({ select: { homologation: true }, orderBy: { homologation: 'asc' } }),
+      prisma.cityMX.findMany({ select: { production: true }, orderBy: { production: 'asc' } }),
       prisma.zipMarket.findMany({ select: { metroCity: true }, distinct: ['metroCity'], orderBy: { metroCity: 'asc' } }),
     ])
     const set = new Set<string>()
-    for (const c of cities) if (c.homologation) set.add(c.homologation.trim())
+    for (const c of cities) if (c.production) set.add(c.production.trim())
     for (const m of metros) if (m.metroCity) set.add(m.metroCity.trim())
     return { locations: [...set].sort((a, b) => a.localeCompare(b)) }
   })

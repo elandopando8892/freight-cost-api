@@ -84,18 +84,41 @@ async function conditionFromMarket(
   return conditionByTrailer(cond, trailer)
 }
 
+/** Map an abbreviated homologation ("Manzanillo, CL") to the full production
+ *  name ("Manzanillo, Colima") that mexLaneExpense is keyed by; passthrough if
+ *  it's already a production name (or unknown). */
+async function mxToProduction(loc: string): Promise<string> {
+  const raw = (loc ?? '').trim()
+  if (!raw) return raw
+  const hit = await prisma.cityMX.findFirst({
+    where: { homologation: { equals: raw, mode: 'insensitive' } },
+    select: { production: true },
+  })
+  return hit?.production ?? raw
+}
+
 async function resolveMexLeg(
   origin: string, dest: string, eq: EquipmentSpec, operation: string, service: string, route: string, warnings: string[],
 ): Promise<MexLegInput | undefined> {
-  const key = `${origin} - ${dest} ${eq.truckType}`
-  const row = await prisma.mexLaneExpense.findFirst({ where: { laneKeyNorm: key.toUpperCase() } })
+  let o = origin, d = dest
+  let key = `${o} - ${d} ${eq.truckType}`
+  let row = await prisma.mexLaneExpense.findFirst({ where: { laneKeyNorm: key.toUpperCase() } })
+  if (!row) {
+    // Retry after normalizing abbreviated homologations → full production names.
+    const [o2, d2] = await Promise.all([mxToProduction(origin), mxToProduction(dest)])
+    if (o2 !== o || d2 !== d) {
+      o = o2; d = d2
+      key = `${o} - ${d} ${eq.truckType}`
+      row = await prisma.mexLaneExpense.findFirst({ where: { laneKeyNorm: key.toUpperCase() } })
+    }
+  }
   if (!row) { warnings.push(`MEX lane not found: "${key}"`); return undefined }
   return {
     baseKm: row.km,
     routeExpensesMxn: 0,   // V3.0 mexLaneProd uses km only (route-expense refs are #REF→0)
     baseHours: 0,
     operation, service, route, equipment: eq,
-    origin, dest,          // full MX names (engine homologates for the ReferenceKey)
+    origin: o, dest: d,    // full MX names (engine homologates for the ReferenceKey)
   }
 }
 
