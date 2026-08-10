@@ -57,7 +57,9 @@ export function calculateMexLeg(lane: MexLegInput, params: ParamMap): MexLegOutp
   const tandemFuelPenalty = getParam(params, 'CONFIG', 'Tandem Fuel Penalty', 0.12)
   const tandemTollPremium = getParam(params, 'CONFIG', 'Tandem Toll Premium', 0.3)
   const tandemMaintFactor = getParam(params, 'CONFIG', 'Tandem Maint/Tires Factor', 1.35)
-  const tandemCfuFactor = getParam(params, 'CONFIG', 'Tandem CFU Factor', 1.2)
+  // E5: tandem CFU is additive (real 2nd-unit monthly cost), not a flat multiplier.
+  const tandemSecondUnitMonthly = getParam(params, 'CONFIG', 'Tandem Second Unit Monthly USD', 1800)
+  const tandemManeuverHours = getParam(params, 'UTILIZATION', 'Tandem Maneuver Hours', 1.0)
   const flatbedComplexity = getParam(params, 'RISK', 'Flatbed Complexity Factor', 0.25)
   const mxSecurityRisk = getParam(params, 'RISK', 'MX Security Risk Reserve', 0.025)
   const configRiskTandem = getParam(params, 'RISK', 'Config Risk Premium Tandem', 0.1)
@@ -108,7 +110,9 @@ export function calculateMexLeg(lane: MexLegInput, params: ParamMap): MexLegOutp
   const baseHours = lane.baseHours ?? 0
   const returnBaseHours = isRoundtrip ? (lane.returnBaseHours ?? baseHours) : 0
   const loadUnloadCycles = isRoundtrip && returnLoaded ? 2 : 1
-  const cycleHours = baseHours + returnBaseHours + (loadTime + unloadTime) * loadUnloadCycles
+  // E5: tandem adds hook/unhook + inspection time for the 2nd trailer + dolly.
+  const maneuverHours = isTandem ? tandemManeuverHours : 0
+  const cycleHours = baseHours + returnBaseHours + (loadTime + unloadTime) * loadUnloadCycles + maneuverHours
   const cycleDays = Math.max(cycleHours / 24, billableDayFloor)
 
   // ── UT margin / border ───────────────────────────────────────────────
@@ -133,14 +137,19 @@ export function calculateMexLeg(lane: MexLegInput, params: ParamMap): MexLegOutp
   const driverUsd = totalMiles * tarifaMx * driverFactor(equipment.driver, params) * eq.driver
   const cvuUsd = fuelUsd + routeExpensesUsd + routeBufferUsd + maintTiresUsd + driverUsd + borderUsd
 
-  // ── CFU ──────────────────────────────────────────────────────────────
+  // ── CFU (separated by equipment config — E5) ─────────────────────────
   const monthlyFleetKm = operadores * kmPerOperator
   const productiveTruckDays = flota * operatividad * periodo
-  const fixedCostPerKm = monthlyFixedCost / monthlyFleetKm
-  const fixedCostPerDay = monthlyFixedCost / productiveTruckDays
-  const configCfu = isTandem ? tandemCfuFactor : 1
-  const cfuByDistanceUsd = totalKm * fixedCostPerKm * configCfu * eq.fixed
-  const cfuByTimeUsd = cycleDays * fixedCostPerDay * eq.fixed * configCfu
+  // Tandem commits a 2nd trailer + dolly → genuinely higher fixed cost. Added at
+  // PER-TRUCK scale (÷ km/operator or ÷ operating days), NOT diluted across the
+  // whole fleet. Additive (not a flat ×1.2) so the uplift % varies by corridor:
+  // larger on short lanes where fixed cost dominates, smaller on long ones.
+  const tandemPerKm = isTandem ? tandemSecondUnitMonthly / kmPerOperator : 0
+  const tandemPerDay = isTandem ? tandemSecondUnitMonthly / periodo : 0
+  const fixedCostPerKm = monthlyFixedCost / monthlyFleetKm + tandemPerKm
+  const fixedCostPerDay = monthlyFixedCost / productiveTruckDays + tandemPerDay
+  const cfuByDistanceUsd = totalKm * fixedCostPerKm * eq.fixed
+  const cfuByTimeUsd = cycleDays * fixedCostPerDay * eq.fixed
   // CFU = max(distance, time) for ALL services — V3.0 mexLaneProd does NOT zero it
   // for backhaul (verified vs row Nuevo Laredo→Queretaro D2D Import Backhaul = $1,400).
   const cfuUsd = Math.max(cfuByDistanceUsd, cfuByTimeUsd)

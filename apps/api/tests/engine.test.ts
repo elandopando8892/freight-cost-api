@@ -288,6 +288,42 @@ describe('E6 — Backhaul semantic (deadhead scaled, physical costs preserved)',
   })
 })
 
+// E5 finding #7: tandem must recalculate by physical components, not a single
+// flat uplift. CFU is additive (real 2nd-trailer + dolly cost, per-truck scale)
+// so the tandem premium % varies by corridor; plus hook/unhook maneuver time.
+describe('E5 — Tandem additive CFU + maneuver time (corridor-varying uplift)', () => {
+  const mk = (baseKm: number, config: string) => calculateMexLeg({
+    baseKm, routeExpensesMxn: 5000, baseHours: baseKm / 60,
+    operation: 'Intra-Mex', service: 'One Way', route: 'Straight & Danger',
+    equipment: { truckType: 'Truck Trailer', trailer: 'Dry Van', config, driver: 'B1' },
+  }, {})
+
+  it('tandem CFU is additively higher than single (not a flat 1.2×)', () => {
+    const s = mk(900, 'Single')
+    const t = mk(900, 'Tandem')
+    expect(t.cfuUsd).toBeGreaterThan(s.cfuUsd)
+    // The 2nd-unit cost is a real per-truck monthly amount, so the CFU delta is
+    // meaningful (not the ~0 a fleet-diluted add would give).
+    expect(t.cfuUsd - s.cfuUsd).toBeGreaterThan(50)
+  })
+
+  it('tandem uplift % is corridor-dependent: higher on short lanes', () => {
+    const upliftShort = mk(150, 'Tandem').requiredTariffUsd / mk(150, 'Single').requiredTariffUsd - 1
+    const upliftLong = mk(900, 'Tandem').requiredTariffUsd / mk(900, 'Single').requiredTariffUsd - 1
+    // Fixed cost dominates short lanes → tandem premium is a bigger fraction there.
+    expect(upliftShort).toBeGreaterThan(upliftLong)
+    // Not a constant multiplier — the two differ by a real margin.
+    expect(upliftShort - upliftLong).toBeGreaterThan(0.05)
+  })
+
+  it('tandem adds hook/unhook maneuver time to the cycle', () => {
+    // Use a lane long enough that cycleDays is driven by hours, not the floor.
+    const s = mk(900, 'Single')
+    const t = mk(900, 'Tandem')
+    expect(t.cycleDays).toBeGreaterThan(s.cycleDays)  // +1h maneuver by default
+  })
+})
+
 // E4 finding #4/#5: drayage is a physical cycle, not FTL + a chassis surcharge.
 // The cost sums real legs (port pickup + loaded linehaul + empty return + final
 // reposition), separate chassis cost, billable time floor, and CONDITIONAL

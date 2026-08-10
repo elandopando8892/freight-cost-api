@@ -66,6 +66,8 @@ const BASE_ASSUMPTIONS = [
   { section: 'UTILIZATION', field: 'Port Dwell Hours',           value: 2,    unit: 'hours',                 low: 0.5,  high: 8,    updateFrequency: 'Semiannual', costBehavior: 'Terminal dwell',         activation: 'By Lane' },
   { section: 'UTILIZATION', field: 'Delivery Service Hours',     value: 2,    unit: 'hours',                 low: 0.5,  high: 8,    updateFrequency: 'Semiannual', costBehavior: 'Live unload/strip',      activation: 'By Lane' },
   { section: 'UTILIZATION', field: 'Billable Day Floor Drayage', value: 1.0,  unit: 'days',                  low: 0.5,  high: 2.0,  updateFrequency: 'Semiannual', costBehavior: 'Minimum billable cycle', activation: 'By Lane' },
+  // E5: tandem hooking/unhooking + inspection of the 2nd trailer + dolly per cycle.
+  { section: 'UTILIZATION', field: 'Tandem Maneuver Hours',      value: 1.0,  unit: 'hours',                 low: 0,    high: 4,    updateFrequency: 'Annual',     costBehavior: 'Hook/unhook 2nd unit',   activation: 'By Config' },
   // (Maint+Tires per km/mile is DERIVED from COST_MAINT/COST_TIRES cost cards — see engine.outputs.ts)
 
   // ── BORDER ───────────────────────────────────────────────────────────
@@ -88,7 +90,11 @@ const BASE_ASSUMPTIONS = [
   { section: 'CONFIG', field: 'Tandem Toll Premium',       value: 0.30, unit: '% uplift', low: 0, high: 0.5,  updateFrequency: 'Annual', costBehavior: '% base tolls',      activation: 'By Config' },
   { section: 'CONFIG', field: 'Tandem Fuel Penalty',       value: 0.12, unit: '% uplift', low: 0, high: 0.3,  updateFrequency: 'Annual', costBehavior: '% efficiency loss', activation: 'By Config' },
   { section: 'CONFIG', field: 'Tandem Maint/Tires Factor', value: 1.35, unit: 'factor',   low: 1, high: 2,    updateFrequency: 'Annual', costBehavior: 'factor',            activation: 'By Config' },
-  { section: 'CONFIG', field: 'Tandem CFU Factor',         value: 1.20, unit: 'factor',   low: 1, high: 2,    updateFrequency: 'Annual', costBehavior: 'factor',            activation: 'By Config' },
+  { section: 'CONFIG', field: 'Tandem CFU Factor',         value: 1.20, unit: 'factor',   low: 1, high: 2,    updateFrequency: 'Annual', costBehavior: 'DEPRECATED — replaced by Tandem Second Unit Monthly (E5)', activation: 'By Config' },
+  // E5: tandem CFU is now ADDITIVE (real 2nd-trailer + dolly monthly cost), not a
+  // flat multiplier — so the tandem uplift varies by corridor (higher % on short
+  // lanes where fixed cost dominates), matching the benchmarks.
+  { section: 'CONFIG', field: 'Tandem Second Unit Monthly USD', value: 1800, unit: 'USD/month', low: 0, high: 6000, updateFrequency: 'Annual', costBehavior: '2nd trailer + dolly (invest/rent/insure)', activation: 'By Config' },
   // E4 Drayage cycle (physical legs as fraction of loaded linehaul, + chassis/day).
   { section: 'CONFIG', field: 'Chassis Day Cost USD',          value: 25,   unit: 'USD/day', low: 0,   high: 80,  updateFrequency: 'Annual',   costBehavior: 'Chassis rental/ownership', activation: 'By Config' },
   { section: 'CONFIG', field: 'Drayage Port Pickup Factor',    value: 0.20, unit: 'x linehaul', low: 0, high: 1,   updateFrequency: 'Annual',   costBehavior: 'Yard → port deadhead',     activation: 'By Lane' },
