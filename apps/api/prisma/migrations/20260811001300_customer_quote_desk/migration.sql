@@ -1,0 +1,8 @@
+CREATE TYPE "CustomerQuoteStatus" AS ENUM ('DRAFT', 'REVIEW', 'APPROVED', 'ARCHIVED');
+CREATE TABLE "CustomerQuote" ("id" TEXT NOT NULL, "orgId" TEXT NOT NULL, "folio" TEXT NOT NULL, "clientName" TEXT NOT NULL, "contactName" TEXT, "contactEmail" TEXT, "quoteType" TEXT NOT NULL DEFAULT 'Spot', "goodsValue" TEXT, "validUntil" TIMESTAMP(3) NOT NULL, "status" "CustomerQuoteStatus" NOT NULL DEFAULT 'DRAFT', "notes" TEXT, "createdById" TEXT, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL, CONSTRAINT "CustomerQuote_pkey" PRIMARY KEY ("id"));
+CREATE TABLE "CustomerQuoteLine" ("id" TEXT NOT NULL, "customerQuoteId" TEXT NOT NULL, "position" INTEGER NOT NULL, "origin" TEXT NOT NULL, "destination" TEXT NOT NULL, "equipment" TEXT NOT NULL, "config" TEXT NOT NULL, "operation" TEXT NOT NULL, "service" TEXT NOT NULL, "tariff" DOUBLE PRECISION NOT NULL, "currency" TEXT NOT NULL DEFAULT 'USD', "borderCrossing" TEXT, "distance" TEXT, CONSTRAINT "CustomerQuoteLine_pkey" PRIMARY KEY ("id"));
+CREATE UNIQUE INDEX "CustomerQuote_orgId_folio_key" ON "CustomerQuote"("orgId", "folio");
+CREATE INDEX "CustomerQuote_orgId_status_updatedAt_idx" ON "CustomerQuote"("orgId", "status", "updatedAt");
+CREATE UNIQUE INDEX "CustomerQuoteLine_customerQuoteId_position_key" ON "CustomerQuoteLine"("customerQuoteId", "position");
+ALTER TABLE "CustomerQuote" ADD CONSTRAINT "CustomerQuote_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "CustomerQuoteLine" ADD CONSTRAINT "CustomerQuoteLine_customerQuoteId_fkey" FOREIGN KEY ("customerQuoteId") REFERENCES "CustomerQuote"("id") ON DELETE CASCADE ON UPDATE CASCADE;

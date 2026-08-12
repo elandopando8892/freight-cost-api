@@ -9,15 +9,15 @@ import { Input } from '@/components/ui/input'
 import { fetcher } from '@/lib/fetcher'
 import { LocationInput } from './location-input'
 import {
-  type QuoteResult, type FormFields, type FormErrors, type LaneHint,
+  type QuoteResult, type FormFields, type FormErrors, type LaneHint, type CostBaseOption,
   OPS, SVCS, TRUCKS, TRAILERS, CONFIGS, DRIVERS, ROUTES, selectCls,
-  INITIAL_FORM, validate, quoteBody, Field, ResultSkeleton, Placeholder, Result,
+  initialFormFor, compatibleBases, validate, quoteBody, Field, ResultSkeleton, Placeholder, Result,
 } from './quote-shared'
 
 export type { LaneHint }
 
-export function QuoteForm({ recentLanes = [] }: { recentLanes?: LaneHint[] }) {
-  const [form, setForm] = useState<FormFields>(INITIAL_FORM)
+export function QuoteForm({ recentLanes = [], costBases = [] }: { recentLanes?: LaneHint[]; costBases?: CostBaseOption[] }) {
+  const [form, setForm] = useState<FormFields>(() => initialFormFor(costBases))
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [result, setResult] = useState<QuoteResult | null>(null)
   const [errors, setErrors] = useState<FormErrors>({})
@@ -47,6 +47,14 @@ export function QuoteForm({ recentLanes = [] }: { recentLanes?: LaneHint[] }) {
     setForm((f) => ({ ...f, [k]: v }))
     if (errors[k]) setErrors((e) => ({ ...e, [k]: undefined }))
   }
+  const setOperation = (operation: (typeof OPS)[number]) => {
+    const options = compatibleBases(costBases, operation)
+    setForm((current) => {
+      const currentStillValid = options.some((base) => base.id === current.costBaseId)
+      const fallback = options.find((base) => base.isDefault) ?? (options.length === 1 ? options[0] : undefined)
+      return { ...current, operation, costBaseId: currentStillValid ? current.costBaseId : fallback?.id ?? '' }
+    })
+  }
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const err = validate(form)
@@ -55,7 +63,7 @@ export function QuoteForm({ recentLanes = [] }: { recentLanes?: LaneHint[] }) {
     quote.mutate()
   }
   const clear = () => {
-    setForm(INITIAL_FORM)
+    setForm(initialFormFor(costBases))
     setResult(null)
     setErrors({})
     setShowAdvanced(false)
@@ -65,7 +73,13 @@ export function QuoteForm({ recentLanes = [] }: { recentLanes?: LaneHint[] }) {
       ...f,
       outboundLocation: lane.origin ?? f.outboundLocation,
       inboundLocation: lane.destination ?? f.inboundLocation,
-      operation: (OPS as readonly string[]).includes(lane.operation) ? (lane.operation as (typeof OPS)[number]) : f.operation,
+      ...(() => {
+        const operation = (OPS as readonly string[]).includes(lane.operation) ? (lane.operation as (typeof OPS)[number]) : f.operation
+        const options = compatibleBases(costBases, operation)
+        const currentStillValid = options.some((base) => base.id === f.costBaseId)
+        const fallback = options.find((base) => base.isDefault) ?? (options.length === 1 ? options[0] : undefined)
+        return { operation, costBaseId: currentStillValid ? f.costBaseId : fallback?.id ?? '' }
+      })(),
       service: (SVCS as readonly string[]).includes(lane.service) ? (lane.service as (typeof SVCS)[number]) : f.service,
     }))
     setErrors({})
@@ -117,8 +131,18 @@ export function QuoteForm({ recentLanes = [] }: { recentLanes?: LaneHint[] }) {
             </Field>
 
             <Field label="Operation" hint="Movement type: D2D Export/Import (cross-border door-to-door), Drayage (port/terminal), Intra-Mex (domestic MX), or Local.">
-              <select className={selectCls} value={form.operation} onChange={(e) => set('operation', e.target.value as (typeof OPS)[number])}>
+              <select className={selectCls} value={form.operation} onChange={(e) => setOperation(e.target.value as (typeof OPS)[number])}>
                 {OPS.map((o) => <option key={o} value={o}>{o}</option>)}
+              </select>
+            </Field>
+
+            <Field label="Cost base" hint="The selected base and its active version become permanent lineage on the route and saved quote.">
+              <select className={selectCls} value={form.costBaseId} onChange={(e) => set('costBaseId', e.target.value)}>
+                <option value="">Legacy active assumptions</option>
+                {compatibleBases(costBases, form.operation).map((base) => {
+                  const active = base.versions.find((version) => version.isActive)
+                  return <option key={base.id} value={base.id}>{base.code} Â· {base.name}{active ? ` Â· v${active.version}` : ''}{base.isDefault ? ' Â· default' : ''}</option>
+                })}
               </select>
             </Field>
 
@@ -196,6 +220,7 @@ export function QuoteForm({ recentLanes = [] }: { recentLanes?: LaneHint[] }) {
               origin: form.outboundLocation.trim(),
               destination: form.inboundLocation.trim(),
               equipment: { truckType: form.truckType, trailer: form.trailer, config: form.config, driver: form.driver },
+              costBaseLabel: costBases.find((base) => base.id === form.costBaseId)?.code ?? 'Legacy',
             }}
           />
         ) : (

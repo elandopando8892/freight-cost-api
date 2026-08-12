@@ -3,10 +3,11 @@
 import { useState } from 'react'
 import { QuoteForm, type LaneHint } from './quote-form'
 import { QuoteWizard } from './quote-wizard'
+import type { CostBaseOption } from './quote-shared'
 
 type Mode = 'guided' | 'fast'
 
-export function QuoteModes({ recentLanes = [] }: { recentLanes?: LaneHint[] }) {
+export function QuoteModes({ recentLanes = [], costBases = [] }: { recentLanes?: LaneHint[]; costBases?: CostBaseOption[] }) {
   const [mode, setMode] = useState<Mode>('guided')
   return (
     <>
@@ -14,7 +15,7 @@ export function QuoteModes({ recentLanes = [] }: { recentLanes?: LaneHint[] }) {
         <ModeTab active={mode === 'guided'} onClick={() => setMode('guided')} label="Guiado" hint="Step-by-step wizard" />
         <ModeTab active={mode === 'fast'} onClick={() => setMode('fast')} label="Rápido" hint="Single dense form (expert)" />
       </div>
-      {mode === 'guided' ? <QuoteWizard /> : <QuoteForm recentLanes={recentLanes} />}
+      {mode === 'guided' ? <QuoteWizard costBases={costBases} /> : <QuoteForm recentLanes={recentLanes} costBases={costBases} />}
     </>
   )
 }

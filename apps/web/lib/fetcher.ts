@@ -2,6 +2,8 @@
 
 import { toast } from 'sonner'
 
+export const sessionExpiredEvent = 'freight-cost-model:session-expired'
+
 export class ClientApiError extends Error {
   constructor(public status: number, public body: unknown, message: string) { super(message) }
 }
@@ -24,7 +26,7 @@ export async function fetcher<T = unknown>(
   }
   const res = await fetch(path, { ...rest, headers })
   if (res.status === 401) {
-    if (typeof window !== 'undefined') window.location.href = '/login'
+    if (typeof window !== 'undefined') window.dispatchEvent(new Event(sessionExpiredEvent))
     throw new ClientApiError(401, null, 'Session expired')
   }
   const text = await res.text()

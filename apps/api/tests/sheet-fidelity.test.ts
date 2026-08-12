@@ -10,6 +10,7 @@ import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { createHash } from 'node:crypto'
 import { calculateMexLeg } from '../src/modules/engine/engine.mex.js'
 import { calculateUsaLeg } from '../src/modules/engine/engine.usa.js'
 import type { MarketCondition } from '../src/modules/engine/engine.types.js'
@@ -41,13 +42,7 @@ function mismatches(
   return out
 }
 
-// SKIPPED after E2: the MEX engine now applies production floors (Billable Day
-// Floor, Empty KM Min, Min Trip Cost) for local/short-haul lanes. That's a
-// deliberate divergence from the raw sheet — the sheet lacked these floors and
-// underpriced short-haul. Re-enable by regenerating the fixture with floors
-// applied, OR by adding a "floors off" flag to the engine and running fidelity
-// with floors disabled. Tracked as a follow-up.
-describe.skip('Sheet fidelity — MEX leg (mexLaneProd, 90 rows) [diverges post-E2]', () => {
+describe('Sheet fidelity — MEX leg / WORKBOOK_V3 (mexLaneProd, 90 rows)', () => {
   it('every component matches the workbook', () => {
     const fails = mismatches(
       mex,
@@ -63,6 +58,7 @@ describe.skip('Sheet fidelity — MEX leg (mexLaneProd, 90 rows) [diverges post-
             equipment: { truckType: i.truckType as string, trailer: i.trailer as string, config: i.config as string, driver: i.driver as string },
           },
           {},
+          'WORKBOOK_V3',
         ) as unknown as Record<string, number>,
       {
         loadedMiles: { got: 'loadedMiles', exp: 'loadedMiles', tol: [0.5, 0.01] },
@@ -80,6 +76,34 @@ describe.skip('Sheet fidelity — MEX leg (mexLaneProd, 90 rows) [diverges post-
       },
     )
     expect(fails, fails.slice(0, 10).join('\n')).toHaveLength(0)
+  })
+})
+
+describe('Operational policy golden — MEX leg / OPERATIONAL_V3 (90 rows)', () => {
+  it('keeps the reviewed production rules stable as a separate model', () => {
+    const projection = mex.map((c) => {
+      const i = c.in
+      const result = calculateMexLeg({
+        baseKm: i.baseKm as number,
+        routeExpensesMxn: (i.routeExpensesMxn as number) ?? 0,
+        baseHours: (i.baseHours as number) ?? 0,
+        operation: i.operation as string,
+        service: i.service as string,
+        route: i.route as string,
+        equipment: {
+          truckType: i.truckType as string, trailer: i.trailer as string,
+          config: i.config as string, driver: i.driver as string,
+        },
+      }, {}, 'OPERATIONAL_V3')
+      return [
+        result.loadedMiles, result.emptyMiles, result.cycleDays, result.fuelUsd,
+        result.maintTiresUsd, result.driverUsd, result.cvuUsd, result.cfuUsd,
+        result.productionCostUsd, result.technicalTariffUsd, result.totalRiskAdjUsd,
+        result.requiredTariffUsd, result.rpm, result.fsc,
+      ].map((value) => Number(value.toFixed(6)))
+    })
+    const digest = createHash('sha256').update(JSON.stringify(projection)).digest('hex')
+    expect(digest).toBe('98720311927ff4601d0efd3e34dbfd6abe7a9f454bb408618cb84bcb49726975')
   })
 })
 

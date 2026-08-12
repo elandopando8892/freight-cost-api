@@ -3,6 +3,8 @@ import type { MarketCondition } from './engine.factors.js'
 
 export type { MarketCondition }
 
+export type EnginePolicy = 'OPERATIONAL_V3' | 'WORKBOOK_V3'
+
 /**
  * Freight Cost Model V3.0 — cost-plus carrier engine.
  *
@@ -171,6 +173,7 @@ export interface CommercialOutput {
 
 // ── Cross-border assembly ──────────────────────────────────────────────────
 export interface EngineOutput {
+  policy: EnginePolicy
   operation: string
   mexLeg: MexLegOutput | null
   usaLeg: UsaLegOutput | null
@@ -182,6 +185,7 @@ export interface EngineOutput {
 }
 
 export interface EngineInput {
+  policy?: EnginePolicy
   operation: string
   service: string
   equipment: EquipmentSpec

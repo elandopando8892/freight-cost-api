@@ -22,9 +22,13 @@ export function formatRelative(iso: string, now: number): string {
 export function RelativeTime({ iso }: { iso: string }) {
   const [now, setNow] = useState<number | null>(null)
   useEffect(() => {
-    setNow(Date.now())
-    const id = setInterval(() => setNow(Date.now()), 60_000)
-    return () => clearInterval(id)
+    const update = () => setNow(Date.now())
+    const initial = window.setTimeout(update, 0)
+    const interval = window.setInterval(update, 60_000)
+    return () => {
+      window.clearTimeout(initial)
+      window.clearInterval(interval)
+    }
   }, [])
   const abs = new Date(iso).toLocaleString()
   if (now == null) return <span>{abs}</span>

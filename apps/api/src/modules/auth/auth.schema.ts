@@ -3,8 +3,9 @@
 export interface JwtPayload {
   sub: string       // our internal userId
   orgId: string
-  role: string
+  role: Role
   kindeId?: string  // Kinde subject (sub)
   iat?: number
   exp?: number
 }
+import type { Role } from '@prisma/client'

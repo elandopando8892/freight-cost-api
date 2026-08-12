@@ -56,7 +56,7 @@ export function FuelDashboard({
     },
   })
 
-  const regions = status.data?.regions ?? []
+  const regions = useMemo(() => status.data?.regions ?? [], [status.data?.regions])
   const newestAt = useMemo(() => {
     if (regions.length === 0) return null
     return regions.reduce((acc, r) => (r.updatedAt > acc ? r.updatedAt : acc), regions[0].updatedAt)
@@ -124,7 +124,7 @@ export function FuelDashboard({
           </div>
           {!trend.isFetching && (trend.data ?? []).length === 0 && (
             <p className="text-sm text-muted-foreground">
-              No history for "{area}". Trigger the historical pull from the API:{' '}
+              No history for &ldquo;{area}&rdquo;. Trigger the historical pull from the API:{' '}
               <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">POST /market/fuel/fetch-eia-history</code> (needs EIA_API_KEY).
             </p>
           )}

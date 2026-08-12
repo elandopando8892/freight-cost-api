@@ -19,13 +19,18 @@ import {
 } from './engine.factors.js'
 import { deriveMonthlyFixedCost, deriveMaintTiresPerKm } from './engine.outputs.js'
 import { buildReferenceKey, homologateMx } from './reference-key.js'
-import type { MexLegInput, MexLegOutput } from './engine.types.js'
+import type { EnginePolicy, MexLegInput, MexLegOutput } from './engine.types.js'
 
 const MI_PER_KM = 1 / 1.60934
 const mround = (x: number, m: number) => Math.round(x / m) * m
 
-export function calculateMexLeg(lane: MexLegInput, params: ParamMap): MexLegOutput {
+export function calculateMexLeg(
+  lane: MexLegInput,
+  params: ParamMap,
+  policy: EnginePolicy = 'OPERATIONAL_V3',
+): MexLegOutput {
   const { equipment } = lane
+  const workbookExact = policy === 'WORKBOOK_V3'
   const isD2D = lane.operation === 'D2D Export' || lane.operation === 'D2D Import'
   const isRoundtrip = lane.service === 'Roundtrip'
   const isBackhaul = lane.service === 'Backhaul'
@@ -68,17 +73,17 @@ export function calculateMexLeg(lane: MexLegInput, params: ParamMap): MexLegOutp
   // distance-based math already captures the real cycle).
   const isLocal = lane.baseKm <= 100
   const isShortHaul = !isLocal && lane.baseKm <= 300
-  const billableDayFloor = isLocal
+  const billableDayFloor = workbookExact ? 0.33 : isLocal
     ? getParam(params, 'UTILIZATION', 'Billable Day Floor Local', 1.0)
     : isShortHaul
       ? getParam(params, 'UTILIZATION', 'Billable Day Floor Short-haul', 0.5)
       : getParam(params, 'UTILIZATION', 'Billable Day Floor Long-haul', 0.33)
-  const emptyKmFloor = isLocal
+  const emptyKmFloor = workbookExact ? 0 : isLocal
     ? getParam(params, 'UTILIZATION', 'Empty KM Min Local', 20)
     : isShortHaul
       ? getParam(params, 'UTILIZATION', 'Empty KM Min Short-haul', 40)
       : 0
-  const minTripCostFloor = isLocal
+  const minTripCostFloor = workbookExact ? 0 : isLocal
     ? getParam(params, 'UTILIZATION', 'Min Trip Cost Local USD', 200)
     : isShortHaul
       ? getParam(params, 'UTILIZATION', 'Min Trip Cost Short-haul USD', 150)
@@ -89,17 +94,23 @@ export function calculateMexLeg(lane: MexLegInput, params: ParamMap): MexLegOutp
   // ── Distances (2 physical legs for roundtrip) ────────────────────────
   // Backhaul (E6): reduces expected deadhead vs one-way, but doesn't eliminate
   // residual reposition. The factor (default 0.5) is editable per set/lane.
-  const roundtripEmptyFactor = getParam(params, 'UTILIZATION', 'Roundtrip Empty Factor', 0.03)
-  const emptyPct = isRoundtrip ? roundtripEmptyFactor : isBackhaul ? deadheadBase * backhaulDeadheadFactor : deadheadBase
+  const roundtripEmptyFactor = workbookExact ? 0.03 : getParam(params, 'UTILIZATION', 'Roundtrip Empty Factor', 0.03)
+  const emptyPct = isRoundtrip
+    ? roundtripEmptyFactor
+    : isBackhaul
+      ? workbookExact ? 0 : deadheadBase * backhaulDeadheadFactor
+      : deadheadBase
   // Return leg (only when roundtrip). Defaults reproduce a symmetric fully-loaded
   // return; carrier can override each field per E3.
-  const rtKm = isRoundtrip ? (lane.returnKm ?? lane.baseKm) : 0
-  const returnLoaded = isRoundtrip ? (lane.returnLoaded ?? true) : false
+  const rtKm = isRoundtrip ? (workbookExact ? lane.baseKm : lane.returnKm ?? lane.baseKm) : 0
+  const returnLoaded = isRoundtrip ? (workbookExact ? true : lane.returnLoaded ?? true) : false
   const loadedReturnKm = returnLoaded ? rtKm : 0
   const deadheadReturnKm = returnLoaded ? 0 : rtKm
   const loadedKm = lane.baseKm + loadedReturnKm
   // Empty = outbound reposition + loaded-return reposition + full return-if-deadhead
-  const emptyKmComputed = lane.baseKm * emptyPct + loadedReturnKm * emptyPct + deadheadReturnKm
+  const emptyKmComputed = workbookExact
+    ? lane.baseKm * emptyPct
+    : lane.baseKm * emptyPct + loadedReturnKm * emptyPct + deadheadReturnKm
   // Empty-KM floor applies universally (E6): even backhaul has residual reposition.
   const emptyKm = Math.max(emptyKmComputed, emptyKmFloor)
   const totalKm = loadedKm + emptyKm
@@ -109,10 +120,10 @@ export function calculateMexLeg(lane: MexLegInput, params: ParamMap): MexLegOutp
 
   // ── Timing (roundtrip = 2 load/unload cycles if return is loaded) ────
   const baseHours = lane.baseHours ?? 0
-  const returnBaseHours = isRoundtrip ? (lane.returnBaseHours ?? baseHours) : 0
-  const loadUnloadCycles = isRoundtrip && returnLoaded ? 2 : 1
+  const returnBaseHours = !workbookExact && isRoundtrip ? (lane.returnBaseHours ?? baseHours) : 0
+  const loadUnloadCycles = !workbookExact && isRoundtrip && returnLoaded ? 2 : 1
   // E5: tandem adds hook/unhook + inspection time for the 2nd trailer + dolly.
-  const maneuverHours = isTandem ? tandemManeuverHours : 0
+  const maneuverHours = !workbookExact && isTandem ? tandemManeuverHours : 0
   const cycleHours = baseHours + returnBaseHours + (loadTime + unloadTime) * loadUnloadCycles + maneuverHours
   const cycleDays = Math.max(cycleHours / 24, billableDayFloor)
 
@@ -131,7 +142,7 @@ export function calculateMexLeg(lane: MexLegInput, params: ParamMap): MexLegOutp
   const fuelUsd = (loadedKm / adjLoadedKmL + emptyKm / adjEmptyKmL) * blendedDieselUsdL * (1 + fuelEscalation)
   // Tolls: outbound + return (roundtrip). Return defaults to same as outbound; override with returnRouteExpensesMxn.
   const outboundTollsMxn = lane.routeExpensesMxn ?? 0
-  const returnTollsMxn = isRoundtrip ? (lane.returnRouteExpensesMxn ?? outboundTollsMxn) : 0
+  const returnTollsMxn = !workbookExact && isRoundtrip ? (lane.returnRouteExpensesMxn ?? outboundTollsMxn) : 0
   const routeExpensesUsd = ((outboundTollsMxn + returnTollsMxn) / tc) * (1 + (isTandem ? tandemTollPremium : 0))
   const routeBufferUsd = routeExpensesUsd * gastoAdicional
   const maintTiresUsd = totalKm * maintTiresPerKm * eq.maint * (isTandem ? tandemMaintFactor : 1)
@@ -145,12 +156,13 @@ export function calculateMexLeg(lane: MexLegInput, params: ParamMap): MexLegOutp
   // PER-TRUCK scale (÷ km/operator or ÷ operating days), NOT diluted across the
   // whole fleet. Additive (not a flat ×1.2) so the uplift % varies by corridor:
   // larger on short lanes where fixed cost dominates, smaller on long ones.
-  const tandemPerKm = isTandem ? tandemSecondUnitMonthly / kmPerOperator : 0
-  const tandemPerDay = isTandem ? tandemSecondUnitMonthly / periodo : 0
+  const tandemPerKm = !workbookExact && isTandem ? tandemSecondUnitMonthly / kmPerOperator : 0
+  const tandemPerDay = !workbookExact && isTandem ? tandemSecondUnitMonthly / periodo : 0
   const fixedCostPerKm = monthlyFixedCost / monthlyFleetKm + tandemPerKm
   const fixedCostPerDay = monthlyFixedCost / productiveTruckDays + tandemPerDay
-  const cfuByDistanceUsd = totalKm * fixedCostPerKm * eq.fixed
-  const cfuByTimeUsd = cycleDays * fixedCostPerDay * eq.fixed
+  const workbookTandemCfu = workbookExact && isTandem ? getParam(params, 'CONFIG', 'Tandem CFU Factor', 1.2) : 1
+  const cfuByDistanceUsd = totalKm * fixedCostPerKm * eq.fixed * workbookTandemCfu
+  const cfuByTimeUsd = cycleDays * fixedCostPerDay * eq.fixed * workbookTandemCfu
   // CFU = max(distance, time) for ALL services — V3.0 mexLaneProd does NOT zero it
   // for backhaul (verified vs row Nuevo Laredo→Queretaro D2D Import Backhaul = $1,400).
   const cfuUsd = Math.max(cfuByDistanceUsd, cfuByTimeUsd)
@@ -176,7 +188,7 @@ export function calculateMexLeg(lane: MexLegInput, params: ParamMap): MexLegOutp
     routeRiskUsd + trailerRiskUsd + flatbedComplexityUsd + securityRiskUsd + tandemRiskUsd + operationRiskUsd
 
   // ── Required tariff ──────────────────────────────────────────────────
-  const rateRounding = getParam(params, 'TECHNICAL_MARGIN', 'Rate Rounding MEX USD', 100)
+  const rateRounding = workbookExact ? 100 : getParam(params, 'TECHNICAL_MARGIN', 'Rate Rounding MEX USD', 100)
   const requiredTariffUsd = mround(technicalTariffUsd + totalRiskAdjUsd, rateRounding)
   const operatingProfitUsd = requiredTariffUsd - productionCostUsd
   const operatingMargin = requiredTariffUsd > 0 ? operatingProfitUsd / requiredTariffUsd : 0

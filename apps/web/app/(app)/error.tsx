@@ -1,12 +1,13 @@
 'use client'
 
 import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function AppError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+  const router = useRouter()
   useEffect(() => {
-    // eslint-disable-next-line no-console
     console.error(error)
   }, [error])
   return (
@@ -20,7 +21,7 @@ export default function AppError({ error, reset }: { error: Error & { digest?: s
           <pre className="overflow-auto rounded-md border bg-muted/40 p-3 text-xs text-muted-foreground">{error.message}</pre>
           <div className="flex gap-2">
             <Button onClick={reset}>Try again</Button>
-            <Button variant="outline" onClick={() => { window.location.href = '/' }}>Dashboard</Button>
+            <Button variant="outline" onClick={() => router.push('/')}>Dashboard</Button>
           </div>
         </CardContent>
       </Card>

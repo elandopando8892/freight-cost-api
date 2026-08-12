@@ -24,9 +24,11 @@ export interface SavedQuote {
   requiredTariffUsd: number
   requiredTariffMxn: number
   fxRateUsed: number
+  calculationPolicy: 'LEGACY_UNSPECIFIED' | 'OPERATIONAL_V3' | 'WORKBOOK_V3'
   createdAt: string
   lane?: { origin?: string | null; destination?: string | null } | null
   set?: { id: string; name: string; version: number } | null
+  costBase?: { id: string; code: string; name: string; scope: string } | null
 }
 
 type SortKey = 'createdAt' | 'freightBaselineUsd' | 'requiredTariffMxn'
@@ -55,7 +57,7 @@ function laneStr(q: SavedQuote): string {
 
 function matchesQuery(q: SavedQuote, needle: string): boolean {
   if (!needle) return true
-  const hay = [q.label ?? '', q.operation, q.service, q.lane?.origin ?? '', q.lane?.destination ?? '', q.id.slice(0, 8)]
+  const hay = [q.label ?? '', q.operation, q.service, q.lane?.origin ?? '', q.lane?.destination ?? '', q.costBase?.code ?? '', q.costBase?.name ?? '', q.id.slice(0, 8)]
     .join(' ').toLowerCase()
   return hay.includes(needle)
 }
@@ -69,14 +71,14 @@ function compareQuotes(a: SavedQuote, b: SavedQuote, key: SortKey, dir: SortDir)
 }
 
 function toCsv(rows: SavedQuote[]): string {
-  const header = ['When', 'Label', 'Operation', 'Service', 'Origin', 'Destination', 'Baseline USD', 'Required USD', 'Required MXN', 'FX', 'Set', 'Id']
+  const header = ['When', 'Label', 'Operation', 'Service', 'Origin', 'Destination', 'Cost Base', 'Base Scope', 'Policy', 'Baseline USD', 'Required USD', 'Required MXN', 'FX', 'Set', 'Id']
   const esc = (v: unknown) => {
     const s = String(v ?? '')
     return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
   }
   const lines = rows.map((q) => [
     new Date(q.createdAt).toISOString(), q.label ?? '', q.operation, q.service,
-    q.lane?.origin ?? '', q.lane?.destination ?? '',
+    q.lane?.origin ?? '', q.lane?.destination ?? '', q.costBase?.code ?? '', q.costBase?.scope ?? '', q.calculationPolicy,
     q.freightBaselineUsd, q.requiredTariffUsd, q.requiredTariffMxn, q.fxRateUsed,
     q.set ? `${q.set.name} v${q.set.version}` : '', q.id,
   ].map(esc).join(','))
@@ -217,6 +219,7 @@ export function QuotesList({ initial }: { initial: SavedQuote[] }) {
                   <th className="px-4 py-2 text-left font-medium text-muted-foreground">Label</th>
                   <th className="px-4 py-2 text-left font-medium text-muted-foreground">Lane</th>
                   <th className="px-4 py-2 text-left font-medium text-muted-foreground">Operation</th>
+                  <th className="px-4 py-2 text-left font-medium text-muted-foreground">Cost base</th>
                   <SortHeader label="Baseline" sortKey="freightBaselineUsd" current={sortKey} dir={sortDir} onChange={toggleSort} align="right" />
                   <SortHeader label="Required (MXN)" sortKey="requiredTariffMxn" current={sortKey} dir={sortDir} onChange={toggleSort} align="right" />
                   <th className="px-4 py-2 text-right font-medium text-muted-foreground">FX</th>
@@ -226,7 +229,7 @@ export function QuotesList({ initial }: { initial: SavedQuote[] }) {
               <tbody>
                 {shown.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="px-4 py-12 text-center text-sm text-muted-foreground">
+                    <td colSpan={10} className="px-4 py-12 text-center text-sm text-muted-foreground">
                       {filtering ? (
                         <>No quotes match your filters.{' '}
                           <button type="button" onClick={() => { setSearch(''); setOpFilter(''); onDatePreset('all') }}
@@ -259,6 +262,12 @@ export function QuotesList({ initial }: { initial: SavedQuote[] }) {
                         <CellLink href={href} className="whitespace-nowrap">
                           <div>{q.operation}</div>
                           <div className="text-xs text-muted-foreground">{q.service}</div>
+                        </CellLink>
+                        <CellLink href={href} className="whitespace-nowrap">
+                          <div>{q.costBase?.code ?? <span className="text-muted-foreground">Legacy</span>}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {q.set ? `v${q.set.version}` : 'no version'} · {q.calculationPolicy === 'WORKBOOK_V3' ? 'Workbook' : q.calculationPolicy === 'OPERATIONAL_V3' ? 'Operational' : 'unspecified'}
+                          </div>
                         </CellLink>
                         <CellLink href={href} className="whitespace-nowrap text-right font-medium">
                           {usd.format(q.freightBaselineUsd)}

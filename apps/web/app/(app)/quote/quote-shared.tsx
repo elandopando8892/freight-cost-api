@@ -46,6 +46,7 @@ export interface ResolvedUsaLeg {
   origin?: string; dest?: string
 }
 export interface QuoteResult {
+  policy: 'OPERATIONAL_V3' | 'WORKBOOK_V3'
   operation: string
   mexLeg: MexLeg | null
   usaLeg: UsaLeg | null
@@ -53,6 +54,7 @@ export interface QuoteResult {
   commercial: Commercial
   fxRateUsed: number
   warnings: string[]
+  costBaseId: string | null
   assumptionSetId: string | null
   resolved: { mexLeg: ResolvedMexLeg | null; usaLeg: ResolvedUsaLeg | null }
 }
@@ -62,6 +64,7 @@ export interface FormSnapshot {
   fxRate: string
   origin: string
   destination: string
+  costBaseLabel: string
   equipment: { truckType: string; trailer: string; config: string; driver: string }
 }
 
@@ -72,6 +75,18 @@ export interface LaneHint {
   service: string
   origin: string | null
   destination: string | null
+}
+
+export type CostBaseScope = 'CROSS_BORDER' | 'DRAYAGE' | 'LOCAL' | 'INTRA_MEX' | 'INTRA_US'
+export interface CostBaseOption {
+  id: string
+  code: string
+  name: string
+  scope: CostBaseScope
+  status: 'DRAFT' | 'ACTIVE' | 'ARCHIVED'
+  defaultPolicy: 'OPERATIONAL_V3' | 'WORKBOOK_V3'
+  isDefault: boolean
+  versions: { id: string; version: number; isActive: boolean }[]
 }
 
 // ── Field constants ─────────────────────────────────────────────────────────
@@ -96,6 +111,7 @@ export const INITIAL_FORM = {
   mexBorder: 'Nuevo Laredo, Tamaulipas',
   usBorder: 'Laredo, TX',
   operation: 'D2D Import' as (typeof OPS)[number],
+  costBaseId: '',
   service: '' as (typeof SVCS)[number],
   route: 'Straight & Danger',
   fxRate: '',
@@ -106,6 +122,26 @@ export const INITIAL_FORM = {
 }
 export type FormFields = typeof INITIAL_FORM
 export type FormErrors = Partial<Record<keyof FormFields, string>>
+
+export function scopeForOperation(operation: string): CostBaseScope | null {
+  if (operation === 'D2D Export' || operation === 'D2D Import') return 'CROSS_BORDER'
+  if (operation === 'Drayage') return 'DRAYAGE'
+  if (operation === 'Local') return 'LOCAL'
+  if (operation === 'Intra-Mex' || operation === 'MX Northbound' || operation === 'MX Southbound') return 'INTRA_MEX'
+  if (operation === 'Intra-US' || operation === 'US Northbound' || operation === 'US Southbound') return 'INTRA_US'
+  return null
+}
+
+export function compatibleBases(bases: CostBaseOption[], operation: string) {
+  const scope = scopeForOperation(operation)
+  return bases.filter((base) => base.status !== 'ARCHIVED' && (!scope || base.scope === scope))
+}
+
+export function initialFormFor(bases: CostBaseOption[]): FormFields {
+  const options = compatibleBases(bases, INITIAL_FORM.operation)
+  const selected = options.find((base) => base.isDefault) ?? (options.length === 1 ? options[0] : undefined)
+  return { ...INITIAL_FORM, costBaseId: selected?.id ?? '' }
+}
 
 export function validate(f: FormFields): FormErrors {
   const e: FormErrors = {}
@@ -130,6 +166,7 @@ export function quoteBody(form: FormFields): Record<string, unknown> {
     equipment: { truckType: form.truckType, trailer: form.trailer, config: form.config, driver: form.driver },
   }
   if (form.service) body.service = form.service
+  if (form.costBaseId) body.costBaseId = form.costBaseId
   if (form.fxRate) body.fxRate = Number(form.fxRate)
   return body
 }
@@ -213,6 +250,8 @@ export function Placeholder() {
 
 export function Result({ r, snapshot }: { r: QuoteResult; snapshot: FormSnapshot }) {
   const c = r.commercial
+  const decision = c.noGoFlag ? 'NO-GO' : c.reviewFlag ? 'REVISAR' : 'LISTA PARA DECISION'
+  const decisionClass = c.noGoFlag ? 'border-rose-200 bg-rose-50 text-rose-800' : c.reviewFlag ? 'border-amber-200 bg-amber-50 text-amber-800' : 'border-emerald-200 bg-emerald-50 text-emerald-800'
   const [label, setLabel] = useState('')
   const [savedId, setSavedId] = useState<string | null>(null)
 
@@ -224,6 +263,9 @@ export function Result({ r, snapshot }: { r: QuoteResult; snapshot: FormSnapshot
       if (snapshot.fxRate) body.fxRate = Number(snapshot.fxRate)
       if (snapshot.origin) body.origin = snapshot.origin
       if (snapshot.destination) body.destination = snapshot.destination
+      if (r.costBaseId) body.costBaseId = r.costBaseId
+      if (r.assumptionSetId) body.assumptionSetId = r.assumptionSetId
+      body.policy = r.policy
       if (r.resolved.mexLeg) {
         const m = r.resolved.mexLeg
         body.mex = { baseKm: m.baseKm, routeExpensesMxn: m.routeExpensesMxn ?? 0, baseHours: m.baseHours ?? 0, route: m.route }
@@ -257,6 +299,15 @@ export function Result({ r, snapshot }: { r: QuoteResult; snapshot: FormSnapshot
             <Stat label="FX" value={r.fxRateUsed.toFixed(2)} />
             <Stat label="Operation" value={r.operation} />
             <Stat label="Margin" value={pct(c.grossMarginPct)} />
+          </div>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+            <span>Cost base: {r.costBaseId ? snapshot.costBaseLabel : 'legacy assumptions'}</span>
+            <span>Version: {r.assumptionSetId ? r.assumptionSetId.slice(0, 8) : 'none'}</span>
+            <span>Policy: {r.policy === 'WORKBOOK_V3' ? 'Workbook exact' : 'Operational V3'}</span>
+          </div>
+          <div className={`rounded border px-3 py-2 text-sm ${decisionClass}`}>
+            <span className="font-medium">Decision: {decision}</span>
+            {c.notes.length > 0 && <span className="ml-2 text-xs">{c.notes.join(' · ')}</span>}
           </div>
           <form className="flex flex-wrap items-center gap-2 border-t pt-3" onSubmit={(e) => { e.preventDefault(); save.mutate() }}>
             <Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Label (optional) — e.g. Acme Q3" className="h-9 flex-1 min-w-[200px]" disabled={save.isPending} />

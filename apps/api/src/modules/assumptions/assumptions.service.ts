@@ -34,13 +34,29 @@ function rangeWarning(section: string, field: string, value: number): RangeWarni
   return null
 }
 
+function versionLocked(status: string | undefined) {
+  return status === 'PUBLISHED' || status === 'ARCHIVED'
+}
+
+async function assertEditableSet(orgId: string, setId: string) {
+  const set = await prisma.assumptionSet.findFirstOrThrow({ where: { id: setId, orgId }, select: { status: true } })
+  if (versionLocked(set.status)) {
+    const err = new Error(`This assumption version is ${set.status.toLowerCase()} and cannot be modified. Create a new draft version first.`) as Error & { statusCode: number }
+    err.statusCode = 409
+    throw err
+  }
+  return set
+}
+
 export async function listSets(orgId: string) {
   return prisma.assumptionSet.findMany({
     where: { orgId },
     orderBy: [{ isActive: 'desc' }, { createdAt: 'desc' }],
     select: {
       id: true, name: true, version: true, isActive: true, notes: true,
+      status: true, sourceVersionId: true, publishedAt: true,
       createdAt: true, updatedAt: true,
+      costBase: { select: { id: true, code: true, name: true, scope: true, status: true } },
       _count: { select: { params: true } },
     },
   })
@@ -92,8 +108,8 @@ export async function createSet(orgId: string, input: CreateSetInput) {
           field: a.field,
           value: a.value,
           unit: a.unit,
-          low: a.low || null,
-          high: a.high || null,
+          low: a.low ?? null,
+          high: a.high ?? null,
           updateFrequency: a.updateFrequency,
           costBehavior: a.costBehavior,
           activation: a.activation,
@@ -112,7 +128,7 @@ export async function getSet(orgId: string, id: string) {
 }
 
 export async function updateSet(orgId: string, id: string, input: UpdateSetInput) {
-  await prisma.assumptionSet.findFirstOrThrow({ where: { id, orgId } })
+  await assertEditableSet(orgId, id)
   return prisma.assumptionSet.update({ where: { id }, data: input })
 }
 
@@ -123,13 +139,18 @@ export async function deleteSet(orgId: string, id: string) {
     err.statusCode = 409
     throw err
   }
+  if (versionLocked(set.status)) {
+    const err = new Error('Cannot delete a published or archived assumption version') as Error & { statusCode: number }
+    err.statusCode = 409
+    throw err
+  }
   return prisma.assumptionSet.delete({ where: { id } })
 }
 
 export async function activateSet(orgId: string, id: string) {
-  await prisma.assumptionSet.findFirstOrThrow({ where: { id, orgId } })
+  const target = await prisma.assumptionSet.findFirstOrThrow({ where: { id, orgId }, select: { costBaseId: true } })
   await prisma.$transaction([
-    prisma.assumptionSet.updateMany({ where: { orgId, isActive: true }, data: { isActive: false } }),
+    prisma.assumptionSet.updateMany({ where: { orgId, costBaseId: target.costBaseId, isActive: true }, data: { isActive: false } }),
     prisma.assumptionSet.update({ where: { id }, data: { isActive: true } }),
   ])
   return prisma.assumptionSet.findUnique({ where: { id } })
@@ -170,7 +191,7 @@ export async function getParams(orgId: string, setId: string) {
 }
 
 export async function bulkUpdateParams(orgId: string, setId: string, updates: BulkUpdateInput) {
-  await prisma.assumptionSet.findFirstOrThrow({ where: { id: setId, orgId } })
+  await assertEditableSet(orgId, setId)
 
   await prisma.$transaction(
     updates.map((u) => {
@@ -199,7 +220,7 @@ export async function bulkUpdateParams(orgId: string, setId: string, updates: Bu
 
 /** Reset params to their V3.0 recommended values (all, or only the given fields). */
 export async function resetParams(orgId: string, setId: string, fields?: ResetParamsInput['fields']) {
-  await prisma.assumptionSet.findFirstOrThrow({ where: { id: setId, orgId } })
+  await assertEditableSet(orgId, setId)
 
   const targets: DefaultParam[] =
     fields && fields.length > 0
@@ -214,10 +235,10 @@ export async function resetParams(orgId: string, setId: string, fields?: ResetPa
         where: { setId_section_field: { setId, section: a.section as Section, field: a.field } },
         create: {
           setId, section: a.section as Section, field: a.field, value: a.value,
-          unit: a.unit, low: a.low || null, high: a.high || null,
+          unit: a.unit, low: a.low ?? null, high: a.high ?? null,
           updateFrequency: a.updateFrequency, costBehavior: a.costBehavior, activation: a.activation,
         },
-        update: { value: a.value, low: a.low || null, high: a.high || null },
+        update: { value: a.value, low: a.low ?? null, high: a.high ?? null },
       }),
     ),
   )

@@ -193,6 +193,28 @@ describe('Cross-border assembly — Monterrey → Dallas Flatbed D2D Export = $2
   })
 })
 
+describe('Calculation policy is explicit and auditable', () => {
+  const equipment = { truckType: 'Truck Trailer', trailer: 'Flatbed', config: 'Single', driver: 'B1' }
+  const mexLeg = {
+    baseKm: 225, routeExpensesMxn: 0, baseHours: 0,
+    operation: 'D2D Export', service: 'One Way', route: 'Straight & Danger', equipment,
+  }
+
+  it('defaults to operational rules and returns the selected policy', () => {
+    const result = calculate({ operation: 'D2D Export', service: 'One Way', equipment, params: {}, mexLeg })
+    expect(result.policy).toBe('OPERATIONAL_V3')
+    expect(result.mexLeg?.requiredTariffUsd).toBe(1300)
+  })
+
+  it('WORKBOOK_V3 reproduces the source result without changing operational defaults', () => {
+    const workbook = calculate({ policy: 'WORKBOOK_V3', operation: 'D2D Export', service: 'One Way', equipment, params: {}, mexLeg })
+    const operational = calculate({ policy: 'OPERATIONAL_V3', operation: 'D2D Export', service: 'One Way', equipment, params: {}, mexLeg })
+    expect(workbook.policy).toBe('WORKBOOK_V3')
+    expect(workbook.mexLeg?.requiredTariffUsd).toBe(1200)
+    expect(operational.mexLeg?.requiredTariffUsd).toBe(1300)
+  })
+})
+
 describe('ReferenceKey — byte-exact vs V3.0 (mexLaneProd!CL / usaLaneProd!BV)', () => {
   const equipment = { truckType: 'Truck Trailer', trailer: 'Flatbed', config: 'Single', driver: 'B1' }
 

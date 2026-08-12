@@ -4,6 +4,7 @@ import crypto from 'crypto'
 export const CreateLaneSchema = z.object({
   origin: z.string().min(2),
   destination: z.string().min(2),
+  costBaseId: z.string().min(1).nullable().optional(),
   equipmentId: z.string().cuid().optional(),
   operationType: z.string().min(1),
   serviceType: z.string().min(1),
@@ -31,7 +32,8 @@ export function buildLaneKey(
   operationType: string,
   serviceType: string,
   config: string,
+  costBaseId?: string | null,
 ): string {
-  const raw = `${orgId}|${origin}|${destination}|${equipmentId ?? ''}|${operationType}|${serviceType}|${config}`
+  const raw = `${orgId}|${origin}|${destination}|${equipmentId ?? ''}|${operationType}|${serviceType}|${config}|${costBaseId ?? ''}`
   return crypto.createHash('sha256').update(raw).digest('hex').slice(0, 16)
 }

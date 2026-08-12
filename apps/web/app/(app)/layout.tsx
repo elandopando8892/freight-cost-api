@@ -9,9 +9,18 @@ import { ThemeToggle } from './theme-toggle'
 const NAV = [
   { href: '/', label: 'Dashboard' },
   { href: '/assumptions', label: 'Assumptions' },
+  { href: '/cost-bases', label: 'Bases' },
+  { href: '/catalog', label: 'Catalog' },
   { href: '/production', label: 'Rutas' },
   { href: '/quote', label: 'Quote' },
   { href: '/quotes', label: 'History' },
+  { href: '/ratebooks', label: 'RateBook' },
+  { href: '/market-intelligence', label: 'Market' },
+  { href: '/approvals', label: 'Approvals' },
+  { href: '/onboarding', label: 'Onboarding' },
+  { href: '/pilot-readiness', label: 'Pilot' },
+  { href: '/assistant', label: 'AI' },
+  { href: '/scenarios', label: 'Scenarios' },
   { href: '/fuel', label: 'Fuel' },
 ]
 

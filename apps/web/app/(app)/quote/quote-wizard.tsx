@@ -9,9 +9,9 @@ import { Input } from '@/components/ui/input'
 import { fetcher } from '@/lib/fetcher'
 import { LocationInput } from './location-input'
 import {
-  type QuoteResult, type FormFields, type FormErrors,
+  type QuoteResult, type FormFields, type FormErrors, type CostBaseOption,
   OPS, SVCS, TRUCKS, TRAILERS, CONFIGS, DRIVERS, ROUTES, selectCls,
-  INITIAL_FORM, quoteBody, Field, ResultSkeleton, Result,
+  initialFormFor, compatibleBases, quoteBody, Field, ResultSkeleton, Result,
 } from './quote-shared'
 
 // Progressive-disclosure steps: one decision at a time, with microcopy.
@@ -21,9 +21,9 @@ const STEPS = [
   { key: 'review', title: 'Revisar', blurb: 'Confirm and price. You can tweak anything before saving.' },
 ] as const
 
-export function QuoteWizard() {
+export function QuoteWizard({ costBases = [] }: { costBases?: CostBaseOption[] }) {
   const [step, setStep] = useState(0)
-  const [form, setForm] = useState<FormFields>(INITIAL_FORM)
+  const [form, setForm] = useState<FormFields>(() => initialFormFor(costBases))
   const [errors, setErrors] = useState<FormErrors>({})
   const [result, setResult] = useState<QuoteResult | null>(null)
 
@@ -67,7 +67,7 @@ export function QuoteWizard() {
 
   const next = () => { if (validateStep(step)) setStep((s) => Math.min(s + 1, STEPS.length - 1)) }
   const back = () => setStep((s) => Math.max(s - 1, 0))
-  const restart = () => { setForm(INITIAL_FORM); setErrors({}); setResult(null); setStep(0) }
+  const restart = () => { setForm(initialFormFor(costBases)); setErrors({}); setResult(null); setStep(0) }
 
   return (
     <div className="mx-auto grid max-w-3xl gap-6">
@@ -79,9 +79,9 @@ export function QuoteWizard() {
           <CardDescription>{STEPS[step].blurb}</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-5">
-          {step === 0 && <LaneStep form={form} errors={errors} set={set} locations={locations} />}
+          {step === 0 && <LaneStep form={form} errors={errors} set={set} locations={locations} costBases={costBases} />}
           {step === 1 && <EquipmentStep form={form} set={set} />}
-          {step === 2 && <ReviewStep form={form} onEdit={setStep} />}
+          {step === 2 && <ReviewStep form={form} onEdit={setStep} costBases={costBases} />}
         </CardContent>
       </Card>
 
@@ -114,6 +114,7 @@ export function QuoteWizard() {
                 origin: form.outboundLocation.trim(),
                 destination: form.inboundLocation.trim(),
                 equipment: { truckType: form.truckType, trailer: form.trailer, config: form.config, driver: form.driver },
+                costBaseLabel: costBases.find((base) => base.id === form.costBaseId)?.code ?? 'Legacy',
               }}
             />
           ) : null}
@@ -160,7 +161,7 @@ type StepProps = {
   set: <K extends keyof FormFields>(k: K, v: FormFields[K]) => void
 }
 
-function LaneStep({ form, errors, set, locations }: StepProps & { errors: FormErrors; locations: string[] }) {
+function LaneStep({ form, errors, set, locations, costBases }: StepProps & { errors: FormErrors; locations: string[]; costBases: CostBaseOption[] }) {
   const [showAdvanced, setShowAdvanced] = useState(false)
   return (
     <>
@@ -174,7 +175,14 @@ function LaneStep({ form, errors, set, locations }: StepProps & { errors: FormEr
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Operation" hint="Movement type: D2D Export/Import (cross-border), Drayage (port), Intra-Mex, or Local.">
-          <select className={selectCls} value={form.operation} onChange={(e) => set('operation', e.target.value as (typeof OPS)[number])}>
+          <select className={selectCls} value={form.operation} onChange={(e) => {
+            const operation = e.target.value as (typeof OPS)[number]
+            const options = compatibleBases(costBases, operation)
+            const currentStillValid = options.some((base) => base.id === form.costBaseId)
+            const fallback = options.find((base) => base.isDefault) ?? (options.length === 1 ? options[0] : undefined)
+            set('operation', operation)
+            set('costBaseId', currentStillValid ? form.costBaseId : fallback?.id ?? '')
+          }}>
             {OPS.map((o) => <option key={o} value={o}>{o}</option>)}
           </select>
         </Field>
@@ -185,6 +193,15 @@ function LaneStep({ form, errors, set, locations }: StepProps & { errors: FormEr
           </select>
         </Field>
       </div>
+      <Field label="Cost base" hint="The base and active version used here stay attached to the route and saved quote.">
+        <select className={selectCls} value={form.costBaseId} onChange={(e) => set('costBaseId', e.target.value)}>
+          <option value="">Legacy active assumptions</option>
+          {compatibleBases(costBases, form.operation).map((base) => {
+            const active = base.versions.find((version) => version.isActive)
+            return <option key={base.id} value={base.id}>{base.code} · {base.name}{active ? ` · v${active.version}` : ''}{base.isDefault ? ' · default' : ''}</option>
+          })}
+        </select>
+      </Field>
       <button type="button" onClick={() => setShowAdvanced((v) => !v)} className="justify-self-start text-xs text-muted-foreground hover:text-foreground">
         {showAdvanced ? '− advanced' : '+ advanced (borders, route, FX)'}
       </button>
@@ -233,10 +250,13 @@ function EquipmentStep({ form, set }: StepProps) {
   )
 }
 
-function ReviewStep({ form, onEdit }: { form: FormFields; onEdit: (s: number) => void }) {
+function ReviewStep({ form, onEdit, costBases }: { form: FormFields; onEdit: (s: number) => void; costBases: CostBaseOption[] }) {
+  const selectedBase = costBases.find((base) => base.id === form.costBaseId)
+  const activeVersion = selectedBase?.versions.find((version) => version.isActive)
   const rows: { label: string; value: string; step: number }[] = [
     { label: 'Lane', value: `${form.outboundLocation || '—'} → ${form.inboundLocation || '—'}`, step: 0 },
     { label: 'Operation', value: `${form.operation}${form.service ? ` · ${form.service}` : ' · auto service'}`, step: 0 },
+    { label: 'Cost base', value: selectedBase ? `${selectedBase.code} · ${selectedBase.name}${activeVersion ? ` · v${activeVersion.version}` : ''}` : 'Legacy active assumptions', step: 0 },
     { label: 'Equipment', value: `${form.truckType} · ${form.trailer} · ${form.config} · ${form.driver}`, step: 1 },
   ]
   return (

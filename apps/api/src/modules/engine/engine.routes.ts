@@ -2,12 +2,12 @@ import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import { authenticate } from '../../middleware/authenticate.js'
 import type { JwtPayload } from '../auth/auth.schema.js'
-import { getActiveSet, buildParamMap, type ParamMap } from '../assumptions/assumptions.service.js'
-import { prisma } from '../../config/prisma.js'
+import { buildParamMap, type ParamMap } from '../assumptions/assumptions.service.js'
 import { calculate } from './engine.calculator.js'
 import { resolveRoute } from './lane-resolver.service.js'
 import { defaultService } from './engine.factors.js'
 import type { EngineInput, EquipmentSpec, MarketCondition } from './engine.types.js'
+import { resolveCalculationContext } from '../cost-bases/cost-bases.service.js'
 
 const MarketConditionEnum = z.enum([
   'Very Tight', 'Moderately Tight', 'Balanced', 'Slightly Loose', 'Very Loose',
@@ -20,6 +20,8 @@ const EquipmentSchema = z.object({
   config: z.string().default('Single'),
   driver: z.string().default('B1'),
 })
+
+const EnginePolicySchema = z.enum(['OPERATIONAL_V3', 'WORKBOOK_V3'])
 
 const MexSchema = z.object({
   baseKm: z.number().nonnegative(),
@@ -64,6 +66,8 @@ const DrayageSchema = z.object({
 })
 
 const CalculateSchema = z.object({
+  policy: EnginePolicySchema.optional(),
+  costBaseId: z.string().min(1).optional(),
   assumptionSetId: z.string().min(1).optional(),
   overrides: z.record(z.number()).optional(),
   operation: z.string(),
@@ -90,13 +94,12 @@ export async function engineRoutes(app: FastifyInstance) {
     const service = body.service ?? defaultService(body.operation)
 
     let params: ParamMap = {}
-    const set = body.assumptionSetId
-      ? await prisma.assumptionSet.findFirst({ where: { id: body.assumptionSetId, orgId }, include: { params: true } })
-      : await getActiveSet(orgId)
+    const { costBase, set, defaultPolicy } = await resolveCalculationContext(orgId, body)
     if (set) params = buildParamMap(set.params)
 
     const equipment: EquipmentSpec = body.equipment
     const input: EngineInput = {
+      policy: body.policy ?? defaultPolicy,
       operation: body.operation,
       service,
       equipment,
@@ -122,11 +125,13 @@ export async function engineRoutes(app: FastifyInstance) {
     }
 
     const result = calculate(input)
-    return reply.send({ ...result, assumptionSetId: set?.id ?? null })
+    return reply.send({ ...result, costBaseId: costBase?.id ?? null, assumptionSetId: set?.id ?? null })
   })
 
   // ── Quote by route name — resolves leg facts from V3.0 reference tables ───
   const ByRouteSchema = z.object({
+    policy: EnginePolicySchema.optional(),
+    costBaseId: z.string().min(1).optional(),
     assumptionSetId: z.string().min(1).optional(),
     overrides: z.record(z.number()).optional(),
     outboundLocation: z.string().min(1),
@@ -162,12 +167,11 @@ export async function engineRoutes(app: FastifyInstance) {
     }
 
     let params: ParamMap = {}
-    const set = body.assumptionSetId
-      ? await prisma.assumptionSet.findFirst({ where: { id: body.assumptionSetId, orgId }, include: { params: true } })
-      : await getActiveSet(orgId)
+    const { costBase, set, defaultPolicy } = await resolveCalculationContext(orgId, body)
     if (set) params = buildParamMap(set.params)
 
     const result = calculate({
+      policy: body.policy ?? defaultPolicy,
       operation: body.operation,
       service,
       equipment: body.equipment,
@@ -182,6 +186,7 @@ export async function engineRoutes(app: FastifyInstance) {
       ...result,
       resolved: { mexLeg: resolved.mexLeg ?? null, usaLeg: resolved.usaLeg ?? null },
       warnings: resolved.warnings,
+      costBaseId: costBase?.id ?? null,
       assumptionSetId: set?.id ?? null,
     })
   })

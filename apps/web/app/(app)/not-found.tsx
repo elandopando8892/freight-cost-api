@@ -11,7 +11,7 @@ export default function AppNotFound() {
         <CardHeader>
           <CardTitle>404 — Not found</CardTitle>
           <CardDescription>
-            We couldn't find that page. It may have moved or you may not have access to it.
+            We couldn&apos;t find that page. It may have moved or you may not have access to it.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2 text-sm">

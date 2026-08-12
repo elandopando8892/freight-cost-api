@@ -6,12 +6,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { buttonVariants } from '@/components/ui/button'
 import { RelativeTime } from '@/components/relative-time'
 import { OrgNameForm } from './org-name-form'
+import { GmailIntegrationCard } from './gmail-integration-card'
+import { TeamInvitations } from './team-invitations'
 
 export const dynamic = 'force-dynamic'
 export const metadata: Metadata = { title: 'Settings' }
 
 interface Org { id: string; name: string; country: string; createdAt: string }
-interface Member { id: string; email: string; role: string; createdAt: string }
+interface Member { id: string; email: string; role: string; identityLinked: boolean; createdAt: string }
+interface Invitation { id: string; email: string; role: 'ADMIN' | 'OPERATOR' | 'VIEWER'; status: 'PENDING' | 'ACCEPTED' | 'REVOKED' | 'EXPIRED'; expiresAt: string }
 interface Me { id: string; email: string; role: string; orgId: string }
 
 function initials(name: string, email: string): string {
@@ -22,10 +25,11 @@ function initials(name: string, email: string): string {
 
 export default async function SettingsPage() {
   const { getUser } = getKindeServerSession()
-  const [org, members, me, user] = await Promise.all([
+  const [org, members, me, invitations, user] = await Promise.all([
     api<Org>('/org').catch(() => null),
     api<Member[]>('/org/members').catch(() => [] as Member[]),
     api<Me>('/auth/me').catch(() => null),
+    api<Invitation[]>('/org/invitations').catch(() => [] as Invitation[]),
     getUser(),
   ])
 
@@ -61,7 +65,7 @@ export default async function SettingsPage() {
                         <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium">{m.role}</span>
                       </td>
                       <td className="px-3 py-2 text-right text-xs text-muted-foreground">
-                        joined <RelativeTime iso={m.createdAt} />
+                        {m.identityLinked ? 'Kinde linked' : 'Awaiting first login'}
                       </td>
                     </tr>
                   ))}
@@ -71,10 +75,12 @@ export default async function SettingsPage() {
                 </tbody>
               </table>
             </div>
-            <p className="mt-2 text-xs text-muted-foreground">Inviting teammates is coming soon.</p>
           </div>
+          {me?.role === 'ADMIN' ? <TeamInvitations invitations={invitations} /> : null}
         </CardContent>
       </Card>
+
+      <GmailIntegrationCard email={email} />
 
       {/* Account */}
       <Card>

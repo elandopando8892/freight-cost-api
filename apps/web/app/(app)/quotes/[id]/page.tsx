@@ -6,6 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { RelativeTime } from '@/components/relative-time'
 import { DeleteQuoteButton } from './delete-button'
 import { ShareButtons } from './share-buttons'
+import { SnapshotVerifier } from './snapshot-verifier'
+import { QuoteConfirmation, RatewareHandoffDownload } from './quote-confirmation'
 
 export const dynamic = 'force-dynamic'
 
@@ -46,6 +48,19 @@ interface Commercial {
   recommendedSellUsd: number; grossProfitUsd: number; grossMarginPct: number; gpPerLoadedMileUsd: number
   marketReferenceUsd: number; noGoFlag: boolean; reviewFlag: boolean; notes: string[]
 }
+interface QuoteExplanation {
+  format: 'fcm.quote-explanation.v1'
+  input: {
+    operation: string; service: string
+    equipment: { truckType: string; trailer: string; config: string; driver: string }
+    fxRateRequested: number | null; overrideCount: number
+    legs: { mex: { baseKm: number; routeExpensesMxn: number; baseHours: number; route: string } | null; usa: { loadedMiles: number; transitDaysRaw: number; outState: string; dieselUsdGal: number; fscUsdMile: number } | null }
+  }
+  lineage: { policy: string; costBase: { code: string; name: string; scope: string; status: string } | null; set: { name: string; version: number; status: string } | null }
+  calculation: { freightBaselineUsd: number; fxRateUsed: number; mex: { tariffUsd: number; productionCostUsd: number; riskAdjUsd: number; referenceKey: string } | null; usa: { tariffUsd: number; productionCostUsd: number; riskAdjUsd: number; referenceKey: string; marketRateUsd: number } | null }
+  decision: { disposition: 'READY' | 'REVIEW' | 'NO_GO'; alerts: { code: string; message: string }[] }
+  snapshot?: { format: 'fcm.calculation-snapshot.v1'; engineVersion: string; checksum: string }
+}
 
 interface QuoteDetail {
   id: string
@@ -56,12 +71,21 @@ interface QuoteDetail {
   requiredTariffUsd: number
   requiredTariffMxn: number
   fxRateUsed: number
+  calculationPolicy: 'LEGACY_UNSPECIFIED' | 'OPERATIONAL_V3' | 'WORKBOOK_V3'
+  status: 'DRAFT' | 'CONFIRMED' | 'ARCHIVED'
+  confirmedAt: string | null
+  confirmedBy: { id: string; email: string } | null
+  confirmationNote: string | null
+  auditEvents: { id: string; action: 'CREATED' | 'CONFIRMED'; note: string | null; createdAt: string; actor: { id: string; email: string } | null }[]
   createdAt: string
   mexLeg: MexLegOutput | null
   usaLeg: UsaLegOutput | null
   commercial: Commercial | null
+  explanation: QuoteExplanation | null
   lane: { id: string; origin: string | null; destination: string | null } | null
+  productionRoute: { id: string; code: string | null; status: string; origin: string; destination: string } | null
   set: { id: string; name: string; version: number } | null
+  costBase: { id: string; code: string; name: string; scope: string } | null
 }
 
 const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
@@ -109,11 +133,20 @@ export default async function QuoteDetailPage(
             {q.operation} · {q.service} · saved <RelativeTime iso={q.createdAt} />
             {q.set && <> · <Link href={`/assumptions/${q.set.id}`} className="hover:text-foreground">{q.set.name} (v{q.set.version})</Link></>}
           </p>
+          <p className="text-sm text-muted-foreground">
+            Cost base:{' '}
+            {q.costBase ? <Link href="/cost-bases" className="font-medium text-foreground hover:underline">{q.costBase.code} · {q.costBase.name}</Link> : <span>Legacy assumptions</span>}
+            {' · '}Policy: {q.calculationPolicy === 'WORKBOOK_V3' ? 'Workbook exact' : q.calculationPolicy === 'OPERATIONAL_V3' ? 'Operational V3' : 'Legacy unspecified'}
+          </p>
+          <p className={q.status === 'CONFIRMED' ? 'text-sm font-medium text-emerald-700' : q.status === 'ARCHIVED' ? 'text-sm text-muted-foreground' : 'text-sm font-medium text-amber-700'}>
+            {q.status === 'CONFIRMED' ? 'Confirmed human decision' : q.status === 'ARCHIVED' ? 'Archived quote' : 'Pending human confirmation'}
+          </p>
           {q.lane && (q.lane.origin || q.lane.destination) && (
             <p className="text-sm text-muted-foreground">
               Lane: <span className="text-foreground">{q.lane.origin ?? '—'}</span> → <span className="text-foreground">{q.lane.destination ?? '—'}</span>
             </p>
           )}
+          {q.productionRoute && <p className="text-sm text-muted-foreground">Source: production route <Link href="/production" className="font-medium text-foreground hover:underline">{q.productionRoute.code ?? `${q.productionRoute.origin} to ${q.productionRoute.destination}`}</Link></p>}
         </div>
         <div className="flex shrink-0 flex-wrap items-center gap-2 print:hidden">
           <ShareButtons
@@ -143,6 +176,8 @@ export default async function QuoteDetailPage(
               commercial: q.commercial,
             }}
           />
+          <QuoteConfirmation quoteId={q.id} status={q.status} confirmedAt={q.confirmedAt} confirmedBy={q.confirmedBy} confirmationNote={q.confirmationNote} />
+          {q.status === 'CONFIRMED' && <RatewareHandoffDownload quoteId={q.id} />}
           <Link
             href="/quote"
             className="rounded-md border bg-background px-3 py-1.5 text-sm shadow-sm hover:bg-accent"
@@ -169,6 +204,9 @@ export default async function QuoteDetailPage(
         </CardContent>
       </Card>
 
+      {q.explanation && <EvidenceCard quoteId={q.id} explanation={q.explanation} />}
+      <AuditTimeline events={q.auditEvents} />
+
       {/* Leg cards */}
       <div className="mb-6 grid gap-4 md:grid-cols-2">
         {q.mexLeg && <MexLegCard leg={q.mexLeg} />}
@@ -178,6 +216,51 @@ export default async function QuoteDetailPage(
       {/* Commercial */}
       {q.commercial && <CommercialCard c={q.commercial} />}
     </main>
+  )
+}
+
+function AuditTimeline({ events }: { events: QuoteDetail['auditEvents'] }) {
+  if (events.length === 0) return <Card className="mb-6"><CardContent className="py-4 text-sm text-muted-foreground">Cotizacion historica sin eventos de auditoria estructurados.</CardContent></Card>
+  return (
+    <Card className="mb-6">
+      <CardHeader className="pb-2"><CardTitle className="text-base">Historial de auditoria</CardTitle><CardDescription>Eventos escritos por el servidor al crear y confirmar la cotizacion.</CardDescription></CardHeader>
+      <CardContent className="grid gap-3">
+        {events.map((event) => <div key={event.id} className="grid gap-1 border-l-2 border-muted pl-3 text-sm"><div className="flex flex-wrap items-center gap-x-2"><span className="font-medium">{event.action === 'CREATED' ? 'Cotizacion creada' : 'Cotizacion confirmada'}</span><span className="text-xs text-muted-foreground">{new Date(event.createdAt).toLocaleString()}</span></div><div className="text-xs text-muted-foreground">{event.actor?.email ?? 'Usuario ya no disponible'}</div>{event.note && <div className="text-sm text-muted-foreground">{event.note}</div>}</div>)}
+      </CardContent>
+    </Card>
+  )
+}
+
+function EvidenceCard({ quoteId, explanation }: { quoteId: string; explanation: QuoteExplanation }) {
+  const isNoGo = explanation.decision.disposition === 'NO_GO'
+  const isReview = explanation.decision.disposition === 'REVIEW'
+  const tone = isNoGo ? 'border-rose-300 bg-rose-50/60 dark:bg-rose-950/20' : isReview ? 'border-amber-300 bg-amber-50/60 dark:bg-amber-950/20' : 'border-emerald-300 bg-emerald-50/50 dark:bg-emerald-950/20'
+  const label = isNoGo ? 'No-go' : isReview ? 'Requiere revision' : 'Lista para decision'
+  return (
+    <Card className={`mb-6 ${tone}`}>
+      <CardHeader className="pb-2">
+        <CardTitle className="flex flex-wrap items-center justify-between gap-2 text-base"><span>Evidencia de la cotizacion</span><span className="rounded border bg-background/70 px-2 py-1 text-xs font-medium">{label}</span></CardTitle>
+        <CardDescription>Registro generado por el servidor al guardar. No se recalcula cuando cambian datos posteriores.</CardDescription>
+      </CardHeader>
+      <CardContent className="grid gap-4">
+        <div className="grid gap-3 text-sm sm:grid-cols-3">
+          <Stat label="Base" value={explanation.lineage.costBase ? `${explanation.lineage.costBase.code} · ${explanation.lineage.costBase.status}` : 'Legacy'} />
+          <Stat label="Version" value={explanation.lineage.set ? `v${explanation.lineage.set.version} · ${explanation.lineage.set.status}` : 'Sin version'} />
+          <Stat label="Politica" value={explanation.lineage.policy === 'WORKBOOK_V3' ? 'Workbook exact' : 'Operational V3'} />
+        </div>
+        {explanation.decision.alerts.length > 0 ? <div className="grid gap-1 text-sm">{explanation.decision.alerts.map((alert, index) => <div key={`${alert.code}-${index}`}><span className="font-medium">{alert.code.replaceAll('_', ' ')}:</span> {alert.message}</div>)}</div> : <p className="text-sm text-muted-foreground">Sin alertas comerciales ni de gobierno de datos.</p>}
+        <details className="rounded border bg-background/70 px-3 py-2 text-sm">
+          <summary className="cursor-pointer font-medium">Ver contexto y componentes guardados</summary>
+          <div className="mt-3 grid gap-3 text-xs text-muted-foreground sm:grid-cols-2">
+            <div><div className="font-medium text-foreground">Contexto</div><div>{explanation.input.operation} · {explanation.input.service}</div><div>{explanation.input.equipment.truckType} · {explanation.input.equipment.trailer} · {explanation.input.equipment.config}</div><div>FX solicitado: {explanation.input.fxRateRequested ?? 'default'} · Overrides: {explanation.input.overrideCount}</div></div>
+            <div><div className="font-medium text-foreground">Desglose guardado</div>{explanation.calculation.mex && <div>MEX: costo {usd.format(explanation.calculation.mex.productionCostUsd)} + riesgo {usd.format(explanation.calculation.mex.riskAdjUsd)} = {usd.format(explanation.calculation.mex.tariffUsd)}</div>}{explanation.calculation.usa && <div>USA: costo {usd.format(explanation.calculation.usa.productionCostUsd)} + riesgo {usd.format(explanation.calculation.usa.riskAdjUsd)} = {usd.format(explanation.calculation.usa.tariffUsd)}</div>}</div>
+          </div>
+        </details>
+        {explanation.snapshot
+          ? <SnapshotVerifier quoteId={quoteId} checksum={explanation.snapshot.checksum} />
+          : <p className="text-xs text-muted-foreground">Cotizacion historica sin snapshot reproducible.</p>}
+      </CardContent>
+    </Card>
   )
 }
 

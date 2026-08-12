@@ -17,8 +17,8 @@ next-env.d.ts
 .env.*.local
 *.env.local
 
-# Prisma local artifacts (db push workflow — migrations SQL not committed)
-**/prisma/migrations/*.sql
+# Prisma local artifacts
+# Migration SQL is intentionally versioned; only local database files are ignored.
 **/*.db
 **/*.db-journal
 

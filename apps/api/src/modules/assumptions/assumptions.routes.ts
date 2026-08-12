@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify'
 import { authenticate } from '../../middleware/authenticate.js'
+import { requireRole } from '../../middleware/authorize.js'
 import type { JwtPayload } from '../auth/auth.schema.js'
 import {
   CreateSetSchema,
@@ -27,7 +28,7 @@ export async function assumptionsRoutes(app: FastifyInstance) {
     return listSets(orgId)
   })
 
-  app.post('/assumptions/sets', async (request, reply) => {
+  app.post('/assumptions/sets', { preHandler: requireRole('ADMIN') }, async (request, reply) => {
     const { orgId } = request.user as JwtPayload
     const input = CreateSetSchema.parse(request.body)
     const set = await createSet(orgId, input)
@@ -40,21 +41,21 @@ export async function assumptionsRoutes(app: FastifyInstance) {
     return getSet(orgId, id)
   })
 
-  app.put('/assumptions/sets/:id', async (request) => {
+  app.put('/assumptions/sets/:id', { preHandler: requireRole('ADMIN') }, async (request) => {
     const { orgId } = request.user as JwtPayload
     const { id } = request.params as { id: string }
     const input = UpdateSetSchema.parse(request.body)
     return updateSet(orgId, id, input)
   })
 
-  app.delete('/assumptions/sets/:id', async (request, reply) => {
+  app.delete('/assumptions/sets/:id', { preHandler: requireRole('ADMIN') }, async (request, reply) => {
     const { orgId } = request.user as JwtPayload
     const { id } = request.params as { id: string }
     await deleteSet(orgId, id)
     return reply.status(204).send()
   })
 
-  app.post('/assumptions/sets/:id/activate', async (request) => {
+  app.post('/assumptions/sets/:id/activate', { preHandler: requireRole('ADMIN') }, async (request) => {
     const { orgId } = request.user as JwtPayload
     const { id } = request.params as { id: string }
     return activateSet(orgId, id)
@@ -66,7 +67,7 @@ export async function assumptionsRoutes(app: FastifyInstance) {
     return getParams(orgId, id)
   })
 
-  app.patch('/assumptions/sets/:id/params', async (request) => {
+  app.patch('/assumptions/sets/:id/params', { preHandler: requireRole('ADMIN') }, async (request) => {
     const { orgId } = request.user as JwtPayload
     const { id } = request.params as { id: string }
     const updates = BulkUpdateParamsSchema.parse(request.body)
@@ -74,7 +75,7 @@ export async function assumptionsRoutes(app: FastifyInstance) {
   })
 
   // Reset params to V3.0 recommended values (whole set, or only the given fields).
-  app.post('/assumptions/sets/:id/params/reset', async (request) => {
+  app.post('/assumptions/sets/:id/params/reset', { preHandler: requireRole('ADMIN') }, async (request) => {
     const { orgId } = request.user as JwtPayload
     const { id } = request.params as { id: string }
     const body = ResetParamsSchema.parse(request.body ?? {})

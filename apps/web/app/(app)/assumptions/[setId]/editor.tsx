@@ -32,7 +32,7 @@ interface Warning { section: string; field: string; value: number; low: number |
 const key = (p: { section: string; field: string }) => `${p.section}__${p.field}`
 const fmt = (n: number) => Number.isInteger(n) ? String(n) : String(+n.toFixed(6))
 
-export function Editor({ setId, initial, sections }: { setId: string; initial: Grouped; sections: string[] }) {
+export function Editor({ setId, initial, sections, readOnly = false }: { setId: string; initial: Grouped; sections: string[]; readOnly?: boolean }) {
   const [data, setData] = useState<Grouped>(initial)
   const [pending, setPending] = useState<Record<string, number>>({})
   const [warnings, setWarnings] = useState<Warning[]>([])
@@ -89,12 +89,12 @@ export function Editor({ setId, initial, sections }: { setId: string; initial: G
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
         e.preventDefault()
-        if (pendingCount > 0 && !save.isPending) save.mutate()
+        if (!readOnly && pendingCount > 0 && !save.isPending) save.mutate()
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [pendingCount, save])
+  }, [pendingCount, readOnly, save])
 
   // Per-section counts for the side nav: pending edits + out-of-range params + matches.
   const sectionStats = useMemo(() => {
@@ -161,7 +161,9 @@ export function Editor({ setId, initial, sections }: { setId: string; initial: G
       <div>
       <div className="sticky top-0 z-10 -mx-4 mb-4 flex flex-wrap items-center justify-between gap-3 border-b bg-background/80 px-4 py-3 backdrop-blur">
         <div className="flex items-center gap-3 text-sm">
-          {pendingCount === 0 ? (
+          {readOnly ? (
+            <span className="font-medium text-muted-foreground">Read-only published version.</span>
+          ) : pendingCount === 0 ? (
             <span className="text-muted-foreground">No pending changes.</span>
           ) : (
             <span className="font-medium">{pendingCount} pending change{pendingCount === 1 ? '' : 's'}</span>
@@ -174,13 +176,13 @@ export function Editor({ setId, initial, sections }: { setId: string; initial: G
           />
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={() => setPending({})} disabled={pendingCount === 0 || save.isPending}>
+          <Button variant="ghost" size="sm" onClick={() => setPending({})} disabled={readOnly || pendingCount === 0 || save.isPending}>
             Discard
           </Button>
           <AlertDialog>
             <AlertDialogTrigger
               render={
-                <Button variant="outline" size="sm" disabled={resetAll.isPending || save.isPending}>
+                <Button variant="outline" size="sm" disabled={readOnly || resetAll.isPending || save.isPending}>
                   {resetAll.isPending ? 'Resetting…' : 'Reset all to recommended'}
                 </Button>
               }
@@ -199,7 +201,7 @@ export function Editor({ setId, initial, sections }: { setId: string; initial: G
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-          <Button size="sm" onClick={() => save.mutate()} disabled={pendingCount === 0 || save.isPending} title="Save (⌘S / Ctrl+S)">
+          <Button size="sm" onClick={() => save.mutate()} disabled={readOnly || pendingCount === 0 || save.isPending} title="Save (⌘S / Ctrl+S)">
             {save.isPending ? 'Saving…' : `Save ${pendingCount || ''}`.trim()}
           </Button>
         </div>
@@ -241,7 +243,8 @@ export function Editor({ setId, initial, sections }: { setId: string; initial: G
               pending={pending}
               onChange={(k, v) => setPending((p) => ({ ...p, [k]: v }))}
               onReset={(k, recommended) => setPending((p) => ({ ...p, [k]: recommended }))}
-              onUndo={(k) => setPending((p) => { const { [k]: _, ...rest } = p; return rest })}
+              onUndo={(k) => setPending((p) => Object.fromEntries(Object.entries(p).filter(([entryKey]) => entryKey !== k)))}
+              readOnly={readOnly}
             />
           )
         })}
@@ -252,7 +255,7 @@ export function Editor({ setId, initial, sections }: { setId: string; initial: G
 }
 
 function SectionCard({
-  section, rows, pending, onChange, onReset, onUndo,
+  section, rows, pending, onChange, onReset, onUndo, readOnly,
 }: {
   section: string
   rows: Param[]
@@ -260,6 +263,7 @@ function SectionCard({
   onChange: (key: string, value: number) => void
   onReset: (key: string, recommended: number) => void
   onUndo: (key: string) => void
+  readOnly: boolean
 }) {
   return (
     <Card id={section} className="scroll-mt-20">
@@ -267,20 +271,21 @@ function SectionCard({
         <CardTitle className="text-base">{section}</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-2">
-        {rows.map((p) => <Row key={p.id} p={p} pending={pending} onChange={onChange} onReset={onReset} onUndo={onUndo} />)}
+        {rows.map((p) => <Row key={p.id} p={p} pending={pending} onChange={onChange} onReset={onReset} onUndo={onUndo} readOnly={readOnly} />)}
       </CardContent>
     </Card>
   )
 }
 
 function Row({
-  p, pending, onChange, onReset, onUndo,
+  p, pending, onChange, onReset, onUndo, readOnly,
 }: {
   p: Param
   pending: Record<string, number>
   onChange: (key: string, value: number) => void
   onReset: (key: string, recommended: number) => void
   onUndo: (key: string) => void
+  readOnly: boolean
 }) {
   const k = key(p)
   const displayValue = useMemo(() => (k in pending ? pending[k] : p.value), [k, pending, p.value])
@@ -300,6 +305,7 @@ function Row({
         value={Number.isFinite(displayValue) ? displayValue : ''}
         onChange={(e) => onChange(k, e.target.value === '' ? NaN : Number(e.target.value))}
         className={out ? 'border-amber-500/60' : ''}
+        disabled={readOnly}
       />
       <div className="text-xs text-muted-foreground">
         <div>
@@ -312,7 +318,7 @@ function Row({
         {modified && (
           <button type="button" onClick={() => onUndo(k)} className="text-xs text-muted-foreground hover:text-foreground">undo</button>
         )}
-        {p.recommended != null && (
+        {!readOnly && p.recommended != null && (
           <button
             type="button"
             onClick={() => onReset(k, p.recommended as number)}

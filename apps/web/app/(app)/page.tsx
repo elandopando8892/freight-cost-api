@@ -53,6 +53,7 @@ interface SavedQuote {
   fxRateUsed: number
   createdAt: string
 }
+interface CarrierOnboarding { completed: number; total: number; ready: boolean }
 
 const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
 
@@ -66,10 +67,11 @@ async function safe<T>(p: Promise<T>, fallback: T): Promise<T> {
 export default async function DashboardPage() {
   // Fetch everything in parallel; tolerate per-endpoint 404/empty so a missing
   // section doesn't blow up the whole page.
-  const [sets, fuel, quotes] = await Promise.all([
+  const [sets, fuel, quotes, onboarding] = await Promise.all([
     safe(api<AssumptionSet[]>('/assumptions/sets'), [] as AssumptionSet[]),
     safe(api<FuelStatus>('/market/fuel'), null as FuelStatus | null),
     safe(api<SavedQuote[]>('/quotes'), [] as SavedQuote[]),
+    safe(api<CarrierOnboarding>('/onboarding/carrier'), { completed: 0, total: 5, ready: false }),
   ])
   const active = sets.find((s) => s.isActive) ?? null
   const usRegion = fuel?.regions.find((r) => r.region === 'U.S.') ?? null
@@ -87,6 +89,8 @@ export default async function DashboardPage() {
           <p className="text-sm text-muted-foreground">At a glance — active set, fuel, and recent quotes.</p>
         </div>
       </header>
+
+      {!onboarding.ready && <Card className="mb-6 border-primary/30 bg-primary/5"><CardHeader className="pb-2"><CardTitle className="text-base">Activación del carrier</CardTitle><CardDescription>{onboarding.completed} de {onboarding.total} pasos con evidencia operativa.</CardDescription></CardHeader><CardContent><Link href="/onboarding" className="text-sm font-medium underline underline-offset-2">Continuar onboarding →</Link></CardContent></Card>}
 
       {/* First-run onboarding — only until the first quote is saved */}
       {quotes.length === 0 && (

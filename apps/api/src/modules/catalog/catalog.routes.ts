@@ -1,12 +1,35 @@
 import { FastifyInstance } from 'fastify'
 import { authenticate } from '../../middleware/authenticate.js'
 import { prisma } from '../../config/prisma.js'
+import { PARAMETER_DEFINITIONS, ParameterKind, summarizeParameterCatalog } from '../../data/parameter-catalog.js'
+import { getCostBaseCoverage } from './coverage.service.js'
 
 export async function catalogRoutes(app: FastifyInstance) {
   app.addHook('preHandler', authenticate)
 
   app.get('/catalog/equipment', async () => {
     return prisma.equipmentConfig.findMany({ orderBy: [{ truckType: 'asc' }, { trailerType: 'asc' }] })
+  })
+
+  app.get('/catalog/parameters/summary', async () => summarizeParameterCatalog())
+
+  app.get('/catalog/coverage', async (request) => {
+    const { orgId } = request.user as { orgId: string }
+    return getCostBaseCoverage(orgId)
+  })
+
+  app.get('/catalog/parameters', async (request) => {
+    const query = request.query as { section?: string; kind?: string; q?: string }
+    const kind = query.kind?.toUpperCase() as ParameterKind | undefined
+    const section = query.section?.trim().toUpperCase()
+    const search = query.q?.trim().toLocaleLowerCase()
+    const data = PARAMETER_DEFINITIONS.filter((definition) => {
+      if (section && definition.section !== section) return false
+      if (kind && definition.kind !== kind) return false
+      return !search || [definition.key, definition.label, definition.section, definition.unit, definition.costBehavior]
+        .some((value) => value.toLocaleLowerCase().includes(search))
+    })
+    return { data, total: data.length, catalogTotal: PARAMETER_DEFINITIONS.length }
   })
 
   app.get('/catalog/cities/mx', async () => {

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { api } from '@/lib/api'
 import type { LaneHint } from './quote-form'
 import { QuoteModes } from './quote-modes'
+import type { CostBaseOption } from './quote-shared'
 
 export const dynamic = 'force-dynamic'
 export const metadata: Metadata = { title: 'Quote by route' }
@@ -36,7 +37,10 @@ async function fetchRecentLanes(): Promise<LaneHint[]> {
 }
 
 export default async function QuotePage() {
-  const recentLanes = await fetchRecentLanes()
+  const [recentLanes, costBases] = await Promise.all([
+    fetchRecentLanes(),
+    api<CostBaseOption[]>('/cost-bases').catch(() => []),
+  ])
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8">
       <header className="mb-6">
@@ -46,7 +50,7 @@ export default async function QuotePage() {
           prevailing service default (Import/Southbound → Backhaul) all happen server-side.
         </p>
       </header>
-      <QuoteModes recentLanes={recentLanes} />
+      <QuoteModes recentLanes={recentLanes} costBases={costBases} />
     </main>
   )
 }

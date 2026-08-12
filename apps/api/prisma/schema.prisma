@@ -17,6 +17,12 @@ enum Role {
   VIEWER
 }
 
+enum OrganizationInvitationStatus {
+  PENDING
+  ACCEPTED
+  REVOKED
+}
+
 enum Section {
   GENERAL_BASE
   FUEL
@@ -44,6 +50,84 @@ enum QuoteStatus {
   ARCHIVED
 }
 
+enum CustomerQuoteStatus {
+  DRAFT
+  REVIEW
+  APPROVED
+  ARCHIVED
+}
+
+enum CustomerQuoteEmailStatus {
+  PREPARED
+}
+
+enum RateBookStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum RatewareDeliveryStatus {
+  DELIVERED
+  FAILED
+}
+
+enum ApprovalAction {
+  RATEBOOK_PUBLISH
+  RATEWARE_DELIVERY
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+// Metadata-only lifecycle for supervised-assistant calls. It intentionally
+// excludes the user prompt and model output to preserve commercial privacy.
+enum AssistantInteractionStatus {
+  STARTED
+  COMPLETED
+  FAILED
+  REJECTED
+}
+
+// A scenario review is evidence for a human decision. It is intentionally
+// separate from an assumption-version lifecycle and cannot publish or mutate
+// the source quote by itself.
+enum ScenarioReviewStatus {
+  DRAFT
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+// A human release disposition captured against an immutable readiness snapshot.
+// It is a governance record only: it cannot deploy, publish, activate, or send
+// any external Rateware payload.
+enum PilotDecisionOutcome {
+  GO
+  NO_GO
+}
+
+enum PilotVerificationKind {
+  STAGING_AUTH_BFF_SMOKE
+  STAGING_AUTH_BFF_HUMAN
+}
+
+enum PilotVerificationOutcome {
+  PASS
+  FAIL
+}
+
+enum QuoteAuditAction {
+  CREATED
+  CONFIRMED
+  RATEWARE_ENRICHED
+}
+
 enum MarketDataType {
   DIESEL_MX
   DIESEL_US
@@ -51,35 +135,259 @@ enum MarketDataType {
   FSC
 }
 
+enum ParameterKind {
+  ASSUMPTION
+  COST_CARD
+}
+
+enum CalculationPolicy {
+  LEGACY_UNSPECIFIED
+  OPERATIONAL_V3
+  WORKBOOK_V3
+}
+
+enum CostBaseScope {
+  CROSS_BORDER
+  DRAYAGE
+  LOCAL
+  INTRA_MEX
+  INTRA_US
+}
+
+enum CostBaseStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum AssumptionVersionStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum AssumptionVersionAuditAction {
+  DRAFT_CREATED
+  PUBLISHED
+  ARCHIVED
+}
+
+// Lifecycle of an operational route. A DRAFT can be modelled freely, but only
+// a route backed by a compatible published assumption version can enter
+// PRODUCTION.
+enum ProductionRouteStatus {
+  DRAFT
+  PRODUCTION
+  ARCHIVED
+}
+
+enum ProductionRouteAuditAction {
+  CREATED
+  PRODUCED
+  ARCHIVED
+  REPLACEMENT_PROPOSED
+}
+
+enum RouteGeography {
+  MX
+  US
+  CROSS_BORDER
+}
+
 // ─────────────────────────────────────────────
 // MULTI-TENANCY & AUTH
 // ─────────────────────────────────────────────
 
 model Organization {
-  id         String   @id @default(cuid())
-  name       String
-  country    String   @default("MX")
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id        String   @id @default(cuid())
+  name      String
+  country   String   @default("MX")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  users            User[]
-  assumptionSets   AssumptionSet[]
-  lanes            Lane[]
-  quotes           Quote[]
-  marketData       MarketData[]
-  carrierMexLanes  CarrierMexLane[]
-  carrierUsaLanes  CarrierUsaLane[]
+  users                    User[]
+  assumptionSets           AssumptionSet[]
+  lanes                    Lane[]
+  quotes                   Quote[]
+  customerQuotes           CustomerQuote[]
+  customerQuoteEmailDrafts CustomerQuoteEmailDraft[]
+  customerQuoteTemplates   CustomerQuoteTemplate[]
+  rateBooks                RateBook[]
+  ratewareDeliveries       RatewareDelivery[]
+  approvalRequests         ApprovalRequest[]
+  assistantInteractions    AssistantInteraction[]
+  scenarioReviews          ScenarioReview[]
+  pilotDecisions           PilotDecision[]
+  pilotVerifications       PilotVerification[]
+  pilotGoApprovals         PilotGoApproval[]
+  invitations             OrganizationInvitation[]
+  marketData               MarketData[]
+  carrierMexLanes          CarrierMexLane[]
+  carrierUsaLanes          CarrierUsaLane[]
+  productionRoutes         ProductionRoute[]
+  costBases                CostBase[]
+  carrierProfile           CarrierProfile?
 }
 
 model User {
   id           String   @id @default(cuid())
   orgId        String
-  kindeId      String?  @unique               // Kinde subject (sub); null for legacy/local users
+  kindeId      String?  @unique // Kinde subject (sub); null for legacy/local users
   email        String   @unique
-  passwordHash String?                         // null for Kinde-managed identities
+  passwordHash String? // null for Kinde-managed identities
   role         Role     @default(OPERATOR)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  org                         Organization                @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  publishedAssumptionVersions AssumptionSet[]             @relation("AssumptionVersionPublishedBy")
+  assumptionVersionAudits     AssumptionVersionAudit[]    @relation("AssumptionVersionAuditActor")
+  confirmedQuotes             Quote[]                     @relation("QuoteConfirmedBy")
+  quoteAuditEvents            QuoteAuditEvent[]           @relation("QuoteAuditActor")
+  productionRouteAuditEvents  ProductionRouteAuditEvent[] @relation("ProductionRouteAuditActor")
+  ratewareDeliveries          RatewareDelivery[]          @relation("RatewareDeliveryActor")
+  requestedApprovals          ApprovalRequest[]           @relation("ApprovalRequester")
+  reviewedApprovals           ApprovalRequest[]           @relation("ApprovalReviewer")
+  assistantInteractions       AssistantInteraction[]      @relation("AssistantInteractionActor")
+  createdScenarioReviews      ScenarioReview[]            @relation("ScenarioReviewCreatedBy")
+  reviewedScenarioReviews     ScenarioReview[]            @relation("ScenarioReviewReviewedBy")
+  pilotDecisions              PilotDecision[]             @relation("PilotDecisionActor")
+  pilotVerifications          PilotVerification[]         @relation("PilotVerificationActor")
+  pilotGoApprovals            PilotGoApproval[]            @relation("PilotGoApprovalActor")
+  customerQuoteEmailDrafts    CustomerQuoteEmailDraft[]   @relation("CustomerQuoteEmailDraftActor")
+  invitationsSent             OrganizationInvitation[]    @relation("OrganizationInvitationInviter")
+  invitationsAccepted         OrganizationInvitation[]    @relation("OrganizationInvitationAcceptor")
+}
+
+model OrganizationInvitation {
+  id           String                       @id @default(cuid())
+  orgId        String
+  email        String                       @unique
+  role         Role                         @default(OPERATOR)
+  status       OrganizationInvitationStatus @default(PENDING)
+  expiresAt    DateTime
+  invitedById  String
+  acceptedById String?
+  acceptedAt   DateTime?
+  createdAt    DateTime                     @default(now())
+  updatedAt    DateTime                     @updatedAt
+
+  org        Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  invitedBy  User         @relation("OrganizationInvitationInviter", fields: [invitedById], references: [id], onDelete: Restrict)
+  acceptedBy User?        @relation("OrganizationInvitationAcceptor", fields: [acceptedById], references: [id], onDelete: SetNull)
+
+  @@index([orgId, status, createdAt])
+  @@index([email, status])
+}
+
+model PilotDecision {
+  id               String               @id @default(cuid())
+  orgId            String
+  outcome          PilotDecisionOutcome
+  rationale        String
+  evidence         Json
+  evidencePolicy   String
+  evidenceReady    Boolean
+  evidenceBlockers Int
+  evidenceWarnings Int
+  evidenceAt       DateTime
+  decidedById      String
+  createdAt        DateTime             @default(now())
+
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  decidedBy User         @relation("PilotDecisionActor", fields: [decidedById], references: [id], onDelete: Restrict)
+  goApprovals PilotGoApproval[]
+
+  @@index([orgId, createdAt])
+  @@index([decidedById, createdAt])
+}
+
+// A GO requires two distinct ADMIN approvals over the exact same readiness
+// fingerprint. Approvals are immutable and cannot deploy or publish anything.
+model PilotGoApproval {
+  id              String   @id @default(cuid())
+  orgId           String
+  releaseId       String
+  roundId         String
+  gateFingerprint String
+  rationale       String
+  evidence        Json
+  evidenceAt      DateTime
+  approvedById    String
+  decisionId      String?
+  createdAt       DateTime @default(now())
+
+  org        Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  approvedBy User          @relation("PilotGoApprovalActor", fields: [approvedById], references: [id], onDelete: Restrict)
+  decision   PilotDecision? @relation(fields: [decisionId], references: [id], onDelete: Restrict)
+
+  @@unique([orgId, roundId, approvedById])
+  @@index([orgId, releaseId, createdAt])
+  @@index([orgId, gateFingerprint, createdAt])
+  @@index([orgId, roundId, createdAt])
+  @@index([decisionId])
+}
+
+// A staging verification is evidence only. It remains separate from a GO/NO_GO
+// decision so a passing smoke test cannot authorize a release by itself.
+model PilotVerification {
+  id           String                   @id @default(cuid())
+  orgId        String
+  kind         PilotVerificationKind
+  outcome      PilotVerificationOutcome
+  releaseId    String
+  executedAt   DateTime
+  summary      String
+  checks       Json
+  verifiedById String
+  createdAt    DateTime                 @default(now())
+
+  org        Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  verifiedBy User         @relation("PilotVerificationActor", fields: [verifiedById], references: [id], onDelete: Restrict)
+
+  @@index([orgId, createdAt])
+  @@index([orgId, releaseId])
+  @@index([verifiedById, createdAt])
+}
+
+// An auditable, privacy-preserving trace of a supervised AI request. The
+// interaction content remains outside FCM storage; only operational metadata is
+// retained so usage, availability, and rate limits can be reviewed.
+model AssistantInteraction {
+  id          String                     @id @default(cuid())
+  orgId       String
+  actorId     String
+  focus       String
+  model       String?
+  inputChars  Int
+  outputChars Int?
+  latencyMs   Int?
+  status      AssistantInteractionStatus @default(STARTED)
+  failureCode String?
+  createdAt   DateTime                   @default(now())
+  completedAt DateTime?
+
+  org   Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  actor User         @relation("AssistantInteractionActor", fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([orgId, actorId, createdAt])
+  @@index([orgId, status, createdAt])
+}
+
+// Minimal operating identity for a carrier tenant. Commercial tariffs and
+// regulatory credentials remain separate, reviewable workflows.
+model CarrierProfile {
+  id                  String          @id @default(cuid())
+  orgId               String          @unique
+  legalName           String?
+  operatingName       String?
+  primaryContactName  String?
+  primaryContactEmail String?
+  primaryContactPhone String?
+  defaultCurrency     String          @default("USD")
+  operatingScopes     CostBaseScope[] @default([])
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
 
   org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 }
@@ -89,25 +397,61 @@ model User {
 // ─────────────────────────────────────────────
 
 model AssumptionSet {
-  id        String   @id @default(cuid())
-  orgId     String
-  name      String
-  version   Int      @default(1)
-  isActive  Boolean  @default(false)
-  notes     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String                  @id @default(cuid())
+  orgId           String
+  costBaseId      String?
+  name            String
+  version         Int                     @default(1)
+  isActive        Boolean                 @default(false)
+  status          AssumptionVersionStatus @default(DRAFT)
+  notes           String?
+  sourceVersionId String?
+  publishedAt     DateTime?
+  publishedById   String?
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
 
-  org    Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  params AssumptionParam[]
-  quotes Quote[]
+  org                       Organization             @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  costBase                  CostBase?                @relation(fields: [costBaseId], references: [id], onDelete: Restrict)
+  sourceVersion             AssumptionSet?           @relation("AssumptionVersionLineage", fields: [sourceVersionId], references: [id], onDelete: Restrict)
+  derivedVersions           AssumptionSet[]          @relation("AssumptionVersionLineage")
+  publishedBy               User?                    @relation("AssumptionVersionPublishedBy", fields: [publishedById], references: [id], onDelete: SetNull)
+  params                    AssumptionParam[]
+  quotes                    Quote[]
+  auditEvents               AssumptionVersionAudit[]
+  scenarioReviewSource      ScenarioReview?          @relation("ScenarioReviewDerivedVersion")
+  confirmedProductionRoutes ProductionRoute[]        @relation("ProductionRouteConfirmedVersion")
+  rateBooks                 RateBook[]
 
   @@unique([orgId, name, version])
+  @@index([costBaseId, version])
+  @@index([sourceVersionId])
+  @@index([publishedById])
+}
+
+model AssumptionVersionAudit {
+  id         String                       @id @default(cuid())
+  orgId      String
+  setId      String
+  action     AssumptionVersionAuditAction
+  fromStatus AssumptionVersionStatus?
+  toStatus   AssumptionVersionStatus?
+  note       String?
+  actorId    String?
+  createdAt  DateTime                     @default(now())
+
+  set   AssumptionSet @relation(fields: [setId], references: [id], onDelete: Cascade)
+  actor User?         @relation("AssumptionVersionAuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([setId, createdAt])
+  @@index([orgId, createdAt])
+  @@index([actorId])
 }
 
 model AssumptionParam {
   id              String   @id @default(cuid())
   setId           String
+  definitionId    String?
   section         Section
   field           String
   value           Float
@@ -121,20 +465,77 @@ model AssumptionParam {
   notes           String?
   updatedAt       DateTime @updatedAt
 
-  set AssumptionSet @relation(fields: [setId], references: [id], onDelete: Cascade)
+  set        AssumptionSet        @relation(fields: [setId], references: [id], onDelete: Cascade)
+  definition ParameterDefinition? @relation(fields: [definitionId], references: [id], onDelete: SetNull)
 
   @@unique([setId, section, field])
+  @@index([definitionId])
 }
 
 // ─────────────────────────────────────────────
 // CATALOG (global, shared across all orgs)
 // ─────────────────────────────────────────────
 
+model ParameterDefinition {
+  id              String        @id @default(cuid())
+  key             String        @unique
+  section         Section
+  field           String
+  label           String
+  kind            ParameterKind
+  defaultValue    Float
+  unit            String
+  low             Float?
+  high            Float?
+  updateFrequency String?
+  costBehavior    String?
+  activation      String?
+  sourceSheet     String
+  sourceVersion   String
+  displayOrder    Int
+  isActive        Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  params AssumptionParam[]
+
+  @@unique([section, field])
+  @@index([section, displayOrder])
+  @@index([kind])
+}
+
+model CostBase {
+  id            String            @id @default(cuid())
+  orgId         String
+  code          String
+  name          String
+  description   String?
+  scope         CostBaseScope
+  status        CostBaseStatus    @default(DRAFT)
+  defaultPolicy CalculationPolicy @default(OPERATIONAL_V3)
+  currency      String            @default("USD")
+  isDefault     Boolean           @default(false)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  org                       Organization      @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  versions                  AssumptionSet[]
+  lanes                     Lane[]
+  quotes                    Quote[]
+  suggestedProductionRoutes ProductionRoute[] @relation("ProductionRouteSuggestedBase")
+  confirmedProductionRoutes ProductionRoute[] @relation("ProductionRouteConfirmedBase")
+  rateBooks                 RateBook[]
+
+  @@unique([orgId, code])
+  @@index([orgId, scope, status])
+  @@index([orgId, scope, isDefault])
+}
+
 model EquipmentConfig {
   id                   String  @id @default(cuid())
   truckType            String
   trailerType          String
-  config               String  // "Single" | "Tandem"
+  config               String // "Single" | "Tandem"
   operationType        String
   serviceType          String
   driverType           String
@@ -188,14 +589,14 @@ model MexLaneExpense {
 // then falls back to the global reference tables. Truck-agnostic: the carrier
 // captures a route once (origin→dest), and it applies to every equipment.
 model CarrierMexLane {
-  id          String @id @default(cuid())
+  id          String   @id @default(cuid())
   orgId       String
   origin      String
   destination String
   laneKeyNorm String // uppercased "origin - destination"
   km          Float
-  tolls       Float  @default(0)
-  horasRuta   Float  @default(0) // transit hours
+  tolls       Float    @default(0)
+  horasRuta   Float    @default(0) // transit hours
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -206,15 +607,15 @@ model CarrierMexLane {
 }
 
 model CarrierUsaLane {
-  id            String @id @default(cuid())
+  id            String   @id @default(cuid())
   orgId         String
   origin        String
   destination   String
   laneKeyNorm   String // uppercased "origin - destination"
   outState      String
   miles         Float
-  truckDays     Float  @default(0)
-  routeExpenses Float  @default(0)
+  truckDays     Float    @default(0)
+  routeExpenses Float    @default(0)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -222,6 +623,72 @@ model CarrierUsaLane {
 
   @@unique([orgId, laneKeyNorm])
   @@index([orgId])
+}
+
+// Operational catalog. This is intentionally separate from CarrierMexLane and
+// CarrierUsaLane: those tables hold resolver facts for individual legs, while
+// this record owns the commercial route, its geography, equipment and governed
+// cost-base lineage.
+model ProductionRoute {
+  id                       String                @id @default(cuid())
+  orgId                    String
+  routeKey                 String
+  revision                 Int                   @default(1)
+  supersedesRouteId        String?
+  code                     String?
+  origin                   String
+  destination              String
+  mexBorder                String?
+  usaBorder                String?
+  geography                RouteGeography
+  operation                String
+  service                  String                @default("One Way")
+  truckType                String                @default("Truck")
+  trailerType              String                @default("Trailer")
+  config                   String                @default("Single")
+  driverType               String                @default("Company")
+  suggestedCostBaseId      String?
+  confirmedCostBaseId      String?
+  confirmedAssumptionSetId String?
+  status                   ProductionRouteStatus @default(DRAFT)
+  notes                    String?
+  createdAt                DateTime              @default(now())
+  updatedAt                DateTime              @updatedAt
+
+  org                    Organization                @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  suggestedCostBase      CostBase?                   @relation("ProductionRouteSuggestedBase", fields: [suggestedCostBaseId], references: [id], onDelete: SetNull)
+  confirmedCostBase      CostBase?                   @relation("ProductionRouteConfirmedBase", fields: [confirmedCostBaseId], references: [id], onDelete: SetNull)
+  confirmedAssumptionSet AssumptionSet?              @relation("ProductionRouteConfirmedVersion", fields: [confirmedAssumptionSetId], references: [id], onDelete: SetNull)
+  supersedesRoute        ProductionRoute?            @relation("ProductionRouteRevisionLineage", fields: [supersedesRouteId], references: [id], onDelete: Restrict)
+  replacementRoutes      ProductionRoute[]           @relation("ProductionRouteRevisionLineage")
+  auditEvents            ProductionRouteAuditEvent[]
+  quotes                 Quote[]
+
+  @@unique([orgId, routeKey, revision])
+  @@index([orgId, status])
+  @@index([orgId, geography])
+  @@index([suggestedCostBaseId])
+  @@index([confirmedCostBaseId])
+  @@index([confirmedAssumptionSetId])
+  @@index([supersedesRouteId])
+}
+
+model ProductionRouteAuditEvent {
+  id        String                     @id @default(cuid())
+  orgId     String
+  routeId   String
+  action    ProductionRouteAuditAction
+  actorId   String?
+  note      String?
+  payload   Json?
+  createdAt DateTime                   @default(now())
+
+  route ProductionRoute @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  actor User?           @relation("ProductionRouteAuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([routeId, createdAt])
+  @@index([orgId, createdAt])
+  @@index([actorId])
 }
 
 // usaLaneData — USA leg facts, keyed "ORIGIN - DEST TRUCK TRAILER" (uppercase)
@@ -298,8 +765,8 @@ model RegionDiesel {
 // usaFSCindex — fuel-surcharge schedule: diesel-price bracket → FSC per mile
 model FscIndex {
   id                  String @id @default(cuid())
-  fromDiesel          Float  // bracket lower bound ($/gal)
-  toDiesel            Float  // bracket upper bound ($/gal)
+  fromDiesel          Float // bracket lower bound ($/gal)
+  toDiesel            Float // bracket upper bound ($/gal)
   ltlPct              Float  @default(0)
   truckloadFscPerMile Float  @default(0)
 
@@ -308,12 +775,12 @@ model FscIndex {
 
 // usaFuelpast — monthly diesel history from EIA API v2 (EPD2D), for FSC trend
 model DieselHistory {
-  id           String @id @default(cuid())
-  period       String // "2026-04"
-  duoarea      String // EIA area code (e.g. "NUS", "R10")
-  areaName     String
-  value        Float  // diesel $/gal
-  units        String @default("$/GAL")
+  id       String @id @default(cuid())
+  period   String // "2026-04"
+  duoarea  String // EIA area code (e.g. "NUS", "R10")
+  areaName String
+  value    Float // diesel $/gal
+  units    String @default("$/GAL")
 
   @@unique([duoarea, period])
   @@index([period])
@@ -324,16 +791,16 @@ model DieselHistory {
 // ─────────────────────────────────────────────
 
 model MarketData {
-  id      String         @id @default(cuid())
-  orgId   String
-  type    MarketDataType
-  region  String?
-  state   String?
-  value   Float
-  unit    String
-  date    DateTime
-  source  String?
-  createdAt DateTime     @default(now())
+  id        String         @id @default(cuid())
+  orgId     String
+  type      MarketDataType
+  region    String?
+  state     String?
+  value     Float
+  unit      String
+  date      DateTime
+  source    String?
+  createdAt DateTime       @default(now())
 
   org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
@@ -347,6 +814,7 @@ model MarketData {
 model Lane {
   id            String   @id @default(cuid())
   orgId         String
+  costBaseId    String?
   laneKey       String
   origin        String
   destination   String
@@ -365,11 +833,13 @@ model Lane {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  org       Organization    @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  org       Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  costBase  CostBase?        @relation(fields: [costBaseId], references: [id], onDelete: Restrict)
   equipment EquipmentConfig? @relation(fields: [equipmentId], references: [id])
   quotes    Quote[]
 
   @@unique([orgId, laneKey])
+  @@index([costBaseId])
 }
 
 // ─────────────────────────────────────────────
@@ -377,21 +847,27 @@ model Lane {
 // ─────────────────────────────────────────────
 
 model Quote {
-  id              String      @id @default(cuid())
-  orgId           String
-  laneId          String?
-  assumptionSetId String?
-  label           String?
-  version         Int         @default(1)
-  status          QuoteStatus @default(DRAFT)
-  createdAt       DateTime    @default(now())
+  id                String            @id @default(cuid())
+  orgId             String
+  laneId            String?
+  assumptionSetId   String?
+  costBaseId        String?
+  productionRouteId String?
+  label             String?
+  version           Int               @default(1)
+  status            QuoteStatus       @default(DRAFT)
+  confirmedAt       DateTime?
+  confirmedById     String?
+  confirmationNote  String?
+  calculationPolicy CalculationPolicy @default(LEGACY_UNSPECIFIED)
+  createdAt         DateTime          @default(now())
 
   // ── Routing context ──────────────────────────────────────────────────
   operation String
   service   String
 
   // ── Freight Cost Model V3.0 result ───────────────────────────────────
-  freightBaselineUsd Float   // Σ leg flats (MROUND 100)
+  freightBaselineUsd Float // Σ leg flats (MROUND 100)
   requiredTariffUsd  Float
   requiredTariffMxn  Float
   fxRateUsed         Float
@@ -401,9 +877,283 @@ model Quote {
   usaLeg Json?
 
   // ── Commercial / decision layer (cost floor → sell tiers → margin → flags) ──
-  commercial Json?
+  commercial      Json?
+  // Immutable, server-generated evidence of the inputs, governed lineage,
+  // calculation components and commercial decision at save time.
+  explanation     Json?
+  auditEvents     QuoteAuditEvent[]
+  scenarioReviews ScenarioReview[]
 
-  org  Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  lane Lane?          @relation(fields: [laneId], references: [id])
-  set  AssumptionSet? @relation(fields: [assumptionSetId], references: [id])
+  org             Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  lane            Lane?            @relation(fields: [laneId], references: [id])
+  set             AssumptionSet?   @relation(fields: [assumptionSetId], references: [id])
+  costBase        CostBase?        @relation(fields: [costBaseId], references: [id], onDelete: Restrict)
+  productionRoute ProductionRoute? @relation(fields: [productionRouteId], references: [id], onDelete: Restrict)
+  confirmedBy     User?            @relation("QuoteConfirmedBy", fields: [confirmedById], references: [id], onDelete: SetNull)
+
+  @@index([costBaseId])
+  @@index([productionRouteId])
+  @@index([confirmedById])
+  @@index([orgId, status])
+}
+
+// Immutable review packet generated from a reproducible quote snapshot. The
+// values in `evidence` are calculated server-side at creation time and bind to
+// `sourceChecksum`; approving it is a decision record only, never an executor.
+model ScenarioReview {
+  id                     String               @id @default(cuid())
+  orgId                  String
+  quoteId                String
+  sourceChecksum         String
+  changes                Json
+  evidence               Json
+  note                   String?
+  status                 ScenarioReviewStatus @default(DRAFT)
+  createdById            String
+  submittedAt            DateTime?
+  reviewedById           String?
+  reviewedAt             DateTime?
+  decisionNote           String?
+  derivedAssumptionSetId String?              @unique
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+
+  org                  Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  quote                Quote          @relation(fields: [quoteId], references: [id], onDelete: Restrict)
+  createdBy            User           @relation("ScenarioReviewCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  reviewedBy           User?          @relation("ScenarioReviewReviewedBy", fields: [reviewedById], references: [id], onDelete: SetNull)
+  derivedAssumptionSet AssumptionSet? @relation("ScenarioReviewDerivedVersion", fields: [derivedAssumptionSetId], references: [id], onDelete: Restrict)
+
+  @@index([orgId, status, createdAt])
+  @@index([quoteId, createdAt])
+  @@index([createdById, status, createdAt])
+  @@index([reviewedById])
+}
+
+// Commercial proposal addressed to a customer. It is deliberately separate
+// from Quote, which preserves internal cost-calculation evidence.
+model CustomerQuote {
+  id           String              @id @default(cuid())
+  orgId        String
+  folio        String
+  clientName   String
+  contactName  String?
+  contactEmail String?
+  quoteType    String              @default("Spot")
+  goodsValue   String?
+  validUntil   DateTime
+  status       CustomerQuoteStatus @default(DRAFT)
+  notes        String?
+  createdById  String?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  org         Organization              @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  lines       CustomerQuoteLine[]
+  emailDrafts CustomerQuoteEmailDraft[]
+
+  @@unique([orgId, folio])
+  @@index([orgId, status, updatedAt])
+}
+
+model CustomerQuoteEmailDraft {
+  id              String                   @id @default(cuid())
+  orgId           String
+  customerQuoteId String
+  templateId      String
+  templateName    String
+  toEmail         String
+  subject         String
+  htmlBody        String                   @db.Text
+  textBody        String                   @db.Text
+  payloadChecksum String
+  status          CustomerQuoteEmailStatus @default(PREPARED)
+  createdById     String
+  createdAt       DateTime                 @default(now())
+
+  org           Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  customerQuote CustomerQuote @relation(fields: [customerQuoteId], references: [id], onDelete: Cascade)
+  createdBy     User          @relation("CustomerQuoteEmailDraftActor", fields: [createdById], references: [id], onDelete: Restrict)
+
+  @@index([orgId, customerQuoteId, createdAt])
+  @@index([createdById, createdAt])
+}
+
+model CustomerQuoteLine {
+  id              String  @id @default(cuid())
+  customerQuoteId String
+  position        Int
+  origin          String
+  destination     String
+  equipment       String
+  config          String
+  operation       String
+  service         String
+  tariff          Float
+  currency        String  @default("USD")
+  borderCrossing  String?
+  distance        String?
+
+  customerQuote CustomerQuote @relation(fields: [customerQuoteId], references: [id], onDelete: Cascade)
+
+  @@unique([customerQuoteId, position])
+}
+
+// Tenant-owned email layouts. The rendered preview is safe HTML and never
+// contains Gmail credentials or delivery state.
+model CustomerQuoteTemplate {
+  id              String   @id @default(cuid())
+  orgId           String
+  name            String
+  subjectTemplate String
+  htmlTemplate    String   @db.Text
+  createdById     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, name])
+  @@index([orgId, updatedAt])
+}
+
+// Published commercial tariff artifact. It snapshots confirmed internal quotes
+// and remains independent from source routes and their future replacements.
+model RateBook {
+  id               String         @id @default(cuid())
+  orgId            String
+  costBaseId       String
+  assumptionSetId  String
+  code             String
+  name             String
+  currency         String         @default("USD")
+  effectiveFrom    DateTime
+  effectiveUntil   DateTime?
+  status           RateBookStatus @default(DRAFT)
+  notes            String?
+  publicationNote  String?
+  sourceRateBookId String?
+  regenerationNote String?
+  publishedAt      DateTime?
+  publishedById    String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  org                Organization       @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  costBase           CostBase           @relation(fields: [costBaseId], references: [id], onDelete: Restrict)
+  set                AssumptionSet      @relation(fields: [assumptionSetId], references: [id], onDelete: Restrict)
+  entries            RateBookEntry[]
+  sourceRateBook     RateBook?          @relation("RateBookRegenerationLineage", fields: [sourceRateBookId], references: [id], onDelete: Restrict)
+  regeneratedBooks   RateBook[]         @relation("RateBookRegenerationLineage")
+  ratewareDeliveries RatewareDelivery[]
+  approvalRequests   ApprovalRequest[]
+
+  @@unique([orgId, code])
+  @@index([orgId, status, effectiveFrom])
+  @@index([costBaseId, assumptionSetId])
+  @@index([sourceRateBookId])
+}
+
+// Delivery trace only. The complete package remains in Rateware's staging
+// receipt; FCM retains its checksum, idempotency key and remote receipt.
+model RatewareDelivery {
+  id                String                 @id @default(cuid())
+  orgId             String
+  rateBookId        String
+  approvalRequestId String?
+  actorId           String?
+  contractVersion   String
+  idempotencyKey    String
+  payloadChecksum   String
+  status            RatewareDeliveryStatus
+  responseCode      Int?
+  receiptId         String?
+  error             String?
+  attemptedAt       DateTime               @default(now())
+  deliveredAt       DateTime?
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+
+  org             Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  rateBook        RateBook         @relation(fields: [rateBookId], references: [id], onDelete: Cascade)
+  approvalRequest ApprovalRequest? @relation(fields: [approvalRequestId], references: [id], onDelete: SetNull)
+  actor           User?            @relation("RatewareDeliveryActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@unique([orgId, idempotencyKey])
+  @@index([rateBookId, attemptedAt])
+  @@index([orgId, status, attemptedAt])
+  @@index([actorId])
+  @@index([approvalRequestId])
+}
+
+// A human review record for consequential actions. Approval is evidence, not an
+// automatic executor: the approved RateBook remains visible for final action.
+model ApprovalRequest {
+  id            String         @id @default(cuid())
+  orgId         String
+  rateBookId    String
+  action        ApprovalAction
+  status        ApprovalStatus @default(PENDING)
+  requestNote   String
+  decisionNote  String?
+  requestedById String
+  reviewedById  String?
+  reviewedAt    DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  org                Organization       @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  rateBook           RateBook           @relation(fields: [rateBookId], references: [id], onDelete: Cascade)
+  requestedBy        User               @relation("ApprovalRequester", fields: [requestedById], references: [id], onDelete: Restrict)
+  reviewedBy         User?              @relation("ApprovalReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  ratewareDeliveries RatewareDelivery[]
+
+  @@index([orgId, status, createdAt])
+  @@index([rateBookId, action, status])
+  @@index([requestedById, status, createdAt])
+  @@index([reviewedById])
+}
+
+model RateBookEntry {
+  id                      String   @id @default(cuid())
+  rateBookId              String
+  sourceQuoteId           String
+  sourceProductionRouteId String?
+  sourceQuoteVersion      Int
+  origin                  String
+  destination             String
+  operation               String
+  service                 String
+  equipment               String?
+  config                  String?
+  publishedTariff         Float
+  currency                String
+  sourceTariffUsd         Float
+  sourceTariffMxn         Float
+  fxRateUsed              Float
+  createdAt               DateTime @default(now())
+
+  rateBook RateBook @relation(fields: [rateBookId], references: [id], onDelete: Cascade)
+
+  @@unique([rateBookId, sourceQuoteId])
+  @@index([rateBookId, operation])
+  @@index([sourceProductionRouteId])
+}
+
+model QuoteAuditEvent {
+  id        String           @id @default(cuid())
+  orgId     String
+  quoteId   String
+  action    QuoteAuditAction
+  actorId   String?
+  note      String?
+  payload   Json?
+  createdAt DateTime         @default(now())
+
+  quote Quote @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  actor User? @relation("QuoteAuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([quoteId, createdAt])
+  @@index([orgId, createdAt])
+  @@index([actorId])
 }

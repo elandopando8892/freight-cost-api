@@ -3,10 +3,17 @@ import { DEFAULT_ASSUMPTIONS } from './assumptions.seed.js'
 import { EQUIPMENT_CATALOG } from './equipment.seed.js'
 import { CITIES_MX } from './cities-mx.seed.js'
 import { seedReferenceTables } from './reference.seed.js'
+import { syncParameterCatalog } from './parameter-catalog.seed.js'
 
 const prisma = new PrismaClient()
 
+async function synchronizeCatalog() {
+  const catalog = await syncParameterCatalog(prisma)
+  console.log(`Canonical parameter catalog: ${catalog.definitions} definitions; ${catalog.paramsLinked} existing params linked`)
+}
+
 async function main() {
+  await synchronizeCatalog()
   console.log('🌱 Seeding database...')
 
   // Equipment catalog
@@ -66,8 +73,8 @@ async function main() {
             field: a.field,
             value: a.value,
             unit: a.unit,
-            low: a.low || null,
-            high: a.high || null,
+            low: a.low ?? null,
+            high: a.high ?? null,
             updateFrequency: a.updateFrequency,
             costBehavior: a.costBehavior,
             activation: a.activation,
@@ -79,6 +86,9 @@ async function main() {
   } else {
     console.log('     ✓ Default set already exists — skipped')
   }
+
+  // Link the default set created above without modifying its values.
+  await synchronizeCatalog()
 
   // Engine reference lookup tables (mexLaneExpenses, usaLaneData, FSC, etc.)
   console.log('  → Reference lookup tables...')

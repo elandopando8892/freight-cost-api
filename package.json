@@ -2,6 +2,7 @@
   "name": "freight-cost-model",
   "private": true,
   "version": "0.1.0",
+  "packageManager": "npm@10.8.1",
   "description": "Freight Cost Model — carrier SaaS monorepo (Fastify API + Next.js web)",
   "workspaces": [
     "apps/*",
@@ -11,8 +12,23 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "test": "turbo run test",
+    "audit:production": "npm audit --omit=dev",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
+    "secrets:scan": "tsx apps/api/scripts/verify-tracked-secrets.ts",
+    "migrations:verify": "tsx apps/api/scripts/verify-migration-artifacts.ts",
+    "migrations:contract": "tsx apps/api/scripts/verify-pilot-verification-migration.ts",
+    "migrations:go-approval-contract": "tsx apps/api/scripts/verify-pilot-go-approval-migration.ts",
+    "migrations:invitation-contract": "tsx apps/api/scripts/verify-organization-invitation-migration.ts",
+    "security:headers": "tsx apps/api/scripts/verify-web-security-headers.ts",
+    "smoke:staging:auth": "tsx apps/api/scripts/staging-auth-bff-smoke.ts",
+    "e2e:staging:pilot": "tsx apps/api/scripts/staging-pilot-go-e2e.ts",
+    "preflight:staging:infra": "tsx apps/api/scripts/staging-infrastructure-preflight.ts",
+    "db:migrate:staging": "tsx apps/api/scripts/migrate-staging.ts",
+    "db:seed:staging": "tsx apps/api/scripts/seed-staging.ts",
+    "verify:ci": "npm run secrets:scan && npm run lint && npm run test && npm run typecheck && npm run db:validate -w freight-cost-api && npm run migrations:verify && npm run migrations:contract && npm run migrations:go-approval-contract && npm run migrations:invitation-contract && npm run security:headers && npm run build && npm run audit:production && git diff --check && git diff --cached --check",
+    "verify:release": "npm run verify:ci && npm run preflight:release -w freight-cost-api",
+    "verify:release:rateware": "npm run verify:ci && npm run preflight:release -w freight-cost-api -- --require-rateware",
     "dev:api": "npm run dev -w freight-cost-api",
     "dev:web": "npm run dev -w freight-cost-web"
   },
@@ -20,7 +36,7 @@
     "turbo": "^2.0.0"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=20.19.0"
   },
   "overrides": {
     "zod": "^3.23.8"

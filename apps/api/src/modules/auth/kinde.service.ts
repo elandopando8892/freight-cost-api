@@ -1,7 +1,9 @@
 import { createRemoteJWKSet, jwtVerify, type JWTPayload } from 'jose'
-import { Section } from '@prisma/client'
+import { Section, type Role } from '@prisma/client'
 import { prisma } from '../../config/prisma.js'
 import { DEFAULT_ASSUMPTIONS } from '../../data/default-assumptions.js'
+import { acceptPendingOrganizationInvitation } from '../org/organization-invitations.service.js'
+import { normalizeInvitationEmail } from '../org/organization-invitations.js'
 
 const ISSUER = (process.env.KINDE_ISSUER_URL ?? '').replace(/\/$/, '')
 const AUDIENCE = process.env.KINDE_AUDIENCE ?? ''
@@ -44,7 +46,7 @@ async function fetchKindeProfile(token: string): Promise<KindeProfile> {
   }
 }
 
-export interface ResolvedUser { id: string; orgId: string; role: string; kindeId: string }
+export interface ResolvedUser { id: string; orgId: string; role: Role; kindeId: string }
 
 /**
  * Map a Kinde subject to our User/Organization. Auto-provisions on first sight:
@@ -58,15 +60,26 @@ export async function resolveUser(kindeSub: string, token: string): Promise<Reso
   }
 
   const profile = await fetchKindeProfile(token).catch(() => ({ email: '' } as KindeProfile))
-  const email = profile.email || `${kindeSub}@kinde.local`
+  const email = normalizeInvitationEmail(profile.email || `${kindeSub}@kinde.local`)
   const orgName = profile.email ? `${profile.email.split('@')[0]}'s org` : 'New org'
 
   // Link a pre-existing user with the same email (e.g. legacy password account).
-  const byEmail = await prisma.user.findUnique({ where: { email } })
+  const byEmail = await prisma.user.findFirst({
+    where: { email: { equals: email, mode: 'insensitive' } },
+  })
   if (byEmail) {
+    if (byEmail.kindeId && byEmail.kindeId !== kindeSub) {
+      throw new Error('Email is already linked to another Kinde identity')
+    }
     const linked = await prisma.user.update({ where: { id: byEmail.id }, data: { kindeId: kindeSub } })
     await ensureActiveSet(linked.orgId)
     return { id: linked.id, orgId: linked.orgId, role: linked.role, kindeId: kindeSub }
+  }
+
+  const invited = await acceptPendingOrganizationInvitation(kindeSub, email)
+  if (invited) {
+    await ensureActiveSet(invited.orgId)
+    return invited
   }
 
   try {
@@ -112,8 +125,8 @@ function defaultParamsCreate() {
     field: a.field,
     value: a.value,
     unit: a.unit,
-    low: a.low || null,
-    high: a.high || null,
+    low: a.low ?? null,
+    high: a.high ?? null,
     updateFrequency: a.updateFrequency,
     costBehavior: a.costBehavior,
     activation: a.activation,

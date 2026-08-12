@@ -53,12 +53,13 @@ function legsFor(operation: string): { mex: boolean; usa: boolean } {
 
 export function calculate(input: EngineInput): EngineOutput {
   const params: ParamMap = Object.assign({}, input.params, input.overrides ?? {})
+  const policy = input.policy ?? 'OPERATIONAL_V3'
   const { operation } = input
   const fxRate = input.fxRate && input.fxRate > 0 ? input.fxRate : 17.5
   const need = legsFor(operation)
 
   let mexLeg: MexLegOutput | null = null
-  if (need.mex && input.mexLeg) mexLeg = calculateMexLeg(input.mexLeg, params)
+  if (need.mex && input.mexLeg) mexLeg = calculateMexLeg(input.mexLeg, params, policy)
 
   // Drayage runs its own cycle engine (fills the USA-side slot). It accepts an
   // explicit drayageLeg, or adapts a resolver-produced usaLeg into one.
@@ -99,6 +100,7 @@ export function calculate(input: EngineInput): EngineOutput {
   })
 
   return {
+    policy,
     operation,
     mexLeg,
     usaLeg,

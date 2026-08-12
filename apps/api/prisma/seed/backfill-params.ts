@@ -12,10 +12,12 @@
  */
 import { PrismaClient, Section } from '@prisma/client'
 import { DEFAULT_ASSUMPTIONS } from './assumptions.seed.js'
+import { syncParameterCatalog } from './parameter-catalog.seed.js'
 
 const prisma = new PrismaClient()
 
 async function backfill() {
+  await syncParameterCatalog(prisma)
   const sets = await prisma.assumptionSet.findMany({ select: { id: true, name: true } })
   console.log(`Backfilling ${DEFAULT_ASSUMPTIONS.length} default params across ${sets.length} set(s)…`)
 
@@ -39,8 +41,8 @@ async function backfill() {
         field: a.field,
         value: a.value,
         unit: a.unit,
-        low: a.low || null,
-        high: a.high || null,
+        low: a.low ?? null,
+        high: a.high ?? null,
         updateFrequency: a.updateFrequency,
         costBehavior: a.costBehavior,
         activation: a.activation,
@@ -50,7 +52,8 @@ async function backfill() {
     totalCreated += missing.length
     console.log(`  ${set.name}: +${missing.length} params`)
   }
-  console.log(`Done — ${totalCreated} param(s) created.`)
+  const catalog = await syncParameterCatalog(prisma)
+  console.log(`Done: ${totalCreated} param(s) created; ${catalog.paramsLinked} linked to canonical definitions.`)
 }
 
 backfill()
