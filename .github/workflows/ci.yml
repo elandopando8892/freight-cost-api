@@ -37,3 +37,10 @@ jobs:
         run: npm run verify:ci
         env:
           DATABASE_URL: postgresql://ci:ci@localhost:5432/freight_cost_ci
+          KINDE_CLIENT_ID: your-ci-client-id
+          KINDE_CLIENT_SECRET: your-ci-client-secret
+          KINDE_ISSUER_URL: https://ci-placeholder.kinde.com
+          KINDE_SITE_URL: http://localhost:3001
+          KINDE_POST_LOGOUT_REDIRECT_URL: http://localhost:3001
+          KINDE_POST_LOGIN_REDIRECT_URL: http://localhost:3001/
+          KINDE_AUDIENCE: https://api.ci.invalid
