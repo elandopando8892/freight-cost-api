@@ -30,5 +30,8 @@ jobs:
       - name: Install locked dependencies
         run: npm ci
 
+      - name: Generate Prisma client
+        run: npm run db:generate -w freight-cost-api
+
       - name: Verify local artifact
         run: npm run verify:ci
