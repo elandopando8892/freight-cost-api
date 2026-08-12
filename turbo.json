@@ -3,6 +3,15 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
+      "env": [
+        "KINDE_AUDIENCE",
+        "KINDE_CLIENT_ID",
+        "KINDE_CLIENT_SECRET",
+        "KINDE_ISSUER_URL",
+        "KINDE_POST_LOGIN_REDIRECT_URL",
+        "KINDE_POST_LOGOUT_REDIRECT_URL",
+        "KINDE_SITE_URL"
+      ],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
     "dev": {
