@@ -35,3 +35,5 @@ jobs:
 
       - name: Verify local artifact
         run: npm run verify:ci
+        env:
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/freight_cost_ci
