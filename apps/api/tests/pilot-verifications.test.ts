@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   evaluatePilotVerificationGate,
   PILOT_VERIFICATION_FUTURE_TOLERANCE_MS,
@@ -44,14 +44,18 @@ describe("pilot verification evidence", () => {
   });
 
   it("rejects an execution timestamp beyond the five-minute future tolerance", () => {
-    expect(
-      pilotVerificationBlocker({
-        ...smokePass,
-        executedAt: new Date(
-          Date.now() + PILOT_VERIFICATION_FUTURE_TOLERANCE_MS + 1,
-        ),
-      }),
-    ).toMatch(/futuro/i);
+    const now = Date.now();
+    const clock = vi.spyOn(Date, "now").mockReturnValue(now);
+    try {
+      expect(
+        pilotVerificationBlocker({
+          ...smokePass,
+          executedAt: new Date(now + PILOT_VERIFICATION_FUTURE_TOLERANCE_MS + 1),
+        }),
+      ).toMatch(/futuro/i);
+    } finally {
+      clock.mockRestore();
+    }
   });
 
   it("uses the latest result and invalidates stale or mismatched evidence", () => {
