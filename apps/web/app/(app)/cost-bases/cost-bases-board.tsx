@@ -80,13 +80,46 @@ export interface CostBase {
 const SCOPE_LABEL: Record<Scope, string> = {
   CROSS_BORDER: 'Cross-border', DRAYAGE: 'Drayage', LOCAL: 'Local', INTRA_MEX: 'Intra-MEX', INTRA_US: 'Intra-US',
 }
+const SCOPE_ORDER: Scope[] = ['CROSS_BORDER', 'DRAYAGE', 'LOCAL', 'INTRA_MEX', 'INTRA_US']
 const selectCls = 'h-9 w-full rounded-md border border-input bg-background px-3 text-sm shadow-sm'
+
+type CoverageStatus = 'READY' | 'IN_PROGRESS' | 'MISSING'
+
+interface ScopeCoverage {
+  scope: Scope
+  status: CoverageStatus
+  baseCount: number
+  readyBaseCount: number
+  draftVersionCount: number
+  laneCount: number
+  quoteCount: number
+}
+
+function buildScopeCoverage(bases: CostBase[]): ScopeCoverage[] {
+  return SCOPE_ORDER.map((scope) => {
+    const scopedBases = bases.filter((base) => base.scope === scope && base.status !== 'ARCHIVED')
+    const readyBases = scopedBases.filter((base) => base.status === 'ACTIVE' && base.versions.some((version) => (
+      version.isActive && version.status === 'PUBLISHED' && version._count.params === 210
+    )))
+    return {
+      scope,
+      status: readyBases.length > 0 ? 'READY' : scopedBases.length > 0 ? 'IN_PROGRESS' : 'MISSING',
+      baseCount: scopedBases.length,
+      readyBaseCount: readyBases.length,
+      draftVersionCount: scopedBases.flatMap((base) => base.versions).filter((version) => version.status === 'DRAFT').length,
+      laneCount: scopedBases.reduce((sum, base) => sum + base._count.lanes, 0),
+      quoteCount: scopedBases.reduce((sum, base) => sum + base._count.quotes, 0),
+    }
+  })
+}
 
 export function CostBasesBoard({ initial }: { initial: CostBase[] }) {
   const [bases, setBases] = useState(initial)
   const [showCreate, setShowCreate] = useState(initial.length === 0)
+  const [createScope, setCreateScope] = useState<Scope>('CROSS_BORDER')
   const [versionAction, setVersionAction] = useState<{ kind: 'publish' | 'archive'; baseId: string; version: CostBaseVersion } | null>(null)
   const [impactTarget, setImpactTarget] = useState<{ base: CostBase; version: CostBaseVersion } | null>(null)
+  const coverage = buildScopeCoverage(bases)
 
   const create = useMutation({
     mutationFn: (body: { code: string; name: string; scope: Scope; defaultPolicy: string; isDefault: boolean }) =>
@@ -136,6 +169,11 @@ export function CostBasesBoard({ initial }: { initial: CostBase[] }) {
     impact.mutate({ baseId: base.id, versionId: version.id })
   }
 
+  const openCreate = (scope: Scope) => {
+    setCreateScope(scope)
+    setShowCreate(true)
+  }
+
   return (
     <div className="grid gap-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -146,13 +184,15 @@ export function CostBasesBoard({ initial }: { initial: CostBase[] }) {
         <Button size="sm" onClick={() => setShowCreate((value) => !value)}>{showCreate ? 'Cancel' : 'New base'}</Button>
       </div>
 
-      {showCreate && <CreateBaseForm pending={create.isPending} onSubmit={(body) => create.mutate(body)} />}
+      <CoverageOverview coverage={coverage} onCreate={openCreate} />
+
+      {showCreate && <CreateBaseForm key={createScope} initialScope={createScope} pending={create.isPending} onSubmit={(body) => create.mutate(body)} />}
 
       {bases.length === 0 && !showCreate && (
         <Card><CardHeader><CardTitle>No cost bases</CardTitle><CardDescription>Create the first base and choose which route scope it serves.</CardDescription></CardHeader></Card>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div id="base-list" className="grid scroll-mt-24 gap-4 lg:grid-cols-2">
         {bases.map((base) => {
           const active = base.versions.find((version) => version.isActive)
           return (
@@ -238,6 +278,66 @@ export function CostBasesBoard({ initial }: { initial: CostBase[] }) {
   )
 }
 
+const COVERAGE_STYLE: Record<CoverageStatus, string> = {
+  READY: 'border-emerald-500/30 bg-emerald-500/5 text-emerald-700 dark:text-emerald-400',
+  IN_PROGRESS: 'border-amber-500/30 bg-amber-500/5 text-amber-700 dark:text-amber-400',
+  MISSING: 'border-border bg-muted/25 text-muted-foreground',
+}
+
+const COVERAGE_LABEL: Record<CoverageStatus, string> = {
+  READY: 'Operational',
+  IN_PROGRESS: 'In preparation',
+  MISSING: 'No coverage',
+}
+
+function CoverageOverview({ coverage, onCreate }: { coverage: ScopeCoverage[]; onCreate: (scope: Scope) => void }) {
+  const ready = coverage.filter((item) => item.status === 'READY').length
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <CardTitle>Operational coverage</CardTitle>
+            <CardDescription>Each scope needs an active base and an active published version with all 210 parameters.</CardDescription>
+          </div>
+          <div className="rounded-full border bg-muted/25 px-3 py-1 text-xs font-medium">{ready} of {coverage.length} scopes operational</div>
+        </div>
+      </CardHeader>
+      <CardContent className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+        {coverage.map((item) => (
+          <div key={item.scope} className="flex min-h-48 flex-col rounded-lg border p-3">
+            <div className="flex items-start justify-between gap-2">
+              <div className="font-medium">{SCOPE_LABEL[item.scope]}</div>
+              <span className={`rounded-full border px-2 py-0.5 text-[10px] font-medium ${COVERAGE_STYLE[item.status]}`}>{COVERAGE_LABEL[item.status]}</span>
+            </div>
+            <p className="mt-2 flex-1 text-xs leading-relaxed text-muted-foreground">
+              {item.status === 'READY'
+                ? `${item.readyBaseCount} governed base${item.readyBaseCount === 1 ? '' : 's'} ready for future quotes and production routes.`
+                : item.status === 'IN_PROGRESS'
+                  ? `${item.baseCount} base${item.baseCount === 1 ? '' : 's'} exist${item.baseCount === 1 ? 's' : ''}${item.draftVersionCount > 0 ? ` with ${item.draftVersionCount} draft version${item.draftVersionCount === 1 ? '' : 's'}` : ''}, but none has an active published 210-parameter version.`
+                  : 'No governed base. Manual quotes can calculate, but remain Legacy and require review.'}
+            </p>
+            <div className="mt-3 grid grid-cols-3 gap-2 border-t pt-2 text-center text-xs">
+              <CoverageMetric label="Bases" value={item.baseCount} />
+              <CoverageMetric label="Lanes" value={item.laneCount} />
+              <CoverageMetric label="Quotes" value={item.quoteCount} />
+            </div>
+            <div className="mt-3">
+              {item.status === 'MISSING'
+                ? <Button className="w-full" variant="outline" size="sm" onClick={() => onCreate(item.scope)}>Start {SCOPE_LABEL[item.scope]} base</Button>
+                : <Link href="#base-list" className="block text-center text-xs font-medium underline underline-offset-2">Review bases</Link>}
+            </div>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  )
+}
+
+function CoverageMetric({ label, value }: { label: string; value: number }) {
+  return <div><div className="font-semibold tabular-nums">{value}</div><div className="text-[10px] text-muted-foreground">{label}</div></div>
+}
+
 function VersionBadge({ status }: { status: CostBaseVersion['status'] }) {
   const cls = status === 'PUBLISHED' ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : status === 'ARCHIVED' ? 'bg-muted text-muted-foreground' : 'bg-amber-500/10 text-amber-700 dark:text-amber-400'
   return <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-medium ${cls}`}>{status.toLowerCase()}</span>
@@ -309,13 +409,14 @@ function Metric({ label, value }: { label: string; value: string }) {
   return <div><div className="text-xs text-muted-foreground">{label}</div><div className="font-semibold">{value}</div></div>
 }
 
-function CreateBaseForm({ pending, onSubmit }: {
+function CreateBaseForm({ initialScope, pending, onSubmit }: {
+  initialScope: Scope
   pending: boolean
   onSubmit: (body: { code: string; name: string; scope: Scope; defaultPolicy: string; isDefault: boolean }) => void
 }) {
   const [code, setCode] = useState('')
   const [name, setName] = useState('')
-  const [scope, setScope] = useState<Scope>('CROSS_BORDER')
+  const [scope, setScope] = useState<Scope>(initialScope)
   const [policy, setPolicy] = useState('OPERATIONAL_V3')
   const [isDefault, setIsDefault] = useState(true)
   return (
