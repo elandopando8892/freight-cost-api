@@ -2,6 +2,12 @@
 
 import { useEffect, useState } from 'react'
 
+export function formatAbsolute(iso: string): string {
+  const value = new Date(iso)
+  if (Number.isNaN(value.getTime())) return iso
+  return `${value.toISOString().slice(0, 16).replace('T', ' ')} UTC`
+}
+
 export function formatRelative(iso: string, now: number): string {
   const diffMs = now - new Date(iso).getTime()
   const sec = Math.round(diffMs / 1000)
@@ -16,8 +22,8 @@ export function formatRelative(iso: string, now: number): string {
 }
 
 /**
- * Auto-updating relative timestamp ("5 min ago"). Renders the absolute timestamp
- * pre-mount to avoid hydration mismatch, then switches to relative + hover tooltip.
+ * Auto-updating relative timestamp ("5 min ago"). Renders a deterministic UTC
+ * timestamp pre-mount, then switches to relative + hover tooltip.
  */
 export function RelativeTime({ iso }: { iso: string }) {
   const [now, setNow] = useState<number | null>(null)
@@ -30,7 +36,7 @@ export function RelativeTime({ iso }: { iso: string }) {
       window.clearInterval(interval)
     }
   }, [])
-  const abs = new Date(iso).toLocaleString()
+  const abs = formatAbsolute(iso)
   if (now == null) return <span>{abs}</span>
   return <span title={abs}>{formatRelative(iso, now)}</span>
 }
