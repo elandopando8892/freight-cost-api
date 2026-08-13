@@ -1,12 +1,12 @@
-import { createHash } from "node:crypto";
 import { env } from "../../config/env.js";
 import { prisma } from "../../config/prisma.js";
 import { buildRatewareRateBookContract } from "./rateware-ratebook-contract.js";
+import {
+  buildRatewareDeliveryEnvelope,
+  RATEWARE_RATEBOOK_CONTRACT_VERSION,
+} from "./rateware-delivery-envelope.js";
 import { trustedRatewareEndpoint } from "./rateware-endpoint.js";
 
-const CONTRACT_VERSION = "fcm.rateware-ratebook.v1";
-const sha256 = (value: string) =>
-  createHash("sha256").update(value).digest("hex");
 const boundedError = (value: string) =>
   value.replace(/[\r\n]+/g, " ").slice(0, 1200);
 
@@ -30,17 +30,14 @@ export async function deliverRateBookToRateware(input: {
       new Error("Rateware delivery is not configured for this environment."),
       { statusCode: 503 },
     );
-  const idempotencyKey = sha256(
-    `${CONTRACT_VERSION}:${input.orgId}:${input.book.id}:${input.book.updatedAt.toISOString()}`,
-  );
+  const { idempotencyKey, payload, payloadChecksum } =
+    buildRatewareDeliveryEnvelope({ orgId: input.orgId, book: input.book });
   const prior = await prisma.ratewareDelivery.findUnique({
     where: { orgId_idempotencyKey: { orgId: input.orgId, idempotencyKey } },
   });
   if (prior?.status === "DELIVERED")
     return { delivery: prior, duplicate: true };
 
-  const payload = buildRatewareRateBookContract(input.book);
-  const payloadChecksum = sha256(JSON.stringify(payload));
   let responseCode: number | undefined;
   try {
     const response = await fetch(endpoint, {
@@ -79,7 +76,7 @@ export async function deliverRateBookToRateware(input: {
         rateBookId: input.book.id,
         approvalRequestId: input.approvalRequestId,
         actorId: input.actorId,
-        contractVersion: CONTRACT_VERSION,
+        contractVersion: RATEWARE_RATEBOOK_CONTRACT_VERSION,
         idempotencyKey,
         payloadChecksum,
         status: "DELIVERED",
@@ -113,7 +110,7 @@ export async function deliverRateBookToRateware(input: {
         rateBookId: input.book.id,
         approvalRequestId: input.approvalRequestId,
         actorId: input.actorId,
-        contractVersion: CONTRACT_VERSION,
+        contractVersion: RATEWARE_RATEBOOK_CONTRACT_VERSION,
         idempotencyKey,
         payloadChecksum,
         status: "FAILED",

@@ -5,9 +5,12 @@ un administrador. Solo acepta RateBooks publicados y reenvía el bearer Kinde
 del usuario autenticado; no usa una credencial de Rateware en el navegador.
 
 La entrega calcula una llave SHA-256 estable a partir de la organización, el
-RateBook y su versión local. FCM conserva `RatewareDelivery` con actor,
-checksum, resultado HTTP, error acotado y recibo remoto. Reintentar una
-entrega ya confirmada devuelve el registro local sin volver a transmitirlo.
+RateBook y su versión local. El paquete usa `updatedAt` de esa misma versión
+como `exportedAt`; por ello un reintento conserva exactamente la misma llave,
+carga JSON y checksum aunque la respuesta anterior se haya perdido. FCM
+conserva `RatewareDelivery` con actor, checksum, resultado HTTP, error acotado
+y recibo remoto. Reintentar una entrega ya confirmada devuelve el registro
+local sin volver a transmitirlo.
 
 ## Configuración controlada
 
