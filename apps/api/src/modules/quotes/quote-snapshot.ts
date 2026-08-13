@@ -27,6 +27,17 @@ function stableParams(params: Record<string, number>) {
   return Object.fromEntries(Object.entries(params).sort(([a], [b]) => a.localeCompare(b)))
 }
 
+function canonicalJson(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`
+  if (value && typeof value === 'object') {
+    const entries = Object.entries(value as Record<string, unknown>)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, item]) => `${JSON.stringify(key)}:${canonicalJson(item)}`)
+    return `{${entries.join(',')}}`
+  }
+  return JSON.stringify(value)
+}
+
 function stableNumber(value: number) {
   return Number(value.toFixed(9))
 }
@@ -71,7 +82,7 @@ function payloadFor(input: EngineInput, result: EngineOutput): SnapshotPayload {
 }
 
 function checksum(payload: SnapshotPayload) {
-  return createHash('sha256').update(JSON.stringify(payload)).digest('hex')
+  return createHash('sha256').update(canonicalJson(payload)).digest('hex')
 }
 
 export function buildQuoteCalculationSnapshot(input: EngineInput, result: EngineOutput): QuoteCalculationSnapshot {
