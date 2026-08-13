@@ -759,6 +759,10 @@ describe("Pilot decision ledger", () => {
   });
 
   it("requires two distinct non-verifier admins before recording GO", async () => {
+    const verificationExecutedAt = new Date(Date.now() - 60 * 60 * 1000);
+    const verificationCreatedAt = new Date(
+      verificationExecutedAt.getTime() + 60 * 1000,
+    );
     const migrationRows = [
       "20260811002100_scenario_review_packets",
       "20260811002200_scenario_review_draft_lineage",
@@ -793,9 +797,9 @@ describe("Pilot decision ledger", () => {
           kind: query.where.kind,
           outcome: "PASS",
           releaseId: "abc1234",
-          executedAt: new Date("2026-08-12T10:00:00.000Z"),
+          executedAt: verificationExecutedAt,
           verifiedById: isSmoke ? "verifier-smoke" : "verifier-human",
-          createdAt: new Date("2026-08-12T10:01:00.000Z"),
+          createdAt: verificationCreatedAt,
         } as never;
       },
     );
