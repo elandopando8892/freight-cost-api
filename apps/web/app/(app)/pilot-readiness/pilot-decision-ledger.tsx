@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { formatAbsolute } from "@/components/relative-time";
 import {
   Card,
   CardContent,
@@ -195,7 +196,7 @@ export function PilotDecisionLedger({
                         : "Pendiente"}
                     </span>
                     <span className="block">
-                      {new Date(approval.createdAt).toLocaleString()}
+                      {formatAbsolute(approval.createdAt)}
                     </span>
                   </div>
                 </div>
@@ -230,7 +231,7 @@ export function PilotDecisionLedger({
                         {decision.outcome}
                       </span>
                       <span className="mt-1 block text-xs text-muted-foreground">
-                        {new Date(decision.createdAt).toLocaleString()}
+                        {formatAbsolute(decision.createdAt)}
                       </span>
                     </td>
                     <td className="p-2">
@@ -239,7 +240,7 @@ export function PilotDecisionLedger({
                         : `${decision.evidenceBlockers} bloqueo(s)`}
                       <span className="block text-xs text-muted-foreground">
                         {decision.evidenceWarnings} advertencia(s) ·{" "}
-                        {new Date(decision.evidenceAt).toLocaleString()}
+                        {formatAbsolute(decision.evidenceAt)}
                       </span>
                     </td>
                     <td className="max-w-md p-2">

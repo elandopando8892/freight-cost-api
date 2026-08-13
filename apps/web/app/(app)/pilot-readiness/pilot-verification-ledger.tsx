@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { formatAbsolute } from "@/components/relative-time";
 import {
   Card,
   CardContent,
@@ -206,7 +207,7 @@ export function PilotVerificationLedger({
                     <td className="max-w-md p-2">
                       {verification.summary}
                       <span className="mt-1 block text-xs text-muted-foreground">
-                        {new Date(verification.executedAt).toLocaleString()}
+                        {formatAbsolute(verification.executedAt)}
                       </span>
                     </td>
                     <td className="p-2">{verification.verifiedBy.email}</td>
