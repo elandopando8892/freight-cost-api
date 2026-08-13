@@ -33,6 +33,37 @@ export interface ResolvedRoute {
   warnings: string[]
 }
 
+export type RequiredPricingLeg = 'MEX' | 'USA'
+
+/** Canonical lookup form for user-entered lane names and seeded reference keys. */
+export function normalizeLaneLookup(value: string): string {
+  return (value ?? '')
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .trim()
+    .replace(/\s+/g, ' ')
+    .toUpperCase()
+}
+
+/** Return every pricing leg that an operation requires but the resolver did not find. */
+export function missingRequiredPricingLegs(
+  operation: string,
+  resolved: { mexLeg?: unknown; usaLeg?: unknown },
+): RequiredPricingLeg[] {
+  const missing: RequiredPricingLeg[] = []
+  if (operation === 'D2D Export' || operation === 'D2D Import') {
+    if (!resolved.mexLeg) missing.push('MEX')
+    if (!resolved.usaLeg) missing.push('USA')
+    return missing
+  }
+  if (operation === 'Drayage' || operation === 'Intra-US' || operation === 'US Northbound' || operation === 'US Southbound') {
+    if (!resolved.usaLeg) missing.push('USA')
+    return missing
+  }
+  if (!resolved.mexLeg) missing.push('MEX')
+  return missing
+}
+
 interface UsMetro { metroCity: string; market: string }
 
 /** Extract a 3-digit ZIP prefix from a free-text US location (e.g. "Augusta, GA 30901" → "309"), or null. */
@@ -116,13 +147,13 @@ async function resolveMexLeg(
   // 2) Global reference table (truck-specific), with homologation → production retry.
   let o = origin, d = dest
   let key = `${o} - ${d} ${eq.truckType}`
-  let row = await prisma.mexLaneExpense.findFirst({ where: { laneKeyNorm: key.toUpperCase() } })
+  let row = await prisma.mexLaneExpense.findFirst({ where: { laneKeyNorm: normalizeLaneLookup(key) } })
   if (!row) {
     const [o2, d2] = await Promise.all([mxToProduction(origin), mxToProduction(dest)])
     if (o2 !== o || d2 !== d) {
       o = o2; d = d2
       key = `${o} - ${d} ${eq.truckType}`
-      row = await prisma.mexLaneExpense.findFirst({ where: { laneKeyNorm: key.toUpperCase() } })
+      row = await prisma.mexLaneExpense.findFirst({ where: { laneKeyNorm: normalizeLaneLookup(key) } })
     }
   }
   if (!row) { warnings.push(`MEX lane not found: "${key}" (add it to your production matrix to quote it)`); return undefined }
@@ -137,11 +168,13 @@ async function resolveMexLeg(
 
 /** Look up an org's custom MEX lane by origin→dest, trying raw + homologation-normalized keys. */
 async function findCarrierMexLane(orgId: string, origin: string, dest: string) {
-  const raw = `${origin} - ${dest}`.toUpperCase()
+  const rawInput = `${origin} - ${dest}`.trim().toUpperCase()
+  const raw = normalizeLaneLookup(rawInput)
   let hit = await prisma.carrierMexLane.findUnique({ where: { orgId_laneKeyNorm: { orgId, laneKeyNorm: raw } } })
+  if (!hit && rawInput !== raw) hit = await prisma.carrierMexLane.findUnique({ where: { orgId_laneKeyNorm: { orgId, laneKeyNorm: rawInput } } })
   if (hit) return hit
   const [o2, d2] = await Promise.all([mxToProduction(origin), mxToProduction(dest)])
-  const norm = `${o2} - ${d2}`.toUpperCase()
+  const norm = normalizeLaneLookup(`${o2} - ${d2}`)
   if (norm !== raw) hit = await prisma.carrierMexLane.findUnique({ where: { orgId_laneKeyNorm: { orgId, laneKeyNorm: norm } } })
   return hit
 }
@@ -150,7 +183,7 @@ async function resolveUsaLeg(
   orgId: string, originIn: string, destIn: string, eq: EquipmentSpec, operation: string, service: string, warnings: string[],
 ): Promise<UsaLegInput | undefined> {
   // 1) Carrier's OWN production matrix first (by the raw origin→dest they entered).
-  const carrierKey = `${originIn.trim()} - ${destIn.trim()}`.toUpperCase()
+  const carrierKey = normalizeLaneLookup(`${originIn} - ${destIn}`)
   const carrier = await prisma.carrierUsaLane.findUnique({ where: { orgId_laneKeyNorm: { orgId, laneKeyNorm: carrierKey } } })
   if (carrier) {
     warnings.push(`USA lane from your production matrix: "${carrier.origin} - ${carrier.destination}" (${carrier.miles} mi)`)
@@ -178,7 +211,7 @@ async function resolveUsaLeg(
   const origin = o?.metroCity ?? originIn.trim()
   const dest = d?.metroCity ?? destIn.trim()
 
-  const key = `${origin} - ${dest} ${eq.truckType}`.toUpperCase()
+  const key = normalizeLaneLookup(`${origin} - ${dest} ${eq.truckType}`)
   const row = await prisma.usaLaneData.findFirst({ where: { laneKey: key } })
   if (!row) { warnings.push(`USA lane not found: "${key}"`); return undefined }
   const fuel = await prisma.usaFuel.findUnique({ where: { state: row.outState } })
@@ -186,7 +219,7 @@ async function resolveUsaLeg(
   const originCondition = await conditionFromMarket(o?.market ?? null, origin, eq.trailer, warnings)
   const destCondition = await conditionFromMarket(d?.market ?? null, dest, eq.trailer, warnings)
   // DAT market benchmark: "{Origin} - {Dest} {TruckType} {Trailer}"
-  const datKey = `${origin} - ${dest} ${eq.truckType} ${eq.trailer}`.toUpperCase()
+  const datKey = normalizeLaneLookup(`${origin} - ${dest} ${eq.truckType} ${eq.trailer}`)
   const dat = await prisma.usaDatBenchmark.findFirst({ where: { laneKeyNorm: datKey } })
   if (!dat) warnings.push(`No DAT benchmark for "${datKey}" (market reference uses cost proxy)`)
   return {
@@ -219,7 +252,10 @@ export async function resolveRoute(input: ResolveInput): Promise<ResolvedRoute> 
       const mexLeg = await resolveMexLeg(orgId, mexBorder, inboundLocation, equipment, operation, service, route, warnings)
       return { mexLeg, usaLeg, warnings }
     }
-    case 'Drayage': {
+    case 'Drayage':
+    case 'Intra-US':
+    case 'US Northbound':
+    case 'US Southbound': {
       const usaLeg = await resolveUsaLeg(orgId, outboundLocation, inboundLocation, equipment, operation, service, warnings)
       return { usaLeg, warnings }
     }

@@ -12,7 +12,7 @@ import { prisma } from '../../config/prisma.js'
 import { scopeForOperation } from '../cost-bases/cost-bases.service.js'
 import { buildParamMap } from '../assumptions/assumptions.service.js'
 import { calculate } from '../engine/engine.calculator.js'
-import { resolveRoute } from '../engine/lane-resolver.service.js'
+import { missingRequiredPricingLegs, normalizeLaneLookup, resolveRoute } from '../engine/lane-resolver.service.js'
 import { buildLaneKey } from '../lanes/lanes.schema.js'
 import { buildQuoteExplanation } from '../quotes/quote-explanation.js'
 import { buildQuoteCalculationSnapshot } from '../quotes/quote-snapshot.js'
@@ -20,7 +20,7 @@ import { Prisma } from '@prisma/client'
 import { round2, usdToMxn } from '../../utils/currency.js'
 import type { EquipmentSpec, EngineInput } from '../engine/engine.types.js'
 
-const norm = (origin: string, destination: string) => `${origin.trim()} - ${destination.trim()}`.toUpperCase()
+const norm = (origin: string, destination: string) => normalizeLaneLookup(`${origin} - ${destination}`)
 
 const MexLaneSchema = z.object({
   origin: z.string().min(2),
@@ -73,6 +73,14 @@ const routeKey = (input: z.infer<typeof ProductionRouteSchema>) => [
 
 function httpError(message: string, statusCode: number) {
   return Object.assign(new Error(message), { statusCode })
+}
+
+function assertCompleteResolution(operation: string, resolved: Awaited<ReturnType<typeof resolveRoute>>) {
+  const missing = missingRequiredPricingLegs(operation, resolved)
+  if (missing.length) {
+    const evidence = resolved.warnings.length ? ` ${resolved.warnings.join(' ')}` : ''
+    throw httpError(`Could not resolve required ${missing.join(' and ')} pricing leg(s) for ${operation}.${evidence}`, 422)
+  }
 }
 
 function expectedGeography(operation: string) {
@@ -229,6 +237,12 @@ export async function productionRoutes(app: FastifyInstance) {
     if (route.status !== 'DRAFT') throw httpError('Only a draft route can enter production.', 409)
     const assessment = assessRoute(route)
     if (assessment.quality !== 'READY') throw httpError(`Route cannot enter production: ${assessment.reasons.join(' ')}`, 422)
+    const resolved = await resolveRoute({
+      orgId, outboundLocation: route.origin, inboundLocation: route.destination,
+      mexBorder: route.mexBorder ?? route.origin, usBorder: route.usaBorder ?? route.destination,
+      equipment: engineEquipment(route), operation: route.operation, service: route.service,
+    })
+    assertCompleteResolution(route.operation, resolved)
     const produced = await prisma.$transaction(async (tx) => {
       const updated = await tx.productionRoute.update({ where: { id }, data: { status: 'PRODUCTION' }, include: routeInclude })
       await tx.productionRouteAuditEvent.create({ data: { orgId, routeId: id, actorId: user.sub, action: 'PRODUCED', note: 'Route entered production.', payload: { revision: updated.revision } } })
@@ -307,7 +321,7 @@ export async function productionRoutes(app: FastifyInstance) {
       mexBorder: route.mexBorder ?? route.origin, usBorder: route.usaBorder ?? route.destination,
       equipment, operation: route.operation, service: route.service,
     })
-    if (!resolved.mexLeg && !resolved.usaLeg) throw httpError(`Could not resolve pricing legs for this production route. ${resolved.warnings.join(' ')}`, 422)
+    assertCompleteResolution(route.operation, resolved)
 
     const params = buildParamMap(route.confirmedAssumptionSet.params)
     const input: EngineInput = {

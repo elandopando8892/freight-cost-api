@@ -45,6 +45,9 @@ function legsFor(operation: string): { mex: boolean; usa: boolean } {
     case 'D2D Import':
       return { mex: true, usa: true }
     case 'Drayage':
+    case 'Intra-US':
+    case 'US Northbound':
+    case 'US Southbound':
       return { mex: false, usa: true }
     default: // Intra-Mex, MX Northbound, MX Southbound, Local
       return { mex: true, usa: false }

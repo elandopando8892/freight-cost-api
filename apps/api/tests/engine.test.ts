@@ -193,6 +193,24 @@ describe('Cross-border assembly — Monterrey → Dallas Flatbed D2D Export = $2
   })
 })
 
+describe('USA-only assembly', () => {
+  const equipment = { truckType: 'Truck Trailer', trailer: 'Dry Van', config: 'Single', driver: 'CDL' }
+
+  it('prices Intra-US from its USA leg instead of silently dropping it', () => {
+    const r = calculate({
+      operation: 'Intra-US', service: 'One Way', equipment, params,
+      usaLeg: {
+        loadedMiles: 435, transitDaysRaw: 1, driverExpenses: 0, outState: 'TX',
+        dieselUsdGal: 5.152, fscUsdMile: 0.8, originCondition: 'Balanced', destCondition: 'Balanced',
+        operation: 'Intra-US', service: 'One Way', equipment,
+      },
+    })
+    expect(r.mexLeg).toBeNull()
+    expect(r.usaLeg).not.toBeNull()
+    expect(r.freightBaselineUsd).toBeGreaterThan(0)
+  })
+})
+
 describe('Calculation policy is explicit and auditable', () => {
   const equipment = { truckType: 'Truck Trailer', trailer: 'Flatbed', config: 'Single', driver: 'B1' }
   const mexLeg = {

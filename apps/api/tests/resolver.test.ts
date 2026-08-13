@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { usZipPrefix } from '../src/modules/engine/lane-resolver.service.js'
+import { missingRequiredPricingLegs, normalizeLaneLookup, usZipPrefix } from '../src/modules/engine/lane-resolver.service.js'
 import { homologateMx, buildReferenceKey } from '../src/modules/engine/reference-key.js'
 import { defaultService } from '../src/modules/engine/engine.factors.js'
 
@@ -17,6 +17,25 @@ describe('lane-resolver — US ZIP prefix extraction', () => {
     expect(usZipPrefix('Augusta, GA')).toBeNull()
     expect(usZipPrefix('Greenville, SC')).toBeNull()
     expect(usZipPrefix('')).toBeNull()
+  })
+})
+
+describe('lane-resolver — canonical lane lookup and required legs', () => {
+  it('normalizes diacritics and whitespace to the seeded reference-key form', () => {
+    expect(normalizeLaneLookup('  Monterrey, Nuevo León  -  Nuevo Laredo, Tamaulipas Truck Trailer '))
+      .toBe('MONTERREY, NUEVO LEON - NUEVO LAREDO, TAMAULIPAS TRUCK TRAILER')
+  })
+
+  it('requires both legs for cross-border operations', () => {
+    expect(missingRequiredPricingLegs('D2D Export', { usaLeg: {} })).toEqual(['MEX'])
+    expect(missingRequiredPricingLegs('D2D Import', { mexLeg: {} })).toEqual(['USA'])
+    expect(missingRequiredPricingLegs('D2D Export', { mexLeg: {}, usaLeg: {} })).toEqual([])
+  })
+
+  it('requires the correct single leg for US and MX operations', () => {
+    expect(missingRequiredPricingLegs('Intra-US', { mexLeg: {} })).toEqual(['USA'])
+    expect(missingRequiredPricingLegs('US Northbound', { usaLeg: {} })).toEqual([])
+    expect(missingRequiredPricingLegs('Intra-Mex', { usaLeg: {} })).toEqual(['MEX'])
   })
 })
 
