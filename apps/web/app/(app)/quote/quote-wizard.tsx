@@ -11,7 +11,9 @@ import { LocationInput } from './location-input'
 import {
   type QuoteResult, type FormFields, type FormErrors, type CostBaseOption,
   OPS, SVCS, TRUCKS, TRAILERS, CONFIGS, DRIVERS, ROUTES, selectCls,
-  initialFormFor, compatibleBases, quoteBody, Field, ResultSkeleton, Result,
+  initialFormFor, compatibleBases, preferredGovernedBase, activeVersionFor,
+  costBaseReadiness, costBaseReadinessDetail, quoteBody, Field, CostBaseSelector,
+  CostBaseLineageNotice, ResultSkeleton, Result,
 } from './quote-shared'
 
 // Progressive-disclosure steps: one decision at a time, with microcopy.
@@ -68,6 +70,7 @@ export function QuoteWizard({ costBases = [] }: { costBases?: CostBaseOption[] }
   const next = () => { if (validateStep(step)) setStep((s) => Math.min(s + 1, STEPS.length - 1)) }
   const back = () => setStep((s) => Math.max(s - 1, 0))
   const restart = () => { setForm(initialFormFor(costBases)); setErrors({}); setResult(null); setStep(0) }
+  const selectedCostBase = costBases.find((base) => base.id === form.costBaseId)
 
   return (
     <div className="mx-auto grid max-w-3xl gap-6">
@@ -114,7 +117,9 @@ export function QuoteWizard({ costBases = [] }: { costBases?: CostBaseOption[] }
                 origin: form.outboundLocation.trim(),
                 destination: form.inboundLocation.trim(),
                 equipment: { truckType: form.truckType, trailer: form.trailer, config: form.config, driver: form.driver },
-                costBaseLabel: costBases.find((base) => base.id === form.costBaseId)?.code ?? 'Legacy',
+                costBaseLabel: selectedCostBase?.code ?? 'Legacy',
+                costBaseReadiness: costBaseReadiness(selectedCostBase),
+                costBaseReadinessDetail: costBaseReadinessDetail(selectedCostBase, form.operation),
               }}
             />
           ) : null}
@@ -179,7 +184,7 @@ function LaneStep({ form, errors, set, locations, costBases }: StepProps & { err
             const operation = e.target.value as (typeof OPS)[number]
             const options = compatibleBases(costBases, operation)
             const currentStillValid = options.some((base) => base.id === form.costBaseId)
-            const fallback = options.find((base) => base.isDefault) ?? (options.length === 1 ? options[0] : undefined)
+            const fallback = preferredGovernedBase(costBases, operation)
             set('operation', operation)
             set('costBaseId', currentStillValid ? form.costBaseId : fallback?.id ?? '')
           }}>
@@ -193,15 +198,12 @@ function LaneStep({ form, errors, set, locations, costBases }: StepProps & { err
           </select>
         </Field>
       </div>
-      <Field label="Cost base" hint="The base and active version used here stay attached to the route and saved quote.">
-        <select className={selectCls} value={form.costBaseId} onChange={(e) => set('costBaseId', e.target.value)}>
-          <option value="">Legacy active assumptions</option>
-          {compatibleBases(costBases, form.operation).map((base) => {
-            const active = base.versions.find((version) => version.isActive)
-            return <option key={base.id} value={base.id}>{base.code} · {base.name}{active ? ` · v${active.version}` : ''}{base.isDefault ? ' · default' : ''}</option>
-          })}
-        </select>
-      </Field>
+      <CostBaseSelector
+        bases={costBases}
+        operation={form.operation}
+        value={form.costBaseId}
+        onChange={(value) => set('costBaseId', value)}
+      />
       <button type="button" onClick={() => setShowAdvanced((v) => !v)} className="justify-self-start text-xs text-muted-foreground hover:text-foreground">
         {showAdvanced ? '− advanced' : '+ advanced (borders, route, FX)'}
       </button>
@@ -252,7 +254,7 @@ function EquipmentStep({ form, set }: StepProps) {
 
 function ReviewStep({ form, onEdit, costBases }: { form: FormFields; onEdit: (s: number) => void; costBases: CostBaseOption[] }) {
   const selectedBase = costBases.find((base) => base.id === form.costBaseId)
-  const activeVersion = selectedBase?.versions.find((version) => version.isActive)
+  const activeVersion = activeVersionFor(selectedBase)
   const rows: { label: string; value: string; step: number }[] = [
     { label: 'Lane', value: `${form.outboundLocation || '—'} → ${form.inboundLocation || '—'}`, step: 0 },
     { label: 'Operation', value: `${form.operation}${form.service ? ` · ${form.service}` : ' · auto service'}`, step: 0 },
@@ -260,17 +262,20 @@ function ReviewStep({ form, onEdit, costBases }: { form: FormFields; onEdit: (s:
     { label: 'Equipment', value: `${form.truckType} · ${form.trailer} · ${form.config} · ${form.driver}`, step: 1 },
   ]
   return (
-    <dl className="grid gap-2">
-      {rows.map((r) => (
-        <div key={r.label} className="flex items-center justify-between gap-3 rounded-md border px-3 py-2 text-sm">
-          <div className="min-w-0">
-            <dt className="text-xs text-muted-foreground">{r.label}</dt>
-            <dd className="truncate font-medium">{r.value}</dd>
+    <div className="grid gap-3">
+      <dl className="grid gap-2">
+        {rows.map((r) => (
+          <div key={r.label} className="flex items-center justify-between gap-3 rounded-md border px-3 py-2 text-sm">
+            <div className="min-w-0">
+              <dt className="text-xs text-muted-foreground">{r.label}</dt>
+              <dd className="truncate font-medium">{r.value}</dd>
+            </div>
+            <button type="button" onClick={() => onEdit(r.step)} className="shrink-0 text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground">edit</button>
           </div>
-          <button type="button" onClick={() => onEdit(r.step)} className="shrink-0 text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground">edit</button>
-        </div>
-      ))}
+        ))}
+      </dl>
+      <CostBaseLineageNotice base={selectedBase} operation={form.operation} />
       <p className="text-xs text-muted-foreground">Press <span className="font-medium text-foreground">Get quote</span> to price this lane against your active assumption set.</p>
-    </dl>
+    </div>
   )
 }

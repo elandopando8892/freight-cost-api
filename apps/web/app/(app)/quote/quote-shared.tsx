@@ -65,6 +65,8 @@ export interface FormSnapshot {
   origin: string
   destination: string
   costBaseLabel: string
+  costBaseReadiness: CostBaseReadiness
+  costBaseReadinessDetail: string
   equipment: { truckType: string; trailer: string; config: string; driver: string }
 }
 
@@ -78,6 +80,7 @@ export interface LaneHint {
 }
 
 export type CostBaseScope = 'CROSS_BORDER' | 'DRAYAGE' | 'LOCAL' | 'INTRA_MEX' | 'INTRA_US'
+export type CostBaseReadiness = 'GOVERNED' | 'IN_PREPARATION' | 'LEGACY'
 export interface CostBaseOption {
   id: string
   code: string
@@ -86,7 +89,21 @@ export interface CostBaseOption {
   status: 'DRAFT' | 'ACTIVE' | 'ARCHIVED'
   defaultPolicy: 'OPERATIONAL_V3' | 'WORKBOOK_V3'
   isDefault: boolean
-  versions: { id: string; version: number; isActive: boolean }[]
+  versions: {
+    id: string
+    version: number
+    isActive: boolean
+    status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'
+    _count: { params: number }
+  }[]
+}
+
+const SCOPE_LABEL: Record<CostBaseScope, string> = {
+  CROSS_BORDER: 'Cross-border',
+  DRAYAGE: 'Drayage',
+  LOCAL: 'Local',
+  INTRA_MEX: 'Intra-MEX',
+  INTRA_US: 'Intra-US',
 }
 
 // ── Field constants ─────────────────────────────────────────────────────────
@@ -137,9 +154,39 @@ export function compatibleBases(bases: CostBaseOption[], operation: string) {
   return bases.filter((base) => base.status !== 'ARCHIVED' && (!scope || base.scope === scope))
 }
 
+export function activeVersionFor(base: CostBaseOption | undefined) {
+  return base?.versions.find((version) => version.isActive)
+}
+
+export function costBaseReadiness(base: CostBaseOption | undefined): CostBaseReadiness {
+  if (!base) return 'LEGACY'
+  const version = activeVersionFor(base)
+  return base.status === 'ACTIVE' && version?.status === 'PUBLISHED' && version._count.params === 210
+    ? 'GOVERNED'
+    : 'IN_PREPARATION'
+}
+
+export function costBaseReadinessDetail(base: CostBaseOption | undefined, operation: string) {
+  const scope = scopeForOperation(operation)
+  if (!base) return `No governed ${scope ? SCOPE_LABEL[scope] : 'operation'} base is selected. The calculation remains a proposal and any saved quote requires review.`
+  const version = activeVersionFor(base)
+  if (costBaseReadiness(base) === 'GOVERNED') return `${base.code} v${version?.version} is active, published, and complete with 210 parameters.`
+  const reasons = [
+    base.status !== 'ACTIVE' ? `base is ${base.status.toLowerCase()}` : null,
+    !version ? 'no active version' : null,
+    version && version.status !== 'PUBLISHED' ? `v${version.version} is ${version.status.toLowerCase()}` : null,
+    version && version._count.params !== 210 ? `${version._count.params}/210 parameters` : null,
+  ].filter(Boolean)
+  return `${base.code} is still in preparation (${reasons.join(', ')}). The calculation may proceed as a proposal, but any saved quote requires review.`
+}
+
+export function preferredGovernedBase(bases: CostBaseOption[], operation: string) {
+  const ready = compatibleBases(bases, operation).filter((base) => costBaseReadiness(base) === 'GOVERNED')
+  return ready.find((base) => base.isDefault) ?? (ready.length === 1 ? ready[0] : undefined)
+}
+
 export function initialFormFor(bases: CostBaseOption[]): FormFields {
-  const options = compatibleBases(bases, INITIAL_FORM.operation)
-  const selected = options.find((base) => base.isDefault) ?? (options.length === 1 ? options[0] : undefined)
+  const selected = preferredGovernedBase(bases, INITIAL_FORM.operation)
   return { ...INITIAL_FORM, costBaseId: selected?.id ?? '' }
 }
 
@@ -183,6 +230,41 @@ export function Field({ label, error, hint, children }: { label: string; error?:
       </Label>
       {children}
       {error && <p className="text-xs text-destructive" role="alert">{error}</p>}
+    </div>
+  )
+}
+
+export function CostBaseSelector({ bases, operation, value, onChange }: {
+  bases: CostBaseOption[]
+  operation: string
+  value: string
+  onChange: (value: string) => void
+}) {
+  const options = compatibleBases(bases, operation)
+  const selected = options.find((base) => base.id === value)
+  return (
+    <Field label="Cost base" hint="Only an active base with an active published 210-parameter version is production-governed.">
+      <select className={selectCls} value={value} onChange={(event) => onChange(event.target.value)}>
+        <option value="">Legacy active assumptions · review required</option>
+        {options.map((base) => {
+          const active = activeVersionFor(base)
+          const readiness = costBaseReadiness(base)
+          return <option key={base.id} value={base.id}>{base.code} · {base.name}{active ? ` · v${active.version}` : ''} · {readiness === 'GOVERNED' ? 'ready' : 'review required'}{base.isDefault ? ' · default' : ''}</option>
+        })}
+      </select>
+      <CostBaseLineageNotice base={selected} operation={operation} />
+    </Field>
+  )
+}
+
+export function CostBaseLineageNotice({ base, operation }: { base: CostBaseOption | undefined; operation: string }) {
+  const readiness = costBaseReadiness(base)
+  const governed = readiness === 'GOVERNED'
+  return (
+    <div className={`rounded-md border px-3 py-2 text-xs ${governed ? 'border-emerald-500/30 bg-emerald-500/5 text-emerald-800 dark:text-emerald-300' : 'border-amber-500/30 bg-amber-500/5 text-amber-800 dark:text-amber-300'}`} role="status">
+      <div className="font-medium">{governed ? 'Governed lineage' : 'Review required'}</div>
+      <div className="mt-0.5 opacity-90">{costBaseReadinessDetail(base, operation)}</div>
+      {!governed && <Link href="/cost-bases" className="mt-1 inline-block font-medium underline underline-offset-2">Review cost base coverage →</Link>}
     </div>
   )
 }
@@ -250,8 +332,10 @@ export function Placeholder() {
 
 export function Result({ r, snapshot }: { r: QuoteResult; snapshot: FormSnapshot }) {
   const c = r.commercial
-  const decision = c.noGoFlag ? 'NO-GO' : c.reviewFlag ? 'REVISAR' : 'LISTA PARA DECISION'
-  const decisionClass = c.noGoFlag ? 'border-rose-200 bg-rose-50 text-rose-800' : c.reviewFlag ? 'border-amber-200 bg-amber-50 text-amber-800' : 'border-emerald-200 bg-emerald-50 text-emerald-800'
+  const requiresLineageReview = snapshot.costBaseReadiness !== 'GOVERNED'
+  const requiresReview = c.reviewFlag || requiresLineageReview
+  const decision = c.noGoFlag ? 'NO-GO' : requiresReview ? 'REVISAR' : 'LISTA PARA DECISION'
+  const decisionClass = c.noGoFlag ? 'border-rose-200 bg-rose-50 text-rose-800' : requiresReview ? 'border-amber-200 bg-amber-50 text-amber-800' : 'border-emerald-200 bg-emerald-50 text-emerald-800'
   const [label, setLabel] = useState('')
   const [savedId, setSavedId] = useState<string | null>(null)
 
@@ -282,7 +366,7 @@ export function Result({ r, snapshot }: { r: QuoteResult; snapshot: FormSnapshot
     },
     onSuccess: (q) => {
       setSavedId(q.id)
-      toast.success('Quote saved', { description: q.label ?? q.id.slice(0, 8) })
+      toast.success(requiresLineageReview ? 'Quote saved for review' : 'Quote saved', { description: q.label ?? q.id.slice(0, 8) })
     },
   })
 
@@ -307,12 +391,13 @@ export function Result({ r, snapshot }: { r: QuoteResult; snapshot: FormSnapshot
           </div>
           <div className={`rounded border px-3 py-2 text-sm ${decisionClass}`}>
             <span className="font-medium">Decision: {decision}</span>
+            {requiresLineageReview && <span className="ml-2 text-xs">{snapshot.costBaseReadinessDetail}</span>}
             {c.notes.length > 0 && <span className="ml-2 text-xs">{c.notes.join(' · ')}</span>}
           </div>
           <form className="flex flex-wrap items-center gap-2 border-t pt-3" onSubmit={(e) => { e.preventDefault(); save.mutate() }}>
             <Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Label (optional) — e.g. Acme Q3" className="h-9 flex-1 min-w-[200px]" disabled={save.isPending} />
             <Button type="submit" size="sm" variant="outline" disabled={save.isPending}>
-              {save.isPending ? 'Saving…' : savedId ? 'Save again' : 'Save quote'}
+              {save.isPending ? 'Saving…' : savedId ? 'Save again' : requiresLineageReview ? 'Save for review' : 'Save quote'}
             </Button>
             {savedId && (
               <Link href="/quotes" className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2">view history →</Link>

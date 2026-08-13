@@ -11,7 +11,8 @@ import { LocationInput } from './location-input'
 import {
   type QuoteResult, type FormFields, type FormErrors, type LaneHint, type CostBaseOption,
   OPS, SVCS, TRUCKS, TRAILERS, CONFIGS, DRIVERS, ROUTES, selectCls,
-  initialFormFor, compatibleBases, validate, quoteBody, Field, ResultSkeleton, Placeholder, Result,
+  initialFormFor, compatibleBases, preferredGovernedBase, costBaseReadiness, costBaseReadinessDetail,
+  validate, quoteBody, Field, CostBaseSelector, ResultSkeleton, Placeholder, Result,
 } from './quote-shared'
 
 export type { LaneHint }
@@ -46,14 +47,16 @@ export function QuoteForm({ recentLanes = [], costBases = [] }: { recentLanes?: 
   const set = <K extends keyof FormFields>(k: K, v: FormFields[K]) => {
     setForm((f) => ({ ...f, [k]: v }))
     if (errors[k]) setErrors((e) => ({ ...e, [k]: undefined }))
+    if (result) setResult(null)
   }
   const setOperation = (operation: (typeof OPS)[number]) => {
     const options = compatibleBases(costBases, operation)
     setForm((current) => {
       const currentStillValid = options.some((base) => base.id === current.costBaseId)
-      const fallback = options.find((base) => base.isDefault) ?? (options.length === 1 ? options[0] : undefined)
+      const fallback = preferredGovernedBase(costBases, operation)
       return { ...current, operation, costBaseId: currentStillValid ? current.costBaseId : fallback?.id ?? '' }
     })
+    if (result) setResult(null)
   }
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -77,12 +80,13 @@ export function QuoteForm({ recentLanes = [], costBases = [] }: { recentLanes?: 
         const operation = (OPS as readonly string[]).includes(lane.operation) ? (lane.operation as (typeof OPS)[number]) : f.operation
         const options = compatibleBases(costBases, operation)
         const currentStillValid = options.some((base) => base.id === f.costBaseId)
-        const fallback = options.find((base) => base.isDefault) ?? (options.length === 1 ? options[0] : undefined)
+        const fallback = preferredGovernedBase(costBases, operation)
         return { operation, costBaseId: currentStillValid ? f.costBaseId : fallback?.id ?? '' }
       })(),
       service: (SVCS as readonly string[]).includes(lane.service) ? (lane.service as (typeof SVCS)[number]) : f.service,
     }))
     setErrors({})
+    if (result) setResult(null)
     if (recentRef.current) recentRef.current.open = false
   }
   const onFormKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
@@ -94,6 +98,8 @@ export function QuoteForm({ recentLanes = [], costBases = [] }: { recentLanes?: 
       if (Object.keys(err).length === 0) quote.mutate()
     }
   }
+
+  const selectedCostBase = costBases.find((base) => base.id === form.costBaseId)
 
   return (
     <div className="grid gap-6 lg:grid-cols-[400px_1fr] lg:items-start">
@@ -136,15 +142,12 @@ export function QuoteForm({ recentLanes = [], costBases = [] }: { recentLanes?: 
               </select>
             </Field>
 
-            <Field label="Cost base" hint="The selected base and its active version become permanent lineage on the route and saved quote.">
-              <select className={selectCls} value={form.costBaseId} onChange={(e) => set('costBaseId', e.target.value)}>
-                <option value="">Legacy active assumptions</option>
-                {compatibleBases(costBases, form.operation).map((base) => {
-                  const active = base.versions.find((version) => version.isActive)
-                  return <option key={base.id} value={base.id}>{base.code} Â· {base.name}{active ? ` Â· v${active.version}` : ''}{base.isDefault ? ' Â· default' : ''}</option>
-                })}
-              </select>
-            </Field>
+            <CostBaseSelector
+              bases={costBases}
+              operation={form.operation}
+              value={form.costBaseId}
+              onChange={(value) => set('costBaseId', value)}
+            />
 
             <Field label={`Service ${form.service === '' ? '— auto (per operation)' : ''}`} hint="Auto uses the operation default (Import/Southbound -> Backhaul, else One Way). Override for Roundtrip or Expedited.">
               <select className={selectCls} value={form.service} onChange={(e) => set('service', e.target.value as (typeof SVCS)[number])}>
@@ -220,7 +223,9 @@ export function QuoteForm({ recentLanes = [], costBases = [] }: { recentLanes?: 
               origin: form.outboundLocation.trim(),
               destination: form.inboundLocation.trim(),
               equipment: { truckType: form.truckType, trailer: form.trailer, config: form.config, driver: form.driver },
-              costBaseLabel: costBases.find((base) => base.id === form.costBaseId)?.code ?? 'Legacy',
+              costBaseLabel: selectedCostBase?.code ?? 'Legacy',
+              costBaseReadiness: costBaseReadiness(selectedCostBase),
+              costBaseReadinessDetail: costBaseReadinessDetail(selectedCostBase, form.operation),
             }}
           />
         ) : (

@@ -49,3 +49,14 @@ policy are also retained on the quote.
 Calculation and quote endpoints accept `costBaseId`. They select that base's
 active assumption version unless `assumptionSetId` names another version within
 the same base. Omitting both preserves the legacy active-set behavior.
+
+## Quote lineage preflight
+
+The quote UI auto-selects a base only when the base is `ACTIVE` and its active
+version is `PUBLISHED` with all 210 canonical parameters. A draft, incomplete,
+or legacy selection remains available for exploratory calculations, but the UI
+labels it `REVIEW_REQUIRED` before pricing and when presenting the result.
+
+This preflight is informational rather than an automatic publication action:
+the calculation stays a proposal, saving retains the exact lineage, and a human
+must review the quote before it can advance through its commercial lifecycle.
