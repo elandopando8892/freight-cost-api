@@ -19,9 +19,28 @@ export type QuoteCalculationSnapshot = {
 }
 
 type SnapshotPayload = Omit<QuoteCalculationSnapshot, 'checksum'>
+type SnapshotOutput = QuoteCalculationSnapshot['output']
+
+export const SNAPSHOT_NUMERIC_TOLERANCE = 1e-9
 
 function stableParams(params: Record<string, number>) {
   return Object.fromEntries(Object.entries(params).sort(([a], [b]) => a.localeCompare(b)))
+}
+
+function stableNumber(value: number) {
+  return Number(value.toFixed(9))
+}
+
+export function snapshotOutputDifferences(expected: SnapshotOutput, actual: SnapshotOutput) {
+  return Object.entries(expected).flatMap(([field, expectedValue]) => {
+    const actualValue = actual[field as keyof SnapshotOutput]
+    if (expectedValue === null || actualValue === null) {
+      return expectedValue === actualValue ? [] : [{ field, expected: expectedValue, actual: actualValue }]
+    }
+    return Math.abs(expectedValue - actualValue) <= SNAPSHOT_NUMERIC_TOLERANCE
+      ? []
+      : [{ field, expected: expectedValue, actual: actualValue }]
+  })
 }
 
 function payloadFor(input: EngineInput, result: EngineOutput): SnapshotPayload {
@@ -40,13 +59,13 @@ function payloadFor(input: EngineInput, result: EngineOutput): SnapshotPayload {
       ...(input.drayageLeg ? { drayageLeg: input.drayageLeg } : {}),
     },
     output: {
-      freightBaselineUsd: result.freightBaselineUsd,
-      requiredTariffUsd: result.requiredTariffUsd,
-      fxRateUsed: result.fxRateUsed,
-      mexTariffUsd: result.mexLeg?.requiredTariffUsd ?? null,
-      usaFlatUsd: result.usaLeg?.flatUsd ?? null,
-      costFloorUsd: result.commercial.costFloorUsd,
-      recommendedSellUsd: result.commercial.recommendedSellUsd,
+      freightBaselineUsd: stableNumber(result.freightBaselineUsd),
+      requiredTariffUsd: stableNumber(result.requiredTariffUsd),
+      fxRateUsed: stableNumber(result.fxRateUsed),
+      mexTariffUsd: result.mexLeg ? stableNumber(result.mexLeg.requiredTariffUsd) : null,
+      usaFlatUsd: result.usaLeg ? stableNumber(result.usaLeg.flatUsd) : null,
+      costFloorUsd: stableNumber(result.commercial.costFloorUsd),
+      recommendedSellUsd: stableNumber(result.commercial.recommendedSellUsd),
     },
   }
 }
@@ -66,9 +85,7 @@ export function verifyQuoteCalculationSnapshot(snapshot: QuoteCalculationSnapsho
   const replay = calculate(snapshot.input)
   const expected = snapshot.output
   const actual = payloadFor(snapshot.input, replay).output
-  const differences = Object.entries(expected).flatMap(([field, value]) => (
-    actual[field as keyof typeof actual] === value ? [] : [{ field, expected: value, actual: actual[field as keyof typeof actual] }]
-  ))
+  const differences = snapshotOutputDifferences(expected, actual)
   return {
     reproducible: checksumMatches && differences.length === 0,
     checksumMatches,

@@ -12,7 +12,7 @@ export function SnapshotVerifier({ quoteId, checksum }: { quoteId: string; check
     <div className="flex flex-wrap items-center gap-2 text-xs">
       <code className="rounded bg-muted px-2 py-1 font-mono text-[10px] text-muted-foreground">SHA-256 {checksum.slice(0, 12)}...</code>
       <Button size="sm" variant="outline" onClick={() => verify.mutate()} disabled={verify.isPending}>{verify.isPending ? 'Verificando...' : 'Verificar snapshot'}</Button>
-      {verify.data && <span className={verify.data.reproducible ? 'text-emerald-700' : 'text-rose-700'}>{verify.data.reproducible ? 'Reproducible: coincide exactamente.' : `No coincide${verify.data.differences.length ? `: ${verify.data.differences.map((item) => item.field).join(', ')}` : '.'}`}</span>}
+      {verify.data && <span className={verify.data.reproducible ? 'text-emerald-700' : 'text-rose-700'}>{verify.data.reproducible ? 'Reproducible: checksum íntegro y salida dentro de tolerancia numérica.' : `No coincide${verify.data.differences.length ? `: ${verify.data.differences.map((item) => item.field).join(', ')}` : '.'}`}</span>}
       {verify.error && <span className="text-rose-700">No se pudo verificar este snapshot.</span>}
     </div>
   )
