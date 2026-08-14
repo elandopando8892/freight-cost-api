@@ -11,26 +11,31 @@ export function QuoteModes({ recentLanes = [], costBases = [] }: { recentLanes?:
   const [mode, setMode] = useState<Mode>('guided')
   return (
     <>
-      <div className="mb-6 inline-flex rounded-md border bg-muted/40 p-0.5 text-sm">
-        <ModeTab active={mode === 'guided'} onClick={() => setMode('guided')} label="Guiado" hint="Step-by-step wizard" />
-        <ModeTab active={mode === 'fast'} onClick={() => setMode('fast')} label="Rápido" hint="Single dense form (expert)" />
+      <div
+        role="group"
+        aria-label="Modo de cotización"
+        className="mb-6 grid max-w-2xl grid-cols-2 gap-2 rounded-xl border bg-muted/30 p-2 text-sm"
+      >
+        <ModeTab active={mode === 'guided'} onClick={() => setMode('guided')} label="Guiado" description="Ruta, equipo y revisión" />
+        <ModeTab active={mode === 'fast'} onClick={() => setMode('fast')} label="Rápido" description="Formulario para operación experta" />
       </div>
       {mode === 'guided' ? <QuoteWizard costBases={costBases} /> : <QuoteForm recentLanes={recentLanes} costBases={costBases} />}
     </>
   )
 }
 
-function ModeTab({ active, onClick, label, hint }: { active: boolean; onClick: () => void; label: string; hint: string }) {
+function ModeTab({ active, onClick, label, description }: { active: boolean; onClick: () => void; label: string; description: string }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      title={hint}
-      className={`rounded px-3 py-1.5 font-medium transition-colors ${
-        active ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+      aria-pressed={active}
+      className={`rounded-lg px-3 py-2.5 text-left transition-colors ${
+        active ? 'bg-background text-foreground shadow-sm ring-1 ring-border' : 'text-muted-foreground hover:bg-background/60 hover:text-foreground'
       }`}
     >
-      {label}
+      <span className="block font-medium">{label}</span>
+      <span className="mt-0.5 block text-xs text-muted-foreground">{description}</span>
     </button>
   )
 }

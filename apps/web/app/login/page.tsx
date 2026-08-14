@@ -3,7 +3,7 @@ import { LoginLink, RegisterLink } from '@kinde-oss/kinde-auth-nextjs/components
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { buttonVariants } from '@/components/ui/button'
 
-export const metadata: Metadata = { title: 'Sign in' }
+export const metadata: Metadata = { title: 'Iniciar sesión' }
 
 export default function LoginPage() {
   return (
@@ -11,17 +11,17 @@ export default function LoginPage() {
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>Freight Cost Model</CardTitle>
-          <CardDescription>Sign in to your carrier account</CardDescription>
+          <CardDescription>Ingresa a tu cuenta de transportista</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-3">
           <LoginLink className={buttonVariants({ size: 'lg', className: 'w-full' })}>
-            Sign in
+            Iniciar sesión
           </LoginLink>
           <RegisterLink className={buttonVariants({ variant: 'outline', size: 'lg', className: 'w-full' })}>
-            Create account
+            Crear cuenta
           </RegisterLink>
           <p className="text-center text-xs text-muted-foreground">
-            Secured by Kinde — password reset, email verification, and MFA included.
+            Protegido por Kinde: recuperación de contraseña, verificación de correo y MFA incluidos.
           </p>
         </CardContent>
       </Card>

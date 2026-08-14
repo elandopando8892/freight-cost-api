@@ -3,7 +3,7 @@
 // Shared quote types, field constants, validation, and the Result renderer — used
 // by both the Rápido form (quote-form) and the Guiado wizard (quote-wizard).
 
-import { useState } from 'react'
+import { cloneElement, useId, useState, type ReactElement, type ReactNode } from 'react'
 import Link from 'next/link'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -219,17 +219,23 @@ export function quoteBody(form: FormFields): Record<string, unknown> {
 }
 
 // ── Shared UI ────────────────────────────────────────────────────────────────
-export function Field({ label, error, hint, children }: { label: string; error?: string; hint?: string; children: React.ReactNode }) {
+export function Field({ label, error, hint, children }: { label: string; error?: string; hint?: string; children: ReactElement }) {
+  const controlId = useId()
+  const errorId = `${controlId}-error`
+  const control = cloneElement(children as ReactElement<Record<string, unknown>>, {
+    id: controlId,
+    'aria-describedby': error ? errorId : undefined,
+  })
   return (
     <div className="grid gap-1.5">
-      <Label className="flex items-center gap-1 text-xs text-muted-foreground">
+      <Label htmlFor={controlId} className="flex items-center gap-1 text-xs text-muted-foreground">
         <span>{label}</span>
         {hint && (
           <span className="cursor-help select-none text-muted-foreground/70" title={hint} aria-label={hint}>ⓘ</span>
         )}
       </Label>
-      {children}
-      {error && <p className="text-xs text-destructive" role="alert">{error}</p>}
+      {control}
+      {error && <p id={errorId} className="text-xs text-destructive" role="alert">{error}</p>}
     </div>
   )
 }
@@ -243,17 +249,19 @@ export function CostBaseSelector({ bases, operation, value, onChange }: {
   const options = compatibleBases(bases, operation)
   const selected = options.find((base) => base.id === value)
   return (
-    <Field label="Cost base" hint="Only an active base with an active published 210-parameter version is production-governed.">
-      <select className={selectCls} value={value} onChange={(event) => onChange(event.target.value)}>
-        <option value="">Legacy active assumptions · review required</option>
-        {options.map((base) => {
-          const active = activeVersionFor(base)
-          const readiness = costBaseReadiness(base)
-          return <option key={base.id} value={base.id}>{base.code} · {base.name}{active ? ` · v${active.version}` : ''} · {readiness === 'GOVERNED' ? 'ready' : 'review required'}{base.isDefault ? ' · default' : ''}</option>
-        })}
-      </select>
+    <div className="grid gap-1.5">
+      <Field label="Base de costo" hint="Sólo una base activa con una versión publicada de 210 parámetros tiene gobierno de producción.">
+        <select className={selectCls} value={value} onChange={(event) => onChange(event.target.value)}>
+          <option value="">Supuestos heredados · requieren revisión</option>
+          {options.map((base) => {
+            const active = activeVersionFor(base)
+            const readiness = costBaseReadiness(base)
+            return <option key={base.id} value={base.id}>{base.code} · {base.name}{active ? ` · v${active.version}` : ''} · {readiness === 'GOVERNED' ? 'lista' : 'requiere revisión'}{base.isDefault ? ' · predeterminada' : ''}</option>
+          })}
+        </select>
+      </Field>
       <CostBaseLineageNotice base={selected} operation={operation} />
-    </Field>
+    </div>
   )
 }
 
@@ -520,7 +528,7 @@ function UsaCard({ leg }: { leg: UsaLeg }) {
   )
 }
 
-export function Stat({ label, value }: { label: string; value: React.ReactNode }) {
+export function Stat({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="grid gap-0.5">
       <span className="text-xs text-muted-foreground">{label}</span>

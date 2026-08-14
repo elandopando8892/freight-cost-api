@@ -14,12 +14,16 @@ export function LocationInput({
   suggestions,
   placeholder,
   ariaInvalid,
+  id,
+  'aria-describedby': ariaDescribedBy,
 }: {
   value: string
   onChange: (v: string) => void
   suggestions: string[]
   placeholder?: string
   ariaInvalid?: boolean
+  id?: string
+  'aria-describedby'?: string
 }) {
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState(-1)
@@ -61,12 +65,14 @@ export function LocationInput({
   return (
     <div ref={wrapRef} className="relative">
       <Input
+        id={id}
         value={value}
         onChange={(e) => { onChange(e.target.value); setOpen(true); setActive(-1) }}
         onFocus={() => setOpen(true)}
         onKeyDown={onKeyDown}
         placeholder={placeholder}
         aria-invalid={ariaInvalid}
+        aria-describedby={ariaDescribedBy}
         autoComplete="off"
         role="combobox"
         aria-expanded={showList}

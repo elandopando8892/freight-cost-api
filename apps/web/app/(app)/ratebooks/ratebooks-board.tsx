@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { type ReactNode, useMemo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { BookOpen, CheckCircle2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { formatCivilDate } from "@/lib/civil-date";
 import { fetcher } from "@/lib/fetcher";
 
 type Status = "DRAFT" | "PUBLISHED" | "ARCHIVED";
@@ -120,14 +121,32 @@ interface RateBookLineage {
 const selectCls =
   "h-9 rounded-md border border-input bg-background px-3 text-sm";
 
+function isValidCivilDateKey(value: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const date = new Date(`${value}T00:00:00.000Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+}
+
+const STATUS_LABEL: Record<Status, string> = {
+  DRAFT: "Borrador",
+  PUBLISHED: "Publicado",
+  ARCHIVED: "Archivado",
+};
+
 export function RateBooksBoard({
   initial,
   bases,
   role,
+  headerActions,
+  children,
+  defaultEffectiveFrom,
 }: {
   initial: RateBook[];
   bases: CostBaseOption[];
   role: "ADMIN" | "OPERATOR" | "VIEWER";
+  headerActions?: ReactNode;
+  children?: ReactNode;
+  defaultEffectiveFrom: string;
 }) {
   const [books, setBooks] = useState(initial);
   const [open, setOpen] = useState(initial.length === 0);
@@ -136,9 +155,7 @@ export function RateBooksBoard({
   const [baseId, setBaseId] = useState("");
   const [setId, setSetId] = useState("");
   const [currency, setCurrency] = useState<"USD" | "MXN">("USD");
-  const [effectiveFrom, setEffectiveFrom] = useState(
-    new Date().toISOString().slice(0, 10),
-  );
+  const [effectiveFrom, setEffectiveFrom] = useState(defaultEffectiveFrom);
   const [detail, setDetail] = useState<RateBook | null>(null);
   const [lineage, setLineage] = useState<RateBookLineage | null>(null);
   const [candidates, setCandidates] = useState<Candidate[]>([]);
@@ -165,12 +182,12 @@ export function RateBooksBoard({
       fetcher<RateBook>("/api/v1/ratebooks", {
         method: "POST",
         json: {
-          code,
-          name,
+          code: code.trim(),
+          name: name.trim(),
           costBaseId: baseId,
           assumptionSetId: setId,
           currency,
-          effectiveFrom,
+          effectiveFrom: effectiveFrom.trim(),
         },
       }),
     onSuccess: (book) => {
@@ -234,43 +251,83 @@ export function RateBooksBoard({
       }),
     onSuccess: () => setNote(""),
   });
+  const draftCount = books.filter((book) => book.status === "DRAFT").length;
+  const publishedCount = books.filter((book) => book.status === "PUBLISHED").length;
+  const normalizedCode = code.trim();
+  const normalizedName = name.trim();
+  const normalizedEffectiveFrom = effectiveFrom.trim();
+  const canCreate =
+    normalizedCode.length > 0 &&
+    normalizedName.length > 0 &&
+    baseId.length > 0 &&
+    setId.length > 0 &&
+    isValidCivilDateKey(normalizedEffectiveFrom) &&
+    !create.isPending;
 
   return (
     <div className="grid gap-5">
-      <div className="flex flex-wrap justify-between gap-3">
+      <div className="flex flex-col justify-between gap-4 border-b pb-5 sm:flex-row sm:items-end">
         <div>
-          <h1 className="text-2xl font-semibold">RateBook</h1>
-          <p className="text-sm text-muted-foreground">
-            Tarifarios versionados: borrador → publicado → archivado.
-          </p>
+          <p className="mb-2 text-xs font-medium uppercase tracking-[0.16em] text-primary">Catálogo comercial</p>
+          <div className="flex items-center gap-3">
+            <span className="grid size-10 place-items-center rounded-lg bg-primary/10 text-primary"><BookOpen className="size-5" /></span>
+            <div>
+              <h1 className="text-2xl font-semibold tracking-tight">RateBook</h1>
+              <p className="text-sm text-muted-foreground">Tarifarios por base, versión y vigencia.</p>
+            </div>
+          </div>
         </div>
-        <Button onClick={() => setOpen(!open)}>
-          <Plus className="mr-1 h-4 w-4" />
+        <div className="flex flex-wrap items-center gap-2">
+          {headerActions}
+          <span className="rounded-md bg-amber-500/10 px-2.5 py-1.5 text-xs font-medium text-amber-700 dark:text-amber-300">{draftCount} borradores</span>
+          <span className="rounded-md bg-emerald-500/10 px-2.5 py-1.5 text-xs font-medium text-emerald-700 dark:text-emerald-300">{publishedCount} publicados</span>
+          <Button onClick={() => setOpen(!open)}>
+            <Plus className="mr-1 h-4 w-4" />
           Nuevo RateBook
-        </Button>
+          </Button>
+        </div>
       </div>
+      {children}
       {open && (
-        <Card>
-          <CardHeader>
+        <Card className="border-primary/20">
+          <CardHeader className="border-b bg-muted/25 pb-4">
             <CardTitle>Crear borrador tarifario</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-3 md:grid-cols-3">
+            <label className="sr-only" htmlFor="ratebook-code">
+              Código del RateBook
+            </label>
             <Input
+              id="ratebook-code"
               placeholder="Código, p. ej. MX-2026-Q4"
               value={code}
               onChange={(e) => setCode(e.target.value)}
             />
+            <label className="sr-only" htmlFor="ratebook-name">
+              Nombre comercial
+            </label>
             <Input
+              id="ratebook-name"
               placeholder="Nombre comercial"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
+            <label className="sr-only" htmlFor="ratebook-effective-from">
+              Inicio de vigencia
+            </label>
             <Input
+              id="ratebook-effective-from"
               type="date"
+              required
+              aria-invalid={!isValidCivilDateKey(normalizedEffectiveFrom)}
               value={effectiveFrom}
               onChange={(e) => setEffectiveFrom(e.target.value)}
             />
+            <label className="sr-only" htmlFor="ratebook-base">
+              Base de costos activa
+            </label>
             <select
+              id="ratebook-base"
               className={selectCls}
               value={baseId}
               onChange={(e) => {
@@ -289,7 +346,11 @@ export function RateBooksBoard({
                 </option>
               ))}
             </select>
+            <label className="sr-only" htmlFor="ratebook-version">
+              Versión publicada
+            </label>
             <select
+              id="ratebook-version"
               className={selectCls}
               value={setId}
               onChange={(e) => setSetId(e.target.value)}
@@ -302,7 +363,11 @@ export function RateBooksBoard({
                 </option>
               ))}
             </select>
+            <label className="sr-only" htmlFor="ratebook-currency">
+              Moneda
+            </label>
             <select
+              id="ratebook-currency"
               className={selectCls}
               value={currency}
               onChange={(e) => setCurrency(e.target.value as "USD" | "MXN")}
@@ -312,9 +377,7 @@ export function RateBooksBoard({
             </select>
             <div className="md:col-span-3">
               <Button
-                disabled={
-                  !code || !name || !baseId || !setId || create.isPending
-                }
+                disabled={!canCreate}
                 onClick={() => create.mutate()}
               >
                 Crear borrador
@@ -323,37 +386,47 @@ export function RateBooksBoard({
           </CardContent>
         </Card>
       )}
-      <Card>
+      <Card className="overflow-hidden">
         <CardContent className="overflow-x-auto p-0">
           <table className="w-full text-sm">
-            <thead className="border-b">
+            <thead className="border-b bg-muted/40 text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
               <tr>
-                <th className="p-3 text-left">Código</th>
-                <th className="text-left">Base / versión</th>
-                <th className="text-left">Vigencia</th>
-                <th className="text-left">Rutas</th>
-                <th className="text-left">Estado</th>
-                <th className="p-3 text-right">Detalle</th>
+                <th className="px-5 py-3 text-left font-medium">RateBook</th>
+                <th className="px-5 py-3 text-left font-medium">Base / versión</th>
+                <th className="px-5 py-3 text-left font-medium">Vigencia</th>
+                <th className="px-5 py-3 text-left font-medium">Rutas</th>
+                <th className="px-5 py-3 text-left font-medium">Estado</th>
+                <th className="px-5 py-3 text-right font-medium">Acción</th>
               </tr>
             </thead>
             <tbody>
-              {books.map((book) => (
-                <tr key={book.id} className="border-b">
-                  <td className="p-3 font-medium">
+              {books.length === 0 ? (
+                <tr>
+                  <td
+                    className="px-5 py-10 text-center text-muted-foreground"
+                    colSpan={6}
+                  >
+                    No hay RateBooks todavía. Crea el primer borrador para
+                    comenzar.
+                  </td>
+                </tr>
+              ) : books.map((book) => (
+                <tr key={book.id} className="border-b transition-colors hover:bg-muted/40">
+                  <td className="px-5 py-3.5 font-medium">
                     {book.code}
                     <span className="block text-xs text-muted-foreground">
                       {book.name}
                     </span>
                   </td>
-                  <td>
+                  <td className="px-5 py-3.5">
                     {book.costBase.code} · v{book.set.version}
                   </td>
-                  <td>{new Date(book.effectiveFrom).toLocaleDateString()}</td>
-                  <td>{book._count.entries}</td>
-                  <td>
+                  <td className="whitespace-nowrap px-5 py-3.5 text-muted-foreground">{formatCivilDate(book.effectiveFrom)}</td>
+                  <td className="px-5 py-3.5 tabular-nums">{book._count.entries}</td>
+                  <td className="px-5 py-3.5">
                     <StatusBadge status={book.status} />
                   </td>
-                  <td className="p-3 text-right">
+                  <td className="px-5 py-3.5 text-right">
                     <Button
                       variant="outline"
                       size="sm"
@@ -460,6 +533,14 @@ export function RateBooksBoard({
                   <>
                     <div className="max-h-48 overflow-auto">
                       <table className="w-full text-sm">
+                        <thead className="sr-only">
+                          <tr>
+                            <th scope="col">Seleccionar</th>
+                            <th scope="col">Ruta</th>
+                            <th scope="col">Operación</th>
+                            <th scope="col">Tarifa requerida</th>
+                          </tr>
+                        </thead>
                         <tbody>
                           {candidates.map((candidate) => {
                             const route =
@@ -469,6 +550,7 @@ export function RateBooksBoard({
                                 <td className="p-2">
                                   <input
                                     type="checkbox"
+                                    aria-label={`Seleccionar cotización ${candidate.label ?? candidate.id}: ${route ? `${route.origin} a ${route.destination}` : "ruta no disponible"}`}
                                     checked={selected.has(candidate.id)}
                                     onChange={() =>
                                       setSelected((items) => {
@@ -665,7 +747,7 @@ function StatusBadge({ status }: { status: Status }) {
         : "bg-muted text-muted-foreground";
   return (
     <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${cls}`}>
-      {status.toLowerCase()}
+      {STATUS_LABEL[status]}
     </span>
   );
 }

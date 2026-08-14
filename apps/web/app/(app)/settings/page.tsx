@@ -10,7 +10,7 @@ import { GmailIntegrationCard } from './gmail-integration-card'
 import { TeamInvitations } from './team-invitations'
 
 export const dynamic = 'force-dynamic'
-export const metadata: Metadata = { title: 'Settings' }
+export const metadata: Metadata = { title: 'Configuración' }
 
 interface Org { id: string; name: string; country: string; createdAt: string }
 interface Member { id: string; email: string; role: string; identityLinked: boolean; createdAt: string }
@@ -37,15 +37,19 @@ export default async function SettingsPage() {
   const email = user?.email ?? me?.email ?? ''
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-8">
-      <h1 className="mb-6 text-2xl font-semibold tracking-tight">Settings</h1>
+    <main className="mx-auto w-full max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
+      <header className="mb-6 border-b pb-5">
+        <p className="mb-2 text-xs font-medium uppercase tracking-[0.16em] text-primary">Espacio de trabajo</p>
+        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Configuración</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Identidad, equipo e integraciones de este espacio operativo.</p>
+      </header>
 
       {/* Organization */}
       <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Organization</CardTitle>
+        <CardHeader className="border-b bg-muted/25 pb-4">
+          <CardTitle>Organización</CardTitle>
           <CardDescription>
-            {org ? <>Created <RelativeTime iso={org.createdAt} /> · {org.country}</> : 'Org details unavailable.'}
+            {org ? <>Creada <RelativeTime iso={org.createdAt} /> · {org.country}</> : 'No fue posible cargar los datos de la organización.'}
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-5">
@@ -53,7 +57,7 @@ export default async function SettingsPage() {
 
           <div>
             <div className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Members ({members.length})
+              Equipo ({members.length})
             </div>
             <div className="overflow-hidden rounded-md border">
               <table className="w-full text-sm">
@@ -65,12 +69,12 @@ export default async function SettingsPage() {
                         <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium">{m.role}</span>
                       </td>
                       <td className="px-3 py-2 text-right text-xs text-muted-foreground">
-                        {m.identityLinked ? 'Kinde linked' : 'Awaiting first login'}
+                        {m.identityLinked ? 'Kinde vinculado' : 'Pendiente de primer acceso'}
                       </td>
                     </tr>
                   ))}
                   {members.length === 0 && (
-                    <tr><td className="px-3 py-4 text-center text-sm text-muted-foreground">No members loaded.</td></tr>
+                    <tr><td className="px-3 py-4 text-center text-sm text-muted-foreground">No hay integrantes cargados.</td></tr>
                   )}
                 </tbody>
               </table>
@@ -84,9 +88,9 @@ export default async function SettingsPage() {
 
       {/* Account */}
       <Card>
-        <CardHeader>
-          <CardTitle>Account</CardTitle>
-          <CardDescription>Your identity is managed by Kinde.</CardDescription>
+        <CardHeader className="border-b bg-muted/25 pb-4">
+          <CardTitle>Cuenta</CardTitle>
+          <CardDescription>Tu identidad está administrada por Kinde.</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
           <div className="flex items-center gap-3">
@@ -102,10 +106,10 @@ export default async function SettingsPage() {
             )}
           </div>
           <p className="text-sm text-muted-foreground">
-            Password, email and multi-factor authentication are handled by Kinde. Sign out and back in to update them.
+            La contraseña, correo y autenticación multifactor se administran desde Kinde. Cierra sesión e ingresa de nuevo para actualizarlos.
           </p>
           <div>
-            <LogoutLink className={buttonVariants({ variant: 'outline', size: 'sm' })}>Sign out</LogoutLink>
+            <LogoutLink className={buttonVariants({ variant: 'outline', size: 'sm' })}>Cerrar sesión</LogoutLink>
           </div>
         </CardContent>
       </Card>

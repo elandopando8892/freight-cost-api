@@ -1,11 +1,14 @@
 "use client";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Eye, FileText, Plus } from "lucide-react";
+import { Eye, FileText, Mail, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { formatCivilDate } from "@/lib/civil-date";
 import { fetcher } from "@/lib/fetcher";
+
+type CustomerQuoteStatus = "DRAFT" | "REVIEW" | "APPROVED" | "ARCHIVED";
 
 export interface CustomerQuote {
   id: string;
@@ -15,7 +18,7 @@ export interface CustomerQuote {
   contactEmail: string | null;
   quoteType: string;
   validUntil: string;
-  status: string;
+  status: CustomerQuoteStatus;
   lines: {
     id: string;
     origin: string;
@@ -113,6 +116,11 @@ export function QuoteDesk({
     onSuccess: (q) => {
       setItems((x) => [q, ...x]);
       setOpen(false);
+      setClient("");
+      setContact("");
+      setEmail("");
+      setValid("");
+      setLines([blank()]);
     },
   });
   const saveTemplate = useMutation({
@@ -198,45 +206,57 @@ export function QuoteDesk({
     link.click();
     URL.revokeObjectURL(url);
   };
+  const draftCount = items.filter((item) => item.status === "DRAFT").length;
 
   return (
     <div className="grid gap-5">
-      <div className="flex flex-wrap justify-between gap-3">
+      <div className="flex flex-col justify-between gap-4 border-b pb-5 sm:flex-row sm:items-end">
         <div>
-          <h1 className="text-2xl font-semibold">Quote Desk</h1>
-          <p className="text-sm text-muted-foreground">
-            Propuestas comerciales separadas del costo interno.
-          </p>
+          <p className="mb-2 text-xs font-medium uppercase tracking-[0.16em] text-primary">Propuestas comerciales</p>
+          <div className="flex items-center gap-3">
+            <span className="grid size-10 place-items-center rounded-lg bg-primary/10 text-primary"><Mail className="size-5" /></span>
+            <div>
+              <h1 className="text-2xl font-semibold tracking-tight">Quote Desk</h1>
+              <p className="text-sm text-muted-foreground">Captura, valida y prepara propuestas sin exponer el costo interno.</p>
+            </div>
+          </div>
         </div>
-        <Button onClick={() => setOpen(!open)}>
-          <Plus className="mr-1 h-4 w-4" />
-          Nueva cotización
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="rounded-md bg-muted px-2.5 py-1.5 text-xs font-medium text-muted-foreground">{draftCount} borradores</span>
+          <Button onClick={() => setOpen(!open)}>
+            <Plus className="mr-1 h-4 w-4" />
+            Nueva cotización
+          </Button>
+        </div>
       </div>
       {open && (
-        <Card>
-          <CardHeader>
+        <Card className="border-primary/20">
+          <CardHeader className="border-b bg-muted/25 pb-4">
             <CardTitle>Capturar propuesta</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-3">
             <div className="grid gap-2 md:grid-cols-4">
               <Input
+                aria-label="Cliente"
                 placeholder="Cliente"
                 value={clientName}
                 onChange={(e) => setClient(e.target.value)}
               />
               <Input
+                aria-label="Contacto"
                 placeholder="Contacto"
                 value={contactName}
                 onChange={(e) => setContact(e.target.value)}
               />
               <Input
+                aria-label="Correo electrónico"
                 placeholder="Email"
                 type="email"
                 value={contactEmail}
                 onChange={(e) => setEmail(e.target.value)}
               />
               <Input
+                aria-label="Vigencia"
                 type="date"
                 value={validUntil}
                 onChange={(e) => setValid(e.target.value)}
@@ -248,6 +268,7 @@ export function QuoteDesk({
                 className="grid gap-2 rounded border p-3 md:grid-cols-5"
               >
                 <Input
+                  aria-label={`Ruta ${i + 1}: origen`}
                   placeholder="Origen"
                   value={line.origin}
                   onChange={(e) =>
@@ -259,6 +280,7 @@ export function QuoteDesk({
                   }
                 />
                 <Input
+                  aria-label={`Ruta ${i + 1}: destino`}
                   placeholder="Destino"
                   value={line.destination}
                   onChange={(e) =>
@@ -270,6 +292,7 @@ export function QuoteDesk({
                   }
                 />
                 <Input
+                  aria-label={`Ruta ${i + 1}: tarifa`}
                   placeholder="Tarifa"
                   type="number"
                   value={line.tariff}
@@ -282,6 +305,7 @@ export function QuoteDesk({
                   }
                 />
                 <Input
+                  aria-label={`Ruta ${i + 1}: moneda`}
                   placeholder="Moneda"
                   value={line.currency}
                   onChange={(e) =>
@@ -312,9 +336,9 @@ export function QuoteDesk({
               </Button>
               <Button
                 disabled={
-                  !clientName ||
+                  !clientName.trim() ||
                   !validUntil ||
-                  lines.some((x) => !x.origin || !x.destination || !x.tariff) ||
+                  lines.some((x) => !x.origin.trim() || !x.destination.trim() || !x.tariff) ||
                   save.isPending
                 }
                 onClick={() => save.mutate()}
@@ -326,7 +350,7 @@ export function QuoteDesk({
         </Card>
       )}
       <Card>
-        <CardHeader>
+        <CardHeader className="border-b bg-muted/25 pb-4">
           <CardTitle className="flex items-center gap-2 text-base">
             <FileText className="h-4 w-4" />
             Plantilla de envío
@@ -360,16 +384,19 @@ export function QuoteDesk({
             </summary>
             <div className="mt-3 grid gap-2">
               <Input
+                aria-label="Nombre de plantilla"
                 placeholder="Nombre de plantilla"
                 value={templateName}
                 onChange={(e) => setTemplateName(e.target.value)}
               />
               <Input
+                aria-label="Asunto de la plantilla"
                 placeholder="Asunto, p. ej. Propuesta {{FOLIO_COTIZACION}}"
                 value={templateSubject}
                 onChange={(e) => setTemplateSubject(e.target.value)}
               />
               <textarea
+                aria-label="HTML de la plantilla"
                 className="min-h-40 rounded-md border bg-background p-3 font-mono text-xs"
                 placeholder="HTML con campos como {{NOMBRE_CLIENTE}} y {{RUTAS_TABLA}}"
                 value={templateHtml}
@@ -398,28 +425,35 @@ export function QuoteDesk({
           </p>
         </CardContent>
       </Card>
-      <Card>
+      <Card className="overflow-hidden">
         <CardContent className="overflow-x-auto p-0">
           <table className="w-full text-sm">
-            <thead className="border-b">
+            <thead className="border-b bg-muted/40 text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
               <tr>
-                <th className="p-3 text-left">Folio</th>
-                <th className="text-left">Cliente</th>
-                <th className="text-left">Rutas</th>
-                <th className="text-left">Vigencia</th>
-                <th className="text-left">Estado</th>
-                <th className="p-3 text-right">Correo</th>
+                <th className="px-5 py-3 text-left font-medium">Folio</th>
+                <th className="px-5 py-3 text-left font-medium">Cliente</th>
+                <th className="px-5 py-3 text-left font-medium">Rutas</th>
+                <th className="px-5 py-3 text-left font-medium">Vigencia</th>
+                <th className="px-5 py-3 text-left font-medium">Estado</th>
+                <th className="px-5 py-3 text-right font-medium">Correo</th>
               </tr>
             </thead>
             <tbody>
+              {items.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-5 py-10 text-center text-sm text-muted-foreground">
+                    Aún no hay propuestas. Crea un borrador para iniciar el Quote Desk.
+                  </td>
+                </tr>
+              )}
               {items.map((q) => (
-                <tr key={q.id} className="border-b">
-                  <td className="p-3 font-medium">{q.folio}</td>
-                  <td>{q.clientName}</td>
-                  <td>{q.lines.length}</td>
-                  <td>{new Date(q.validUntil).toLocaleDateString()}</td>
-                  <td>{q.status.toLowerCase()}</td>
-                  <td className="p-3 text-right">
+                <tr key={q.id} className="border-b transition-colors hover:bg-muted/40">
+                  <td className="px-5 py-3.5 font-medium">{q.folio}</td>
+                  <td className="px-5 py-3.5">{q.clientName}</td>
+                  <td className="px-5 py-3.5 tabular-nums">{q.lines.length}</td>
+                  <td className="whitespace-nowrap px-5 py-3.5 text-muted-foreground">{formatCivilDate(q.validUntil)}</td>
+                  <td className="px-5 py-3.5"><QuoteStatusBadge status={q.status} /></td>
+                  <td className="px-5 py-3.5 text-right">
                     <Button
                       size="sm"
                       variant="outline"
@@ -437,7 +471,7 @@ export function QuoteDesk({
       </Card>
       {previewFor && (
         <Card>
-          <CardHeader>
+          <CardHeader className="border-b bg-muted/25 pb-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <CardTitle>Previsualización — {previewFor.folio}</CardTitle>
@@ -476,7 +510,7 @@ export function QuoteDesk({
               </div>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-5">
             {preview.isError ? (
               <p className="text-sm text-destructive">
                 No se pudo generar la vista previa.
@@ -557,5 +591,21 @@ export function QuoteDesk({
         </Card>
       )}
     </div>
+  );
+}
+
+const QUOTE_STATUS: Record<CustomerQuoteStatus, { label: string; className: string }> = {
+  DRAFT: { label: "Borrador", className: "bg-muted text-muted-foreground" },
+  REVIEW: { label: "En revisión", className: "bg-amber-500/10 text-amber-700 dark:text-amber-300" },
+  APPROVED: { label: "Aprobada", className: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" },
+  ARCHIVED: { label: "Archivada", className: "bg-slate-500/10 text-slate-700 dark:text-slate-300" },
+};
+
+function QuoteStatusBadge({ status }: { status: CustomerQuoteStatus }) {
+  const presentation = QUOTE_STATUS[status];
+  return (
+    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${presentation.className}`}>
+      {presentation.label}
+    </span>
   );
 }

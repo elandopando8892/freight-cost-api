@@ -18,10 +18,62 @@ import {
 
 // Progressive-disclosure steps: one decision at a time, with microcopy.
 const STEPS = [
-  { key: 'lane', title: 'Ruta', blurb: 'Where the load moves. This resolves distances, borders, and market on the server.' },
-  { key: 'equipment', title: 'Equipo', blurb: 'What hauls it. Equipment changes fuel, maintenance, and risk factors.' },
-  { key: 'review', title: 'Revisar', blurb: 'Confirm and price. You can tweak anything before saving.' },
+  { key: 'lane', title: 'Ruta', blurb: 'Origen, destino, operación y base de costo que gobierna el cálculo.' },
+  { key: 'equipment', title: 'Equipo', blurb: 'La configuración modifica combustible, mantenimiento y factores de riesgo.' },
+  { key: 'review', title: 'Revisar', blurb: 'Confirma el contexto antes de generar una tarifa explicable.' },
 ] as const
+
+type DisplayValue = Exclude<
+  | (typeof OPS)[number]
+  | (typeof SVCS)[number]
+  | (typeof TRUCKS)[number]
+  | (typeof TRAILERS)[number]
+  | (typeof CONFIGS)[number]
+  | (typeof DRIVERS)[number]
+  | (typeof ROUTES)[number],
+  ''
+>
+
+const DISPLAY_LABELS = {
+  'D2D Export': 'D2D exportación',
+  'D2D Import': 'D2D importación',
+  Drayage: 'Arrastre portuario',
+  'Intra-Mex': 'Intra-México',
+  'MX Northbound': 'México hacia el norte',
+  'MX Southbound': 'México hacia el sur',
+  Local: 'Local',
+  'One Way': 'Solo ida',
+  Backhaul: 'Retorno',
+  Roundtrip: 'Viaje redondo',
+  Expedited: 'Expeditado',
+  'Truck Trailer': 'Tractocamión',
+  Thorton: 'Torton',
+  Rabon: 'Rabón',
+  '3.5 tons': '3.5 toneladas',
+  '1.5 tons': '1.5 toneladas',
+  'Dry Van': 'Caja seca',
+  Flatbed: 'Plataforma',
+  Reefer: 'Refrigerado',
+  Hazmat: 'Materiales peligrosos',
+  Chassis: 'Chasis',
+  'Power Only': 'Solo tractocamión',
+  Overdim: 'Sobredimensionado',
+  Single: 'Sencillo',
+  Tandem: 'Tándem',
+  B1: 'B1',
+  Interstate: 'Interestatal',
+  Intrastate: 'Intraestatal',
+  CDL: 'CDL',
+  'Licencia E': 'Licencia E',
+  'Mostly Straight': 'Mayormente recta',
+  'Mixed Lane': 'Ruta mixta',
+  'Mostly Curvy': 'Mayormente sinuosa',
+  'Straight & Danger': 'Recta con riesgo',
+  'Mixed & Danger': 'Mixta con riesgo',
+  'Curvy & Danger': 'Sinuosa con riesgo',
+} satisfies Record<DisplayValue, string>
+
+const displayLabel = (value: string) => DISPLAY_LABELS[value as DisplayValue] ?? value
 
 export function QuoteWizard({ costBases = [] }: { costBases?: CostBaseOption[] }) {
   const [step, setStep] = useState(0)
@@ -40,8 +92,8 @@ export function QuoteWizard({ costBases = [] }: { costBases?: CostBaseOption[] }
     mutationFn: () => fetcher<QuoteResult>('/api/v1/engine/quote-by-route', { method: 'POST', json: quoteBody(form) }),
     onSuccess: (r) => {
       setResult(r)
-      toast.success(`Baseline ${usdFmt(r.freightBaselineUsd)}`, {
-        description: `${r.operation} · ${r.mexLeg ? 'MEX' : ''}${r.mexLeg && r.usaLeg ? ' + ' : ''}${r.usaLeg ? 'USA' : ''}`,
+      toast.success(`Base estimada ${usdFmt(r.freightBaselineUsd)}`, {
+        description: `${displayLabel(r.operation)} · ${r.mexLeg ? 'MEX' : ''}${r.mexLeg && r.usaLeg ? ' + ' : ''}${r.usaLeg ? 'EE. UU.' : ''}`,
       })
     },
     onError: () => setResult(null),
@@ -57,11 +109,11 @@ export function QuoteWizard({ costBases = [] }: { costBases?: CostBaseOption[] }
   const validateStep = (s: number): boolean => {
     if (s !== 0) return true
     const e: FormErrors = {}
-    if (!form.outboundLocation.trim()) e.outboundLocation = 'Required — ZIP, "City, ST", or a metro city'
-    if (!form.inboundLocation.trim()) e.inboundLocation = 'Required — ZIP, "City, ST", or a metro city'
+    if (!form.outboundLocation.trim()) e.outboundLocation = 'Campo requerido: captura un código postal o una ciudad.'
+    if (!form.inboundLocation.trim()) e.inboundLocation = 'Campo requerido: captura un código postal o una ciudad.'
     if (form.fxRate) {
       const n = Number(form.fxRate)
-      if (!Number.isFinite(n) || n <= 0) e.fxRate = 'Must be a positive number'
+      if (!Number.isFinite(n) || n <= 0) e.fxRate = 'El tipo de cambio debe ser un número mayor que cero.'
     }
     setErrors(e)
     return Object.keys(e).length === 0
@@ -73,11 +125,11 @@ export function QuoteWizard({ costBases = [] }: { costBases?: CostBaseOption[] }
   const selectedCostBase = costBases.find((base) => base.id === form.costBaseId)
 
   return (
-    <div className="mx-auto grid max-w-3xl gap-6">
+    <div className="mx-auto grid max-w-4xl gap-5">
       <Stepper step={step} onJump={(s) => { if (s < step || validateStep(step)) setStep(s) }} />
 
-      <Card>
-        <CardHeader>
+      <Card className="overflow-hidden">
+        <CardHeader className="border-b bg-muted/25 pb-4">
           <CardTitle>{STEPS[step].title}</CardTitle>
           <CardDescription>{STEPS[step].blurb}</CardDescription>
         </CardHeader>
@@ -89,15 +141,15 @@ export function QuoteWizard({ costBases = [] }: { costBases?: CostBaseOption[] }
       </Card>
 
       {/* Nav */}
-      <div className="flex items-center justify-between gap-3">
-        <Button variant="ghost" onClick={back} disabled={step === 0}>← Back</Button>
+      <div className="flex items-center justify-between gap-3 border-t pt-4">
+        <Button variant="ghost" onClick={back} disabled={step === 0}>← Anterior</Button>
         <div className="flex items-center gap-2">
-          <button type="button" onClick={restart} className="text-xs text-muted-foreground hover:text-foreground">Start over</button>
+          <button type="button" onClick={restart} className="text-xs text-muted-foreground hover:text-foreground">Reiniciar</button>
           {step < STEPS.length - 1 ? (
-            <Button onClick={next}>Next →</Button>
+            <Button onClick={next}>Continuar →</Button>
           ) : (
             <Button onClick={() => quote.mutate()} disabled={quote.isPending}>
-              {quote.isPending ? 'Pricing…' : result ? 'Re-price' : 'Get quote'}
+              {quote.isPending ? 'Calculando…' : result ? 'Recalcular' : 'Generar tarifa'}
             </Button>
           )}
         </div>
@@ -117,7 +169,7 @@ export function QuoteWizard({ costBases = [] }: { costBases?: CostBaseOption[] }
                 origin: form.outboundLocation.trim(),
                 destination: form.inboundLocation.trim(),
                 equipment: { truckType: form.truckType, trailer: form.trailer, config: form.config, driver: form.driver },
-                costBaseLabel: selectedCostBase?.code ?? 'Legacy',
+                costBaseLabel: selectedCostBase?.code ?? 'Supuestos heredados',
                 costBaseReadiness: costBaseReadiness(selectedCostBase),
                 costBaseReadinessDetail: costBaseReadinessDetail(selectedCostBase, form.operation),
               }}
@@ -133,7 +185,7 @@ const usdFmt = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency'
 
 function Stepper({ step, onJump }: { step: number; onJump: (s: number) => void }) {
   return (
-    <ol className="flex items-center gap-2">
+    <ol className="flex items-center gap-2 rounded-xl border bg-muted/25 p-3">
       {STEPS.map((s, i) => {
         const state = i < step ? 'done' : i === step ? 'active' : 'todo'
         return (
@@ -171,15 +223,15 @@ function LaneStep({ form, errors, set, locations, costBases }: StepProps & { err
   return (
     <>
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Outbound (shipper)" error={errors.outboundLocation} hint="Where the load originates.">
-          <LocationInput value={form.outboundLocation} onChange={(v) => set('outboundLocation', v)} suggestions={locations} placeholder="e.g. 30901 or Augusta, GA" ariaInvalid={Boolean(errors.outboundLocation)} />
+        <Field label="Origen (remitente)" error={errors.outboundLocation} hint="Lugar donde se origina la carga.">
+          <LocationInput value={form.outboundLocation} onChange={(v) => set('outboundLocation', v)} suggestions={locations} placeholder="Ej. 30901 o Augusta, GA" ariaInvalid={Boolean(errors.outboundLocation)} />
         </Field>
-        <Field label="Inbound (consignee)" error={errors.inboundLocation} hint="Where the load delivers.">
-          <LocationInput value={form.inboundLocation} onChange={(v) => set('inboundLocation', v)} suggestions={locations} placeholder="e.g. Queretaro, Qro or 78040" ariaInvalid={Boolean(errors.inboundLocation)} />
+        <Field label="Destino (consignatario)" error={errors.inboundLocation} hint="Lugar donde se entrega la carga.">
+          <LocationInput value={form.inboundLocation} onChange={(v) => set('inboundLocation', v)} suggestions={locations} placeholder="Ej. Querétaro, Qro. o 78040" ariaInvalid={Boolean(errors.inboundLocation)} />
         </Field>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Operation" hint="Movement type: D2D Export/Import (cross-border), Drayage (port), Intra-Mex, or Local.">
+        <Field label="Operación" hint="Tipo de movimiento: D2D de exportación o importación, arrastre portuario, Intra-México o local.">
           <select className={selectCls} value={form.operation} onChange={(e) => {
             const operation = e.target.value as (typeof OPS)[number]
             const options = compatibleBases(costBases, operation)
@@ -188,13 +240,13 @@ function LaneStep({ form, errors, set, locations, costBases }: StepProps & { err
             set('operation', operation)
             set('costBaseId', currentStillValid ? form.costBaseId : fallback?.id ?? '')
           }}>
-            {OPS.map((o) => <option key={o} value={o}>{o}</option>)}
+            {OPS.map((o) => <option key={o} value={o}>{displayLabel(o)}</option>)}
           </select>
         </Field>
-        <Field label="Service" hint="Auto uses the operation default (Import/Southbound → Backhaul, else One Way).">
+        <Field label="Servicio" hint="Automático usa el valor predeterminado de la operación: retorno para importación o ruta sur; solo ida en los demás casos.">
           <select className={selectCls} value={form.service} onChange={(e) => set('service', e.target.value as (typeof SVCS)[number])}>
-            <option value="">auto (operation default)</option>
-            {SVCS.filter((s) => s !== '').map((s) => <option key={s} value={s}>{s}</option>)}
+            <option value="">Automático (predeterminado de la operación)</option>
+            {SVCS.filter((s) => s !== '').map((s) => <option key={s} value={s}>{displayLabel(s)}</option>)}
           </select>
         </Field>
       </div>
@@ -205,19 +257,19 @@ function LaneStep({ form, errors, set, locations, costBases }: StepProps & { err
         onChange={(value) => set('costBaseId', value)}
       />
       <button type="button" onClick={() => setShowAdvanced((v) => !v)} className="justify-self-start text-xs text-muted-foreground hover:text-foreground">
-        {showAdvanced ? '− advanced' : '+ advanced (borders, route, FX)'}
+        {showAdvanced ? '− Ocultar opciones avanzadas' : '+ Opciones avanzadas (fronteras, ruta y tipo de cambio)'}
       </button>
       {showAdvanced && (
         <div className="grid gap-4 rounded-md border bg-muted/30 p-3 sm:grid-cols-2">
-          <Field label="MX border"><Input value={form.mexBorder} onChange={(e) => set('mexBorder', e.target.value)} /></Field>
-          <Field label="US border"><Input value={form.usBorder} onChange={(e) => set('usBorder', e.target.value)} /></Field>
-          <Field label="Route">
+          <Field label="Frontera de México"><Input value={form.mexBorder} onChange={(e) => set('mexBorder', e.target.value)} /></Field>
+          <Field label="Frontera de EE. UU."><Input value={form.usBorder} onChange={(e) => set('usBorder', e.target.value)} /></Field>
+          <Field label="Tipo de ruta">
             <select className={selectCls} value={form.route} onChange={(e) => set('route', e.target.value)}>
-              {ROUTES.map((r) => <option key={r} value={r}>{r}</option>)}
+              {ROUTES.map((r) => <option key={r} value={r}>{displayLabel(r)}</option>)}
             </select>
           </Field>
-          <Field label="FX rate override (MXN/USD)" error={errors.fxRate}>
-            <Input type="number" step="any" value={form.fxRate} onChange={(e) => set('fxRate', e.target.value)} placeholder="active set FX" aria-invalid={Boolean(errors.fxRate)} />
+          <Field label="Tipo de cambio personalizado (MXN/USD)" error={errors.fxRate}>
+            <Input type="number" step="any" value={form.fxRate} onChange={(e) => set('fxRate', e.target.value)} placeholder="Tipo de cambio de la versión activa" aria-invalid={Boolean(errors.fxRate)} />
           </Field>
         </div>
       )}
@@ -228,24 +280,24 @@ function LaneStep({ form, errors, set, locations, costBases }: StepProps & { err
 function EquipmentStep({ form, set }: StepProps) {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
-      <Field label="Truck" hint="Tractor class — drives fuel efficiency + fixed-cost factors.">
+      <Field label="Camión" hint="La clase del camión determina la eficiencia de combustible y los factores de costo fijo.">
         <select className={selectCls} value={form.truckType} onChange={(e) => set('truckType', e.target.value as (typeof TRUCKS)[number])}>
-          {TRUCKS.map((t) => <option key={t} value={t}>{t}</option>)}
+          {TRUCKS.map((t) => <option key={t} value={t}>{displayLabel(t)}</option>)}
         </select>
       </Field>
-      <Field label="Trailer" hint="Flatbed adds a complexity premium; Chassis routes to the drayage cycle.">
+      <Field label="Remolque" hint="La plataforma agrega complejidad; el chasis dirige el cálculo al ciclo de arrastre portuario.">
         <select className={selectCls} value={form.trailer} onChange={(e) => set('trailer', e.target.value as (typeof TRAILERS)[number])}>
-          {TRAILERS.map((t) => <option key={t} value={t}>{t}</option>)}
+          {TRAILERS.map((t) => <option key={t} value={t}>{displayLabel(t)}</option>)}
         </select>
       </Field>
-      <Field label="Config" hint="Tandem commits a 2nd trailer + dolly — higher fixed cost + maneuver time.">
+      <Field label="Configuración" hint="Tándem agrega un segundo remolque y dolly, con mayor costo fijo y tiempo de maniobra.">
         <select className={selectCls} value={form.config} onChange={(e) => set('config', e.target.value as (typeof CONFIGS)[number])}>
-          {CONFIGS.map((t) => <option key={t} value={t}>{t}</option>)}
+          {CONFIGS.map((t) => <option key={t} value={t}>{displayLabel(t)}</option>)}
         </select>
       </Field>
-      <Field label="Driver" hint="Driver class (B1, Interstate, CDL…) sets the labor rate factor.">
+      <Field label="Operador" hint="La clase de licencia del operador define el factor de mano de obra.">
         <select className={selectCls} value={form.driver} onChange={(e) => set('driver', e.target.value as (typeof DRIVERS)[number])}>
-          {DRIVERS.map((t) => <option key={t} value={t}>{t}</option>)}
+          {DRIVERS.map((t) => <option key={t} value={t}>{displayLabel(t)}</option>)}
         </select>
       </Field>
     </div>
@@ -256,10 +308,10 @@ function ReviewStep({ form, onEdit, costBases }: { form: FormFields; onEdit: (s:
   const selectedBase = costBases.find((base) => base.id === form.costBaseId)
   const activeVersion = activeVersionFor(selectedBase)
   const rows: { label: string; value: string; step: number }[] = [
-    { label: 'Lane', value: `${form.outboundLocation || '—'} → ${form.inboundLocation || '—'}`, step: 0 },
-    { label: 'Operation', value: `${form.operation}${form.service ? ` · ${form.service}` : ' · auto service'}`, step: 0 },
-    { label: 'Cost base', value: selectedBase ? `${selectedBase.code} · ${selectedBase.name}${activeVersion ? ` · v${activeVersion.version}` : ''}` : 'Legacy active assumptions', step: 0 },
-    { label: 'Equipment', value: `${form.truckType} · ${form.trailer} · ${form.config} · ${form.driver}`, step: 1 },
+    { label: 'Ruta', value: `${form.outboundLocation || '—'} → ${form.inboundLocation || '—'}`, step: 0 },
+    { label: 'Operación', value: `${displayLabel(form.operation)}${form.service ? ` · ${displayLabel(form.service)}` : ' · Servicio automático'}`, step: 0 },
+    { label: 'Base de costo', value: selectedBase ? `${selectedBase.code} · ${selectedBase.name}${activeVersion ? ` · v${activeVersion.version}` : ''}` : 'Supuestos activos heredados', step: 0 },
+    { label: 'Equipo', value: `${displayLabel(form.truckType)} · ${displayLabel(form.trailer)} · ${displayLabel(form.config)} · ${displayLabel(form.driver)}`, step: 1 },
   ]
   return (
     <div className="grid gap-3">
@@ -270,12 +322,12 @@ function ReviewStep({ form, onEdit, costBases }: { form: FormFields; onEdit: (s:
               <dt className="text-xs text-muted-foreground">{r.label}</dt>
               <dd className="truncate font-medium">{r.value}</dd>
             </div>
-            <button type="button" onClick={() => onEdit(r.step)} className="shrink-0 text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground">edit</button>
+            <button type="button" onClick={() => onEdit(r.step)} className="shrink-0 text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground">Editar</button>
           </div>
         ))}
       </dl>
       <CostBaseLineageNotice base={selectedBase} operation={form.operation} />
-      <p className="text-xs text-muted-foreground">Press <span className="font-medium text-foreground">Get quote</span> to price this lane against your active assumption set.</p>
+      <p className="text-xs text-muted-foreground">Selecciona <span className="font-medium text-foreground">Generar tarifa</span> para calcular esta ruta con el conjunto activo de supuestos.</p>
     </div>
   )
 }

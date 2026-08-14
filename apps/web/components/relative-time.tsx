@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 
+const relativeTime = new Intl.RelativeTimeFormat('es-MX', { numeric: 'auto' })
+
 export function formatAbsolute(iso: string): string {
   const value = new Date(iso)
   if (Number.isNaN(value.getTime())) return iso
@@ -9,21 +11,25 @@ export function formatAbsolute(iso: string): string {
 }
 
 export function formatRelative(iso: string, now: number): string {
-  const diffMs = now - new Date(iso).getTime()
-  const sec = Math.round(diffMs / 1000)
-  if (sec < 0) return 'just now'
-  if (sec < 60) return `${sec}s ago`
-  const min = Math.round(sec / 60)
-  if (min < 60) return `${min} min ago`
-  const hr = Math.round(min / 60)
-  if (hr < 24) return `${hr}h ago`
-  const days = Math.round(hr / 24)
-  return `${days}d ago`
+  const value = new Date(iso)
+  if (Number.isNaN(value.getTime())) return iso
+
+  const seconds = Math.round((value.getTime() - now) / 1000)
+  const absoluteSeconds = Math.abs(seconds)
+  if (absoluteSeconds < 60) return relativeTime.format(seconds, 'second')
+
+  const minutes = Math.round(seconds / 60)
+  if (Math.abs(minutes) < 60) return relativeTime.format(minutes, 'minute')
+
+  const hours = Math.round(minutes / 60)
+  if (Math.abs(hours) < 24) return relativeTime.format(hours, 'hour')
+
+  return relativeTime.format(Math.round(hours / 24), 'day')
 }
 
 /**
- * Auto-updating relative timestamp ("5 min ago"). Renders a deterministic UTC
- * timestamp pre-mount, then switches to relative + hover tooltip.
+ * Marca de tiempo relativa con actualización automática. Antes del montaje
+ * muestra una fecha UTC determinista y después cambia al formato relativo.
  */
 export function RelativeTime({ iso }: { iso: string }) {
   const [now, setNow] = useState<number | null>(null)
