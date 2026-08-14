@@ -227,6 +227,7 @@ model Organization {
   productionRoutes         ProductionRoute[]
   costBases                CostBase[]
   carrierProfile           CarrierProfile?
+  memberRoleAudits         OrganizationMemberRoleAudit[]
 }
 
 model User {
@@ -257,6 +258,8 @@ model User {
   customerQuoteEmailDrafts    CustomerQuoteEmailDraft[]   @relation("CustomerQuoteEmailDraftActor")
   invitationsSent             OrganizationInvitation[]    @relation("OrganizationInvitationInviter")
   invitationsAccepted         OrganizationInvitation[]    @relation("OrganizationInvitationAcceptor")
+  memberRoleChangesMade       OrganizationMemberRoleAudit[] @relation("OrganizationMemberRoleAuditActor")
+  memberRoleChangesReceived   OrganizationMemberRoleAudit[] @relation("OrganizationMemberRoleAuditMember")
 }
 
 model OrganizationInvitation {
@@ -278,6 +281,25 @@ model OrganizationInvitation {
 
   @@index([orgId, status, createdAt])
   @@index([email, status])
+}
+
+model OrganizationMemberRoleAudit {
+  id           String   @id @default(cuid())
+  orgId        String
+  memberId     String
+  actorId      String
+  previousRole Role
+  nextRole     Role
+  confirmation String
+  createdAt    DateTime @default(now())
+
+  org    Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  member User         @relation("OrganizationMemberRoleAuditMember", fields: [memberId], references: [id], onDelete: Restrict)
+  actor  User         @relation("OrganizationMemberRoleAuditActor", fields: [actorId], references: [id], onDelete: Restrict)
+
+  @@index([orgId, createdAt])
+  @@index([memberId, createdAt])
+  @@index([actorId, createdAt])
 }
 
 model PilotDecision {

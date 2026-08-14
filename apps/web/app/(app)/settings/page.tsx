@@ -8,12 +8,12 @@ import { RelativeTime } from '@/components/relative-time'
 import { OrgNameForm } from './org-name-form'
 import { GmailIntegrationCard } from './gmail-integration-card'
 import { TeamInvitations } from './team-invitations'
+import { TeamMembers, type MemberRoleAudit, type TeamMember } from './team-members'
 
 export const dynamic = 'force-dynamic'
 export const metadata: Metadata = { title: 'Configuración' }
 
 interface Org { id: string; name: string; country: string; createdAt: string }
-interface Member { id: string; email: string; role: string; identityLinked: boolean; createdAt: string }
 interface Invitation { id: string; email: string; role: 'ADMIN' | 'OPERATOR' | 'VIEWER'; status: 'PENDING' | 'ACCEPTED' | 'REVOKED' | 'EXPIRED'; expiresAt: string }
 interface Me { id: string; email: string; role: string; orgId: string }
 
@@ -25,11 +25,12 @@ function initials(name: string, email: string): string {
 
 export default async function SettingsPage() {
   const { getUser } = getKindeServerSession()
-  const [org, members, me, invitations, user] = await Promise.all([
+  const [org, members, me, invitations, roleAudits, user] = await Promise.all([
     api<Org>('/org').catch(() => null),
-    api<Member[]>('/org/members').catch(() => [] as Member[]),
+    api<TeamMember[]>('/org/members').catch(() => [] as TeamMember[]),
     api<Me>('/auth/me').catch(() => null),
     api<Invitation[]>('/org/invitations').catch(() => [] as Invitation[]),
+    api<MemberRoleAudit[]>('/org/member-role-audits').catch(() => [] as MemberRoleAudit[]),
     getUser(),
   ])
 
@@ -53,33 +54,21 @@ export default async function SettingsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-5">
-          {org && <OrgNameForm initialName={org.name} />}
+          {org && me?.role === 'ADMIN' ? (
+            <OrgNameForm initialName={org.name} />
+          ) : org ? (
+            <div>
+              <p className="text-sm font-medium">Nombre de la organización</p>
+              <p className="mt-1 text-sm text-muted-foreground">{org.name}</p>
+            </div>
+          ) : null}
 
-          <div>
-            <div className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Equipo ({members.length})
-            </div>
-            <div className="overflow-hidden rounded-md border">
-              <table className="w-full text-sm">
-                <tbody>
-                  {members.map((m) => (
-                    <tr key={m.id} className="border-b last:border-b-0">
-                      <td className="px-3 py-2">{m.email}</td>
-                      <td className="px-3 py-2">
-                        <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium">{m.role}</span>
-                      </td>
-                      <td className="px-3 py-2 text-right text-xs text-muted-foreground">
-                        {m.identityLinked ? 'Kinde vinculado' : 'Pendiente de primer acceso'}
-                      </td>
-                    </tr>
-                  ))}
-                  {members.length === 0 && (
-                    <tr><td className="px-3 py-4 text-center text-sm text-muted-foreground">No hay integrantes cargados.</td></tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <TeamMembers
+            members={members}
+            currentUserId={me?.id ?? null}
+            canManageRoles={me?.role === 'ADMIN'}
+            audits={roleAudits}
+          />
           {me?.role === 'ADMIN' ? <TeamInvitations invitations={invitations} /> : null}
         </CardContent>
       </Card>

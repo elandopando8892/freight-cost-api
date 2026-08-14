@@ -54,7 +54,7 @@ export function TeamInvitations({ invitations }: { invitations: Invitation[] }) 
       })
     },
     onSuccess: () => {
-      toast.success('Invitation registered. No email was sent automatically.')
+      toast.success('Invitación registrada. No se envió ningún correo automáticamente.')
       setEmail('')
       setPreview(null)
       router.refresh()
@@ -65,7 +65,7 @@ export function TeamInvitations({ invitations }: { invitations: Invitation[] }) 
       method: 'DELETE',
     }),
     onSuccess: () => {
-      toast.success('Invitation revoked')
+      toast.success('Invitación revocada')
       router.refresh()
     },
   })
@@ -83,9 +83,9 @@ export function TeamInvitations({ invitations }: { invitations: Invitation[] }) 
   return (
     <section className="grid gap-4 border-t pt-5" aria-labelledby="team-invitations-heading">
       <div>
-        <h3 id="team-invitations-heading" className="text-sm font-medium">Team invitations</h3>
+        <h3 id="team-invitations-heading" className="text-sm font-medium">Invitaciones al equipo</h3>
         <p className="mt-1 text-xs text-muted-foreground">
-          Preview first. The invitation joins this tenant on the first matching Kinde login and expires after seven days.
+          Primero revisa la invitación. El correo se integra a esta organización en su primer acceso con Kinde y vence después de siete días.
         </p>
       </div>
 
@@ -97,7 +97,7 @@ export function TeamInvitations({ invitations }: { invitations: Invitation[] }) 
         }}
       >
         <div className="grid gap-1.5">
-          <Label htmlFor="invite-email">Email</Label>
+          <Label htmlFor="invite-email">Correo electrónico</Label>
           <Input
             id="invite-email"
             type="email"
@@ -109,20 +109,20 @@ export function TeamInvitations({ invitations }: { invitations: Invitation[] }) 
           />
         </div>
         <div className="grid gap-1.5">
-          <Label htmlFor="invite-role">Role</Label>
+          <Label htmlFor="invite-role">Rol</Label>
           <select
             id="invite-role"
             className="h-9 rounded-md border bg-background px-3 text-sm"
             value={role}
             onChange={(event) => changeRole(event.target.value as Invitation['role'])}
           >
-            <option value="ADMIN">Admin</option>
-            <option value="OPERATOR">Operator</option>
-            <option value="VIEWER">Viewer</option>
+            <option value="ADMIN">Administrador</option>
+            <option value="OPERATOR">Operador</option>
+            <option value="VIEWER">Consulta</option>
           </select>
         </div>
         <Button type="submit" variant="outline" disabled={previewInvitation.isPending || !email.trim()}>
-          {previewInvitation.isPending ? 'Checking…' : 'Preview'}
+          {previewInvitation.isPending ? 'Revisando…' : 'Revisar'}
         </Button>
       </form>
 
@@ -131,8 +131,8 @@ export function TeamInvitations({ invitations }: { invitations: Invitation[] }) 
           {preview.eligible ? (
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p><span className="font-medium">{preview.email}</span> will join as {preview.role}.</p>
-                <p className="mt-1 text-xs text-muted-foreground">No email will be sent by this action.</p>
+                <p><span className="font-medium">{preview.email}</span> se integrará con el rol {preview.role}.</p>
+                <p className="mt-1 text-xs text-muted-foreground">Esta acción no envía ningún correo.</p>
               </div>
               <Button
                 type="button"
@@ -140,11 +140,11 @@ export function TeamInvitations({ invitations }: { invitations: Invitation[] }) 
                 disabled={createInvitation.isPending}
                 onClick={() => createInvitation.mutate()}
               >
-                {createInvitation.isPending ? 'Registering…' : 'Confirm invitation'}
+                {createInvitation.isPending ? 'Registrando…' : 'Confirmar invitación'}
               </Button>
             </div>
           ) : (
-            <p>This email cannot be invited ({preview.reason ?? 'unavailable'}).</p>
+            <p>Este correo no puede ser invitado ({preview.reason ?? 'no disponible'}).</p>
           )}
         </div>
       ) : null}
@@ -153,7 +153,7 @@ export function TeamInvitations({ invitations }: { invitations: Invitation[] }) 
         <div className="overflow-hidden rounded-md border">
           <table className="w-full text-sm">
             <thead className="bg-muted/40 text-left text-xs text-muted-foreground">
-              <tr><th className="px-3 py-2">Email</th><th className="px-3 py-2">Role</th><th className="px-3 py-2">Status</th><th className="px-3 py-2"><span className="sr-only">Actions</span></th></tr>
+              <tr><th className="px-3 py-2">Correo</th><th className="px-3 py-2">Rol</th><th className="px-3 py-2">Estado</th><th className="px-3 py-2"><span className="sr-only">Acciones</span></th></tr>
             </thead>
             <tbody>
               {invitations.map((invitation) => (
@@ -170,7 +170,7 @@ export function TeamInvitations({ invitations }: { invitations: Invitation[] }) 
                         disabled={revokeInvitation.isPending}
                         onClick={() => revokeInvitation.mutate(invitation.id)}
                       >
-                        Revoke
+                        Revocar
                       </Button>
                     ) : null}
                   </td>

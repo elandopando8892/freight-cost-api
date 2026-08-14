@@ -169,6 +169,13 @@ vi.mock("../src/config/prisma.js", () => {
       update: vi.fn(),
       updateMany: vi.fn().mockResolvedValue({ count: 1 }),
     },
+    organizationMemberRoleAudit: {
+      findMany: vi.fn().mockResolvedValue([]),
+      create: vi.fn().mockResolvedValue({
+        id: "member-role-audit-1",
+        createdAt: new Date(),
+      }),
+    },
     costBase: {
       count: vi.fn().mockResolvedValue(0),
       findMany: vi.fn().mockResolvedValue([costBase]),
@@ -1175,6 +1182,126 @@ describe("Role authorization", () => {
 // ─────────────────────────────────────────────────────────────────────────────
 // ASSUMPTIONS
 // ─────────────────────────────────────────────────────────────────────────────
+describe("Organization member role governance", () => {
+  const memberId = "cmember000000000000000001";
+
+  it("previews an administrator demotion with a tenant-bound confirmation", async () => {
+    vi.mocked(prisma.user.findFirst).mockResolvedValueOnce({
+      id: memberId,
+      email: "other-admin@example.com",
+      role: "ADMIN",
+    } as never);
+    vi.mocked(prisma.user.count).mockResolvedValueOnce(3);
+
+    const res = await app.inject({
+      method: "POST",
+      url: `/org/members/${memberId}/role/preview`,
+      headers: { authorization: `Bearer ${token}` },
+      payload: { role: "OPERATOR" },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toMatchObject({
+      eligible: true,
+      adminsRemaining: 2,
+      confirmation: `CHANGE_MEMBER_ROLE:org-1:${memberId}:OPERATOR`,
+    });
+  });
+
+  it("does not reveal members from another organization", async () => {
+    vi.mocked(prisma.user.findFirst).mockResolvedValueOnce(null);
+    vi.mocked(prisma.user.count).mockResolvedValueOnce(3);
+
+    const res = await app.inject({
+      method: "POST",
+      url: `/org/members/${memberId}/role/preview`,
+      headers: { authorization: `Bearer ${token}` },
+      payload: { role: "OPERATOR" },
+    });
+
+    expect(res.statusCode).toBe(404);
+  });
+
+  it("rejects a stale or cross-tenant confirmation before writing", async () => {
+    vi.mocked(prisma.$transaction).mockClear();
+
+    const res = await app.inject({
+      method: "PATCH",
+      url: `/org/members/${memberId}/role`,
+      headers: { authorization: `Bearer ${token}` },
+      payload: { role: "OPERATOR", confirmation: "CHANGE_MEMBER_ROLE:other-org:member:OPERATOR" },
+    });
+
+    expect(res.statusCode).toBe(409);
+    expect(prisma.$transaction).not.toHaveBeenCalled();
+  });
+
+  it("rechecks the actor and persists the role change with its audit atomically", async () => {
+    vi.mocked(prisma.user.findFirst)
+      .mockResolvedValueOnce({ role: "ADMIN" } as never)
+      .mockResolvedValueOnce({
+        id: memberId,
+        email: "other-admin@example.com",
+        role: "ADMIN",
+      } as never);
+    vi.mocked(prisma.user.count).mockResolvedValueOnce(3);
+    vi.mocked(prisma.user.update).mockResolvedValueOnce({
+      id: memberId,
+      email: "other-admin@example.com",
+      role: "OPERATOR",
+    } as never);
+    vi.mocked(prisma.organizationMemberRoleAudit.create).mockClear();
+
+    const confirmation = `CHANGE_MEMBER_ROLE:org-1:${memberId}:OPERATOR`;
+    const res = await app.inject({
+      method: "PATCH",
+      url: `/org/members/${memberId}/role`,
+      headers: { authorization: `Bearer ${token}` },
+      payload: { role: "OPERATOR", confirmation },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.json().member.role).toBe("OPERATOR");
+    expect(prisma.organizationMemberRoleAudit.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          orgId: "org-1",
+          memberId,
+          actorId: "user-1",
+          previousRole: "ADMIN",
+          nextRole: "OPERATOR",
+          confirmation,
+        }),
+      }),
+    );
+  });
+
+  it("blocks a write when the actor lost administrator access", async () => {
+    vi.mocked(prisma.user.findFirst)
+      .mockResolvedValueOnce({ role: "OPERATOR" } as never)
+      .mockResolvedValueOnce({
+        id: memberId,
+        email: "other-admin@example.com",
+        role: "ADMIN",
+      } as never);
+    vi.mocked(prisma.user.count).mockResolvedValueOnce(2);
+    vi.mocked(prisma.organizationMemberRoleAudit.create).mockClear();
+
+    const res = await app.inject({
+      method: "PATCH",
+      url: `/org/members/${memberId}/role`,
+      headers: { authorization: `Bearer ${token}` },
+      payload: {
+        role: "OPERATOR",
+        confirmation: `CHANGE_MEMBER_ROLE:org-1:${memberId}:OPERATOR`,
+      },
+    });
+
+    expect(res.statusCode).toBe(403);
+    expect(prisma.organizationMemberRoleAudit.create).not.toHaveBeenCalled();
+  });
+});
+
 describe("Assumptions", () => {
   it("GET /assumptions/sets → 200 list", async () => {
     const res = await app.inject({
