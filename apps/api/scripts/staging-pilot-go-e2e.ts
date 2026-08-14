@@ -123,10 +123,7 @@ async function main() {
         "STAGING_API_URL",
         "STAGING_EXPECTED_RELEASE_SHA",
         "STAGING_EXPECTED_ORG_ID",
-        "STAGING_SMOKE_VERIFIER_TOKEN",
-        "STAGING_HUMAN_VERIFIER_TOKEN",
-        "STAGING_APPROVER_ONE_TOKEN",
-        "STAGING_APPROVER_TWO_TOKEN",
+        "STAGING_ADMIN_TOKEN",
       ],
       executeOnlyEnvironment: ["STAGING_PILOT_EXECUTION_CONFIRM"],
       note: "Use ephemeral tokens in the process environment; never save them in project files.",
@@ -139,26 +136,17 @@ async function main() {
   if (!/^[a-f0-9]{7,64}$/i.test(expectedReleaseId)) {
     throw new Error("STAGING_EXPECTED_RELEASE_SHA must be a release SHA.");
   }
-  const tokens = {
-    smokeVerifier: required("STAGING_SMOKE_VERIFIER_TOKEN"),
-    humanVerifier: required("STAGING_HUMAN_VERIFIER_TOKEN"),
-    approverOne: required("STAGING_APPROVER_ONE_TOKEN"),
-    approverTwo: required("STAGING_APPROVER_TWO_TOKEN"),
-  };
+  const adminToken = required("STAGING_ADMIN_TOKEN");
 
-  const [health, ready, smokeContext, humanContext, approverOneContext, approverTwoContext] =
-    await Promise.all([
-      call(api, "/health"),
-      call(api, "/ready"),
-      call(api, "/pilot/staging-context", tokens.smokeVerifier),
-      call(api, "/pilot/staging-context", tokens.humanVerifier),
-      call(api, "/pilot/staging-context", tokens.approverOne),
-      call(api, "/pilot/staging-context", tokens.approverTwo),
-    ]);
+  const [health, ready, administratorContext] = await Promise.all([
+    call(api, "/health"),
+    call(api, "/ready"),
+    call(api, "/pilot/staging-context", adminToken),
+  ]);
   const readiness = await call(
     api,
     "/pilot/staging-readiness",
-    tokens.approverOne,
+    adminToken,
   );
   const healthBody = objectBody(health, "health");
   const readyBody = objectBody(ready, "ready");
@@ -178,10 +166,7 @@ async function main() {
       database: typeof readyBody.database === "string" ? readyBody.database : null,
     },
     actors: {
-      smokeVerifier: actorContext(smokeContext, "smoke verifier"),
-      humanVerifier: actorContext(humanContext, "human verifier"),
-      approverOne: actorContext(approverOneContext, "approver one"),
-      approverTwo: actorContext(approverTwoContext, "approver two"),
+      administrator: actorContext(administratorContext, "administrator"),
     },
     readiness: readinessBody(readiness),
   });
@@ -196,10 +181,7 @@ async function main() {
     requestIds: safeRequestIds({
       health,
       ready,
-      smokeContext,
-      humanContext,
-      approverOneContext,
-      approverTwoContext,
+      administratorContext,
       readiness,
     }),
   };
@@ -224,106 +206,42 @@ async function main() {
     );
   }
 
-  const first = await call(api, "/pilot/decisions", tokens.approverOne, {
+  const approval = await call(api, "/pilot/decisions", adminToken, {
     method: "POST",
     json: {
       outcome: "GO",
-      rationale: "Sprint 71 controlled staging E2E: first independent approval.",
+      rationale: "Controlled staging E2E: single administrator approval.",
+      confirmReleaseId: expectedReleaseId,
     },
   });
-  const firstBody = objectBody(first, "first approval");
-  if (
-    first.status !== 202 ||
-    firstBody.state !== "PENDING_SECOND_APPROVAL" ||
-    firstBody.approvalCount !== 1
-  ) {
-    emit({
-      ...preflightEvidence,
-      mode: "EXECUTE_STOPPED_AFTER_FIRST_WRITE",
-      writesAttempted: true,
-      executionReady: false,
-      stopReason: "FIRST_APPROVAL_NOT_PENDING",
-      requestIds: { ...preflightEvidence.requestIds, first: first.requestId },
-    });
-    process.exitCode = 1;
-    return;
-  }
-
-  const duplicate = await call(api, "/pilot/decisions", tokens.approverOne, {
-    method: "POST",
-    json: {
-      outcome: "GO",
-      rationale: "Sprint 71 controlled staging E2E: duplicate identity rejection.",
-    },
-  });
-  const duplicateBody = objectBody(duplicate, "duplicate approval");
-  if (
-    duplicate.status !== 409 ||
-    typeof duplicateBody.error !== "string" ||
-    !/distinct administrator/i.test(duplicateBody.error)
-  ) {
-    emit({
-      ...preflightEvidence,
-      mode: "EXECUTE_STOPPED_WITH_PENDING_APPROVAL",
-      writesAttempted: true,
-      executionReady: false,
-      stopReason: "DUPLICATE_IDENTITY_NOT_BLOCKED",
-      requestIds: {
-        ...preflightEvidence.requestIds,
-        first: first.requestId,
-        duplicate: duplicate.requestId,
-      },
-    });
-    process.exitCode = 1;
-    return;
-  }
-
-  const second = await call(api, "/pilot/decisions", tokens.approverTwo, {
-    method: "POST",
-    json: {
-      outcome: "GO",
-      rationale: "Sprint 71 controlled staging E2E: second independent approval.",
-    },
-  });
-  const secondBody = objectBody(second, "second approval");
+  const approvalBody = objectBody(approval, "single administrator approval");
   const decisionId =
-    secondBody.decision && typeof secondBody.decision.id === "string"
-      ? secondBody.decision.id
+    approvalBody.decision && typeof approvalBody.decision.id === "string"
+      ? approvalBody.decision.id
       : null;
   const [decisionsResult, approvalsResult] = await Promise.all([
-    call(api, "/pilot/decisions", tokens.approverTwo),
-    call(api, "/pilot/go-approvals", tokens.approverTwo),
+    call(api, "/pilot/decisions", adminToken),
+    call(api, "/pilot/go-approvals", adminToken),
   ]);
   const decisions = arrayBody(decisionsResult, "decisions");
   const approvals = arrayBody(approvalsResult, "GO approvals");
   const linkedApprovals = approvals.filter(
     (approval) => approval.decision?.id === decisionId,
   );
-  const distinctApprovers = new Set(
-    linkedApprovals.map((approval) => approval.approvedBy?.id).filter(Boolean),
-  );
   const sequence = evaluatePilotGoSequence({
-    first: {
-      status: first.status,
-      state: typeof firstBody.state === "string" ? firstBody.state : null,
+    approval: {
+      status: approval.status,
+      state: typeof approvalBody.state === "string" ? approvalBody.state : null,
       approvalCount:
-        typeof firstBody.approvalCount === "number" ? firstBody.approvalCount : null,
-    },
-    duplicate: {
-      status: duplicate.status,
-      error: typeof duplicateBody.error === "string" ? duplicateBody.error : null,
-    },
-    second: {
-      status: second.status,
-      state: typeof secondBody.state === "string" ? secondBody.state : null,
-      approvalCount:
-        typeof secondBody.approvalCount === "number" ? secondBody.approvalCount : null,
+        typeof approvalBody.approvalCount === "number"
+          ? approvalBody.approvalCount
+          : null,
       decisionId,
     },
     decisionPersisted: Boolean(
       decisionId && decisions.some((decision) => decision.id === decisionId),
     ),
-    linkedDistinctApprovalCount: distinctApprovers.size,
+    linkedApprovalCount: linkedApprovals.length,
   });
   emit({
     schemaVersion: "fcm.staging-pilot-go-e2e.v1",
@@ -337,14 +255,9 @@ async function main() {
     requestIds: safeRequestIds({
       health,
       ready,
-      smokeContext,
-      humanContext,
-      approverOneContext,
-      approverTwoContext,
+      administratorContext,
       readiness,
-      first,
-      duplicate,
-      second,
+      approval,
       decisionsResult,
       approvalsResult,
     }),

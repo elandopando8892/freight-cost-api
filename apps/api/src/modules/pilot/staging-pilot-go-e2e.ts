@@ -42,10 +42,7 @@ export type PilotStagingPreflightInput = {
     database: string | null;
   };
   actors: {
-    smokeVerifier: PilotStagingActorContext;
-    humanVerifier: PilotStagingActorContext;
-    approverOne: PilotStagingActorContext;
-    approverTwo: PilotStagingActorContext;
+    administrator: PilotStagingActorContext;
   };
   readiness: PilotStagingReadiness;
 };
@@ -63,25 +60,19 @@ export function evaluatePilotStagingPreflight(
   const expectedRelease = input.expectedReleaseId.toLowerCase();
   const releaseMatches = (value: string | null | undefined) =>
     value?.toLowerCase() === expectedRelease;
-  const contexts = Object.values(input.actors);
-  const uniqueActors = new Set(contexts.map((context) => context.userId));
-  const actorsValid =
-    contexts.length === 4 &&
-    uniqueActors.size === 4 &&
-    contexts.every(
-      (context) =>
-        context.role === "ADMIN" &&
-        context.orgId === input.expectedOrgId &&
-        releaseMatches(context.releaseId),
-    );
+  const administrator = input.actors.administrator;
+  const actorValid =
+    administrator.role === "ADMIN" &&
+    administrator.orgId === input.expectedOrgId &&
+    releaseMatches(administrator.releaseId);
   const verifications = input.readiness.stagingVerifications;
   const selectedVerifiersValid =
     verifications.smoke.status === "PASS" &&
     Boolean(verifications.smoke.verificationId) &&
-    verifications.smoke.verifiedById === input.actors.smokeVerifier.userId &&
+    verifications.smoke.verifiedById === administrator.userId &&
     verifications.human.status === "PASS" &&
     Boolean(verifications.human.verificationId) &&
-    verifications.human.verifiedById === input.actors.humanVerifier.userId;
+    verifications.human.verifiedById === administrator.userId;
   const checks: PilotStagingCheck[] = [
     {
       key: "API_HEALTH",
@@ -106,10 +97,10 @@ export function evaluatePilotStagingPreflight(
       detail: "Ready debe confirmar PostgreSQL y el mismo release sin degradación.",
     },
     {
-      key: "FOUR_DISTINCT_ADMINS",
-      status: actorsValid ? "PASS" : "BLOCK",
+      key: "SINGLE_ADMIN_CONTEXT",
+      status: actorValid ? "PASS" : "BLOCK",
       detail:
-        "Los dos verificadores y dos aprobadores deben ser ADMIN distintos del tenant esperado.",
+        "El administrador debe pertenecer al tenant y release esperados.",
     },
     {
       key: "SELECTED_VERIFIERS",
@@ -136,57 +127,36 @@ export function evaluatePilotStagingPreflight(
 }
 
 export type PilotGoSequenceInput = {
-  first: { status: number; state: string | null; approvalCount: number | null };
-  duplicate: { status: number; error: string | null };
-  second: {
+  approval: {
     status: number;
     state: string | null;
     approvalCount: number | null;
     decisionId: string | null;
   };
   decisionPersisted: boolean;
-  linkedDistinctApprovalCount: number;
+  linkedApprovalCount: number;
 };
 
 export function evaluatePilotGoSequence(input: PilotGoSequenceInput) {
   const checks: PilotStagingCheck[] = [
     {
-      key: "FIRST_APPROVAL_PENDING",
+      key: "SINGLE_APPROVAL_CLOSES_GO",
       status:
-        input.first.status === 202 &&
-        input.first.state === "PENDING_SECOND_APPROVAL" &&
-        input.first.approvalCount === 1
+        input.approval.status === 201 &&
+        input.approval.state === "GO_RECORDED" &&
+        input.approval.approvalCount === 1 &&
+        Boolean(input.approval.decisionId)
           ? "PASS"
           : "BLOCK",
-      detail: "La primera identidad debe dejar una aprobación pendiente.",
+      detail: "El ADMIN único debe cerrar GO en una sola aprobación.",
     },
     {
-      key: "DUPLICATE_IDENTITY_BLOCKED",
+      key: "PERSISTED_SINGLE_ADMIN_EVIDENCE",
       status:
-        input.duplicate.status === 409 &&
-        Boolean(input.duplicate.error?.match(/distinct administrator/i))
+        input.decisionPersisted && input.linkedApprovalCount === 1
           ? "PASS"
           : "BLOCK",
-      detail: "La misma identidad no puede completar la segunda aprobación.",
-    },
-    {
-      key: "SECOND_APPROVAL_CLOSES_GO",
-      status:
-        input.second.status === 201 &&
-        input.second.state === "GO_RECORDED" &&
-        input.second.approvalCount === 2 &&
-        Boolean(input.second.decisionId)
-          ? "PASS"
-          : "BLOCK",
-      detail: "La segunda identidad debe cerrar GO con dos aprobaciones.",
-    },
-    {
-      key: "PERSISTED_DUAL_EVIDENCE",
-      status:
-        input.decisionPersisted && input.linkedDistinctApprovalCount === 2
-          ? "PASS"
-          : "BLOCK",
-      detail: "El ledger debe conservar la decisión y dos aprobadores distintos.",
+      detail: "El ledger debe conservar la decisión y su aprobación enlazada.",
     },
   ];
   return {

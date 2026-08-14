@@ -302,8 +302,9 @@ model PilotDecision {
   @@index([decidedById, createdAt])
 }
 
-// A GO requires two distinct ADMIN approvals over the exact same readiness
-// fingerprint. Approvals are immutable and cannot deploy or publish anything.
+// A GO requires one approval when the tenant has a single ADMIN and two
+// distinct approvals otherwise. The exact readiness fingerprint and release
+// confirmation remain immutable; approvals cannot deploy or publish anything.
 model PilotGoApproval {
   id              String   @id @default(cuid())
   orgId           String

@@ -43,7 +43,7 @@ type PilotDecisionMutation = {
   decision: PilotDecision | null;
   approval: PilotGoApproval | null;
   approvalCount: number;
-  requiredApprovals: 2;
+  requiredApprovals: 0 | 1 | 2;
   state:
     | "NO_GO_RECORDED"
     | "PENDING_SECOND_APPROVAL"
@@ -54,15 +54,18 @@ export function PilotDecisionLedger({
   initial,
   initialApprovals,
   role,
+  currentReleaseId,
 }: {
   initial: PilotDecision[];
   initialApprovals: PilotGoApproval[];
   role: "ADMIN" | "OPERATOR" | "VIEWER";
+  currentReleaseId: string;
 }) {
   const [rows, setRows] = useState(initial);
   const [approvals, setApprovals] = useState(initialApprovals);
   const [outcome, setOutcome] = useState<"GO" | "NO_GO">("NO_GO");
   const [rationale, setRationale] = useState("");
+  const [releaseConfirmation, setReleaseConfirmation] = useState("");
   const [lastState, setLastState] = useState<
     PilotDecisionMutation["state"] | null
   >(null);
@@ -70,7 +73,13 @@ export function PilotDecisionLedger({
     mutationFn: () =>
       fetcher<PilotDecisionMutation>("/api/v1/pilot/decisions", {
         method: "POST",
-        json: { outcome, rationale },
+        json: {
+          outcome,
+          rationale,
+          ...(outcome === "GO"
+            ? { confirmReleaseId: releaseConfirmation.trim() }
+            : {}),
+        },
       }),
     onSuccess: ({ decision, approval, state }) => {
       if (decision) setRows((items) => [decision, ...items]);
@@ -92,6 +101,7 @@ export function PilotDecisionLedger({
       }
       setLastState(state);
       setRationale("");
+      setReleaseConfirmation("");
     },
   });
   const status = (decision: PilotDecision) =>
@@ -104,9 +114,10 @@ export function PilotDecisionLedger({
       <CardHeader>
         <CardTitle className="text-base">Ledger de decisiones</CardTitle>
         <CardDescription>
-          NO-GO se registra inmediatamente. GO exige dos administradores
-          distintos que no hayan creado las verificaciones seleccionadas. Nada
-          en este ledger despliega, publica ni activa.
+          NO-GO se registra inmediatamente. En una organización con un solo
+          administrador, GO exige evidencia vigente y confirmar el SHA exacto;
+          con varios administradores se conserva la doble aprobación. Nada en
+          este ledger despliega, publica ni activa.
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4">
@@ -128,8 +139,23 @@ export function PilotDecisionLedger({
               value={rationale}
               onChange={(event) => setRationale(event.target.value)}
             />
+            {outcome === "GO" && (
+              <Input
+                aria-label="Confirmar SHA del release"
+                className="sm:col-span-2"
+                placeholder={`Escribe ${currentReleaseId}`}
+                value={releaseConfirmation}
+                onChange={(event) => setReleaseConfirmation(event.target.value)}
+              />
+            )}
             <Button
-              disabled={rationale.trim().length < 3 || create.isPending}
+              disabled={
+                rationale.trim().length < 3 ||
+                create.isPending ||
+                (outcome === "GO" &&
+                  releaseConfirmation.trim().toLowerCase() !==
+                    currentReleaseId.toLowerCase())
+              }
               onClick={() => create.mutate()}
             >
               {outcome === "GO" ? "Aprobar GO" : "Registrar NO-GO"}
@@ -149,8 +175,8 @@ export function PilotDecisionLedger({
             )}
             {lastState === "GO_RECORDED" && (
               <p className="sm:col-span-3 text-sm text-emerald-700 dark:text-emerald-300">
-                Segunda aprobación registrada y decisión GO cerrada. Esto no
-                ejecuta un despliegue.
+                Decisión GO cerrada sobre el SHA confirmado. Esto no ejecuta un
+                despliegue.
               </p>
             )}
           </div>
@@ -161,8 +187,9 @@ export function PilotDecisionLedger({
             <div>
               <p className="text-sm font-medium">Aprobaciones GO</p>
               <p className="text-xs text-muted-foreground">
-                Cada ronda necesita 2 identidades; un cambio de evidencia deja
-                de contar para el GO actual.
+                Un tenant con un solo ADMIN necesita una aprobación confirmada;
+                con varios ADMIN se requieren dos identidades. Un cambio de
+                evidencia invalida la ronda actual.
               </p>
             </div>
             <span className="text-xs text-muted-foreground">

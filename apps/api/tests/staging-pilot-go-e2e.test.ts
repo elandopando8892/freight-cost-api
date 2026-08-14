@@ -24,10 +24,7 @@ const validInput = {
     database: "connected",
   },
   actors: {
-    smokeVerifier: actor("verifier-smoke"),
-    humanVerifier: actor("verifier-human"),
-    approverOne: actor("approver-one"),
-    approverTwo: actor("approver-two"),
+    administrator: actor("admin-one"),
   },
   readiness: {
     ready: true,
@@ -38,39 +35,37 @@ const validInput = {
       smoke: {
         status: "PASS",
         verificationId: "smoke-1",
-        verifiedById: "verifier-smoke",
+        verifiedById: "admin-one",
       },
       human: {
         status: "PASS",
         verificationId: "human-1",
-        verifiedById: "verifier-human",
+        verifiedById: "admin-one",
       },
     },
   },
 };
 
 describe("controlled staging pilot GO E2E", () => {
-  it("passes read-only preflight only for four distinct admins and selected verifiers", () => {
+  it("passes read-only preflight for the tenant administrator and selected evidence", () => {
     expect(evaluatePilotStagingPreflight(validInput)).toMatchObject({
       ready: true,
       checks: [
         { key: "API_HEALTH", status: "PASS" },
         { key: "API_READY", status: "PASS" },
-        { key: "FOUR_DISTINCT_ADMINS", status: "PASS" },
+        { key: "SINGLE_ADMIN_CONTEXT", status: "PASS" },
         { key: "SELECTED_VERIFIERS", status: "PASS" },
         { key: "CURRENT_RELEASE_GATE", status: "PASS" },
       ],
     });
   });
 
-  it("blocks duplicate identities, another tenant and substituted verification authors", () => {
+  it("blocks another tenant and substituted verification authors", () => {
     const result = evaluatePilotStagingPreflight({
       ...validInput,
       actors: {
-        ...validInput.actors,
-        approverTwo: actor("approver-one"),
-        humanVerifier: {
-          ...actor("verifier-human"),
+        administrator: {
+          ...actor("admin-one"),
           orgId: "other-org",
         },
       },
@@ -90,7 +85,7 @@ describe("controlled staging pilot GO E2E", () => {
       result.checks
         .filter((check) => check.status === "BLOCK")
         .map((check) => check.key),
-    ).toEqual(["FOUR_DISTINCT_ADMINS", "SELECTED_VERIFIERS"]);
+    ).toEqual(["SINGLE_ADMIN_CONTEXT", "SELECTED_VERIFIERS"]);
   });
 
   it("requires the exact release and organization in the execution confirmation", () => {
@@ -99,53 +94,37 @@ describe("controlled staging pilot GO E2E", () => {
     );
   });
 
-  it("accepts only the expected 202, 409, 201 sequence and persisted dual evidence", () => {
+  it("accepts a persisted single-admin GO sequence", () => {
     expect(
       evaluatePilotGoSequence({
-        first: {
-          status: 202,
-          state: "PENDING_SECOND_APPROVAL",
-          approvalCount: 1,
-        },
-        duplicate: {
-          status: 409,
-          error: "A second distinct administrator must approve this GO round.",
-        },
-        second: {
+        approval: {
           status: 201,
           state: "GO_RECORDED",
-          approvalCount: 2,
+          approvalCount: 1,
           decisionId: "decision-1",
         },
         decisionPersisted: true,
-        linkedDistinctApprovalCount: 2,
+        linkedApprovalCount: 1,
       }),
     ).toMatchObject({ ready: true });
   });
 
-  it("blocks a sequence that did not persist two distinct approvals", () => {
+  it("blocks a sequence without its linked approval", () => {
     const result = evaluatePilotGoSequence({
-      first: {
-        status: 202,
-        state: "PENDING_SECOND_APPROVAL",
-        approvalCount: 1,
-      },
-      duplicate: {
-        status: 409,
-        error: "A second distinct administrator must approve this GO round.",
-      },
-      second: {
+      approval: {
         status: 201,
         state: "GO_RECORDED",
-        approvalCount: 2,
+        approvalCount: 1,
         decisionId: "decision-1",
       },
       decisionPersisted: true,
-      linkedDistinctApprovalCount: 1,
+      linkedApprovalCount: 0,
     });
     expect(result.ready).toBe(false);
     expect(
-      result.checks.find((check) => check.key === "PERSISTED_DUAL_EVIDENCE")
+      result.checks.find(
+        (check) => check.key === "PERSISTED_SINGLE_ADMIN_EVIDENCE",
+      )
         ?.status,
     ).toBe("BLOCK");
   });

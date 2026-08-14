@@ -124,6 +124,7 @@ export default async function PilotReadinessPage() {
         initial={decisions}
         initialApprovals={goApprovals}
         role={context.role}
+        currentReleaseId={readiness.releaseId}
       />
       <p className="mt-5 text-xs text-muted-foreground">
         Este tablero confirma únicamente condiciones y evidencia almacenada

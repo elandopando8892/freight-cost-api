@@ -33,17 +33,9 @@ Authorization, datos de clientes ni respuestas completas.
 
 ## 3. Preflight multiusuario de solo lectura
 
-Se necesitan cuatro cuentas ADMIN existentes en el mismo tenant:
-
-- autor del smoke;
-- autor del recorrido humano;
-- aprobador GO 1;
-- aprobador GO 2.
-
-El administrador puede registrar esos cuatro emails desde Settings mediante el
-flujo documentado en `organization-invitations.md`. Cada persona debe completar
-su primer login Kinde antes del preflight; una invitación `PENDING` no cuenta
-como identidad aprovisionada.
+Se necesita la cuenta ADMIN existente del tenant. En el despliegue actual esa
+identidad crea ambas evidencias y confirma el SHA al registrar GO. Si el roster
+incorpora más administradores, el backend activa la doble aprobación.
 
 Los endpoints `/pilot/staging-context` y `/pilot/staging-readiness` verifican
 tokens Kinde mediante lookup de usuarios existentes. No autoaprovisionan usuario,
@@ -56,10 +48,7 @@ Usar tokens efímeros únicamente en las variables del proceso. No agregarlos a
 $env:STAGING_API_URL = "https://api.staging.example"
 $env:STAGING_EXPECTED_RELEASE_SHA = "abcdef1"
 $env:STAGING_EXPECTED_ORG_ID = "org-autorizada"
-$env:STAGING_SMOKE_VERIFIER_TOKEN = "<token efímero>"
-$env:STAGING_HUMAN_VERIFIER_TOKEN = "<token efímero>"
-$env:STAGING_APPROVER_ONE_TOKEN = "<token efímero>"
-$env:STAGING_APPROVER_TWO_TOKEN = "<token efímero>"
+$env:STAGING_ADMIN_TOKEN = "<token efímero>"
 npm run e2e:staging:pilot
 ```
 
@@ -67,14 +56,14 @@ El modo predeterminado sólo hace GET. Bloquea si:
 
 - health, ready o headers no corresponden al release esperado;
 - PostgreSQL no está listo;
-- las cuatro identidades no son ADMIN distintas del tenant esperado;
-- los PASS vigentes no pertenecen a los verificadores declarados;
+- la identidad no es ADMIN del tenant y release esperados;
+- los PASS vigentes no pertenecen al ADMIN declarado;
 - readiness contiene cualquier bloqueo.
 
 La salida JSON sólo conserva estados y `x-request-id`; nunca imprime tokens,
 correos, URLs o IDs de usuario.
 
-## 4. Ejecución explícita de la aprobación dual
+## 4. Ejecución explícita de la aprobación del ADMIN
 
 Este modo escribe evidencia de aprobación y puede crear una decisión GO en
 staging. Requiere autorización humana y confirmación exacta del release y tenant:
@@ -84,25 +73,19 @@ $env:STAGING_PILOT_EXECUTION_CONFIRM = "EXECUTE_STAGING_GO:abcdef1:org-autorizad
 npm run e2e:staging:pilot -- --execute
 ```
 
-La secuencia esperada es:
+La secuencia esperada para el tenant con un solo ADMIN es:
 
-1. Aprobador 1 → `202 PENDING_SECOND_APPROVAL`.
-2. Repetición con aprobador 1 → `409`.
-3. Aprobador 2 → `201 GO_RECORDED`.
-4. GET del ledger confirma la decisión y dos aprobadores distintos.
+1. El ADMIN confirma el `RELEASE_SHA` y recibe `201 GO_RECORDED`.
+2. GET del ledger confirma la decisión y su aprobación enlazada.
 
-No existen reintentos automáticos. Si la primera escritura no queda pendiente o
-el rechazo de identidad duplicada no coincide, el script se detiene y deja una
-razón segura en la salida. La decisión GO no despliega, publica ni llama
-integraciones externas.
+No existen reintentos automáticos. Si la escritura no cierra GO exactamente
+sobre el release esperado, el script se detiene y deja una razón segura en la
+salida. La decisión GO no despliega, publica ni llama integraciones externas.
 
 Al terminar, eliminar las variables efímeras de la sesión:
 
 ```powershell
-Remove-Item Env:\STAGING_SMOKE_VERIFIER_TOKEN
-Remove-Item Env:\STAGING_HUMAN_VERIFIER_TOKEN
-Remove-Item Env:\STAGING_APPROVER_ONE_TOKEN
-Remove-Item Env:\STAGING_APPROVER_TWO_TOKEN
+Remove-Item Env:\STAGING_ADMIN_TOKEN
 Remove-Item Env:\STAGING_PILOT_EXECUTION_CONFIRM
 ```
 

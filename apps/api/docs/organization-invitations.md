@@ -22,17 +22,11 @@ vinculada a otro `kindeId` nunca se reasigna.
 
 ## Operación del piloto
 
-Para el E2E de GO se registran cuatro emails ADMIN distintos:
-
-- autor del smoke;
-- autor del recorrido humano;
-- aprobador GO 1;
-- aprobador GO 2.
-
-Cada persona debe completar su propio login Kinde. El roster muestra
-`Kinde linked` únicamente después de ese enlace. Antes de ejecutar el arnés del
-Sprint 71 deben existir cuatro miembros ADMIN vinculados y distintos dentro del
-mismo `orgId`.
+El tenant operativo actual utiliza un único ADMIN. Esa identidad registra el
+smoke, el recorrido humano y la aprobación GO, siempre sobre el mismo
+`RELEASE_SHA`. La API exige evidencia vigente y confirmación explícita del SHA.
+Si el tenant incorpora un segundo ADMIN, la política cambia automáticamente a
+doble aprobación y separa verificadores de aprobadores.
 
 La revocación sólo cambia invitaciones `PENDING` del tenant del administrador.
 No elimina usuarios ni cuentas Kinde. El envío de correo se incorporará después

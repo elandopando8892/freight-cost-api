@@ -146,13 +146,14 @@ configuración inválida bloquea la entrega antes de que salga una solicitud.
 ## 6. GO / NO-GO
 
 > Regla vigente desde Sprint 70: `NO_GO` es inmediato y cierra rondas
-> pendientes. `GO` requiere dos administradores distintos sobre la misma huella
-> de readiness; ninguno puede ser autor de las verificaciones seleccionadas. La
-> primera aprobación queda pendiente y la segunda crea la decisión. Si cambia
-> la evidencia, la ronda anterior no cuenta. Este control no despliega ni llama
+> pendientes. En un tenant con un único ADMIN, `GO` requiere evidencia vigente
+> y confirmación exacta del `RELEASE_SHA`. Con varios ADMIN, requiere dos
+> aprobaciones distintas y separadas de los verificadores. Si cambia la
+> evidencia, la ronda anterior no cuenta. Este control no despliega ni llama
 > servicios externos.
 
-Un administrador registra `NO_GO`; dos administradores independientes registran `GO`.
+Un administrador registra `NO_GO`; el roster del tenant determina si GO exige
+una o dos aprobaciones.
 El sistema impide un `GO` si hay bloqueos, incluido smoke y recorrido humano
 PASS para el mismo `RELEASE_SHA`, pero el registro no publica, despliega ni
 llama servicios externos. Si hay fallo funcional, registra

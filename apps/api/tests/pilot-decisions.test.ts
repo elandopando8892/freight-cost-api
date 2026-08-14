@@ -4,6 +4,7 @@ import {
   pilotDecisionEvidence,
   pilotGateFingerprint,
   pilotGoApprovalBlocker,
+  pilotRequiredApprovals,
 } from "../src/modules/pilot/pilot-decisions.js";
 
 const blockedEvidence = {
@@ -44,6 +45,12 @@ const blockedEvidence = {
 };
 
 describe("pilot decision ledger policy", () => {
+  it("uses one approval for a single-admin tenant and two otherwise", () => {
+    expect(pilotRequiredApprovals(1)).toBe(1);
+    expect(pilotRequiredApprovals(2)).toBe(2);
+    expect(pilotRequiredApprovals(5)).toBe(2);
+  });
+
   it("does not let a GO record hide readiness blockers", () => {
     expect(pilotDecisionBlocker("GO", blockedEvidence)).toMatch(/no blockers/i);
   });
@@ -116,6 +123,11 @@ describe("pilot decision ledger policy", () => {
     expect(pilotGoApprovalBlocker("verifier-1", readyEvidence)).toMatch(
       /verifier/i,
     );
+    expect(
+      pilotGoApprovalBlocker("verifier-1", readyEvidence, {
+        allowSelectedVerifier: true,
+      }),
+    ).toBeNull();
     expect(pilotGoApprovalBlocker("admin-1", readyEvidence)).toBeNull();
   });
 

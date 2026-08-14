@@ -3,6 +3,10 @@ import type { PilotEvidence } from "./pilot-evidence.js";
 
 export type PilotDecisionOutcome = "GO" | "NO_GO";
 
+export function pilotRequiredApprovals(adminCount: number): 1 | 2 {
+  return adminCount <= 1 ? 1 : 2;
+}
+
 export function pilotDecisionBlocker(
   outcome: PilotDecisionOutcome,
   evidence: PilotEvidence,
@@ -16,6 +20,7 @@ export function pilotDecisionBlocker(
 export function pilotGoApprovalBlocker(
   actorId: string,
   evidence: PilotEvidence,
+  options: { allowSelectedVerifier?: boolean } = {},
 ) {
   const readinessBlocker = pilotDecisionBlocker("GO", evidence);
   if (readinessBlocker) return readinessBlocker;
@@ -32,7 +37,10 @@ export function pilotGoApprovalBlocker(
   ) {
     return "A GO approval requires the two current PASS verification records.";
   }
-  if (selected.some((verification) => verification.verifiedById === actorId)) {
+  if (
+    !options.allowSelectedVerifier &&
+    selected.some((verification) => verification.verifiedById === actorId)
+  ) {
     return "The verifier of selected staging evidence cannot approve the same GO.";
   }
   return null;

@@ -135,6 +135,7 @@ vi.mock("../src/config/prisma.js", () => {
 
   const prisma = {
     user: {
+      count: vi.fn().mockResolvedValue(1),
       findUnique: vi.fn().mockResolvedValue(null),
       findFirst: vi.fn().mockResolvedValue(null),
       create: vi.fn().mockResolvedValue({
@@ -758,7 +759,7 @@ describe("Pilot decision ledger", () => {
     expect(res.json().error).toMatch(/no blockers/i);
   });
 
-  it("requires two distinct non-verifier admins before recording GO", async () => {
+  it("keeps dual approval when the tenant has multiple admins", async () => {
     const verificationExecutedAt = new Date(Date.now() - 60 * 60 * 1000);
     const verificationCreatedAt = new Date(
       verificationExecutedAt.getTime() + 60 * 1000,
@@ -777,6 +778,7 @@ describe("Pilot decision ledger", () => {
     const findApproval = vi.mocked(prisma.pilotGoApproval.findFirst);
     const listApprovals = vi.mocked(prisma.pilotGoApproval.findMany);
 
+    vi.mocked(prisma.user.count).mockResolvedValue(2);
     vi.mocked(prisma.carrierProfile.findUnique).mockResolvedValue({
       legalName: "Test Carrier",
       primaryContactName: "QA Owner",
@@ -855,7 +857,11 @@ describe("Pilot decision ledger", () => {
         method: "POST",
         url: "/pilot/decisions",
         headers: { authorization: `Bearer ${token}` },
-        payload: { outcome: "GO", rationale: "First independent approval." },
+        payload: {
+          outcome: "GO",
+          rationale: "First independent approval.",
+          confirmReleaseId: "abc1234",
+        },
       });
       expect(first.statusCode).toBe(202);
       expect(first.json()).toMatchObject({
@@ -869,7 +875,11 @@ describe("Pilot decision ledger", () => {
         method: "POST",
         url: "/pilot/decisions",
         headers: { authorization: `Bearer ${token}` },
-        payload: { outcome: "GO", rationale: "Duplicate approval attempt." },
+        payload: {
+          outcome: "GO",
+          rationale: "Duplicate approval attempt.",
+          confirmReleaseId: "abc1234",
+        },
       });
       expect(duplicate.statusCode).toBe(409);
       expect(duplicate.json().error).toMatch(/second distinct administrator/i);
@@ -895,7 +905,11 @@ describe("Pilot decision ledger", () => {
         method: "POST",
         url: "/pilot/decisions",
         headers: { authorization: `Bearer ${token}` },
-        payload: { outcome: "GO", rationale: "Second independent approval." },
+        payload: {
+          outcome: "GO",
+          rationale: "Second independent approval.",
+          confirmReleaseId: "abc1234",
+        },
       });
       expect(second.statusCode).toBe(201);
       expect(second.json()).toMatchObject({
@@ -915,6 +929,7 @@ describe("Pilot decision ledger", () => {
       expect(approvalStore).toHaveLength(2);
       expect(new Set(approvalStore.map((item) => item.approvedById)).size).toBe(2);
     } finally {
+      vi.mocked(prisma.user.count).mockResolvedValue(1);
       vi.mocked(prisma.carrierProfile.findUnique).mockResolvedValue(null);
       vi.mocked(prisma.costBase.count).mockResolvedValue(0);
       vi.mocked(prisma.productionRoute.count).mockResolvedValue(0);

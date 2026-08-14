@@ -13,6 +13,7 @@ import {
   pilotDecisionEvidence,
   pilotGateFingerprint,
   pilotGoApprovalBlocker,
+  pilotRequiredApprovals,
 } from "./pilot-decisions.js";
 import {
   evaluatePilotVerificationGate,
@@ -34,6 +35,11 @@ const CreatePilotDecision = z
   .object({
     outcome: z.enum(["GO", "NO_GO"]),
     rationale: z.string().trim().min(3).max(2000),
+    confirmReleaseId: z
+      .string()
+      .trim()
+      .regex(/^[a-f0-9]{7,64}$/i)
+      .optional(),
   })
   .strict();
 const CreatePilotVerification = z
@@ -333,11 +339,18 @@ export async function pilotRoutes(app: FastifyInstance) {
               decision,
               approval: null,
               approvalCount: 0,
+              requiredApprovals: 0,
               state: "NO_GO_RECORDED" as const,
             };
           }
 
-          const blocker = pilotGoApprovalBlocker(user.sub, readiness);
+          const adminCount = await tx.user.count({
+            where: { orgId: user.orgId, role: "ADMIN" },
+          });
+          const requiredApprovals = pilotRequiredApprovals(adminCount);
+          const blocker = pilotGoApprovalBlocker(user.sub, readiness, {
+            allowSelectedVerifier: requiredApprovals === 1,
+          });
           if (blocker) {
             return {
               error: blocker,
@@ -345,6 +358,21 @@ export async function pilotRoutes(app: FastifyInstance) {
               decision: null,
               approval: null,
               approvalCount: 0,
+              requiredApprovals,
+              state: "BLOCKED" as const,
+            };
+          }
+          if (
+            input.confirmReleaseId?.toLowerCase() !==
+            readiness.releaseId.toLowerCase()
+          ) {
+            return {
+              error: "GO confirmation must match the current release SHA.",
+              statusCode: 409,
+              decision: null,
+              approval: null,
+              approvalCount: 0,
+              requiredApprovals,
               state: "BLOCKED" as const,
             };
           }
@@ -364,7 +392,8 @@ export async function pilotRoutes(app: FastifyInstance) {
               statusCode: 409,
               decision: null,
               approval: null,
-              approvalCount: 2,
+              approvalCount: requiredApprovals,
+              requiredApprovals,
               state: "ALREADY_DECIDED" as const,
             };
           }
@@ -386,6 +415,7 @@ export async function pilotRoutes(app: FastifyInstance) {
               decision: null,
               approval: null,
               approvalCount: 1,
+              requiredApprovals,
               state: "PENDING_SECOND_APPROVAL" as const,
             };
           }
@@ -408,22 +438,26 @@ export async function pilotRoutes(app: FastifyInstance) {
             include: pilotGoApprovalInclude,
             orderBy: [{ createdAt: "asc" }, { id: "asc" }],
           });
-          if (approvals.length < 2) {
+          if (approvals.length < requiredApprovals) {
             return {
               error: null,
               statusCode: 202,
               decision: null,
               approval,
               approvalCount: approvals.length,
+              requiredApprovals,
               state: "PENDING_SECOND_APPROVAL" as const,
             };
           }
 
-          const selectedApprovals = approvals.slice(0, 2);
+          const selectedApprovals = approvals.slice(0, requiredApprovals);
           const evidence = {
             ...pilotDecisionEvidence(readiness),
             gateFingerprint,
-            goApprovalPolicy: "TWO_DISTINCT_ADMINS_NOT_SELECTED_VERIFIERS",
+            goApprovalPolicy:
+              requiredApprovals === 1
+                ? "SINGLE_ADMIN_EXACT_RELEASE_CONFIRMATION"
+                : "TWO_DISTINCT_ADMINS_NOT_SELECTED_VERIFIERS",
             goApprovals: selectedApprovals.map((item) => ({
               id: item.id,
               roundId: item.roundId,
@@ -465,7 +499,8 @@ export async function pilotRoutes(app: FastifyInstance) {
                 createdAt: decision.createdAt,
               },
             },
-            approvalCount: 2,
+            approvalCount: requiredApprovals,
+            requiredApprovals,
             state: "GO_RECORDED" as const,
           };
         },
@@ -478,11 +513,13 @@ export async function pilotRoutes(app: FastifyInstance) {
         decision: result.decision,
         approval: result.approval,
         approvalCount: result.approvalCount,
-        requiredApprovals: 2,
+        requiredApprovals: result.requiredApprovals,
         state: result.state,
         policy:
           input.outcome === "GO"
-            ? "DUAL_ADMIN_GO_APPROVAL_NO_EXECUTION"
+            ? result.requiredApprovals === 1
+              ? "SINGLE_ADMIN_EXACT_RELEASE_GO_NO_EXECUTION"
+              : "DUAL_ADMIN_GO_APPROVAL_NO_EXECUTION"
             : "DECISION_RECORD_ONLY_NO_EXECUTION",
       });
     },
