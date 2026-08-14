@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  isProductionBaselineConfirmed,
   isProductionMigrationConfirmed,
+  productionBaselineConfirmation,
   productionMigrationConfirmation,
 } from "../src/config/production-migration-confirmation.js";
 
@@ -30,6 +32,24 @@ describe("production migration confirmation", () => {
     expect(
       isProductionMigrationConfirmed({
         confirmation: "APPLY_PRODUCTION_MIGRATIONS:abc123",
+      }),
+    ).toBe(false);
+  });
+
+  it("binds legacy baseline adoption to the exact release SHA", () => {
+    expect(productionBaselineConfirmation("abc123")).toBe(
+      "ADOPT_PRODUCTION_BASELINE:abc123",
+    );
+    expect(
+      isProductionBaselineConfirmed({
+        confirmation: "ADOPT_PRODUCTION_BASELINE:abc123",
+        releaseSha: "abc123",
+      }),
+    ).toBe(true);
+    expect(
+      isProductionBaselineConfirmed({
+        confirmation: "ADOPT_PRODUCTION_BASELINE:other",
+        releaseSha: "abc123",
       }),
     ).toBe(false);
   });

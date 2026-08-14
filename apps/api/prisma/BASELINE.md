@@ -16,6 +16,19 @@ npx prisma migrate resolve --applied 20260811000000_baseline
 That production adoption step is deliberately manual and is not performed by
 the Sprint 0 code changes.
 
+Production Vercel builds now automate that same guarded adoption with
+`prisma/baseline.prisma`, an exact copy of the schema at the last legacy
+Production release. Adoption runs only when the live diff is empty and both
+release-bound confirmations are present:
+
+```text
+FCM_PRODUCTION_BASELINE_CONFIRMATION=ADOPT_PRODUCTION_BASELINE:<release-sha>
+FCM_PRODUCTION_MIGRATION_CONFIRMATION=APPLY_PRODUCTION_MIGRATIONS:<release-sha>
+```
+
+If either confirmation is absent, the baseline differs, or migration status is
+ambiguous, the build fails before publishing.
+
 ## Sprint 1 parameter catalog
 
 After the baseline is recorded on an existing database, apply normal migrations

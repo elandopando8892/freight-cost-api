@@ -1,0 +1,409 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  OPERATOR
+  VIEWER
+}
+
+enum Section {
+  GENERAL_BASE
+  FUEL
+  LABOR
+  FINANCE
+  UTILIZATION
+  BORDER
+  RISK
+  CONFIG
+  TECHNICAL_MARGIN
+  FACTORS
+  // Editable cost cards (carrier economics) — derived into CVU/CFU by engine.outputs.ts
+  COST_MAINT
+  COST_TIRES
+  COST_INSURANCE
+  COST_PAYROLL
+  COST_COMPANY
+  COST_CAPITAL
+  COST_CROSSBORDER
+}
+
+enum QuoteStatus {
+  DRAFT
+  CONFIRMED
+  ARCHIVED
+}
+
+enum MarketDataType {
+  DIESEL_MX
+  DIESEL_US
+  FX_RATE
+  FSC
+}
+
+// ─────────────────────────────────────────────
+// MULTI-TENANCY & AUTH
+// ─────────────────────────────────────────────
+
+model Organization {
+  id         String   @id @default(cuid())
+  name       String
+  country    String   @default("MX")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  users            User[]
+  assumptionSets   AssumptionSet[]
+  lanes            Lane[]
+  quotes           Quote[]
+  marketData       MarketData[]
+  carrierMexLanes  CarrierMexLane[]
+  carrierUsaLanes  CarrierUsaLane[]
+}
+
+model User {
+  id           String   @id @default(cuid())
+  orgId        String
+  kindeId      String?  @unique               // Kinde subject (sub); null for legacy/local users
+  email        String   @unique
+  passwordHash String?                         // null for Kinde-managed identities
+  role         Role     @default(OPERATOR)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────────
+// ASSUMPTIONS
+// ─────────────────────────────────────────────
+
+model AssumptionSet {
+  id        String   @id @default(cuid())
+  orgId     String
+  name      String
+  version   Int      @default(1)
+  isActive  Boolean  @default(false)
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  org    Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  params AssumptionParam[]
+  quotes Quote[]
+
+  @@unique([orgId, name, version])
+}
+
+model AssumptionParam {
+  id              String   @id @default(cuid())
+  setId           String
+  section         Section
+  field           String
+  value           Float
+  unit            String
+  low             Float?
+  high            Float?
+  updateFrequency String?
+  costBehavior    String?
+  activation      String?
+  purpose         String?
+  notes           String?
+  updatedAt       DateTime @updatedAt
+
+  set AssumptionSet @relation(fields: [setId], references: [id], onDelete: Cascade)
+
+  @@unique([setId, section, field])
+}
+
+// ─────────────────────────────────────────────
+// CATALOG (global, shared across all orgs)
+// ─────────────────────────────────────────────
+
+model EquipmentConfig {
+  id                   String  @id @default(cuid())
+  truckType            String
+  trailerType          String
+  config               String  // "Single" | "Tandem"
+  operationType        String
+  serviceType          String
+  driverType           String
+  dispatchService      String?
+  fuelEfficiencyFactor Float   @default(1.0)
+  fixedCostFactor      Float   @default(1.0)
+  maintTiresFactor     Float   @default(1.0)
+  driverFactor         Float   @default(1.0)
+
+  lanes Lane[]
+
+  @@unique([truckType, trailerType, config, operationType, serviceType, driverType])
+}
+
+model CityMX {
+  id           String @id @default(cuid())
+  production   String @unique
+  homologation String
+  stateCode    String
+}
+
+model ZipMarket {
+  id        String @id @default(cuid())
+  zipCode   String @unique
+  metroZip  String
+  metroCity String
+  market    String
+}
+
+// ─────────────────────────────────────────────
+// REFERENCE TABLES (global lookups for the engine)
+// ─────────────────────────────────────────────
+
+// mexLaneExpenses — MEX leg facts, keyed "Origin - Border TruckType"
+model MexLaneExpense {
+  id             String @id @default(cuid())
+  laneKey        String @unique // "Monterrey, Nuevo Leon - Nuevo Laredo, Tamaulipas Truck Trailer"
+  laneKeyNorm    String @unique // uppercased for case-insensitive lookup
+  km             Float
+  tolls          Float  @default(0)
+  driverExpenses Float  @default(0) // CAGR = driverExpenses / 20
+  pension        Float  @default(0)
+  sumaViaje      Float  @default(0)
+  diasViaje      Float  @default(0)
+  horasRuta      Float  @default(0) // transit hours
+
+  @@index([laneKeyNorm])
+}
+
+// Carrier's OWN production matrix (org-scoped). The resolver checks these FIRST,
+// then falls back to the global reference tables. Truck-agnostic: the carrier
+// captures a route once (origin→dest), and it applies to every equipment.
+model CarrierMexLane {
+  id          String @id @default(cuid())
+  orgId       String
+  origin      String
+  destination String
+  laneKeyNorm String // uppercased "origin - destination"
+  km          Float
+  tolls       Float  @default(0)
+  horasRuta   Float  @default(0) // transit hours
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, laneKeyNorm])
+  @@index([orgId])
+}
+
+model CarrierUsaLane {
+  id            String @id @default(cuid())
+  orgId         String
+  origin        String
+  destination   String
+  laneKeyNorm   String // uppercased "origin - destination"
+  outState      String
+  miles         Float
+  truckDays     Float  @default(0)
+  routeExpenses Float  @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, laneKeyNorm])
+  @@index([orgId])
+}
+
+// usaLaneData — USA leg facts, keyed "ORIGIN - DEST TRUCK TRAILER" (uppercase)
+model UsaLaneData {
+  id            String @id @default(cuid())
+  laneKey       String @unique
+  outState      String
+  miles         Float
+  truckDays     Float  @default(0)
+  routeExpenses Float  @default(0)
+
+  @@index([laneKey])
+}
+
+// usaLaneMktPrice — DAT benchmark RPM, keyed full business route (dedup by lane)
+model UsaLaneMktPrice {
+  id          String @id @default(cuid())
+  laneKey     String @unique // "ORIGIN - DEST Truck Trailer Dry Van Single D2D Export One Way B1"
+  laneKeyNorm String @unique
+  rpm         Float
+
+  @@index([laneKeyNorm])
+}
+
+// usaDATbenchmark — raw DAT spot market, keyed "ORIGIN - DEST TRUCK TRAILER EQUIPMENT"
+model UsaDatBenchmark {
+  id          String  @id @default(cuid())
+  laneKey     String  @unique
+  laneKeyNorm String  @unique
+  miles       Float   @default(0)
+  avgRpm      Float   @default(0)
+  lowRpm      Float   @default(0)
+  highRpm     Float   @default(0)
+  rpm         Float   @default(0) // avg of avg/low/high (DAT AE)
+  fsc         Float   @default(0)
+  allInUsd    Float   @default(0)
+  companies   Int     @default(0)
+  reports     Int     @default(0)
+  stdDev      Float   @default(0)
+  equipment   String?
+  origin      String?
+  dest        String?
+
+  @@index([laneKeyNorm])
+}
+
+// usaMktCondition — market condition by trailer type, per market
+model UsaMktCondition {
+  id          String  @id @default(cuid())
+  market      String  @unique // "Laredo Mkt (TX)"
+  dryVanCond  String
+  flatbedCond String
+  reeferCond  String
+  region      String?
+}
+
+// d2d_usaFuel — fuel surcharge by US state (DERIVED: region diesel → FSC index)
+model UsaFuel {
+  id             String  @id @default(cuid())
+  state          String  @unique // "TX"
+  region         String?
+  pricePerGallon Float   @default(0)
+  fsc            Float   @default(0) // USD/mile fuel surcharge
+}
+
+// usaFuelcurrent — current diesel $/gal by EIA region (the updatable live input)
+model RegionDiesel {
+  id           String   @id @default(cuid())
+  region       String   @unique // "Gulf Coast"
+  dieselUsdGal Float    @default(0)
+  updatedAt    DateTime @updatedAt
+}
+
+// usaFSCindex — fuel-surcharge schedule: diesel-price bracket → FSC per mile
+model FscIndex {
+  id                  String @id @default(cuid())
+  fromDiesel          Float  // bracket lower bound ($/gal)
+  toDiesel            Float  // bracket upper bound ($/gal)
+  ltlPct              Float  @default(0)
+  truckloadFscPerMile Float  @default(0)
+
+  @@index([fromDiesel])
+}
+
+// usaFuelpast — monthly diesel history from EIA API v2 (EPD2D), for FSC trend
+model DieselHistory {
+  id           String @id @default(cuid())
+  period       String // "2026-04"
+  duoarea      String // EIA area code (e.g. "NUS", "R10")
+  areaName     String
+  value        Float  // diesel $/gal
+  units        String @default("$/GAL")
+
+  @@unique([duoarea, period])
+  @@index([period])
+}
+
+// ─────────────────────────────────────────────
+// MARKET DATA (manual, per org)
+// ─────────────────────────────────────────────
+
+model MarketData {
+  id      String         @id @default(cuid())
+  orgId   String
+  type    MarketDataType
+  region  String?
+  state   String?
+  value   Float
+  unit    String
+  date    DateTime
+  source  String?
+  createdAt DateTime     @default(now())
+
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId, type, date])
+}
+
+// ─────────────────────────────────────────────
+// LANES
+// ─────────────────────────────────────────────
+
+model Lane {
+  id            String   @id @default(cuid())
+  orgId         String
+  laneKey       String
+  origin        String
+  destination   String
+  equipmentId   String?
+  operationType String
+  serviceType   String
+  config        String   @default("Single")
+  isD2D         Boolean  @default(false)
+  isDrayage     Boolean  @default(false)
+  isRoundtrip   Boolean  @default(false)
+  isBackhaul    Boolean  @default(false)
+  baseKm        Float?
+  returnKm      Float?
+  loadedMiles   Float?
+  transitDays   Float?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  org       Organization    @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  equipment EquipmentConfig? @relation(fields: [equipmentId], references: [id])
+  quotes    Quote[]
+
+  @@unique([orgId, laneKey])
+}
+
+// ─────────────────────────────────────────────
+// QUOTES (saved calculations)
+// ─────────────────────────────────────────────
+
+model Quote {
+  id              String      @id @default(cuid())
+  orgId           String
+  laneId          String?
+  assumptionSetId String?
+  label           String?
+  version         Int         @default(1)
+  status          QuoteStatus @default(DRAFT)
+  createdAt       DateTime    @default(now())
+
+  // ── Routing context ──────────────────────────────────────────────────
+  operation String
+  service   String
+
+  // ── Freight Cost Model V3.0 result ───────────────────────────────────
+  freightBaselineUsd Float   // Σ leg flats (MROUND 100)
+  requiredTariffUsd  Float
+  requiredTariffMxn  Float
+  fxRateUsed         Float
+
+  // ── Full per-leg breakdowns ──────────────────────────────────────────
+  mexLeg Json?
+  usaLeg Json?
+
+  // ── Commercial / decision layer (cost floor → sell tiers → margin → flags) ──
+  commercial Json?
+
+  org  Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  lane Lane?          @relation(fields: [laneId], references: [id])
+  set  AssumptionSet? @relation(fields: [assumptionSetId], references: [id])
+}

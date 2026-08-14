@@ -1,11 +1,15 @@
 import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 import {
+  isProductionBaselineConfirmed,
   isProductionMigrationConfirmed,
+  productionBaselineConfirmation,
   productionMigrationConfirmation,
 } from "../src/config/production-migration-confirmation.js";
 
 const schema = "prisma/schema.prisma";
+const baselineSchema = "prisma/baseline.prisma";
+const baselineMigration = "20260811000000_baseline";
 
 function prisma(args: string[]) {
   const executable =
@@ -63,6 +67,46 @@ if (
 ) {
   throw new Error(
     `Pending Production migrations require FCM_PRODUCTION_MIGRATION_CONFIRMATION=${productionMigrationConfirmation(releaseSha)}.`,
+  );
+}
+
+if (status.output.includes(baselineMigration)) {
+  if (
+    !isProductionBaselineConfirmed({
+      confirmation: process.env.FCM_PRODUCTION_BASELINE_CONFIRMATION,
+      releaseSha,
+    })
+  ) {
+    throw new Error(
+      `Legacy Production schema adoption requires FCM_PRODUCTION_BASELINE_CONFIRMATION=${productionBaselineConfirmation(releaseSha)}.`,
+    );
+  }
+
+  const baselineDiff = prisma([
+    "migrate",
+    "diff",
+    "--from-schema-datasource",
+    baselineSchema,
+    "--to-schema-datamodel",
+    baselineSchema,
+    "--exit-code",
+  ]);
+  if (baselineDiff.status !== 0) {
+    throw new Error(
+      "Production schema does not exactly match the approved legacy baseline; refusing adoption.",
+    );
+  }
+
+  requireSuccess(
+    "Production baseline adoption",
+    prisma([
+      "migrate",
+      "resolve",
+      "--applied",
+      baselineMigration,
+      "--schema",
+      schema,
+    ]),
   );
 }
 
