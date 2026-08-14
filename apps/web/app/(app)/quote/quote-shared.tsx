@@ -65,6 +65,7 @@ export interface FormSnapshot {
   origin: string
   destination: string
   costBaseLabel: string
+  assumptionVersionLabel: string
   costBaseReadiness: CostBaseReadiness
   costBaseReadinessDetail: string
   equipment: { truckType: string; trailer: string; config: string; driver: string }
@@ -168,16 +169,16 @@ export function costBaseReadiness(base: CostBaseOption | undefined): CostBaseRea
 
 export function costBaseReadinessDetail(base: CostBaseOption | undefined, operation: string) {
   const scope = scopeForOperation(operation)
-  if (!base) return `No governed ${scope ? SCOPE_LABEL[scope] : 'operation'} base is selected. The calculation remains a proposal and any saved quote requires review.`
+  if (!base) return `No hay una base gobernada seleccionada para ${scope ? SCOPE_LABEL[scope] : 'esta operación'}. El cálculo seguirá siendo una propuesta y cualquier cotización guardada requerirá revisión.`
   const version = activeVersionFor(base)
-  if (costBaseReadiness(base) === 'GOVERNED') return `${base.code} v${version?.version} is active, published, and complete with 210 parameters.`
+  if (costBaseReadiness(base) === 'GOVERNED') return `${base.code} v${version?.version} está activa, publicada y completa con 210 parámetros.`
   const reasons = [
-    base.status !== 'ACTIVE' ? `base is ${base.status.toLowerCase()}` : null,
-    !version ? 'no active version' : null,
-    version && version.status !== 'PUBLISHED' ? `v${version.version} is ${version.status.toLowerCase()}` : null,
-    version && version._count.params !== 210 ? `${version._count.params}/210 parameters` : null,
+    base.status !== 'ACTIVE' ? `la base está ${base.status === 'DRAFT' ? 'en borrador' : 'archivada'}` : null,
+    !version ? 'sin versión activa' : null,
+    version && version.status !== 'PUBLISHED' ? `v${version.version} está ${version.status === 'DRAFT' ? 'en borrador' : 'archivada'}` : null,
+    version && version._count.params !== 210 ? `${version._count.params}/210 parámetros` : null,
   ].filter(Boolean)
-  return `${base.code} is still in preparation (${reasons.join(', ')}). The calculation may proceed as a proposal, but any saved quote requires review.`
+  return `${base.code} todavía está en preparación (${reasons.join(', ')}). El cálculo puede continuar como propuesta, pero cualquier cotización guardada requerirá revisión.`
 }
 
 export function preferredGovernedBase(bases: CostBaseOption[], operation: string) {
@@ -252,7 +253,7 @@ export function CostBaseSelector({ bases, operation, value, onChange }: {
     <div className="grid gap-1.5">
       <Field label="Base de costo" hint="Sólo una base activa con una versión publicada de 210 parámetros tiene gobierno de producción.">
         <select className={selectCls} value={value} onChange={(event) => onChange(event.target.value)}>
-          <option value="">Supuestos heredados · requieren revisión</option>
+          <option value="">Supuestos activos sin base · requieren revisión</option>
           {options.map((base) => {
             const active = activeVersionFor(base)
             const readiness = costBaseReadiness(base)
@@ -270,16 +271,63 @@ export function CostBaseLineageNotice({ base, operation }: { base: CostBaseOptio
   const governed = readiness === 'GOVERNED'
   return (
     <div className={`rounded-md border px-3 py-2 text-xs ${governed ? 'border-emerald-500/30 bg-emerald-500/5 text-emerald-800 dark:text-emerald-300' : 'border-amber-500/30 bg-amber-500/5 text-amber-800 dark:text-amber-300'}`} role="status">
-      <div className="font-medium">{governed ? 'Governed lineage' : 'Review required'}</div>
+      <div className="font-medium">{governed ? 'Linaje gobernado' : 'Revisión requerida'}</div>
       <div className="mt-0.5 opacity-90">{costBaseReadinessDetail(base, operation)}</div>
-      {!governed && <Link href="/cost-bases" className="mt-1 inline-block font-medium underline underline-offset-2">Review cost base coverage →</Link>}
+      {!governed && <Link href="/cost-bases" className="mt-1 inline-block font-medium underline underline-offset-2">Revisar cobertura de bases →</Link>}
+    </div>
+  )
+}
+
+export function CalculationContextPanel({
+  base,
+  operation,
+  route,
+  equipment,
+  className = '',
+}: {
+  base: CostBaseOption | undefined
+  operation: string
+  route: string
+  equipment: string
+  className?: string
+}) {
+  const version = activeVersionFor(base)
+  const governed = costBaseReadiness(base) === 'GOVERNED'
+  const versionStatus = version?.status === 'PUBLISHED' ? 'publicada' : version?.status === 'DRAFT' ? 'borrador' : 'archivada'
+  return (
+    <aside className={`grid gap-3 rounded-md border bg-card p-3 ${className}`} aria-label="Contexto del cálculo">
+      <div className="flex items-center justify-between gap-2 border-b pb-2">
+        <h2 className="text-sm font-semibold">Contexto del cálculo</h2>
+        <span className={`rounded-full px-2 py-1 text-[10px] font-medium ${governed ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 'bg-amber-500/10 text-amber-700 dark:text-amber-400'}`}>
+          {governed ? 'Gobernada' : 'Revisar'}
+        </span>
+      </div>
+      <dl className="grid gap-2 text-xs">
+        <ContextRow label="Base" value={base ? `${base.code} · ${base.name}` : 'Sin base seleccionada'} />
+        <ContextRow label="Versión" value={version ? `v${version.version} · ${versionStatus}` : 'Sin versión activa'} />
+        <ContextRow label="Operación" value={operation} />
+        <ContextRow label="Ruta" value={route} />
+        <ContextRow label="Equipo" value={equipment} />
+      </dl>
+      <div className="border-t pt-2 text-[11px] leading-relaxed text-muted-foreground">
+        El motor propone con esta base y versión. Guardar conserva el linaje; no publica una tarifa.
+      </div>
+    </aside>
+  )
+}
+
+function ContextRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <dt className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</dt>
+      <dd className="mt-0.5 break-words font-medium">{value}</dd>
     </div>
   )
 }
 
 export function ResultSkeleton() {
   return (
-    <div className="grid gap-4" aria-busy="true" aria-label="Pricing…">
+    <div className="grid gap-3" aria-busy="true" aria-label="Calculando tarifa">
       <Card>
         <CardHeader className="pb-2">
           <div className="h-3 w-28 animate-pulse rounded bg-muted" />
@@ -316,22 +364,33 @@ export function ResultSkeleton() {
   )
 }
 
+export function QuoteErrorState({ onRetry }: { onRetry: () => void }) {
+  return (
+    <Card className="border-destructive/35 bg-destructive/5">
+      <CardHeader className="px-4 py-3">
+        <CardTitle className="text-base text-destructive">No fue posible generar la tarifa</CardTitle>
+        <CardDescription>Conservamos la captura. Revisa el contexto de base y ruta, o intenta nuevamente.</CardDescription>
+      </CardHeader>
+      <CardContent className="px-4 pb-4 pt-0">
+        <Button type="button" size="sm" variant="outline" onClick={onRetry}>Intentar nuevamente</Button>
+      </CardContent>
+    </Card>
+  )
+}
+
 export function Placeholder() {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Result</CardTitle>
-        <CardDescription>
-          Submit a lane to see the freight baseline, MEX/USA leg breakdowns, and the commercial sell tiers
-          (cost floor → min/target/premium, with margin and GP / loaded mile).
-        </CardDescription>
+    <Card className="border-dashed bg-muted/10">
+      <CardHeader className="px-4 py-3">
+        <CardTitle className="text-base">Revisión técnica</CardTitle>
+        <CardDescription>Genera una tarifa para revisar el costo base, los tramos MEX/EE. UU. y los niveles comerciales.</CardDescription>
       </CardHeader>
-      <CardContent>
-        <ul className="grid gap-1.5 text-sm text-muted-foreground">
-          <li>· Origin/destination resolved via ZIP → metro and MX state homologation</li>
-          <li>· Active assumption set drives all per-leg costs (you can override FX inline)</li>
-          <li>· Service defaults: Import / Southbound → Backhaul; everything else → One Way</li>
-          <li>· Out-of-range warnings surface in the result if any param trips its band</li>
+      <CardContent className="px-4 pb-4 pt-0">
+        <ul className="grid gap-1.5 text-xs text-muted-foreground">
+          <li>· Resuelve origen y destino mediante código postal, zona metropolitana y homologación de estados.</li>
+          <li>· La versión activa de supuestos gobierna los costos de cada tramo.</li>
+          <li>· La regla de servicio se aplica automáticamente cuando no eliges una opción.</li>
+          <li>· Los valores fuera de rango aparecen como notas del motor.</li>
         </ul>
       </CardContent>
     </Card>
@@ -374,41 +433,45 @@ export function Result({ r, snapshot }: { r: QuoteResult; snapshot: FormSnapshot
     },
     onSuccess: (q) => {
       setSavedId(q.id)
-      toast.success(requiresLineageReview ? 'Quote saved for review' : 'Quote saved', { description: q.label ?? q.id.slice(0, 8) })
+      toast.success(requiresLineageReview ? 'Cotización guardada para revisión' : 'Cotización guardada', { description: q.label ?? q.id.slice(0, 8) })
     },
   })
 
   return (
-    <>
-      <Card>
-        <CardHeader className="pb-2">
-          <CardDescription>Freight Baseline</CardDescription>
-          <CardTitle className="text-4xl tracking-tight">{usd.format(r.freightBaselineUsd)}</CardTitle>
+    <div className="grid gap-3">
+      <Card className="overflow-hidden">
+        <CardHeader className="flex-row items-center justify-between gap-3 border-b px-4 py-3">
+          <div>
+            <CardDescription>Tarifa base de flete</CardDescription>
+            <CardTitle className="text-3xl tracking-tight">{usd.format(r.freightBaselineUsd)}</CardTitle>
+          </div>
+          <span className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-semibold ${decisionClass}`}>{decision}</span>
         </CardHeader>
-        <CardContent className="grid gap-4">
-          <div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
+        <CardContent className="grid gap-3 p-4">
+          <div className="grid grid-cols-2 gap-3 rounded-md border bg-muted/15 p-3 text-sm sm:grid-cols-4">
             <Stat label="MXN" value={mxn.format(r.freightBaselineUsd * r.fxRateUsed)} />
             <Stat label="FX" value={r.fxRateUsed.toFixed(2)} />
-            <Stat label="Operation" value={r.operation} />
-            <Stat label="Margin" value={pct(c.grossMarginPct)} />
+            <Stat label="Operación" value={r.operation} />
+            <Stat label="Margen" value={pct(c.grossMarginPct)} />
           </div>
-          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-            <span>Cost base: {r.costBaseId ? snapshot.costBaseLabel : 'legacy assumptions'}</span>
-            <span>Version: {r.assumptionSetId ? r.assumptionSetId.slice(0, 8) : 'none'}</span>
-            <span>Policy: {r.policy === 'WORKBOOK_V3' ? 'Workbook exact' : 'Operational V3'}</span>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 rounded-md bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
+            <span>Base: {r.costBaseId ? snapshot.costBaseLabel : 'supuestos activos sin base'}</span>
+            <span>Versión: {r.assumptionSetId ? snapshot.assumptionVersionLabel : 'sin versión congelada'}</span>
+            <span>Política: {r.policy === 'WORKBOOK_V3' ? 'Libro de cálculo exacto' : 'Operativa V3'}</span>
           </div>
-          <div className={`rounded border px-3 py-2 text-sm ${decisionClass}`}>
-            <span className="font-medium">Decision: {decision}</span>
-            {requiresLineageReview && <span className="ml-2 text-xs">{snapshot.costBaseReadinessDetail}</span>}
-            {c.notes.length > 0 && <span className="ml-2 text-xs">{c.notes.join(' · ')}</span>}
-          </div>
+          {requiresLineageReview || c.notes.length > 0 ? (
+            <div className={`rounded border px-3 py-2 text-xs ${decisionClass}`}>
+              {requiresLineageReview ? <span>{snapshot.costBaseReadinessDetail}</span> : null}
+              {c.notes.length > 0 ? <span className={requiresLineageReview ? 'ml-2' : ''}>{c.notes.join(' · ')}</span> : null}
+            </div>
+          ) : null}
           <form className="flex flex-wrap items-center gap-2 border-t pt-3" onSubmit={(e) => { e.preventDefault(); save.mutate() }}>
-            <Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Label (optional) — e.g. Acme Q3" className="h-9 flex-1 min-w-[200px]" disabled={save.isPending} />
+            <Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Etiqueta opcional · Ej. Acme Q3" aria-label="Etiqueta de la cotización" className="h-9 flex-1 min-w-[200px]" disabled={save.isPending} />
             <Button type="submit" size="sm" variant="outline" disabled={save.isPending}>
-              {save.isPending ? 'Saving…' : savedId ? 'Save again' : requiresLineageReview ? 'Save for review' : 'Save quote'}
+              {save.isPending ? 'Guardando…' : savedId ? 'Guardar otra copia' : requiresLineageReview ? 'Guardar para revisión' : 'Guardar cotización'}
             </Button>
             {savedId && (
-              <Link href="/quotes" className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2">view history →</Link>
+              <Link href="/quotes" className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2">Ver historial →</Link>
             )}
           </form>
         </CardContent>
@@ -418,9 +481,9 @@ export function Result({ r, snapshot }: { r: QuoteResult; snapshot: FormSnapshot
         <Card className="border-amber-500/40 bg-amber-50/40 dark:bg-amber-950/20">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm text-amber-800 dark:text-amber-300">
-              {r.warnings.length} resolver note{r.warnings.length === 1 ? '' : 's'}
+              {r.warnings.length} {r.warnings.length === 1 ? 'nota del motor' : 'notas del motor'}
             </CardTitle>
-            <CardDescription>Origin/destination lookups, fallbacks, or assumptions that landed outside the recommended range.</CardDescription>
+            <CardDescription>Resolución de origen/destino, valores de respaldo o supuestos fuera del rango recomendado.</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-1 text-xs text-muted-foreground">
             {r.warnings.map((w, i) => <div key={i}>· {w}</div>)}
@@ -428,64 +491,64 @@ export function Result({ r, snapshot }: { r: QuoteResult; snapshot: FormSnapshot
         </Card>
       )}
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-3 md:grid-cols-2">
         {r.mexLeg && <MexCard leg={r.mexLeg} />}
         {r.usaLeg && <UsaCard leg={r.usaLeg} />}
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Commercial</CardTitle>
-          <CardDescription>Cost floor → sell tiers (over the carrier&apos;s risk-adjusted COGS).</CardDescription>
+        <CardHeader className="border-b px-4 py-3">
+          <CardTitle className="text-base">Comercial</CardTitle>
+          <CardDescription>Piso de costo → niveles de venta sobre el costo ajustado por riesgo.</CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-4">
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <Stat label="Cost floor" value={usd.format(c.costFloorUsd)} />
-            <Stat label="Min (12%)" value={usd.format(c.minSellUsd)} />
-            <Stat label="Target (18%)" value={usd.format(c.targetSellUsd)} />
+        <CardContent className="grid gap-3 p-4">
+          <div className="grid grid-cols-2 gap-3 rounded-md border bg-muted/15 p-3 sm:grid-cols-4">
+            <Stat label="Piso de costo" value={usd.format(c.costFloorUsd)} />
+            <Stat label="Mínimo (12%)" value={usd.format(c.minSellUsd)} />
+            <Stat label="Objetivo (18%)" value={usd.format(c.targetSellUsd)} />
             <Stat label="Premium (25%)" value={usd.format(c.premiumSellUsd)} />
           </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <Stat label="Recommended sell" value={usd.format(c.recommendedSellUsd)} />
-            <Stat label="Gross profit" value={usd.format(c.grossProfitUsd)} />
-            <Stat label="GP / loaded mile" value={usd.format(c.gpPerLoadedMileUsd)} />
-            <Stat label="Market ref" value={c.marketReferenceUsd > 0 ? usd.format(c.marketReferenceUsd) : '—'} />
+          <div className="grid grid-cols-2 gap-3 rounded-md border bg-muted/15 p-3 sm:grid-cols-4">
+            <Stat label="Venta recomendada" value={usd.format(c.recommendedSellUsd)} />
+            <Stat label="Utilidad bruta" value={usd.format(c.grossProfitUsd)} />
+            <Stat label="UB / milla cargada" value={usd.format(c.gpPerLoadedMileUsd)} />
+            <Stat label="Referencia de mercado" value={c.marketReferenceUsd > 0 ? usd.format(c.marketReferenceUsd) : '—'} />
           </div>
           {(c.noGoFlag || c.reviewFlag || c.notes.length > 0) && (
             <div className="grid gap-1.5 rounded-md border bg-muted/30 p-3 text-sm">
-              {c.noGoFlag && <span className="font-medium text-destructive">NO-GO: sell below cost floor</span>}
-              {c.reviewFlag && <span className="font-medium text-amber-700 dark:text-amber-400">REVIEW</span>}
+              {c.noGoFlag && <span className="font-medium text-destructive">NO-GO: venta por debajo del piso de costo</span>}
+              {c.reviewFlag && <span className="font-medium text-amber-700 dark:text-amber-400">REVISAR</span>}
               {c.notes.map((n, i) => <span key={i} className="text-muted-foreground">· {n}</span>)}
             </div>
           )}
         </CardContent>
       </Card>
-    </>
+    </div>
   )
 }
 
 function MexCard({ leg }: { leg: MexLeg }) {
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="border-b px-4 py-3">
         <CardTitle className="flex items-baseline justify-between">
-          <span>MEX leg</span>
+          <span>Tramo MEX</span>
           <span className="text-2xl">{usd.format(leg.requiredTariffUsd)}</span>
         </CardTitle>
-        <CardDescription>{Math.round(leg.totalKm)} km · {Math.round(leg.totalMiles)} mi · {leg.cycleDays.toFixed(2)} days</CardDescription>
+        <CardDescription>{Math.round(leg.totalKm)} km · {Math.round(leg.totalMiles)} mi · {leg.cycleDays.toFixed(2)} días</CardDescription>
       </CardHeader>
-      <CardContent className="grid gap-3">
+      <CardContent className="grid gap-3 p-4">
         <div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
           <Stat label="RPM" value={leg.rpm.toFixed(2)} />
           <Stat label="FSC" value={leg.fsc.toFixed(2)} />
-          <Stat label="UT margin" value={pct(leg.utMargin)} />
+          <Stat label="Margen UT" value={pct(leg.utMargin)} />
           <Stat label="CFU" value={usd.format(leg.cfuUsd)} />
         </div>
         <div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
-          <Stat label="Fuel" value={usd.format(leg.fuelUsd)} />
-          <Stat label="Maint+Tires" value={usd.format(leg.maintTiresUsd)} />
-          <Stat label="Driver" value={usd.format(leg.driverUsd)} />
-          <Stat label="Border" value={usd.format(leg.borderUsd)} />
+          <Stat label="Combustible" value={usd.format(leg.fuelUsd)} />
+          <Stat label="Mantto. + llantas" value={usd.format(leg.maintTiresUsd)} />
+          <Stat label="Operador" value={usd.format(leg.driverUsd)} />
+          <Stat label="Frontera" value={usd.format(leg.borderUsd)} />
         </div>
         <div className="text-xs">
           <div className="text-muted-foreground">ReferenceKey</div>
@@ -499,25 +562,25 @@ function MexCard({ leg }: { leg: MexLeg }) {
 function UsaCard({ leg }: { leg: UsaLeg }) {
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="border-b px-4 py-3">
         <CardTitle className="flex items-baseline justify-between">
-          <span>USA leg</span>
+          <span>Tramo EE. UU.</span>
           <span className="text-2xl">{usd.format(leg.flatUsd)}</span>
         </CardTitle>
         <CardDescription>{Math.round(leg.loadedMiles)} mi · {Math.round(leg.totalOperationalMiles)} op mi</CardDescription>
       </CardHeader>
-      <CardContent className="grid gap-3">
+      <CardContent className="grid gap-3 p-4">
         <div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
           <Stat label="RPM" value={leg.rpm.toFixed(2)} />
           <Stat label="FSC" value={leg.fsc.toFixed(2)} />
-          <Stat label="UT rate" value={pct(leg.utRate)} />
+          <Stat label="Tarifa UT" value={pct(leg.utRate)} />
           <Stat label="CFU" value={usd.format(leg.cfuUsd)} />
         </div>
         <div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
-          <Stat label="Fuel" value={usd.format(leg.fuelCostUsd)} />
-          <Stat label="Maint+Tires" value={usd.format(leg.maintTiresUsd)} />
-          <Stat label="Driver" value={usd.format(leg.driverCostUsd)} />
-          <Stat label="DAT mkt" value={leg.marketRpm > 0 ? `${leg.marketRpm.toFixed(2)} RPM` : '—'} />
+          <Stat label="Combustible" value={usd.format(leg.fuelCostUsd)} />
+          <Stat label="Mantto. + llantas" value={usd.format(leg.maintTiresUsd)} />
+          <Stat label="Operador" value={usd.format(leg.driverCostUsd)} />
+          <Stat label="Mercado DAT" value={leg.marketRpm > 0 ? `${leg.marketRpm.toFixed(2)} RPM` : '—'} />
         </div>
         <div className="text-xs">
           <div className="text-muted-foreground">ReferenceKey</div>

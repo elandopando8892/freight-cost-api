@@ -71,7 +71,7 @@ function compareQuotes(a: SavedQuote, b: SavedQuote, key: SortKey, dir: SortDir)
 }
 
 function toCsv(rows: SavedQuote[]): string {
-  const header = ['When', 'Label', 'Operation', 'Service', 'Origin', 'Destination', 'Cost Base', 'Base Scope', 'Policy', 'Baseline USD', 'Required USD', 'Required MXN', 'FX', 'Set', 'Id']
+  const header = ['Fecha', 'Etiqueta', 'Operación', 'Servicio', 'Origen', 'Destino', 'Base de costo', 'Alcance', 'Política', 'Base USD', 'Requerida USD', 'Requerida MXN', 'TC', 'Versión', 'Id']
   const esc = (v: unknown) => {
     const s = String(v ?? '')
     return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
@@ -101,7 +101,7 @@ function SortHeader({ label, sortKey, current, dir, onChange, align = 'left' }: 
   const active = current === sortKey
   const arrow = active ? (dir === 'asc' ? '↑' : '↓') : ''
   return (
-    <th className={`px-4 py-2 font-medium ${align === 'right' ? 'text-right' : 'text-left'}`}>
+    <th aria-sort={active ? (dir === 'asc' ? 'ascending' : 'descending') : 'none'} className={`px-3 py-2 font-medium ${align === 'right' ? 'text-right' : 'text-left'}`}>
       <button type="button" onClick={() => onChange(sortKey)}
         className={`inline-flex items-center gap-1 transition-colors ${active ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}>
         <span>{label}</span>
@@ -111,7 +111,7 @@ function SortHeader({ label, sortKey, current, dir, onChange, align = 'left' }: 
   )
 }
 
-export function QuotesList({ initial }: { initial: SavedQuote[] }) {
+export function QuotesList({ initial, canEdit }: { initial: SavedQuote[]; canEdit: boolean }) {
   const router = useRouter()
   const [items, setItems] = useState(initial)
   const [search, setSearch] = useState('')
@@ -153,7 +153,7 @@ export function QuotesList({ initial }: { initial: SavedQuote[] }) {
     setSelected((prev) => {
       const next = new Set(prev)
       if (next.has(id)) { next.delete(id); return next }
-      if (next.size >= 2) { toast.error('Select up to 2 quotes to compare'); return prev }
+      if (next.size >= 2) { toast.error('Selecciona hasta 2 cotizaciones para comparar'); return prev }
       next.add(id)
       return next
     })
@@ -164,7 +164,7 @@ export function QuotesList({ initial }: { initial: SavedQuote[] }) {
     onSuccess: (id) => {
       setItems((prev) => prev.filter((q) => q.id !== id))
       setSelected((prev) => { const n = new Set(prev); n.delete(id); return n })
-      toast.success('Quote deleted')
+      toast.success('Cotización eliminada')
     },
   })
 
@@ -173,23 +173,23 @@ export function QuotesList({ initial }: { initial: SavedQuote[] }) {
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-2">
         <Input value={search} onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search label, lane, operation, id…" className="h-9 w-full sm:max-w-xs" />
-        <select className={selectCls} value={opFilter} onChange={(e) => setOpFilter(e.target.value)} aria-label="Filter by operation">
-          <option value="">All operations</option>
+          placeholder="Buscar etiqueta, ruta, operación o ID…" aria-label="Buscar cotizaciones" className="h-9 w-full sm:max-w-xs" />
+        <select className={selectCls} value={opFilter} onChange={(e) => setOpFilter(e.target.value)} aria-label="Filtrar por operación">
+          <option value="">Todas las operaciones</option>
           {operations.map((o) => <option key={o} value={o}>{o}</option>)}
         </select>
-        <select className={selectCls} value={datePreset} onChange={(e) => onDatePreset(e.target.value as DatePreset)} aria-label="Filter by date">
-          <option value="all">All time</option>
-          <option value="7">Last 7 days</option>
-          <option value="30">Last 30 days</option>
-          <option value="90">Last 90 days</option>
+        <select className={selectCls} value={datePreset} onChange={(e) => onDatePreset(e.target.value as DatePreset)} aria-label="Filtrar por fecha">
+          <option value="all">Todo el historial</option>
+          <option value="7">Últimos 7 días</option>
+          <option value="30">Últimos 30 días</option>
+          <option value="90">Últimos 90 días</option>
         </select>
         <div className="ml-auto flex items-center gap-2">
           <span className="whitespace-nowrap text-xs text-muted-foreground">
-            {filtering ? `${sorted.length} of ${items.length}` : `${items.length} total`}
+            {filtering ? `${sorted.length} de ${items.length}` : `${items.length} en total`}
           </span>
           <Button variant="outline" size="sm" onClick={() => downloadCsv(sorted)} disabled={sorted.length === 0}>
-            Export CSV
+            Exportar CSV
           </Button>
         </div>
       </div>
@@ -197,12 +197,12 @@ export function QuotesList({ initial }: { initial: SavedQuote[] }) {
       {/* Compare bar */}
       {selected.size > 0 && (
         <div className="flex items-center justify-between gap-3 rounded-md border bg-muted/40 px-3 py-2 text-sm">
-          <span className="text-muted-foreground">{selected.size} selected {selected.size === 1 ? '— pick one more to compare' : ''}</span>
+          <span className="text-muted-foreground">{selected.size} seleccionada{selected.size === 1 ? ' · selecciona una más para comparar' : 's'}</span>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={() => setSelected(new Set())}>Clear</Button>
+            <Button variant="ghost" size="sm" onClick={() => setSelected(new Set())}>Limpiar</Button>
             <Button size="sm" disabled={selected.size !== 2}
               onClick={() => router.push(`/quotes/compare?ids=${[...selected].join(',')}`)}>
-              Compare
+              Comparar
             </Button>
           </div>
         </div>
@@ -211,18 +211,18 @@ export function QuotesList({ initial }: { initial: SavedQuote[] }) {
       <Card>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="border-b text-xs uppercase tracking-wide">
+            <table className="w-full min-w-[1120px] text-xs">
+              <thead className="border-b bg-muted/40 text-[10px] uppercase tracking-wide">
                 <tr>
-                  <th className="w-8 px-2 py-2" aria-label="Select"></th>
-                  <SortHeader label="When" sortKey="createdAt" current={sortKey} dir={sortDir} onChange={toggleSort} />
-                  <th className="px-4 py-2 text-left font-medium text-muted-foreground">Label</th>
-                  <th className="px-4 py-2 text-left font-medium text-muted-foreground">Lane</th>
-                  <th className="px-4 py-2 text-left font-medium text-muted-foreground">Operation</th>
-                  <th className="px-4 py-2 text-left font-medium text-muted-foreground">Cost base</th>
-                  <SortHeader label="Baseline" sortKey="freightBaselineUsd" current={sortKey} dir={sortDir} onChange={toggleSort} align="right" />
-                  <SortHeader label="Required (MXN)" sortKey="requiredTariffMxn" current={sortKey} dir={sortDir} onChange={toggleSort} align="right" />
-                  <th className="px-4 py-2 text-right font-medium text-muted-foreground">FX</th>
+                  <th className="w-8 px-2 py-2" aria-label="Seleccionar"></th>
+                  <SortHeader label="Fecha" sortKey="createdAt" current={sortKey} dir={sortDir} onChange={toggleSort} />
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">Etiqueta</th>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">Ruta</th>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">Operación</th>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">Base</th>
+                  <SortHeader label="Tarifa base" sortKey="freightBaselineUsd" current={sortKey} dir={sortDir} onChange={toggleSort} align="right" />
+                  <SortHeader label="Requerida (MXN)" sortKey="requiredTariffMxn" current={sortKey} dir={sortDir} onChange={toggleSort} align="right" />
+                  <th className="px-3 py-2 text-right font-medium text-muted-foreground">TC</th>
                   <th className="px-4 py-2"></th>
                 </tr>
               </thead>
@@ -231,11 +231,11 @@ export function QuotesList({ initial }: { initial: SavedQuote[] }) {
                   <tr>
                     <td colSpan={10} className="px-4 py-12 text-center text-sm text-muted-foreground">
                       {filtering ? (
-                        <>No quotes match your filters.{' '}
+                        <>Ninguna cotización coincide con los filtros.{' '}
                           <button type="button" onClick={() => { setSearch(''); setOpFilter(''); onDatePreset('all') }}
-                            className="underline underline-offset-2">Clear filters</button>
+                            className="underline underline-offset-2">Limpiar filtros</button>
                         </>
-                      ) : 'No quotes saved yet.'}
+                      ) : 'Aún no hay cotizaciones guardadas.'}
                     </td>
                   </tr>
                 ) : (
@@ -247,13 +247,13 @@ export function QuotesList({ initial }: { initial: SavedQuote[] }) {
                         <td className="px-2 py-3 text-center">
                           <input type="checkbox" className="h-4 w-4 cursor-pointer align-middle accent-primary"
                             checked={selected.has(q.id)} onChange={() => toggleSelect(q.id)}
-                            aria-label={`Select quote ${q.id.slice(0, 8)}`} />
+                            aria-label={`Seleccionar cotización ${q.id.slice(0, 8)}`} />
                         </td>
                         <CellLink href={href} className="whitespace-nowrap text-muted-foreground">
                           <RelativeTime iso={q.createdAt} />
                         </CellLink>
                         <CellLink href={href}>
-                          <div className="font-medium">{q.label ?? <span className="text-muted-foreground">— untitled</span>}</div>
+                          <div className="font-medium">{q.label ?? <span className="text-muted-foreground">— sin etiqueta</span>}</div>
                           <div className="text-xs text-muted-foreground">{q.id.slice(0, 8)}</div>
                         </CellLink>
                         <CellLink href={href} className="whitespace-nowrap">
@@ -264,9 +264,9 @@ export function QuotesList({ initial }: { initial: SavedQuote[] }) {
                           <div className="text-xs text-muted-foreground">{q.service}</div>
                         </CellLink>
                         <CellLink href={href} className="whitespace-nowrap">
-                          <div>{q.costBase?.code ?? <span className="text-muted-foreground">Legacy</span>}</div>
+                          <div>{q.costBase?.code ?? <span className="text-muted-foreground">Sin base</span>}</div>
                           <div className="text-xs text-muted-foreground">
-                            {q.set ? `v${q.set.version}` : 'no version'} · {q.calculationPolicy === 'WORKBOOK_V3' ? 'Workbook' : q.calculationPolicy === 'OPERATIONAL_V3' ? 'Operational' : 'unspecified'}
+                            {q.set ? `v${q.set.version}` : 'sin versión'} · {q.calculationPolicy === 'WORKBOOK_V3' ? 'Libro exacto' : q.calculationPolicy === 'OPERATIONAL_V3' ? 'Operativa V3' : 'sin especificar'}
                           </div>
                         </CellLink>
                         <CellLink href={href} className="whitespace-nowrap text-right font-medium">
@@ -279,21 +279,21 @@ export function QuotesList({ initial }: { initial: SavedQuote[] }) {
                           {q.fxRateUsed.toFixed(2)}
                         </CellLink>
                         <td className="whitespace-nowrap px-4 py-3 text-right">
-                          <AlertDialog>
-                            <AlertDialogTrigger render={<Button variant="ghost" size="sm" disabled={remove.isPending}>Delete</Button>} />
+                          {canEdit ? <AlertDialog>
+                            <AlertDialogTrigger render={<Button variant="ghost" size="sm" disabled={remove.isPending}>Eliminar</Button>} />
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Delete this quote?</AlertDialogTitle>
+                                <AlertDialogTitle>¿Eliminar esta cotización?</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  {q.label ?? 'Untitled quote'} · {q.operation} · {usd.format(q.freightBaselineUsd)}. This cannot be undone.
+                                  {q.label ?? 'Cotización sin etiqueta'} · {q.operation} · {usd.format(q.freightBaselineUsd)}. Esta acción no se puede deshacer.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => remove.mutate(q.id)}>Delete</AlertDialogAction>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => remove.mutate(q.id)}>Eliminar</AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>
-                          </AlertDialog>
+                          </AlertDialog> : <span className="text-xs text-muted-foreground">Sólo lectura</span>}
                         </td>
                       </tr>
                     )
@@ -308,7 +308,7 @@ export function QuotesList({ initial }: { initial: SavedQuote[] }) {
       {shown.length < sorted.length && (
         <div className="flex justify-center">
           <Button variant="outline" size="sm" onClick={() => setVisible((v) => v + PAGE)}>
-            Load more ({sorted.length - shown.length} remaining)
+            Cargar más ({sorted.length - shown.length} restantes)
           </Button>
         </div>
       )}

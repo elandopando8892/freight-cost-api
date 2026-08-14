@@ -39,6 +39,7 @@ export function Editor({ setId, initial, sections, readOnly = false }: { setId: 
   const [search, setSearch] = useState('')
 
   const pendingCount = Object.keys(pending).length
+  const invalidPendingCount = Object.values(pending).filter((value) => !Number.isFinite(value)).length
   const q = search.trim().toLowerCase()
   const matches = (p: Param) =>
     q === '' || p.field.toLowerCase().includes(q) || p.unit.toLowerCase().includes(q)
@@ -72,16 +73,16 @@ export function Editor({ setId, initial, sections, readOnly = false }: { setId: 
       setPending({})
       setWarnings(result.warnings ?? [])
       if ((result.warnings ?? []).length > 0) {
-        toast.warning(`Saved ${n} change${n === 1 ? '' : 's'} — ${result.warnings.length} value${result.warnings.length === 1 ? '' : 's'} outside recommended range`)
+        toast.warning(`Se guardaron ${n} cambios · ${result.warnings.length} valores fuera del rango recomendado`)
       } else {
-        toast.success(`Saved ${n} change${n === 1 ? '' : 's'}`)
+        toast.success(`Se guardaron ${n} cambios`)
       }
     },
   })
 
   const resetAll = useMutation({
     mutationFn: () => fetcher<Grouped>(`/api/v1/assumptions/sets/${setId}/params/reset`, { method: 'POST', json: {} }),
-    onSuccess: (result) => { setData(result); setPending({}); setWarnings([]); toast.success('All params reset to recommended values') },
+    onSuccess: (result) => { setData(result); setPending({}); setWarnings([]); toast.success('Todos los parámetros volvieron al valor recomendado') },
   })
 
   // Cmd/Ctrl+S saves pending edits. (Declared after `save` so it's in scope.)
@@ -89,12 +90,12 @@ export function Editor({ setId, initial, sections, readOnly = false }: { setId: 
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
         e.preventDefault()
-        if (!readOnly && pendingCount > 0 && !save.isPending) save.mutate()
+        if (!readOnly && pendingCount > 0 && invalidPendingCount === 0 && !save.isPending) save.mutate()
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [pendingCount, readOnly, save])
+  }, [invalidPendingCount, pendingCount, readOnly, save])
 
   // Per-section counts for the side nav: pending edits + out-of-range params + matches.
   const sectionStats = useMemo(() => {
@@ -113,12 +114,12 @@ export function Editor({ setId, initial, sections, readOnly = false }: { setId: 
   }, [sections, data, pending, q])
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[220px_1fr] lg:items-start">
+    <div className="grid gap-3 lg:grid-cols-[12rem_minmax(0,1fr)] lg:items-start">
       {/* Side nav — desktop only */}
-      <aside className="hidden lg:sticky lg:top-4 lg:block lg:self-start">
-        <nav className="grid gap-0.5 rounded-md border bg-card p-2 text-sm">
+      <aside className="hidden lg:sticky lg:top-16 lg:block lg:self-start">
+        <nav aria-label="Secciones de parámetros" className="grid gap-0.5 rounded-md border bg-card p-2 text-xs">
           <div className="px-2 py-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Sections
+            Secciones
           </div>
           {sections.map((s) => {
             const st = sectionStats[s]
@@ -135,7 +136,7 @@ export function Editor({ setId, initial, sections, readOnly = false }: { setId: 
                   {st.pending > 0 && (
                     <span
                       className="rounded-full bg-blue-500/15 px-1.5 py-0.5 font-medium text-blue-700 dark:text-blue-400"
-                      title={`${st.pending} pending edit${st.pending === 1 ? '' : 's'}`}
+                      title={`${st.pending} cambios pendientes`}
                     >
                       {st.pending}
                     </span>
@@ -143,7 +144,7 @@ export function Editor({ setId, initial, sections, readOnly = false }: { setId: 
                   {st.outOfRange > 0 && (
                     <span
                       className="rounded-full bg-amber-500/15 px-1.5 py-0.5 font-medium text-amber-700 dark:text-amber-400"
-                      title={`${st.outOfRange} out-of-range param${st.outOfRange === 1 ? '' : 's'}`}
+                      title={`${st.outOfRange} parámetros fuera de rango`}
                     >
                       {st.outOfRange}
                     </span>
@@ -158,51 +159,54 @@ export function Editor({ setId, initial, sections, readOnly = false }: { setId: 
         </nav>
       </aside>
 
-      <div>
-      <div className="sticky top-0 z-10 -mx-4 mb-4 flex flex-wrap items-center justify-between gap-3 border-b bg-background/80 px-4 py-3 backdrop-blur">
-        <div className="flex items-center gap-3 text-sm">
+      <div className="min-w-0">
+      <div className="sticky top-12 z-10 -mx-2 mb-3 flex flex-wrap items-center justify-between gap-2 border-b bg-background/90 px-2 py-2 backdrop-blur">
+        <div className="flex items-center gap-3 text-sm" aria-live="polite">
           {readOnly ? (
-            <span className="font-medium text-muted-foreground">Read-only published version.</span>
+            <span className="font-medium text-muted-foreground">Versión publicada de solo lectura.</span>
+          ) : invalidPendingCount > 0 ? (
+            <span className="font-medium text-destructive">Completa {invalidPendingCount} {invalidPendingCount === 1 ? 'valor requerido' : 'valores requeridos'}.</span>
           ) : pendingCount === 0 ? (
-            <span className="text-muted-foreground">No pending changes.</span>
+            <span className="text-muted-foreground">Sin cambios pendientes.</span>
           ) : (
-            <span className="font-medium">{pendingCount} pending change{pendingCount === 1 ? '' : 's'}</span>
+            <span className="font-medium">{pendingCount} {pendingCount === 1 ? 'cambio pendiente' : 'cambios pendientes'}</span>
           )}
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Filter params…"
-            className="h-8 w-48"
+            placeholder="Buscar parámetro…"
+            aria-label="Buscar parámetros"
+            className="h-8 w-44"
           />
         </div>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" onClick={() => setPending({})} disabled={readOnly || pendingCount === 0 || save.isPending}>
-            Discard
+            Descartar
           </Button>
           <AlertDialog>
             <AlertDialogTrigger
               render={
                 <Button variant="outline" size="sm" disabled={readOnly || resetAll.isPending || save.isPending}>
-                  {resetAll.isPending ? 'Resetting…' : 'Reset all to recommended'}
+                  {resetAll.isPending ? 'Restableciendo…' : 'Usar recomendados'}
                 </Button>
               }
             />
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Reset every param to recommended?</AlertDialogTitle>
+                <AlertDialogTitle>¿Restablecer todos los parámetros?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This overwrites every value in this assumption set with the V3.0 recommended default. Other carriers
-                  &lsquo; sets are not affected, but this set&rsquo;s edits will be lost.
+                  Esto reemplazará cada valor de esta versión por el recomendado del catálogo V3.0. No afectará otras
+                  bases, pero se perderán los cambios de esta versión.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={() => resetAll.mutate()}>Reset all</AlertDialogAction>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={() => resetAll.mutate()}>Restablecer todo</AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-          <Button size="sm" onClick={() => save.mutate()} disabled={readOnly || pendingCount === 0 || save.isPending} title="Save (⌘S / Ctrl+S)">
-            {save.isPending ? 'Saving…' : `Save ${pendingCount || ''}`.trim()}
+          <Button size="sm" onClick={() => save.mutate()} disabled={readOnly || pendingCount === 0 || invalidPendingCount > 0 || save.isPending} title="Guardar (⌘S / Ctrl+S)">
+            {save.isPending ? 'Guardando…' : `Guardar ${pendingCount || ''}`.trim()}
           </Button>
         </div>
       </div>
@@ -210,7 +214,7 @@ export function Editor({ setId, initial, sections, readOnly = false }: { setId: 
       {warnings.length > 0 && (
         <Card className="mb-4 border-amber-500/40 bg-amber-50/40 dark:bg-amber-950/20">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm">{warnings.length} value{warnings.length === 1 ? '' : 's'} outside recommended range</CardTitle>
+            <CardTitle className="text-sm">{warnings.length} {warnings.length === 1 ? 'valor fuera' : 'valores fuera'} del rango recomendado</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-1 text-sm text-muted-foreground">
             {warnings.map((w) => (
@@ -222,13 +226,13 @@ export function Editor({ setId, initial, sections, readOnly = false }: { setId: 
         </Card>
       )}
 
-      <div className="grid gap-6">
+      <div className="grid gap-3">
         {q !== '' && (
           <div className="text-xs text-muted-foreground">
-            Filtering by &ldquo;{search}&rdquo; — showing matching params only.
+            Filtrando por &ldquo;{search}&rdquo; · sólo se muestran coincidencias.
             {' '}
             <button type="button" className="underline underline-offset-2 hover:text-foreground" onClick={() => setSearch('')}>
-              clear
+              Limpiar
             </button>
           </div>
         )}
@@ -266,12 +270,27 @@ function SectionCard({
   readOnly: boolean
 }) {
   return (
-    <Card id={section} className="scroll-mt-20">
-      <CardHeader>
-        <CardTitle className="text-base">{section}</CardTitle>
+    <Card id={section} className="scroll-mt-28 overflow-hidden">
+      <CardHeader className="flex-row items-center justify-between border-b px-3 py-2">
+        <CardTitle className="text-sm">{section}</CardTitle>
+        <span className="text-[11px] text-muted-foreground">{rows.length} parámetros</span>
       </CardHeader>
-      <CardContent className="grid gap-2">
-        {rows.map((p) => <Row key={p.id} p={p} pending={pending} onChange={onChange} onReset={onReset} onUndo={onUndo} readOnly={readOnly} />)}
+      <CardContent className="overflow-x-auto p-0">
+        <table className="w-full min-w-[740px] table-fixed text-left text-xs">
+          <thead className="bg-muted/45 text-[10px] uppercase tracking-wide text-muted-foreground">
+            <tr>
+              <th scope="col" className="w-[29%] px-3 py-2 font-medium">Parámetro</th>
+              <th scope="col" className="w-[18%] px-3 py-2 font-medium">Valor actual</th>
+              <th scope="col" className="w-[16%] px-3 py-2 font-medium">Recomendado</th>
+              <th scope="col" className="w-[18%] px-3 py-2 font-medium">Rango</th>
+              <th scope="col" className="w-[11%] px-3 py-2 font-medium">Estado</th>
+              <th scope="col" className="w-[8%] px-3 py-2 text-right font-medium">Acción</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y">
+            {rows.map((p) => <Row key={p.id} p={p} pending={pending} onChange={onChange} onReset={onReset} onUndo={onUndo} readOnly={readOnly} />)}
+          </tbody>
+        </table>
       </CardContent>
     </Card>
   )
@@ -288,49 +307,69 @@ function Row({
   readOnly: boolean
 }) {
   const k = key(p)
-  const displayValue = useMemo(() => (k in pending ? pending[k] : p.value), [k, pending, p.value])
+  const displayValue = k in pending ? pending[k] : p.value
   const modified = k in pending
   const lo = p.recommendedLow ?? p.low
   const hi = p.recommendedHigh ?? p.high
+  const invalid = modified && !Number.isFinite(displayValue)
   const out = isOutOfRange(displayValue, lo, hi)
 
   return (
-    <div className={`grid grid-cols-1 gap-2 rounded-md border px-3 py-2 text-sm sm:grid-cols-[minmax(0,1fr)_150px_minmax(0,1fr)_auto] sm:items-center sm:gap-3 ${modified ? 'border-blue-500/40 bg-blue-50/30 dark:bg-blue-950/20' : ''}`}>
-      <div className="min-w-0">
-        <div className="truncate font-medium">{p.field}</div>
-        <div className="truncate text-xs text-muted-foreground">{p.unit}</div>
-      </div>
-      <Input
-        type="number" step="any"
-        value={Number.isFinite(displayValue) ? displayValue : ''}
-        onChange={(e) => onChange(k, e.target.value === '' ? NaN : Number(e.target.value))}
-        className={out ? 'border-amber-500/60' : ''}
-        disabled={readOnly}
-      />
-      <div className="text-xs text-muted-foreground">
-        <div>
-          recommended <span className="font-medium text-foreground">{p.recommended != null ? fmt(p.recommended) : '—'}</span>
-          {out && <span className="ml-2 rounded-full bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:text-amber-400">out of range</span>}
-        </div>
-        <div>range {lo ?? '—'} … {hi ?? '—'}</div>
-      </div>
-      <div className="flex justify-end gap-1">
-        {modified && (
-          <button type="button" onClick={() => onUndo(k)} className="text-xs text-muted-foreground hover:text-foreground">undo</button>
+    <tr className={modified ? 'bg-blue-50/55 dark:bg-blue-950/20' : 'hover:bg-muted/20'}>
+      <th scope="row" className="px-3 py-2 font-medium">
+        <span className="block truncate" title={p.field}>{p.field}</span>
+        <span className="block truncate text-[11px] font-normal text-muted-foreground">{p.unit}</span>
+      </th>
+      <td className="px-3 py-1.5">
+        <Input
+          type="number"
+          step="any"
+          value={Number.isFinite(displayValue) ? displayValue : ''}
+          onChange={(e) => onChange(k, e.target.value === '' ? NaN : Number(e.target.value))}
+          aria-label={`${p.field} (${p.unit})`}
+          aria-invalid={invalid || undefined}
+          className={`h-8 w-full font-mono text-xs ${invalid ? 'border-destructive' : out ? 'border-amber-500/60' : ''}`}
+          disabled={readOnly}
+        />
+      </td>
+      <td className="px-3 py-2 font-mono text-foreground">{p.recommended != null ? fmt(p.recommended) : '—'}</td>
+      <td className="px-3 py-2 font-mono text-muted-foreground">{formatRange(lo, hi)}</td>
+      <td className="px-3 py-2">
+        {invalid ? (
+          <span className="rounded-full bg-destructive/10 px-2 py-1 text-[10px] font-medium text-destructive">Requerido</span>
+        ) : out ? (
+          <span className="rounded-full bg-amber-500/12 px-2 py-1 text-[10px] font-medium text-amber-700 dark:text-amber-400">Fuera de rango</span>
+        ) : modified ? (
+          <span className="rounded-full bg-blue-500/12 px-2 py-1 text-[10px] font-medium text-blue-700 dark:text-blue-400">Modificado</span>
+        ) : (
+          <span className="text-[11px] text-muted-foreground">En rango</span>
         )}
-        {!readOnly && p.recommended != null && (
+      </td>
+      <td className="px-3 py-2 text-right">
+        {modified ? (
+          <button type="button" onClick={() => onUndo(k)} className="text-[11px] font-medium text-muted-foreground hover:text-foreground">
+            Deshacer
+          </button>
+        ) : !readOnly && p.recommended != null ? (
           <button
             type="button"
             onClick={() => onReset(k, p.recommended as number)}
-            className="text-xs text-muted-foreground hover:text-foreground"
-            title="Reset to recommended"
+            className="text-[11px] font-medium text-muted-foreground hover:text-foreground"
+            title="Usar valor recomendado"
           >
-            reset
+            Usar
           </button>
-        )}
-      </div>
-    </div>
+        ) : null}
+      </td>
+    </tr>
   )
+}
+
+function formatRange(lo: number | null, hi: number | null): string {
+  if (lo == null && hi == null) return 'Sin rango'
+  if (lo == null) return `≤ ${fmt(hi as number)}`
+  if (hi == null) return `≥ ${fmt(lo)}`
+  return `${fmt(lo)} – ${fmt(hi)}`
 }
 
 function isOutOfRange(v: number, lo: number | null, hi: number | null): boolean {

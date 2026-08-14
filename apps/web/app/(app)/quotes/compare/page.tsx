@@ -4,7 +4,7 @@ import { api, ApiError } from '@/lib/api'
 import { Card, CardContent } from '@/components/ui/card'
 
 export const dynamic = 'force-dynamic'
-export const metadata: Metadata = { title: 'Compare quotes' }
+export const metadata: Metadata = { title: 'Comparar cotizaciones' }
 
 interface MexLeg { requiredTariffUsd: number; totalKm: number; cycleDays: number; rpm: number; fuelUsd: number; driverUsd: number }
 interface UsaLeg { flatUsd: number; loadedMiles: number; rpm: number; fuelCostUsd: number; driverCostUsd: number; marketRpm: number }
@@ -17,6 +17,9 @@ interface QuoteDetail {
   freightBaselineUsd: number; requiredTariffUsd: number; requiredTariffMxn: number; fxRateUsed: number
   mexLeg: MexLeg | null; usaLeg: UsaLeg | null; commercial: Commercial | null
   lane: { origin: string | null; destination: string | null } | null
+  set: { name: string; version: number } | null
+  costBase: { code: string; name: string } | null
+  calculationPolicy: 'LEGACY_UNSPECIFIED' | 'OPERATIONAL_V3' | 'WORKBOOK_V3'
 }
 
 const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
@@ -30,10 +33,10 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
 
   if (list.length !== 2) {
     return (
-      <main className="mx-auto w-full max-w-3xl px-4 py-8">
+      <main className="mx-auto w-full max-w-3xl px-3 py-4 sm:px-4">
         <Breadcrumb />
         <Card><CardContent className="px-6 py-10 text-center text-sm text-muted-foreground">
-          Select exactly two quotes from <Link href="/quotes" className="underline underline-offset-2">Quote history</Link> to compare.
+          Selecciona exactamente dos cotizaciones desde el <Link href="/quotes" className="underline underline-offset-2">historial</Link> para compararlas.
         </CardContent></Card>
       </main>
     )
@@ -45,11 +48,11 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
   } catch (err) {
     const notFound = err instanceof ApiError && err.status === 404
     return (
-      <main className="mx-auto w-full max-w-3xl px-4 py-8">
+      <main className="mx-auto w-full max-w-3xl px-3 py-4 sm:px-4">
         <Breadcrumb />
         <Card><CardContent className="px-6 py-10 text-center text-sm text-muted-foreground">
-          {notFound ? 'One of the quotes no longer exists.' : 'Could not load the quotes.'}{' '}
-          <Link href="/quotes" className="underline underline-offset-2">Back to history</Link>
+          {notFound ? 'Una de las cotizaciones ya no existe.' : 'No fue posible cargar las cotizaciones.'}{' '}
+          <Link href="/quotes" className="underline underline-offset-2">Volver al historial</Link>
         </CardContent></Card>
       </main>
     )
@@ -60,25 +63,28 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
   const anyUsa = a.usaLeg || b.usaLeg
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-8">
+    <main className="mx-auto w-full max-w-[1200px] px-3 py-4 sm:px-4">
       <Breadcrumb />
-      <h1 className="mb-6 text-2xl font-semibold tracking-tight">Compare quotes</h1>
+      <h1 className="mb-4 text-xl font-semibold tracking-tight">Comparar cotizaciones</h1>
 
       <Card>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="border-b">
+            <table className="w-full min-w-[760px] text-xs">
+              <thead className="border-b bg-muted/20">
                 <tr className="align-bottom">
-                  <th className="w-40 px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">Metric</th>
+                  <th className="w-40 px-3 py-3 text-left text-[10px] font-medium uppercase tracking-wide text-muted-foreground">Métrica</th>
                   {quotes.map((q) => (
                     <th key={q.id} className="px-4 py-3 text-right">
                       <Link href={`/quotes/${q.id}`} className="block font-semibold hover:underline">
-                        {q.label ?? `Quote ${q.id.slice(0, 8)}`}
+                        {q.label ?? `Cotización ${q.id.slice(0, 8)}`}
                       </Link>
                       <div className="text-xs font-normal text-muted-foreground">{q.operation}{q.service ? ` · ${q.service}` : ''}</div>
                       <div className="truncate text-xs font-normal text-muted-foreground">
                         {q.lane && (q.lane.origin || q.lane.destination) ? `${q.lane.origin ?? '—'} → ${q.lane.destination ?? '—'}` : '—'}
+                      </div>
+                      <div className="mt-1 text-[10px] font-normal text-muted-foreground">
+                        {q.costBase?.code ?? 'Sin base'} · {q.set ? `v${q.set.version}` : 'sin versión'} · {q.calculationPolicy === 'WORKBOOK_V3' ? 'Libro exacto' : q.calculationPolicy === 'OPERATIONAL_V3' ? 'Operativa V3' : 'sin especificar'}
                       </div>
                     </th>
                   ))}
@@ -86,38 +92,38 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
                 </tr>
               </thead>
               <tbody>
-                <Section title="Headline" />
-                <Row label="Freight baseline" a={a.freightBaselineUsd} b={b.freightBaselineUsd} fmt={usd.format} />
-                <Row label="Required (USD)" a={a.requiredTariffUsd} b={b.requiredTariffUsd} fmt={usd.format} />
-                <Row label="Required (MXN)" a={a.requiredTariffMxn} b={b.requiredTariffMxn} fmt={mxn.format} />
-                <Row label="FX" a={a.fxRateUsed} b={b.fxRateUsed} fmt={num} />
-                <Row label="Gross margin" a={a.commercial?.grossMarginPct} b={b.commercial?.grossMarginPct} fmt={pct} />
+                <Section title="Resumen" />
+                <Row label="Tarifa base" a={a.freightBaselineUsd} b={b.freightBaselineUsd} fmt={usd.format} />
+                <Row label="Requerida (USD)" a={a.requiredTariffUsd} b={b.requiredTariffUsd} fmt={usd.format} />
+                <Row label="Requerida (MXN)" a={a.requiredTariffMxn} b={b.requiredTariffMxn} fmt={mxn.format} />
+                <Row label="Tipo de cambio" a={a.fxRateUsed} b={b.fxRateUsed} fmt={num} />
+                <Row label="Margen bruto" a={a.commercial?.grossMarginPct} b={b.commercial?.grossMarginPct} fmt={pct} />
 
                 {anyMex && (
                   <>
-                    <Section title="MEX leg" />
-                    <Row label="Required tariff" a={a.mexLeg?.requiredTariffUsd} b={b.mexLeg?.requiredTariffUsd} fmt={usd.format} />
-                    <Row label="Total km" a={a.mexLeg?.totalKm} b={b.mexLeg?.totalKm} fmt={(n) => Math.round(n).toString()} />
-                    <Row label="Cycle days" a={a.mexLeg?.cycleDays} b={b.mexLeg?.cycleDays} fmt={num} />
+                    <Section title="Tramo MEX" />
+                    <Row label="Tarifa requerida" a={a.mexLeg?.requiredTariffUsd} b={b.mexLeg?.requiredTariffUsd} fmt={usd.format} />
+                    <Row label="Kilómetros totales" a={a.mexLeg?.totalKm} b={b.mexLeg?.totalKm} fmt={(n) => Math.round(n).toString()} />
+                    <Row label="Días de ciclo" a={a.mexLeg?.cycleDays} b={b.mexLeg?.cycleDays} fmt={num} />
                     <Row label="RPM" a={a.mexLeg?.rpm} b={b.mexLeg?.rpm} fmt={num} />
                   </>
                 )}
 
                 {anyUsa && (
                   <>
-                    <Section title="USA leg" />
-                    <Row label="Flat" a={a.usaLeg?.flatUsd} b={b.usaLeg?.flatUsd} fmt={usd.format} />
-                    <Row label="Loaded miles" a={a.usaLeg?.loadedMiles} b={b.usaLeg?.loadedMiles} fmt={(n) => Math.round(n).toString()} />
+                    <Section title="Tramo EE. UU." />
+                    <Row label="Tarifa plana" a={a.usaLeg?.flatUsd} b={b.usaLeg?.flatUsd} fmt={usd.format} />
+                    <Row label="Millas cargadas" a={a.usaLeg?.loadedMiles} b={b.usaLeg?.loadedMiles} fmt={(n) => Math.round(n).toString()} />
                     <Row label="RPM" a={a.usaLeg?.rpm} b={b.usaLeg?.rpm} fmt={num} />
-                    <Row label="DAT market RPM" a={a.usaLeg?.marketRpm} b={b.usaLeg?.marketRpm} fmt={num} />
+                    <Row label="RPM mercado DAT" a={a.usaLeg?.marketRpm} b={b.usaLeg?.marketRpm} fmt={num} />
                   </>
                 )}
 
-                <Section title="Commercial" />
-                <Row label="Cost floor" a={a.commercial?.costFloorUsd} b={b.commercial?.costFloorUsd} fmt={usd.format} />
-                <Row label="Recommended sell" a={a.commercial?.recommendedSellUsd} b={b.commercial?.recommendedSellUsd} fmt={usd.format} />
-                <Row label="Gross profit" a={a.commercial?.grossProfitUsd} b={b.commercial?.grossProfitUsd} fmt={usd.format} />
-                <Row label="GP / loaded mile" a={a.commercial?.gpPerLoadedMileUsd} b={b.commercial?.gpPerLoadedMileUsd} fmt={usd.format} />
+                <Section title="Comercial" />
+                <Row label="Piso de costo" a={a.commercial?.costFloorUsd} b={b.commercial?.costFloorUsd} fmt={usd.format} />
+                <Row label="Venta recomendada" a={a.commercial?.recommendedSellUsd} b={b.commercial?.recommendedSellUsd} fmt={usd.format} />
+                <Row label="Utilidad bruta" a={a.commercial?.grossProfitUsd} b={b.commercial?.grossProfitUsd} fmt={usd.format} />
+                <Row label="UB / milla cargada" a={a.commercial?.gpPerLoadedMileUsd} b={b.commercial?.gpPerLoadedMileUsd} fmt={usd.format} />
               </tbody>
             </table>
           </div>
@@ -130,9 +136,9 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
 function Breadcrumb() {
   return (
     <div className="mb-3 text-xs text-muted-foreground">
-      <Link href="/quotes" className="hover:text-foreground">Quote history</Link>
+      <Link href="/quotes" className="hover:text-foreground">Historial</Link>
       <span className="mx-1">/</span>
-      <span>Compare</span>
+      <span>Comparar</span>
     </div>
   )
 }

@@ -161,6 +161,9 @@ export function RateBooksBoard({
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [note, setNote] = useState("");
+  const [contextBaseId, setContextBaseId] = useState(
+    initial[0]?.costBase.id ?? bases[0]?.id ?? "",
+  );
   const activeBases = useMemo(
     () =>
       bases.filter(
@@ -175,6 +178,24 @@ export function RateBooksBoard({
     selectedBase?.versions.filter(
       (version) => version.status === "PUBLISHED",
     ) ?? [];
+  const bookCountsByBase = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const book of books) {
+      counts.set(book.costBase.id, (counts.get(book.costBase.id) ?? 0) + 1);
+    }
+    return counts;
+  }, [books]);
+  const contextBase = bases.find((base) => base.id === contextBaseId) ?? null;
+  const contextBooks = useMemo(
+    () =>
+      contextBaseId
+        ? books.filter((book) => book.costBase.id === contextBaseId)
+        : books,
+    [books, contextBaseId],
+  );
+  const contextDrafts = contextBooks.filter((book) => book.status === "DRAFT").length;
+  const contextPublished = contextBooks.filter((book) => book.status === "PUBLISHED").length;
+  const contextRoutes = contextBooks.reduce((total, book) => total + book._count.entries, 0);
   const replaceBook = (book: RateBook) =>
     setBooks((items) => [book, ...items.filter((item) => item.id !== book.id)]);
   const create = useMutation({
@@ -192,6 +213,7 @@ export function RateBooksBoard({
       }),
     onSuccess: (book) => {
       replaceBook(book);
+      setContextBaseId(book.costBase.id);
       setDetail(book);
       setOpen(false);
       setCode("");
@@ -265,15 +287,15 @@ export function RateBooksBoard({
     !create.isPending;
 
   return (
-    <div className="grid gap-5">
-      <div className="flex flex-col justify-between gap-4 border-b pb-5 sm:flex-row sm:items-end">
+    <div className="grid gap-3">
+      <header className="flex flex-col justify-between gap-3 border-b pb-3 sm:flex-row sm:items-end">
         <div>
-          <p className="mb-2 text-xs font-medium uppercase tracking-[0.16em] text-primary">Catálogo comercial</p>
-          <div className="flex items-center gap-3">
-            <span className="grid size-10 place-items-center rounded-lg bg-primary/10 text-primary"><BookOpen className="size-5" /></span>
+          <p className="mb-1 text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">Catálogo comercial</p>
+          <div className="flex items-center gap-2">
+            <span className="grid size-8 place-items-center rounded-md bg-primary/10 text-primary"><BookOpen className="size-4" /></span>
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight">RateBook</h1>
-              <p className="text-sm text-muted-foreground">Tarifarios por base, versión y vigencia.</p>
+              <h1 className="text-xl font-semibold tracking-tight">RateBook</h1>
+              <p className="text-xs text-muted-foreground">Tarifarios gobernados por base, versión y vigencia.</p>
             </div>
           </div>
         </div>
@@ -286,95 +308,95 @@ export function RateBooksBoard({
           Nuevo RateBook
           </Button>
         </div>
-      </div>
+      </header>
       {children}
       {open && (
         <Card className="border-primary/20">
           <CardHeader className="border-b bg-muted/25 pb-4">
             <CardTitle>Crear borrador tarifario</CardTitle>
           </CardHeader>
-          <CardContent className="grid gap-3 md:grid-cols-3">
-            <label className="sr-only" htmlFor="ratebook-code">
+          <CardContent className="grid gap-3 pt-4 md:grid-cols-3">
+            <label className="grid gap-1 text-xs font-medium" htmlFor="ratebook-code">
               Código del RateBook
+              <Input
+                id="ratebook-code"
+                placeholder="p. ej. MX-2026-Q4"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+              />
             </label>
-            <Input
-              id="ratebook-code"
-              placeholder="Código, p. ej. MX-2026-Q4"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-            />
-            <label className="sr-only" htmlFor="ratebook-name">
+            <label className="grid gap-1 text-xs font-medium" htmlFor="ratebook-name">
               Nombre comercial
+              <Input
+                id="ratebook-name"
+                placeholder="Nombre del tarifario"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
             </label>
-            <Input
-              id="ratebook-name"
-              placeholder="Nombre comercial"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-            <label className="sr-only" htmlFor="ratebook-effective-from">
+            <label className="grid gap-1 text-xs font-medium" htmlFor="ratebook-effective-from">
               Inicio de vigencia
+              <Input
+                id="ratebook-effective-from"
+                type="date"
+                required
+                aria-invalid={!isValidCivilDateKey(normalizedEffectiveFrom)}
+                value={effectiveFrom}
+                onChange={(e) => setEffectiveFrom(e.target.value)}
+              />
             </label>
-            <Input
-              id="ratebook-effective-from"
-              type="date"
-              required
-              aria-invalid={!isValidCivilDateKey(normalizedEffectiveFrom)}
-              value={effectiveFrom}
-              onChange={(e) => setEffectiveFrom(e.target.value)}
-            />
-            <label className="sr-only" htmlFor="ratebook-base">
+            <label className="grid gap-1 text-xs font-medium" htmlFor="ratebook-base">
               Base de costos activa
+              <select
+                id="ratebook-base"
+                className={selectCls}
+                value={baseId}
+                onChange={(e) => {
+                  setBaseId(e.target.value);
+                  setSetId("");
+                  const base = activeBases.find(
+                    (item) => item.id === e.target.value,
+                  );
+                  if (base) setCurrency(base.currency === "MXN" ? "MXN" : "USD");
+                }}
+              >
+                <option value="">Selecciona una base…</option>
+                {activeBases.map((base) => (
+                  <option key={base.id} value={base.id}>
+                    {base.code} — {base.name}
+                  </option>
+                ))}
+              </select>
             </label>
-            <select
-              id="ratebook-base"
-              className={selectCls}
-              value={baseId}
-              onChange={(e) => {
-                setBaseId(e.target.value);
-                setSetId("");
-                const base = activeBases.find(
-                  (item) => item.id === e.target.value,
-                );
-                if (base) setCurrency(base.currency === "MXN" ? "MXN" : "USD");
-              }}
-            >
-              <option value="">Base activa…</option>
-              {activeBases.map((base) => (
-                <option key={base.id} value={base.id}>
-                  {base.code} — {base.name}
-                </option>
-              ))}
-            </select>
-            <label className="sr-only" htmlFor="ratebook-version">
+            <label className="grid gap-1 text-xs font-medium" htmlFor="ratebook-version">
               Versión publicada
+              <select
+                id="ratebook-version"
+                className={selectCls}
+                value={setId}
+                onChange={(e) => setSetId(e.target.value)}
+                disabled={!selectedBase}
+              >
+                <option value="">Selecciona una versión…</option>
+                {publishedVersions.map((version) => (
+                  <option key={version.id} value={version.id}>
+                    {version.name} v{version.version}
+                  </option>
+                ))}
+              </select>
             </label>
-            <select
-              id="ratebook-version"
-              className={selectCls}
-              value={setId}
-              onChange={(e) => setSetId(e.target.value)}
-              disabled={!selectedBase}
-            >
-              <option value="">Versión publicada…</option>
-              {publishedVersions.map((version) => (
-                <option key={version.id} value={version.id}>
-                  {version.name} v{version.version}
-                </option>
-              ))}
-            </select>
-            <label className="sr-only" htmlFor="ratebook-currency">
+            <label className="grid gap-1 text-xs font-medium" htmlFor="ratebook-currency">
               Moneda
+              <select
+                id="ratebook-currency"
+                className={selectCls}
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value as "USD" | "MXN")}
+              >
+                <option value="USD">USD</option>
+                <option value="MXN">MXN</option>
+              </select>
             </label>
-            <select
-              id="ratebook-currency"
-              className={selectCls}
-              value={currency}
-              onChange={(e) => setCurrency(e.target.value as "USD" | "MXN")}
-            >
-              <option value="USD">USD</option>
-              <option value="MXN">MXN</option>
-            </select>
             <div className="md:col-span-3">
               <Button
                 disabled={!canCreate}
@@ -386,47 +408,138 @@ export function RateBooksBoard({
           </CardContent>
         </Card>
       )}
-      <Card className="overflow-hidden">
+      <div className="grid gap-3 lg:grid-cols-[13rem_minmax(0,1fr)] lg:items-start">
+        <aside className="rounded-lg border bg-card p-2 lg:sticky lg:top-16">
+          <div className="px-2 pb-2 pt-1">
+            <p className="text-xs font-semibold">Bases de costos</p>
+            <p className="mt-0.5 text-[11px] text-muted-foreground">
+              Selecciona el contexto tarifario.
+            </p>
+          </div>
+          <div className="grid gap-1">
+            {bases.length === 0 ? (
+              <p className="px-2 py-4 text-xs text-muted-foreground">
+                No hay bases disponibles.
+              </p>
+            ) : (
+              bases.map((base) => {
+                const isCurrent = base.id === contextBaseId;
+                return (
+                  <button
+                    key={base.id}
+                    type="button"
+                    aria-pressed={isCurrent}
+                    className={`rounded-md border px-2.5 py-2 text-left transition-colors ${
+                      isCurrent
+                        ? "border-primary/30 bg-primary/10 text-foreground"
+                        : "border-transparent hover:border-border hover:bg-muted/50"
+                    }`}
+                    onClick={() => {
+                      setContextBaseId(base.id);
+                      setDetail(null);
+                      setLineage(null);
+                      setCandidates([]);
+                      setSelected(new Set());
+                    }}
+                  >
+                    <span className="flex items-center justify-between gap-2">
+                      <span className="truncate text-xs font-semibold">
+                        {base.code}
+                      </span>
+                      <span className="rounded bg-background/70 px-1.5 py-0.5 text-[10px] tabular-nums text-muted-foreground">
+                        {bookCountsByBase.get(base.id) ?? 0}
+                      </span>
+                    </span>
+                    <span className="mt-0.5 block truncate text-[11px] text-muted-foreground">
+                      {base.name}
+                    </span>
+                    <span className="mt-1 block text-[10px] uppercase tracking-wide text-muted-foreground">
+                      {base.scope} · {base.status === "ACTIVE" ? "Activa" : base.status}
+                    </span>
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </aside>
+
+        <div className="grid min-w-0 gap-3">
+          <section className="rounded-lg border bg-card p-3" aria-label="Resumen de la base seleccionada">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+                  Contexto tarifario
+                </p>
+                <h2 className="mt-0.5 text-base font-semibold">
+                  {contextBase
+                    ? `${contextBase.code} — ${contextBase.name}`
+                    : "Sin base seleccionada"}
+                </h2>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  {contextBase
+                    ? `${contextBase.scope} · ${contextBase.currency} · ${contextBase.versions.length} versiones registradas`
+                    : "Selecciona una base para revisar sus versiones comerciales."}
+                </p>
+              </div>
+              {contextBase && (
+                <span className="rounded-md border px-2 py-1 text-[11px] font-medium">
+                  {contextBase.status === "ACTIVE" ? "Base activa" : contextBase.status}
+                </span>
+              )}
+            </div>
+            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <Metric label="RateBooks" value={contextBooks.length} />
+              <Metric label="Publicados" value={contextPublished} tone="success" />
+              <Metric label="Borradores" value={contextDrafts} tone="warning" />
+              <Metric label="Rutas" value={contextRoutes} />
+            </div>
+          </section>
+
+          <Card className="overflow-hidden">
         <CardContent className="overflow-x-auto p-0">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[760px] text-xs">
             <thead className="border-b bg-muted/40 text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
               <tr>
-                <th className="px-5 py-3 text-left font-medium">RateBook</th>
-                <th className="px-5 py-3 text-left font-medium">Base / versión</th>
-                <th className="px-5 py-3 text-left font-medium">Vigencia</th>
-                <th className="px-5 py-3 text-left font-medium">Rutas</th>
-                <th className="px-5 py-3 text-left font-medium">Estado</th>
-                <th className="px-5 py-3 text-right font-medium">Acción</th>
+                <th className="px-3 py-2.5 text-left font-medium">RateBook</th>
+                <th className="px-3 py-2.5 text-left font-medium">Versión</th>
+                <th className="px-3 py-2.5 text-left font-medium">Vigencia</th>
+                <th className="px-3 py-2.5 text-left font-medium">Rutas</th>
+                <th className="px-3 py-2.5 text-left font-medium">Estado</th>
+                <th className="px-3 py-2.5 text-right font-medium">Acción</th>
               </tr>
             </thead>
             <tbody>
-              {books.length === 0 ? (
+              {contextBooks.length === 0 ? (
                 <tr>
                   <td
-                    className="px-5 py-10 text-center text-muted-foreground"
+                    className="px-3 py-10 text-center text-muted-foreground"
                     colSpan={6}
                   >
-                    No hay RateBooks todavía. Crea el primer borrador para
-                    comenzar.
+                    Esta base aún no tiene RateBooks. Crea un borrador para comenzar.
                   </td>
                 </tr>
-              ) : books.map((book) => (
-                <tr key={book.id} className="border-b transition-colors hover:bg-muted/40">
-                  <td className="px-5 py-3.5 font-medium">
+              ) : contextBooks.map((book) => (
+                <tr
+                  key={book.id}
+                  className={`border-b transition-colors hover:bg-muted/40 ${
+                    detail?.id === book.id ? "bg-primary/5" : ""
+                  }`}
+                >
+                  <td className="px-3 py-2.5 font-medium">
                     {book.code}
-                    <span className="block text-xs text-muted-foreground">
+                    <span className="block text-[11px] text-muted-foreground">
                       {book.name}
                     </span>
                   </td>
-                  <td className="px-5 py-3.5">
-                    {book.costBase.code} · v{book.set.version}
+                  <td className="px-3 py-2.5">
+                    {book.set.name} · v{book.set.version}
                   </td>
-                  <td className="whitespace-nowrap px-5 py-3.5 text-muted-foreground">{formatCivilDate(book.effectiveFrom)}</td>
-                  <td className="px-5 py-3.5 tabular-nums">{book._count.entries}</td>
-                  <td className="px-5 py-3.5">
+                  <td className="whitespace-nowrap px-3 py-2.5 text-muted-foreground">{formatCivilDate(book.effectiveFrom)}</td>
+                  <td className="px-3 py-2.5 tabular-nums">{book._count.entries}</td>
+                  <td className="px-3 py-2.5">
                     <StatusBadge status={book.status} />
                   </td>
-                  <td className="px-5 py-3.5 text-right">
+                  <td className="px-3 py-2.5 text-right">
                     <Button
                       variant="outline"
                       size="sm"
@@ -457,9 +570,10 @@ export function RateBooksBoard({
                 </p>
               </div>
               {detail.status === "DRAFT" && role === "ADMIN" && (
-                <div className="flex gap-2">
+                <div className="flex w-full flex-wrap justify-end gap-2 sm:w-auto">
                   <Input
-                    className="w-64"
+                    aria-label="Nota de publicación"
+                    className="w-full sm:w-64"
                     placeholder="Nota de publicación"
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
@@ -476,9 +590,10 @@ export function RateBooksBoard({
                 </div>
               )}
               {detail.status === "DRAFT" && role === "OPERATOR" && (
-                <div className="flex gap-2">
+                <div className="flex w-full flex-wrap justify-end gap-2 sm:w-auto">
                   <Input
-                    className="w-64"
+                    aria-label="Motivo para solicitar aprobación de publicación"
+                    className="w-full sm:w-64"
                     placeholder="Motivo para aprobación"
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
@@ -496,9 +611,10 @@ export function RateBooksBoard({
               )}
               {detail.status === "PUBLISHED" &&
                 (role === "OPERATOR" || role === "ADMIN") && (
-                  <div className="flex gap-2">
+                  <div className="flex w-full flex-wrap justify-end gap-2 sm:w-auto">
                     <Input
-                      className="w-64"
+                      aria-label="Motivo para solicitar aprobación de entrega"
+                      className="w-full sm:w-64"
                       placeholder="Motivo para aprobación"
                       value={note}
                       onChange={(e) => setNote(e.target.value)}
@@ -643,7 +759,9 @@ export function RateBooksBoard({
           </CardContent>
         </Card>
       )}
-      {lineage && <RateBookLineagePanel lineage={lineage} />}
+          {lineage && <RateBookLineagePanel lineage={lineage} />}
+        </div>
+      </div>
     </div>
   );
 }
@@ -663,7 +781,7 @@ function RateBookLineagePanel({ lineage }: { lineage: RateBookLineage }) {
       </p>
       {review ? (
         <p className="mt-2 text-xs text-muted-foreground">
-          Escenario aprobado: {review.id.slice(0, 8)} · quote{" "}
+          Escenario aprobado: {review.id.slice(0, 8)} · cotización{" "}
           {review.quoteId.slice(0, 8)} · checksum{" "}
           {review.sourceChecksum.slice(0, 12)}…
         </p>
@@ -714,8 +832,8 @@ function RatewareDeliveryHistory({
             </p>
             {delivery.approvalRequest ? (
               <p className="mt-1 text-muted-foreground">
-                Aprobacion {delivery.approvalRequest.id.slice(0, 8)}: solicito{" "}
-                {delivery.approvalRequest.requestedBy.email}; reviso{" "}
+                Aprobación {delivery.approvalRequest.id.slice(0, 8)}: solicitó{" "}
+                {delivery.approvalRequest.requestedBy.email}; revisó{" "}
                 {delivery.approvalRequest.reviewedBy?.email ?? "sin revisor"}
                 {delivery.approvalRequest.decisionNote
                   ? ` · ${delivery.approvalRequest.decisionNote}`
@@ -723,7 +841,7 @@ function RatewareDeliveryHistory({
               </p>
             ) : (
               <p className="mt-1 text-muted-foreground">
-                Entrega historica sin referencia de aprobacion.
+                Entrega histórica sin referencia de aprobación.
               </p>
             )}
             {delivery.error && (
@@ -749,5 +867,32 @@ function StatusBadge({ status }: { status: Status }) {
     <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${cls}`}>
       {STATUS_LABEL[status]}
     </span>
+  );
+}
+
+function Metric({
+  label,
+  value,
+  tone = "neutral",
+}: {
+  label: string;
+  value: number;
+  tone?: "neutral" | "success" | "warning";
+}) {
+  const valueClass =
+    tone === "success"
+      ? "text-emerald-700 dark:text-emerald-300"
+      : tone === "warning"
+        ? "text-amber-700 dark:text-amber-300"
+        : "text-foreground";
+  return (
+    <div className="rounded-md border bg-muted/20 px-2.5 py-2">
+      <p className={`text-base font-semibold tabular-nums ${valueClass}`}>
+        {value}
+      </p>
+      <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+        {label}
+      </p>
+    </div>
   );
 }

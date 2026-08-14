@@ -11,8 +11,8 @@ import { LocationInput } from './location-input'
 import {
   type QuoteResult, type FormFields, type FormErrors, type LaneHint, type CostBaseOption,
   OPS, SVCS, TRUCKS, TRAILERS, CONFIGS, DRIVERS, ROUTES, selectCls,
-  initialFormFor, compatibleBases, preferredGovernedBase, costBaseReadiness, costBaseReadinessDetail,
-  validate, quoteBody, Field, CostBaseSelector, ResultSkeleton, Placeholder, Result,
+  initialFormFor, compatibleBases, preferredGovernedBase, activeVersionFor, costBaseReadiness, costBaseReadinessDetail,
+  validate, quoteBody, Field, CostBaseSelector, CalculationContextPanel, ResultSkeleton, QuoteErrorState, Placeholder, Result,
 } from './quote-shared'
 
 export type { LaneHint }
@@ -108,6 +108,7 @@ export function QuoteForm({ recentLanes = [], costBases = [] }: { recentLanes?: 
     setForm((f) => ({ ...f, [k]: v }))
     if (errors[k]) setErrors((e) => ({ ...e, [k]: undefined }))
     if (result) setResult(null)
+    if (quote.isError) quote.reset()
   }
   const setOperation = (operation: (typeof OPS)[number]) => {
     const options = compatibleBases(costBases, operation)
@@ -117,6 +118,7 @@ export function QuoteForm({ recentLanes = [], costBases = [] }: { recentLanes?: 
       return { ...current, operation, costBaseId: currentStillValid ? current.costBaseId : fallback?.id ?? '' }
     })
     if (result) setResult(null)
+    if (quote.isError) quote.reset()
   }
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -130,6 +132,7 @@ export function QuoteForm({ recentLanes = [], costBases = [] }: { recentLanes?: 
     setResult(null)
     setErrors({})
     setShowAdvanced(false)
+    quote.reset()
   }
   const applyLane = (lane: LaneHint) => {
     setForm((f) => ({
@@ -147,6 +150,7 @@ export function QuoteForm({ recentLanes = [], costBases = [] }: { recentLanes?: 
     }))
     setErrors({})
     if (result) setResult(null)
+    if (quote.isError) quote.reset()
     if (recentRef.current) recentRef.current.open = false
   }
   const onFormKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
@@ -160,11 +164,12 @@ export function QuoteForm({ recentLanes = [], costBases = [] }: { recentLanes?: 
   }
 
   const selectedCostBase = costBases.find((base) => base.id === form.costBaseId)
+  const selectedVersion = activeVersionFor(selectedCostBase)
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[400px_1fr] lg:items-start">
-      <Card className="lg:sticky lg:top-4">
-        <CardHeader>
+    <div className="grid gap-3 lg:grid-cols-[25rem_minmax(0,1fr)] lg:items-start">
+      <Card className="lg:sticky lg:top-16">
+        <CardHeader className="px-4 py-3">
           <div className="flex items-baseline justify-between gap-2">
             <CardTitle>Ruta</CardTitle>
             {recentLanes.length > 0 && (
@@ -187,7 +192,7 @@ export function QuoteForm({ recentLanes = [], costBases = [] }: { recentLanes?: 
           </div>
           <CardDescription>Código postal, &ldquo;Ciudad, Estado&rdquo; o ciudad de una zona metropolitana.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 pb-4 pt-0">
           <form className="grid gap-4" onSubmit={onSubmit} onKeyDown={onFormKeyDown} noValidate>
             <Field label="Origen (remitente)" error={errors.outboundLocation} hint="Lugar donde se origina la carga. Escribe una ciudad o código postal para ver sugerencias.">
               <LocationInput value={form.outboundLocation} onChange={(v) => set('outboundLocation', v)} suggestions={locations} placeholder="Ej. 30901 o Augusta, GA" ariaInvalid={Boolean(errors.outboundLocation)} />
@@ -271,7 +276,14 @@ export function QuoteForm({ recentLanes = [], costBases = [] }: { recentLanes?: 
         </CardContent>
       </Card>
 
-      <div className="grid gap-4">
+      <div className="grid min-w-0 gap-3">
+        <CalculationContextPanel
+          base={selectedCostBase}
+          operation={displayLabel(form.operation)}
+          route={form.outboundLocation || form.inboundLocation ? `${form.outboundLocation || '—'} → ${form.inboundLocation || '—'}` : 'Pendiente'}
+          equipment={`${displayLabel(form.truckType)} · ${displayLabel(form.trailer)}`}
+          className="lg:sticky lg:top-16 lg:z-10"
+        />
         {quote.isPending ? (
           <ResultSkeleton />
         ) : result ? (
@@ -283,11 +295,14 @@ export function QuoteForm({ recentLanes = [], costBases = [] }: { recentLanes?: 
               origin: form.outboundLocation.trim(),
               destination: form.inboundLocation.trim(),
               equipment: { truckType: form.truckType, trailer: form.trailer, config: form.config, driver: form.driver },
-              costBaseLabel: selectedCostBase?.code ?? 'Supuestos heredados',
+              costBaseLabel: selectedCostBase?.code ?? 'Supuestos activos sin base',
+              assumptionVersionLabel: selectedVersion ? `v${selectedVersion.version}` : 'Sin versión activa',
               costBaseReadiness: costBaseReadiness(selectedCostBase),
               costBaseReadinessDetail: costBaseReadinessDetail(selectedCostBase, form.operation),
             }}
           />
+        ) : quote.isError ? (
+          <QuoteErrorState onRetry={() => quote.mutate()} />
         ) : (
           <Placeholder />
         )}

@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: 'Aprobaciones' }
 export default async function ApprovalsPage() {
   const [approvals, context] = await Promise.all([
     api<Approval[]>('/approvals'),
-    api<{ role: 'ADMIN' | 'OPERATOR' | 'VIEWER' }>('/approvals/context'),
+    api<{ role: 'ADMIN' | 'OPERATOR' | 'VIEWER'; userId: string; adminCount: number; singleAdminMode: boolean }>('/approvals/context'),
   ])
-  return <main className="mx-auto w-full max-w-6xl px-4 py-8"><ApprovalsBoard initial={approvals} role={context.role} /></main>
+  return <main className="mx-auto w-full max-w-[1440px] px-3 py-4 sm:px-4"><ApprovalsBoard initial={approvals} role={context.role} currentUserId={context.userId} singleAdminMode={context.singleAdminMode} /></main>
 }

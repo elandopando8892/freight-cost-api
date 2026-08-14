@@ -4,9 +4,10 @@ import { QuoteDesk, type CustomerQuote, type CustomerQuoteTemplate } from './quo
 export const dynamic = 'force-dynamic'
 export const metadata: Metadata = { title: 'Quote Desk' }
 export default async function QuoteDeskPage() {
-  const [quotes, templates] = await Promise.all([
+  const [quotes, templates, user] = await Promise.all([
     api<CustomerQuote[]>('/customer-quotes'),
     api<CustomerQuoteTemplate[]>('/customer-quote-templates'),
+    api<{ role: 'ADMIN' | 'OPERATOR' | 'VIEWER' }>('/auth/me'),
   ])
-  return <main className="mx-auto w-full max-w-[90rem] px-4 py-6 sm:px-6 lg:px-8"><QuoteDesk initial={quotes} initialTemplates={templates} /></main>
+  return <main className="mx-auto w-full max-w-[1440px] px-3 py-4 sm:px-4"><QuoteDesk initial={quotes} initialTemplates={templates} canEdit={user.role !== 'VIEWER'} /></main>
 }

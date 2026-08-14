@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Eye, FileText, Mail, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -77,11 +77,14 @@ const blank = () => ({
 export function QuoteDesk({
   initial,
   initialTemplates,
+  canEdit,
 }: {
   initial: CustomerQuote[];
   initialTemplates: CustomerQuoteTemplate[];
+  canEdit: boolean;
 }) {
   const queryClient = useQueryClient();
+  const lineSequence = useRef(1);
   const [items, setItems] = useState(initial);
   const [templates, setTemplates] = useState(initialTemplates);
   const [open, setOpen] = useState(false);
@@ -89,7 +92,11 @@ export function QuoteDesk({
   const [contactName, setContact] = useState("");
   const [contactEmail, setEmail] = useState("");
   const [validUntil, setValid] = useState("");
-  const [lines, setLines] = useState([blank()]);
+  const [lines, setLines] = useState([{ ...blank(), clientId: "line-0" }]);
+  const newBlankLine = () => ({
+    ...blank(),
+    clientId: `line-${lineSequence.current++}`,
+  });
   const [templateName, setTemplateName] = useState("");
   const [templateSubject, setTemplateSubject] = useState("");
   const [templateHtml, setTemplateHtml] = useState("");
@@ -101,6 +108,8 @@ export function QuoteDesk({
   const [selectedTemplate, setSelectedTemplate] = useState(
     initialTemplates[0]?.id ?? "system:marksman-xbf-proposal",
   );
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"ALL" | CustomerQuoteStatus>("ALL");
   const save = useMutation({
     mutationFn: () =>
       fetcher<CustomerQuote>("/api/v1/customer-quotes", {
@@ -110,7 +119,18 @@ export function QuoteDesk({
           contactName: contactName || null,
           contactEmail: contactEmail || null,
           validUntil,
-          lines: lines.map((x) => ({ ...x, tariff: Number(x.tariff) })),
+          lines: lines.map((line) => ({
+            origin: line.origin,
+            destination: line.destination,
+            equipment: line.equipment,
+            config: line.config,
+            operation: line.operation,
+            service: line.service,
+            tariff: Number(line.tariff),
+            currency: line.currency,
+            borderCrossing: line.borderCrossing,
+            distance: line.distance,
+          })),
         },
       }),
     onSuccess: (q) => {
@@ -120,7 +140,7 @@ export function QuoteDesk({
       setContact("");
       setEmail("");
       setValid("");
-      setLines([blank()]);
+      setLines([newBlankLine()]);
     },
   });
   const saveTemplate = useMutation({
@@ -207,47 +227,79 @@ export function QuoteDesk({
     URL.revokeObjectURL(url);
   };
   const draftCount = items.filter((item) => item.status === "DRAFT").length;
+  const reviewCount = items.filter((item) => item.status === "REVIEW").length;
+  const approvedCount = items.filter((item) => item.status === "APPROVED").length;
+  const needle = search.trim().toLowerCase();
+  const visibleItems = useMemo(() => items.filter((item) => {
+    if (statusFilter !== "ALL" && item.status !== statusFilter) return false;
+    if (!needle) return true;
+    const searchable = [
+      item.folio,
+      item.clientName,
+      item.contactName ?? "",
+      item.contactEmail ?? "",
+      ...item.lines.flatMap((line) => [line.origin, line.destination]),
+    ].join(" ").toLowerCase();
+    return searchable.includes(needle);
+  }), [items, needle, statusFilter]);
 
   return (
-    <div className="grid gap-5">
-      <div className="flex flex-col justify-between gap-4 border-b pb-5 sm:flex-row sm:items-end">
+    <div className="grid gap-3">
+      <header className="flex flex-col justify-between gap-3 border-b pb-3 sm:flex-row sm:items-end">
         <div>
-          <p className="mb-2 text-xs font-medium uppercase tracking-[0.16em] text-primary">Propuestas comerciales</p>
-          <div className="flex items-center gap-3">
-            <span className="grid size-10 place-items-center rounded-lg bg-primary/10 text-primary"><Mail className="size-5" /></span>
+          <p className="mb-1 text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">Propuestas comerciales</p>
+          <div className="flex items-center gap-2">
+            <span className="grid size-8 place-items-center rounded-md bg-primary/10 text-primary"><Mail className="size-4" /></span>
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight">Quote Desk</h1>
-              <p className="text-sm text-muted-foreground">Captura, valida y prepara propuestas sin exponer el costo interno.</p>
+              <h1 className="text-xl font-semibold tracking-tight">Quote Desk</h1>
+              <p className="text-xs text-muted-foreground">Captura, valida y prepara propuestas sin exponer el costo interno.</p>
             </div>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-md bg-muted px-2.5 py-1.5 text-xs font-medium text-muted-foreground">{draftCount} borradores</span>
-          <Button onClick={() => setOpen(!open)}>
-            <Plus className="mr-1 h-4 w-4" />
-            Nueva cotización
-          </Button>
+          {canEdit ? (
+            <Button onClick={() => setOpen(!open)}>
+              <Plus className="mr-1 h-4 w-4" />
+              Nueva cotización
+            </Button>
+          ) : <span className="rounded-md border px-2 py-1 text-xs text-muted-foreground">Modo consulta</span>}
         </div>
+      </header>
+      <div className="grid overflow-hidden rounded-md border bg-card sm:grid-cols-4">
+        <DeskMetric label="Borradores" value={draftCount} />
+        <DeskMetric label="En revisión" value={reviewCount} tone={reviewCount > 0 ? "warning" : "default"} />
+        <DeskMetric label="Aprobadas" value={approvedCount} />
+        <DeskMetric label="Plantillas" value={templates.length} last />
       </div>
-      {open && (
+      {canEdit && open && (
         <Card className="border-primary/20">
           <CardHeader className="border-b bg-muted/25 pb-4">
             <CardTitle>Capturar propuesta</CardTitle>
           </CardHeader>
-          <CardContent className="grid gap-3">
+          <CardContent className="grid gap-3 p-4 lg:grid-cols-[minmax(0,1fr)_14rem] lg:items-start">
+            <div className="grid gap-3">
             <div className="grid gap-2 md:grid-cols-4">
+              <label className="grid gap-1 text-xs text-muted-foreground">
+                Cliente <span className="sr-only">requerido</span>
               <Input
                 aria-label="Cliente"
                 placeholder="Cliente"
                 value={clientName}
                 onChange={(e) => setClient(e.target.value)}
               />
+              </label>
+              <label className="grid gap-1 text-xs text-muted-foreground">
+                Contacto
               <Input
                 aria-label="Contacto"
                 placeholder="Contacto"
                 value={contactName}
                 onChange={(e) => setContact(e.target.value)}
               />
+              </label>
+              <label className="grid gap-1 text-xs text-muted-foreground">
+                Correo electrónico
               <Input
                 aria-label="Correo electrónico"
                 placeholder="Email"
@@ -255,18 +307,25 @@ export function QuoteDesk({
                 value={contactEmail}
                 onChange={(e) => setEmail(e.target.value)}
               />
+              </label>
+              <label className="grid gap-1 text-xs text-muted-foreground">
+                Vigencia <span className="sr-only">requerida</span>
               <Input
                 aria-label="Vigencia"
                 type="date"
                 value={validUntil}
                 onChange={(e) => setValid(e.target.value)}
               />
+              </label>
             </div>
             {lines.map((line, i) => (
               <div
-                key={i}
+                key={line.clientId}
                 className="grid gap-2 rounded border p-3 md:grid-cols-5"
               >
+                <div className="text-xs font-medium text-foreground md:col-span-5">Ruta {i + 1}</div>
+                <label className="grid gap-1 text-[11px] text-muted-foreground">
+                  Origen
                 <Input
                   aria-label={`Ruta ${i + 1}: origen`}
                   placeholder="Origen"
@@ -279,6 +338,9 @@ export function QuoteDesk({
                     )
                   }
                 />
+                </label>
+                <label className="grid gap-1 text-[11px] text-muted-foreground">
+                  Destino
                 <Input
                   aria-label={`Ruta ${i + 1}: destino`}
                   placeholder="Destino"
@@ -291,6 +353,9 @@ export function QuoteDesk({
                     )
                   }
                 />
+                </label>
+                <label className="grid gap-1 text-[11px] text-muted-foreground">
+                  Tarifa
                 <Input
                   aria-label={`Ruta ${i + 1}: tarifa`}
                   placeholder="Tarifa"
@@ -304,6 +369,9 @@ export function QuoteDesk({
                     )
                   }
                 />
+                </label>
+                <label className="grid gap-1 text-[11px] text-muted-foreground">
+                  Moneda
                 <Input
                   aria-label={`Ruta ${i + 1}: moneda`}
                   placeholder="Moneda"
@@ -316,8 +384,10 @@ export function QuoteDesk({
                     )
                   }
                 />
+                </label>
                 <Button
                   variant="ghost"
+                  className="self-end"
                   disabled={lines.length === 1}
                   onClick={() => setLines((x) => x.filter((_, n) => n !== i))}
                 >
@@ -325,12 +395,12 @@ export function QuoteDesk({
                 </Button>
               </div>
             ))}
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button
                 type="button"
                 variant="outline"
                 disabled={lines.length >= 15}
-                onClick={() => setLines((x) => [...x, blank()])}
+                onClick={() => setLines((x) => [...x, newBlankLine()])}
               >
                 Agregar ruta
               </Button>
@@ -346,6 +416,14 @@ export function QuoteDesk({
                 Guardar borrador
               </Button>
             </div>
+            </div>
+            <CaptureSummary
+              clientName={clientName}
+              contactName={contactName}
+              contactEmail={contactEmail}
+              validUntil={validUntil}
+              lines={lines}
+            />
           </CardContent>
         </Card>
       )}
@@ -360,7 +438,7 @@ export function QuoteDesk({
           <div className="flex flex-wrap items-center gap-2">
             <select
               aria-label="Plantilla de cotización"
-              className="h-9 min-w-64 rounded-md border bg-background px-3 text-sm"
+              className="h-9 w-full rounded-md border bg-background px-3 text-sm sm:w-auto sm:min-w-64"
               value={selectedTemplate}
               onChange={(e) => {
                 setSelectedTemplate(e.target.value);
@@ -378,7 +456,7 @@ export function QuoteDesk({
               Campos: folio, cliente, vigencia y hasta 15 rutas.
             </span>
           </div>
-          <details className="rounded-md border p-3">
+          {canEdit ? <details className="rounded-md border p-3">
             <summary className="cursor-pointer text-sm font-medium">
               Precargar una plantilla HTML propia
             </summary>
@@ -417,7 +495,7 @@ export function QuoteDesk({
                 </Button>
               </div>
             </div>
-          </details>
+          </details> : null}
           <p className="text-xs text-muted-foreground">
             Se eliminan scripts, formularios, iframes y URLs ejecutables. La
             previsualización se muestra en un iframe sandbox; guardar una
@@ -425,35 +503,58 @@ export function QuoteDesk({
           </p>
         </CardContent>
       </Card>
-      <Card className="overflow-hidden">
+      <div className="flex flex-wrap items-center gap-2">
+        <Input
+          aria-label="Buscar propuestas"
+          placeholder="Buscar folio, cliente, correo o ruta…"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          className="h-9 w-full sm:max-w-sm"
+        />
+        <select
+          aria-label="Filtrar propuestas por estado"
+          value={statusFilter}
+          onChange={(event) => setStatusFilter(event.target.value as "ALL" | CustomerQuoteStatus)}
+          className="h-9 w-full rounded-md border bg-background px-3 text-sm sm:w-auto"
+        >
+          <option value="ALL">Todos los estados</option>
+          <option value="DRAFT">Borradores</option>
+          <option value="REVIEW">En revisión</option>
+          <option value="APPROVED">Aprobadas</option>
+          <option value="ARCHIVED">Archivadas</option>
+        </select>
+        <span className="text-xs text-muted-foreground sm:ml-auto">{visibleItems.length} de {items.length}</span>
+      </div>
+      <div className={previewFor ? "grid gap-3 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] xl:items-start" : ""}>
+      <Card className="min-w-0 overflow-hidden">
         <CardContent className="overflow-x-auto p-0">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[760px] text-xs">
             <thead className="border-b bg-muted/40 text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
               <tr>
-                <th className="px-5 py-3 text-left font-medium">Folio</th>
-                <th className="px-5 py-3 text-left font-medium">Cliente</th>
-                <th className="px-5 py-3 text-left font-medium">Rutas</th>
-                <th className="px-5 py-3 text-left font-medium">Vigencia</th>
-                <th className="px-5 py-3 text-left font-medium">Estado</th>
-                <th className="px-5 py-3 text-right font-medium">Correo</th>
+                <th className="px-3 py-2 text-left font-medium">Folio</th>
+                <th className="px-3 py-2 text-left font-medium">Cliente</th>
+                <th className="px-3 py-2 text-left font-medium">Rutas</th>
+                <th className="px-3 py-2 text-left font-medium">Vigencia</th>
+                <th className="px-3 py-2 text-left font-medium">Estado</th>
+                <th className="px-3 py-2 text-right font-medium">Correo</th>
               </tr>
             </thead>
             <tbody>
-              {items.length === 0 && (
+              {visibleItems.length === 0 && (
                 <tr>
                   <td colSpan={6} className="px-5 py-10 text-center text-sm text-muted-foreground">
-                    Aún no hay propuestas. Crea un borrador para iniciar el Quote Desk.
+                    {items.length === 0 ? "Aún no hay propuestas. Crea un borrador para iniciar el Quote Desk." : "Ninguna propuesta coincide con los filtros."}
                   </td>
                 </tr>
               )}
-              {items.map((q) => (
+              {visibleItems.map((q) => (
                 <tr key={q.id} className="border-b transition-colors hover:bg-muted/40">
-                  <td className="px-5 py-3.5 font-medium">{q.folio}</td>
-                  <td className="px-5 py-3.5">{q.clientName}</td>
-                  <td className="px-5 py-3.5 tabular-nums">{q.lines.length}</td>
-                  <td className="whitespace-nowrap px-5 py-3.5 text-muted-foreground">{formatCivilDate(q.validUntil)}</td>
-                  <td className="px-5 py-3.5"><QuoteStatusBadge status={q.status} /></td>
-                  <td className="px-5 py-3.5 text-right">
+                  <td className="px-3 py-2.5 font-medium">{q.folio}</td>
+                  <td className="px-3 py-2.5">{q.clientName}</td>
+                  <td className="px-3 py-2.5 tabular-nums">{q.lines.length}</td>
+                  <td className="whitespace-nowrap px-3 py-2.5 text-muted-foreground">{formatCivilDate(q.validUntil)}</td>
+                  <td className="px-3 py-2.5"><QuoteStatusBadge status={q.status} /></td>
+                  <td className="px-3 py-2.5 text-right">
                     <Button
                       size="sm"
                       variant="outline"
@@ -470,8 +571,8 @@ export function QuoteDesk({
         </CardContent>
       </Card>
       {previewFor && (
-        <Card>
-          <CardHeader className="border-b bg-muted/25 pb-4">
+        <Card className="min-w-0 xl:sticky xl:top-16">
+          <CardHeader className="border-b bg-muted/25 px-4 py-3">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <CardTitle>Previsualización — {previewFor.folio}</CardTitle>
@@ -479,8 +580,8 @@ export function QuoteDesk({
                   {preview.data?.subject || "Generando…"}
                 </p>
               </div>
-              <div className="flex items-center gap-2">
-                <Button
+              <div className="flex flex-wrap items-center gap-2">
+                {canEdit ? <Button
                   size="sm"
                   disabled={
                     !previewFor.contactEmail ||
@@ -495,7 +596,7 @@ export function QuoteDesk({
                   }
                 >
                   Preparar para Gmail
-                </Button>
+                </Button> : null}
                 <Button
                   variant="ghost"
                   onClick={() => {
@@ -519,7 +620,7 @@ export function QuoteDesk({
               <iframe
                 title="Previsualización de correo"
                 sandbox=""
-                className="h-[620px] w-full rounded-md border bg-white"
+                className="h-[520px] w-full rounded-md border bg-white"
                 srcDoc={preview.data?.html || ""}
               />
             )}
@@ -590,6 +691,7 @@ export function QuoteDesk({
           </CardContent>
         </Card>
       )}
+      </div>
     </div>
   );
 }
@@ -607,5 +709,66 @@ function QuoteStatusBadge({ status }: { status: CustomerQuoteStatus }) {
     <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${presentation.className}`}>
       {presentation.label}
     </span>
+  );
+}
+
+function DeskMetric({
+  label,
+  value,
+  tone = "default",
+  last = false,
+}: {
+  label: string;
+  value: number;
+  tone?: "default" | "warning";
+  last?: boolean;
+}) {
+  return (
+    <div className={`px-3 py-2 ${last ? "" : "border-b sm:border-r sm:border-b-0"}`}>
+      <div className={`text-lg font-semibold tabular-nums ${tone === "warning" ? "text-amber-700 dark:text-amber-400" : ""}`}>
+        {value}
+      </div>
+      <div className="text-[11px] text-muted-foreground">{label}</div>
+    </div>
+  );
+}
+
+function CaptureSummary({
+  clientName,
+  contactName,
+  contactEmail,
+  validUntil,
+  lines,
+}: {
+  clientName: string;
+  contactName: string;
+  contactEmail: string;
+  validUntil: string;
+  lines: ReturnType<typeof blank>[];
+}) {
+  const completeLines = lines.filter((line) => line.origin.trim() && line.destination.trim() && line.tariff).length;
+  return (
+    <aside className="grid gap-3 rounded-md border bg-muted/20 p-3 lg:sticky lg:top-16" aria-label="Resumen de la propuesta">
+      <div className="flex items-center justify-between gap-2 border-b pb-2">
+        <h3 className="text-sm font-semibold">Resumen</h3>
+        <span className="rounded-full bg-muted px-2 py-1 text-[10px] font-medium text-muted-foreground">Sin guardar</span>
+      </div>
+      <dl className="grid gap-2 text-xs">
+        <SummaryRow label="Cliente" value={clientName.trim() || "Pendiente"} />
+        <SummaryRow label="Contacto" value={contactName.trim() || contactEmail.trim() || "Pendiente"} />
+        <SummaryRow label="Vigencia" value={validUntil ? formatCivilDate(validUntil) : "Pendiente"} />
+        <SummaryRow label="Rutas" value={`${completeLines}/${lines.length} completas`} />
+      </dl>
+      <p className="border-t pt-2 text-[11px] leading-relaxed text-muted-foreground">Guardar crea un borrador comercial; no prepara ni envía correo.</p>
+    </aside>
+  );
+}
+
+function SummaryRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <dt className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</dt>
+      <dd className="mt-0.5 break-words font-medium">{value}</dd>
+    </div>
   );
 }

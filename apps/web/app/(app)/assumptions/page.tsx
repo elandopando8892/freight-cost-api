@@ -3,13 +3,16 @@ import { api } from '@/lib/api'
 import { AssumptionsList, type AssumptionSet } from './assumptions-list'
 
 export const dynamic = 'force-dynamic'
-export const metadata: Metadata = { title: 'Assumptions' }
+export const metadata: Metadata = { title: 'Supuestos por base' }
 
 export default async function AssumptionsListPage() {
-  const sets = await api<AssumptionSet[]>('/assumptions/sets')
+  const [sets, user] = await Promise.all([
+    api<AssumptionSet[]>('/assumptions/sets'),
+    api<{ role: 'ADMIN' | 'OPERATOR' | 'VIEWER' }>('/auth/me'),
+  ])
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-8">
-      <AssumptionsList initial={sets} />
+    <main className="mx-auto w-full max-w-[1440px] px-3 py-4 sm:px-4">
+      <AssumptionsList initial={sets} canEdit={user.role === 'ADMIN'} />
     </main>
   )
 }

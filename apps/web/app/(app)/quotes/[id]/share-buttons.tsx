@@ -107,8 +107,8 @@ export function ShareButtons({ quote }: { quote: QuoteSummaryProps }) {
     const url = window.location.href
     const ok = await copy(url)
     setBusy(null)
-    if (ok) toast.success('Link copied')
-    else toast.error('Could not copy link')
+    if (ok) toast.success('Enlace copiado')
+    else toast.error('No se pudo copiar el enlace')
   }
 
   const copySummary = async () => {
@@ -116,8 +116,8 @@ export function ShareButtons({ quote }: { quote: QuoteSummaryProps }) {
     const text = buildSummary(quote, window.location.href)
     const ok = await copy(text)
     setBusy(null)
-    if (ok) toast.success('Summary copied to clipboard')
-    else toast.error('Could not copy summary')
+    if (ok) toast.success('Resumen copiado al portapapeles')
+    else toast.error('No se pudo copiar el resumen')
   }
 
   return (

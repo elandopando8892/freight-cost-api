@@ -13,7 +13,7 @@ import {
   OPS, SVCS, TRUCKS, TRAILERS, CONFIGS, DRIVERS, ROUTES, selectCls,
   initialFormFor, compatibleBases, preferredGovernedBase, activeVersionFor,
   costBaseReadiness, costBaseReadinessDetail, quoteBody, Field, CostBaseSelector,
-  CostBaseLineageNotice, ResultSkeleton, Result,
+  CostBaseLineageNotice, CalculationContextPanel, ResultSkeleton, QuoteErrorState, Result,
 } from './quote-shared'
 
 // Progressive-disclosure steps: one decision at a time, with microcopy.
@@ -103,6 +103,7 @@ export function QuoteWizard({ costBases = [] }: { costBases?: CostBaseOption[] }
     setForm((f) => ({ ...f, [k]: v }))
     if (errors[k]) setErrors((e) => ({ ...e, [k]: undefined }))
     if (result) setResult(null) // changing inputs invalidates the shown price
+    if (quote.isError) quote.reset()
   }
 
   // Only the lane step has required fields.
@@ -121,43 +122,52 @@ export function QuoteWizard({ costBases = [] }: { costBases?: CostBaseOption[] }
 
   const next = () => { if (validateStep(step)) setStep((s) => Math.min(s + 1, STEPS.length - 1)) }
   const back = () => setStep((s) => Math.max(s - 1, 0))
-  const restart = () => { setForm(initialFormFor(costBases)); setErrors({}); setResult(null); setStep(0) }
+  const restart = () => { setForm(initialFormFor(costBases)); setErrors({}); setResult(null); quote.reset(); setStep(0) }
   const selectedCostBase = costBases.find((base) => base.id === form.costBaseId)
+  const selectedVersion = activeVersionFor(selectedCostBase)
 
   return (
-    <div className="mx-auto grid max-w-4xl gap-5">
-      <Stepper step={step} onJump={(s) => { if (s < step || validateStep(step)) setStep(s) }} />
+    <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_17rem] xl:items-start">
+      <div className="grid min-w-0 gap-3">
+        <Stepper step={step} onJump={(s) => { if (s < step || validateStep(step)) setStep(s) }} />
 
-      <Card className="overflow-hidden">
-        <CardHeader className="border-b bg-muted/25 pb-4">
-          <CardTitle>{STEPS[step].title}</CardTitle>
-          <CardDescription>{STEPS[step].blurb}</CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-5">
-          {step === 0 && <LaneStep form={form} errors={errors} set={set} locations={locations} costBases={costBases} />}
-          {step === 1 && <EquipmentStep form={form} set={set} />}
-          {step === 2 && <ReviewStep form={form} onEdit={setStep} costBases={costBases} />}
-        </CardContent>
-      </Card>
+        <Card className="overflow-hidden">
+          <CardHeader className="border-b bg-muted/25 px-4 py-3">
+            <CardTitle className="text-base">{STEPS[step].title}</CardTitle>
+            <CardDescription>{STEPS[step].blurb}</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4 p-4">
+            {step === 0 && <LaneStep form={form} errors={errors} set={set} locations={locations} costBases={costBases} />}
+            {step === 1 && <EquipmentStep form={form} set={set} />}
+            {step === 2 && <ReviewStep form={form} onEdit={setStep} costBases={costBases} />}
+          </CardContent>
+        </Card>
 
-      {/* Nav */}
-      <div className="flex items-center justify-between gap-3 border-t pt-4">
-        <Button variant="ghost" onClick={back} disabled={step === 0}>← Anterior</Button>
-        <div className="flex items-center gap-2">
-          <button type="button" onClick={restart} className="text-xs text-muted-foreground hover:text-foreground">Reiniciar</button>
-          {step < STEPS.length - 1 ? (
-            <Button onClick={next}>Continuar →</Button>
-          ) : (
-            <Button onClick={() => quote.mutate()} disabled={quote.isPending}>
-              {quote.isPending ? 'Calculando…' : result ? 'Recalcular' : 'Generar tarifa'}
-            </Button>
-          )}
+        <div className="flex items-center justify-between gap-3 border-t pt-3">
+          <Button variant="ghost" onClick={back} disabled={step === 0}>← Anterior</Button>
+          <div className="flex items-center gap-2">
+            <button type="button" onClick={restart} className="text-xs text-muted-foreground hover:text-foreground">Reiniciar</button>
+            {step < STEPS.length - 1 ? (
+              <Button onClick={next}>Continuar →</Button>
+            ) : (
+              <Button onClick={() => quote.mutate()} disabled={quote.isPending}>
+                {quote.isPending ? 'Calculando…' : result ? 'Recalcular' : 'Generar tarifa'}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Result (only on the review step) */}
+      <CalculationContextPanel
+        base={selectedCostBase}
+        operation={displayLabel(form.operation)}
+        route={form.outboundLocation || form.inboundLocation ? `${form.outboundLocation || '—'} → ${form.inboundLocation || '—'}` : 'Pendiente'}
+        equipment={`${displayLabel(form.truckType)} · ${displayLabel(form.trailer)}`}
+        className="xl:sticky xl:top-16"
+      />
+
       {step === STEPS.length - 1 && (
-        <div className="grid gap-4">
+        <div className="grid gap-4 xl:col-span-2">
           {quote.isPending ? (
             <ResultSkeleton />
           ) : result ? (
@@ -169,11 +179,14 @@ export function QuoteWizard({ costBases = [] }: { costBases?: CostBaseOption[] }
                 origin: form.outboundLocation.trim(),
                 destination: form.inboundLocation.trim(),
                 equipment: { truckType: form.truckType, trailer: form.trailer, config: form.config, driver: form.driver },
-                costBaseLabel: selectedCostBase?.code ?? 'Supuestos heredados',
+                costBaseLabel: selectedCostBase?.code ?? 'Supuestos activos sin base',
+                assumptionVersionLabel: selectedVersion ? `v${selectedVersion.version}` : 'Sin versión activa',
                 costBaseReadiness: costBaseReadiness(selectedCostBase),
                 costBaseReadinessDetail: costBaseReadinessDetail(selectedCostBase, form.operation),
               }}
             />
+          ) : quote.isError ? (
+            <QuoteErrorState onRetry={() => quote.mutate()} />
           ) : null}
         </div>
       )}
@@ -185,7 +198,7 @@ const usdFmt = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency'
 
 function Stepper({ step, onJump }: { step: number; onJump: (s: number) => void }) {
   return (
-    <ol className="flex items-center gap-2 rounded-xl border bg-muted/25 p-3">
+    <ol className="flex items-center gap-2 rounded-md border bg-muted/25 p-2">
       {STEPS.map((s, i) => {
         const state = i < step ? 'done' : i === step ? 'active' : 'todo'
         return (

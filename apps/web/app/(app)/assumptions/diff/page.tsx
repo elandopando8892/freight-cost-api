@@ -4,7 +4,7 @@ import { api, ApiError } from '@/lib/api'
 import { Card, CardContent } from '@/components/ui/card'
 
 export const dynamic = 'force-dynamic'
-export const metadata: Metadata = { title: 'Compare assumption sets' }
+export const metadata: Metadata = { title: 'Comparar versiones de supuestos' }
 
 interface SetParam { section: string; field: string; value: number; unit: string }
 interface SetDetail { id: string; name: string; version: number; params: SetParam[] }

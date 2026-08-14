@@ -15,16 +15,16 @@ export default async function RateBooksPage() {
     api<{ role: 'ADMIN' | 'OPERATOR' | 'VIEWER' }>('/approvals/context'),
   ])
   return (
-    <main className="mx-auto w-full max-w-[90rem] px-4 py-6 sm:px-6 lg:px-8">
+    <main className="mx-auto w-full max-w-[1440px] px-3 py-4 sm:px-4">
       <RateBooksBoard
         initial={books}
         bases={bases}
         role={approvalContext.role}
         defaultEffectiveFrom={dateKeyInTimeZone(new Date())}
         headerActions={
-          <Link className="rounded-md border bg-background px-3 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent" href="/ratebooks/regenerate">
+          approvalContext.role === 'ADMIN' ? <Link className="rounded-md border bg-background px-3 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent" href="/ratebooks/regenerate">
             Revisar regeneraciones
-          </Link>
+          </Link> : null
         }
       >
         <RateBookExports role={approvalContext.role} books={books.filter((book) => book.status === 'PUBLISHED').map((book) => ({ id: book.id, code: book.code, name: book.name }))} />

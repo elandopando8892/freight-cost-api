@@ -4,10 +4,13 @@ import { authenticate } from '../../middleware/authenticate.js'
 import { requireRole } from '../../middleware/authorize.js'
 import { prisma } from '../../config/prisma.js'
 import type { JwtPayload } from '../auth/auth.schema.js'
-import { approvalReviewBlocker } from './approval-rules.js'
+import { approvalReviewBlocker, singleAdminApprovalConfirmation } from './approval-rules.js'
 
 const RequestApproval = z.object({ action: z.enum(['RATEBOOK_PUBLISH', 'RATEWARE_DELIVERY']), note: z.string().trim().min(3).max(2000) })
-const DecideApproval = z.object({ note: z.string().trim().min(3).max(2000) })
+const DecideApproval = z.object({
+  note: z.string().trim().min(3).max(2000),
+  singleAdminConfirmation: z.string().trim().max(200).optional(),
+})
 const approvalInclude = {
   rateBook: { select: { id: true, code: true, name: true, status: true, effectiveFrom: true, effectiveUntil: true } },
   requestedBy: { select: { id: true, email: true, role: true } },
@@ -19,7 +22,11 @@ function httpError(message: string, statusCode: number) { return Object.assign(n
 export async function approvalsRoutes(app: FastifyInstance) {
   app.addHook('preHandler', authenticate)
 
-  app.get('/approvals/context', async (request) => ({ role: (request.user as JwtPayload).role }))
+  app.get('/approvals/context', async (request) => {
+    const user = request.user as JwtPayload
+    const adminCount = await prisma.user.count({ where: { orgId: user.orgId, role: 'ADMIN' } })
+    return { role: user.role, userId: user.sub, adminCount, singleAdminMode: adminCount === 1 }
+  })
   app.get('/approvals', async (request) => {
     const user = request.user as JwtPayload
     const query = request.query as { status?: string }
@@ -48,20 +55,48 @@ export async function approvalsRoutes(app: FastifyInstance) {
   app.post('/approvals/:id/approve', { preHandler: requireRole('ADMIN') }, async (request) => {
     const user = request.user as JwtPayload
     const { id } = request.params as { id: string }
-    const { note } = DecideApproval.parse(request.body)
-    const approval = await prisma.approvalRequest.findFirstOrThrow({ where: { id, orgId: user.orgId }, include: approvalInclude })
-    const blocker = approvalReviewBlocker({ status: approval.status, requestedById: approval.requestedById, reviewerId: user.sub })
+    const input = DecideApproval.parse(request.body)
+    const [approval, adminCount] = await Promise.all([
+      prisma.approvalRequest.findFirstOrThrow({ where: { id, orgId: user.orgId }, include: approvalInclude }),
+      prisma.user.count({ where: { orgId: user.orgId, role: 'ADMIN' } }),
+    ])
+    const singleAdminSelfReview = adminCount === 1 && approval.requestedById === user.sub
+    const expectedConfirmation = singleAdminApprovalConfirmation(approval.id)
+    const blocker = approvalReviewBlocker({
+      status: approval.status,
+      requestedById: approval.requestedById,
+      reviewerId: user.sub,
+      allowSingleAdminSelfReview: singleAdminSelfReview,
+      singleAdminConfirmed: input.singleAdminConfirmation === expectedConfirmation,
+    })
     if (blocker) throw httpError(blocker, approval.status === 'PENDING' ? 422 : 409)
-    return prisma.approvalRequest.update({ where: { id }, data: { status: 'APPROVED', decisionNote: note, reviewedById: user.sub, reviewedAt: new Date() }, include: approvalInclude })
+    const decisionNote = singleAdminSelfReview
+      ? `${input.note}\n[${expectedConfirmation}]`
+      : input.note
+    return prisma.approvalRequest.update({ where: { id }, data: { status: 'APPROVED', decisionNote, reviewedById: user.sub, reviewedAt: new Date() }, include: approvalInclude })
   })
 
   app.post('/approvals/:id/reject', { preHandler: requireRole('ADMIN') }, async (request) => {
     const user = request.user as JwtPayload
     const { id } = request.params as { id: string }
-    const { note } = DecideApproval.parse(request.body)
-    const approval = await prisma.approvalRequest.findFirstOrThrow({ where: { id, orgId: user.orgId }, select: { id: true, status: true, requestedById: true } })
-    const blocker = approvalReviewBlocker({ status: approval.status, requestedById: approval.requestedById, reviewerId: user.sub })
+    const input = DecideApproval.parse(request.body)
+    const [approval, adminCount] = await Promise.all([
+      prisma.approvalRequest.findFirstOrThrow({ where: { id, orgId: user.orgId }, select: { id: true, status: true, requestedById: true } }),
+      prisma.user.count({ where: { orgId: user.orgId, role: 'ADMIN' } }),
+    ])
+    const singleAdminSelfReview = adminCount === 1 && approval.requestedById === user.sub
+    const expectedConfirmation = singleAdminApprovalConfirmation(approval.id)
+    const blocker = approvalReviewBlocker({
+      status: approval.status,
+      requestedById: approval.requestedById,
+      reviewerId: user.sub,
+      allowSingleAdminSelfReview: singleAdminSelfReview,
+      singleAdminConfirmed: input.singleAdminConfirmation === expectedConfirmation,
+    })
     if (blocker) throw httpError(blocker, approval.status === 'PENDING' ? 422 : 409)
-    return prisma.approvalRequest.update({ where: { id }, data: { status: 'REJECTED', decisionNote: note, reviewedById: user.sub, reviewedAt: new Date() }, include: approvalInclude })
+    const decisionNote = singleAdminSelfReview
+      ? `${input.note}\n[${expectedConfirmation}]`
+      : input.note
+    return prisma.approvalRequest.update({ where: { id }, data: { status: 'REJECTED', decisionNote, reviewedById: user.sub, reviewedAt: new Date() }, include: approvalInclude })
   })
 }

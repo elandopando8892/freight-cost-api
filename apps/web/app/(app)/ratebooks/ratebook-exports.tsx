@@ -140,8 +140,8 @@ export function RateBookExports({
         </p>
       )}
       <p className="w-full text-right text-xs text-muted-foreground">
-        La entrega requiere una solicitud aprobada por otro administrador y crea
-        una recepción trazable; no publica ni modifica tarifas en Rateware.
+        La entrega requiere una solicitud aprobada en un segundo paso explícito
+        y crea una recepción trazable; no publica ni modifica tarifas en Rateware.
       </p>
     </section>
   );

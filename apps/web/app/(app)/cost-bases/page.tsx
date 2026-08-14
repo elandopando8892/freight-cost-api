@@ -6,10 +6,13 @@ export const dynamic = 'force-dynamic'
 export const metadata: Metadata = { title: 'Bases de costo' }
 
 export default async function CostBasesPage() {
-  const bases = await api<CostBase[]>('/cost-bases')
+  const [bases, user] = await Promise.all([
+    api<CostBase[]>('/cost-bases'),
+    api<{ role: 'ADMIN' | 'OPERATOR' | 'VIEWER' }>('/auth/me'),
+  ])
   return (
-    <main className="mx-auto w-full max-w-[90rem] px-4 py-6 sm:px-6 lg:px-8">
-      <CostBasesBoard initial={bases} />
+    <main className="mx-auto w-full max-w-[1440px] px-3 py-4 sm:px-4">
+      <CostBasesBoard initial={bases} canEdit={user.role === 'ADMIN'} />
     </main>
   )
 }

@@ -16,7 +16,7 @@ export function DeleteQuoteButton({ id, label }: { id: string; label: string }) 
   const remove = useMutation({
     mutationFn: () => fetcher<null>(`/api/v1/quotes/${id}`, { method: 'DELETE' }),
     onSuccess: () => {
-      toast.success('Quote deleted')
+      toast.success('Cotización eliminada')
       router.push('/quotes')
       router.refresh()
     },
@@ -27,20 +27,20 @@ export function DeleteQuoteButton({ id, label }: { id: string; label: string }) 
       <AlertDialogTrigger
         render={
           <Button variant="outline" size="sm" disabled={remove.isPending}>
-            {remove.isPending ? 'Deleting…' : 'Delete'}
+            {remove.isPending ? 'Eliminando…' : 'Eliminar'}
           </Button>
         }
       />
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete this quote?</AlertDialogTitle>
+          <AlertDialogTitle>¿Eliminar esta cotización?</AlertDialogTitle>
           <AlertDialogDescription>
-            {label}. This cannot be undone.
+            {label}. Esta acción no se puede deshacer.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={() => remove.mutate()}>Delete</AlertDialogAction>
+          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+          <AlertDialogAction onClick={() => remove.mutate()}>Eliminar</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

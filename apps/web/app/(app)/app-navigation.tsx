@@ -90,10 +90,10 @@ function NavigationLink({
         if (closeOnNavigate) event.currentTarget.closest('details')?.removeAttribute('open')
       }}
       className={[
-        'group flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors',
+        'group relative flex items-center gap-2 rounded-md px-3 py-2 text-xs transition-colors',
         active
-          ? 'bg-primary/10 font-medium text-primary shadow-[inset_3px_0_0_var(--primary)]'
-          : 'text-muted-foreground hover:bg-accent hover:text-foreground',
+          ? 'bg-sidebar-accent font-medium text-foreground shadow-[inset_3px_0_0_var(--sidebar-primary)]'
+          : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
       ].join(' ')}
     >
       <Icon className="size-4 shrink-0" aria-hidden />
@@ -110,11 +110,11 @@ export function AppNavigation({
   closeOnNavigate?: boolean
 }) {
   return (
-    <nav aria-label="Navegación principal" className={compact ? 'grid gap-3' : 'grid gap-5'}>
-      {navigation.map((group) => (
-        <section key={group.label} aria-label={group.label} className="grid gap-1">
+    <nav aria-label="Navegación principal" className="grid gap-3">
+      {navigation.map((group, index) => (
+        <section key={group.label} aria-label={group.label} className={`grid gap-0.5 ${index > 0 && !compact ? 'border-t pt-3' : ''}`}>
           {!compact && (
-            <h2 className="px-2.5 pb-1 text-[10px] font-medium tracking-[0.12em] text-muted-foreground uppercase">
+            <h2 className="px-2 pb-1 text-[10px] font-medium tracking-[0.04em] text-muted-foreground uppercase">
               {group.label}
             </h2>
           )}
@@ -123,7 +123,7 @@ export function AppNavigation({
           ))}
         </section>
       ))}
-      <section aria-label="Cuenta" className="grid gap-1 border-t pt-3">
+      <section aria-label="Cuenta" className="grid gap-0.5 border-t pt-3">
         {!compact && <h2 className="px-2.5 pb-1 text-[10px] font-medium tracking-[0.12em] text-muted-foreground uppercase">Cuenta</h2>}
         {accountLinks.map((item) => (
           <NavigationLink key={item.href} {...item} closeOnNavigate={closeOnNavigate} />

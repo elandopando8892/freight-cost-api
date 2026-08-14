@@ -68,7 +68,7 @@ const qualityClass: Record<Quality, string> = {
   READY: 'border-emerald-200 bg-emerald-50 text-emerald-800',
 }
 
-export function ProductionRoutesBoard({ initialRoutes, costBases }: { initialRoutes: ProductionRoute[]; costBases: CostBaseOption[] }) {
+export function ProductionRoutesBoard({ initialRoutes, costBases, canEdit }: { initialRoutes: ProductionRoute[]; costBases: CostBaseOption[]; canEdit: boolean }) {
   const router = useRouter()
   const [routes, setRoutes] = useState(initialRoutes)
   const [filter, setFilter] = useState<'ALL' | Quality>('ALL')
@@ -83,7 +83,7 @@ export function ProductionRoutesBoard({ initialRoutes, costBases }: { initialRou
 
   const produce = useMutation({
     mutationFn: (id: string) => fetcher<ProductionRoute>(`/api/v1/production/routes/${id}/produce`, { method: 'POST' }),
-    onSuccess: (route) => { upsert(route); toast.success('Ruta habilitada para produccion') },
+    onSuccess: (route) => { upsert(route); toast.success('Ruta habilitada para producción') },
   })
   const archive = useMutation({
     mutationFn: (id: string) => fetcher<ProductionRoute>(`/api/v1/production/routes/${id}/archive`, { method: 'POST' }),
@@ -91,7 +91,7 @@ export function ProductionRoutesBoard({ initialRoutes, costBases }: { initialRou
   })
   const quote = useMutation({
     mutationFn: (id: string) => fetcher<{ id: string; resolverWarnings: string[] }>(`/api/v1/production/routes/${id}/quotes`, { method: 'POST' }),
-    onSuccess: (saved) => { toast.success('Cotizacion creada desde la ruta producida'); router.push(`/quotes/${saved.id}`) },
+    onSuccess: (saved) => { toast.success('Cotización creada desde la ruta producida'); router.push(`/quotes/${saved.id}`) },
   })
   const replace = useMutation({
     mutationFn: ({ route, confirmedCostBaseId, confirmedAssumptionSetId, notes }: { route: ProductionRoute; confirmedCostBaseId: string; confirmedAssumptionSetId: string; notes?: string }) =>
@@ -103,8 +103,8 @@ export function ProductionRoutesBoard({ initialRoutes, costBases }: { initialRou
     <section className="grid gap-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-sm font-medium">Catalogo operativo</p>
-          <p className="text-sm text-muted-foreground">La base sugerida orienta; la base y version confirmadas gobiernan la produccion.</p>
+          <p className="text-sm font-medium">Catálogo operativo</p>
+          <p className="text-sm text-muted-foreground">La base sugerida orienta; la base y versión confirmadas gobiernan la producción.</p>
         </div>
         <div className="flex items-center gap-2">
           <select value={filter} onChange={(event) => setFilter(event.target.value as typeof filter)} className="h-9 rounded-md border bg-background px-2 text-sm">
@@ -113,7 +113,7 @@ export function ProductionRoutesBoard({ initialRoutes, costBases }: { initialRou
             <option value="NEEDS_REVIEW">Revisar</option>
             <option value="INCOMPLETE">Incompletas</option>
           </select>
-          <Button size="sm" onClick={() => setEdit(null)}>+ Nueva ruta</Button>
+          {canEdit ? <Button size="sm" onClick={() => setEdit(null)}>+ Nueva ruta</Button> : <span className="rounded-md border px-2 py-1 text-xs text-muted-foreground">Modo consulta</span>}
         </div>
       </div>
 
@@ -124,7 +124,7 @@ export function ProductionRoutesBoard({ initialRoutes, costBases }: { initialRou
               <table className="w-full min-w-[1060px] text-sm">
                 <thead className="border-b bg-muted/30 text-xs uppercase tracking-wide text-muted-foreground">
                   <tr>
-                    <th className="px-4 py-2 text-left font-medium">Ruta</th><th className="px-4 py-2 text-left font-medium">Geografia</th><th className="px-4 py-2 text-left font-medium">Operacion / equipo</th>
+                    <th className="px-4 py-2 text-left font-medium">Ruta</th><th className="px-4 py-2 text-left font-medium">Geografía</th><th className="px-4 py-2 text-left font-medium">Operación / equipo</th>
                     <th className="px-4 py-2 text-left font-medium">Base sugerida</th><th className="px-4 py-2 text-left font-medium">Base confirmada</th><th className="px-4 py-2 text-left font-medium">Calidad</th><th className="px-4 py-2 text-left font-medium">Estado</th><th className="px-4 py-2" />
                   </tr>
                 </thead>
@@ -134,10 +134,10 @@ export function ProductionRoutesBoard({ initialRoutes, costBases }: { initialRou
                     <td className="px-4 py-3"><span className="rounded border bg-muted px-2 py-1 text-xs">{route.geography}</span></td>
                     <td className="px-4 py-3"><div>{route.operation}</div><div className="text-xs text-muted-foreground">{route.truckType} · {route.trailerType} · {route.config}</div></td>
                     <td className="px-4 py-3 text-xs">{route.suggestedCostBase ? <><div className="font-medium">{route.suggestedCostBase.code}</div><div className="text-muted-foreground">{route.suggestedCostBase.name}</div></> : <span className="text-muted-foreground">Sin sugerencia publicada</span>}</td>
-                    <td className="px-4 py-3 text-xs">{route.confirmedCostBase ? <><div className="font-medium">{route.confirmedCostBase.code}</div><div className="text-muted-foreground">v{route.confirmedAssumptionSet?.version ?? '—'} · {route.confirmedAssumptionSet?.status ?? 'sin version'}</div></> : <span className="text-muted-foreground">Pendiente</span>}</td>
+                    <td className="px-4 py-3 text-xs">{route.confirmedCostBase ? <><div className="font-medium">{route.confirmedCostBase.code}</div><div className="text-muted-foreground">v{route.confirmedAssumptionSet?.version ?? '—'} · {route.confirmedAssumptionSet?.status ?? 'sin versión'}</div></> : <span className="text-muted-foreground">Pendiente</span>}</td>
                     <td className="px-4 py-3"><span title={route.reasons.join(' ')} className={`rounded border px-2 py-1 text-xs font-medium ${qualityClass[route.quality]}`}>{qualityLabel[route.quality]}</span>{route.reasons[0] && <div className="mt-1 max-w-[220px] text-xs text-muted-foreground">{route.reasons[0]}</div>}<RouteHistory events={route.auditEvents} /></td>
-                    <td className="px-4 py-3 text-xs font-medium">{route.status === 'PRODUCTION' ? 'En produccion' : route.status === 'ARCHIVED' ? 'Archivada' : 'Borrador'}</td>
-                    <td className="px-4 py-3 text-right whitespace-nowrap"><Button variant="ghost" size="sm" onClick={() => setEdit(route)} disabled={route.status !== 'DRAFT'}>Editar</Button>{route.status === 'DRAFT' && <Button variant="ghost" size="sm" disabled={route.quality !== 'READY' || produce.isPending} onClick={() => produce.mutate(route.id)}>Producir</Button>}{route.status === 'PRODUCTION' && <><Button variant="ghost" size="sm" disabled={quote.isPending} onClick={() => quote.mutate(route.id)}>Cotizar</Button><Button variant="ghost" size="sm" disabled={replace.isPending} onClick={() => setReplacement(route)}>Reemplazar</Button></>}{route.status !== 'ARCHIVED' && <Button variant="ghost" size="sm" disabled={archive.isPending} onClick={() => archive.mutate(route.id)}>Archivar</Button>}</td>
+                    <td className="px-4 py-3 text-xs font-medium">{route.status === 'PRODUCTION' ? 'En producción' : route.status === 'ARCHIVED' ? 'Archivada' : 'Borrador'}</td>
+                    <td className="px-4 py-3 text-right whitespace-nowrap">{canEdit ? <><Button variant="ghost" size="sm" onClick={() => setEdit(route)} disabled={route.status !== 'DRAFT'}>Editar</Button>{route.status === 'DRAFT' && <Button variant="ghost" size="sm" disabled={route.quality !== 'READY' || produce.isPending} onClick={() => produce.mutate(route.id)}>Producir</Button>}{route.status === 'PRODUCTION' && <><Button variant="ghost" size="sm" disabled={quote.isPending} onClick={() => quote.mutate(route.id)}>Cotizar</Button><Button variant="ghost" size="sm" disabled={replace.isPending} onClick={() => setReplacement(route)}>Reemplazar</Button></>}{route.status !== 'ARCHIVED' && <Button variant="ghost" size="sm" disabled={archive.isPending} onClick={() => archive.mutate(route.id)}>Archivar</Button>}</> : <span className="text-xs text-muted-foreground">Sólo lectura</span>}</td>
                   </tr>)}
                 </tbody>
               </table>
@@ -219,10 +219,10 @@ function RouteForm({ route, costBases, onSaved, onCancel }: { route: ProductionR
   const valid = origin.trim().length >= 2 && destination.trim().length >= 2 && (!isCrossBorder || (mexBorder.trim().length >= 2 && usaBorder.trim().length >= 2))
 
   return <form onSubmit={(event) => { event.preventDefault(); if (valid) save.mutate() }} className="grid gap-4">
-    <DialogHeader><DialogTitle>{route ? 'Editar ruta operativa' : 'Nueva ruta operativa'}</DialogTitle><DialogDescription>La confirmacion captura una version publicada; la ruta solo puede pasar a produccion cuando queda lista.</DialogDescription></DialogHeader>
+    <DialogHeader><DialogTitle>{route ? 'Editar ruta operativa' : 'Nueva ruta operativa'}</DialogTitle><DialogDescription>La confirmación captura una versión publicada; la ruta sólo puede pasar a producción cuando queda lista.</DialogDescription></DialogHeader>
     <div className="grid gap-3 sm:grid-cols-2">
       <Field label="Codigo interno (opcional)"><Input value={code} onChange={(event) => setCode(event.target.value)} placeholder="XB-MTY-DAL-01" /></Field>
-      <Field label="Operacion"><select value={operation} onChange={(event) => { setOperation(event.target.value); setConfirmedCostBaseId('') }} className="h-10 w-full rounded-md border bg-background px-3 text-sm">{operations.map(([name]) => <option key={name}>{name}</option>)}</select></Field>
+      <Field label="Operación"><select value={operation} onChange={(event) => { setOperation(event.target.value); setConfirmedCostBaseId('') }} className="h-10 w-full rounded-md border bg-background px-3 text-sm">{operations.map(([name]) => <option key={name}>{name}</option>)}</select></Field>
       <Field label="Origen"><Input value={origin} onChange={(event) => setOrigin(event.target.value)} placeholder="Monterrey, NL" /></Field>
       <Field label="Destino"><Input value={destination} onChange={(event) => setDestination(event.target.value)} placeholder="Dallas, TX" /></Field>
       {isCrossBorder && <><Field label="Cruce MX"><Input value={mexBorder} onChange={(event) => setMexBorder(event.target.value)} placeholder="Nuevo Laredo, Tamaulipas" /></Field><Field label="Cruce US"><Input value={usaBorder} onChange={(event) => setUsaBorder(event.target.value)} placeholder="Laredo, TX" /></Field></>}
@@ -231,7 +231,7 @@ function RouteForm({ route, costBases, onSaved, onCancel }: { route: ProductionR
       <Field label="Configuracion"><Input value={config} onChange={(event) => setConfig(event.target.value)} /></Field>
       <Field label="Conductor"><Input value={driverType} onChange={(event) => setDriverType(event.target.value)} /></Field>
     </div>
-    <DialogFooter><DialogClose render={<Button variant="outline" type="button" onClick={onCancel} />}>Cancelar</DialogClose><Button type="submit" disabled={!valid || save.isPending}>{save.isPending ? 'Guardando...' : route ? 'Guardar' : 'Crear borrador'}</Button></DialogFooter>
+    <DialogFooter><DialogClose render={<Button variant="outline" type="button" onClick={onCancel} />}>Cancelar</DialogClose><Button type="submit" disabled={!valid || save.isPending}>{save.isPending ? 'Guardando…' : route ? 'Guardar' : 'Crear borrador'}</Button></DialogFooter>
   </form>
 }
 

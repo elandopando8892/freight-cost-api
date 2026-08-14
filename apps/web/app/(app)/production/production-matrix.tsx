@@ -25,7 +25,7 @@ type EditState =
   | { side: 'usa'; lane: Partial<UsaLane> | null }
   | null
 
-export function ProductionMatrix({ initialMex, initialUsa }: { initialMex: MexLane[]; initialUsa: UsaLane[] }) {
+export function ProductionMatrix({ initialMex, initialUsa, canEdit }: { initialMex: MexLane[]; initialUsa: UsaLane[]; canEdit: boolean }) {
   const [side, setSide] = useState<Side>('mex')
   const [mex, setMex] = useState(initialMex)
   const [usa, setUsa] = useState(initialUsa)
@@ -55,7 +55,7 @@ export function ProductionMatrix({ initialMex, initialUsa }: { initialMex: MexLa
         </div>
         <div className="flex items-center gap-3">
           <span className="text-sm text-muted-foreground">{count}</span>
-          <Button size="sm" onClick={() => setEdit({ side, lane: null })}>+ Nueva ruta</Button>
+          {canEdit ? <Button size="sm" onClick={() => setEdit({ side, lane: null })}>+ Nueva ruta</Button> : <span className="rounded-md border px-2 py-1 text-xs text-muted-foreground">Modo consulta</span>}
         </div>
       </div>
 
@@ -99,7 +99,7 @@ export function ProductionMatrix({ initialMex, initialUsa }: { initialMex: MexLa
                         <td className="px-4 py-2 text-right tabular-nums text-muted-foreground">{l.tolls || '—'}</td>
                         <td className="px-4 py-2 text-right tabular-nums text-muted-foreground">{l.horasRuta || '—'}</td>
                         <td className="whitespace-nowrap px-4 py-2 text-right">
-                          <RowActions onEdit={() => setEdit({ side: 'mex', lane: l })} onDelete={() => removeMex.mutate(l.id)} pending={removeMex.isPending} label={`${l.origin} → ${l.destination}`} />
+                          {canEdit ? <RowActions onEdit={() => setEdit({ side: 'mex', lane: l })} onDelete={() => removeMex.mutate(l.id)} pending={removeMex.isPending} label={`${l.origin} → ${l.destination}`} /> : <span className="text-xs text-muted-foreground">Sólo lectura</span>}
                         </td>
                       </tr>
                     ))
@@ -112,7 +112,7 @@ export function ProductionMatrix({ initialMex, initialUsa }: { initialMex: MexLa
                         <td className="px-4 py-2 text-right tabular-nums text-muted-foreground">{l.truckDays || '—'}</td>
                         <td className="px-4 py-2 text-right tabular-nums text-muted-foreground">{l.routeExpenses || '—'}</td>
                         <td className="whitespace-nowrap px-4 py-2 text-right">
-                          <RowActions onEdit={() => setEdit({ side: 'usa', lane: l })} onDelete={() => removeUsa.mutate(l.id)} pending={removeUsa.isPending} label={`${l.origin} → ${l.destination}`} />
+                          {canEdit ? <RowActions onEdit={() => setEdit({ side: 'usa', lane: l })} onDelete={() => removeUsa.mutate(l.id)} pending={removeUsa.isPending} label={`${l.origin} → ${l.destination}`} /> : <span className="text-xs text-muted-foreground">Sólo lectura</span>}
                         </td>
                       </tr>
                     ))}
@@ -148,7 +148,7 @@ function RowActions({ onEdit, onDelete, pending, label }: { onEdit: () => void; 
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>¿Borrar esta ruta?</AlertDialogTitle>
-            <AlertDialogDescription>{label}. Los quotes guardados no se afectan; sólo dejará de resolverse desde tu matriz.</AlertDialogDescription>
+            <AlertDialogDescription>{label}. Las cotizaciones guardadas no se afectan; sólo dejará de resolverse desde tu matriz.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>

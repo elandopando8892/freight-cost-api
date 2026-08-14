@@ -14,7 +14,7 @@ export function QuoteModes({ recentLanes = [], costBases = [] }: { recentLanes?:
       <div
         role="group"
         aria-label="Modo de cotización"
-        className="mb-6 grid max-w-2xl grid-cols-2 gap-2 rounded-xl border bg-muted/30 p-2 text-sm"
+        className="mb-4 grid max-w-xl grid-cols-2 gap-1 rounded-md border bg-muted/30 p-1 text-sm"
       >
         <ModeTab active={mode === 'guided'} onClick={() => setMode('guided')} label="Guiado" description="Ruta, equipo y revisión" />
         <ModeTab active={mode === 'fast'} onClick={() => setMode('fast')} label="Rápido" description="Formulario para operación experta" />
@@ -30,7 +30,7 @@ function ModeTab({ active, onClick, label, description }: { active: boolean; onC
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`rounded-lg px-3 py-2.5 text-left transition-colors ${
+      className={`rounded px-3 py-2 text-left transition-colors ${
         active ? 'bg-background text-foreground shadow-sm ring-1 ring-border' : 'text-muted-foreground hover:bg-background/60 hover:text-foreground'
       }`}
     >

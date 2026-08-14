@@ -126,20 +126,28 @@ function buildScopeCoverage(bases: CostBase[]): ScopeCoverage[] {
   })
 }
 
-export function CostBasesBoard({ initial }: { initial: CostBase[] }) {
+export function CostBasesBoard({ initial, canEdit }: { initial: CostBase[]; canEdit: boolean }) {
   const [bases, setBases] = useState(initial)
-  const [showCreate, setShowCreate] = useState(initial.length === 0)
+  const [selectedBaseId, setSelectedBaseId] = useState(() => (
+    initial.find((base) => base.isDefault && base.status === 'ACTIVE')?.id ??
+    initial.find((base) => base.status === 'ACTIVE')?.id ??
+    initial[0]?.id ??
+    ''
+  ))
+  const [showCreate, setShowCreate] = useState(canEdit && initial.length === 0)
   const [createScope, setCreateScope] = useState<Scope>('CROSS_BORDER')
   const [versionAction, setVersionAction] = useState<{ kind: 'publish' | 'archive'; baseId: string; version: CostBaseVersion } | null>(null)
   const [impactTarget, setImpactTarget] = useState<{ base: CostBase; version: CostBaseVersion } | null>(null)
   const coverage = buildScopeCoverage(bases)
   const readyScopeCount = coverage.filter((item) => item.status === 'READY').length
+  const selectedBase = bases.find((base) => base.id === selectedBaseId) ?? bases[0] ?? null
 
   const create = useMutation({
     mutationFn: (body: { code: string; name: string; scope: Scope; defaultPolicy: string; isDefault: boolean }) =>
       fetcher<CostBase>('/api/v1/cost-bases', { method: 'POST', json: body }),
     onSuccess: (base) => {
       setBases((items) => [base, ...items.map((item) => base.isDefault && item.scope === base.scope ? { ...item, isDefault: false } : item)])
+      setSelectedBaseId(base.id)
       setShowCreate(false)
       toast.success(`Base ${base.code} creada`, { description: 'La versión 1 contiene los 210 parámetros canónicos.' })
     },
@@ -184,6 +192,7 @@ export function CostBasesBoard({ initial }: { initial: CostBase[] }) {
   }
 
   const openCreate = (scope: Scope) => {
+    if (!canEdit) return
     setCreateScope(scope)
     setShowCreate(true)
   }
@@ -203,74 +212,39 @@ export function CostBasesBoard({ initial }: { initial: CostBase[] }) {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-md bg-muted px-2.5 py-1.5 text-xs font-medium text-muted-foreground">{readyScopeCount} de {coverage.length} alcances listos</span>
-          <Button size="sm" onClick={() => setShowCreate((value) => !value)}>{showCreate ? 'Cancelar' : <><Plus className="mr-1 size-4" /> Nueva base</>}</Button>
+          {canEdit
+            ? <Button size="sm" onClick={() => setShowCreate((value) => !value)}>{showCreate ? 'Cancelar' : <><Plus className="mr-1 size-4" /> Nueva base</>}</Button>
+            : <span className="rounded-md border px-2 py-1 text-xs text-muted-foreground">Modo consulta</span>}
         </div>
       </div>
 
-      <CoverageOverview coverage={coverage} onCreate={openCreate} />
+      <CoverageOverview coverage={coverage} onCreate={openCreate} canEdit={canEdit} />
 
       {showCreate && <CreateBaseForm key={createScope} initialScope={createScope} pending={create.isPending} onSubmit={(body) => create.mutate(body)} />}
 
       {bases.length === 0 && !showCreate && (
-        <Card><CardHeader><CardTitle>No hay bases de costo</CardTitle><CardDescription>Crea la primera base y selecciona el alcance de rutas que atenderá.</CardDescription></CardHeader></Card>
+        <Card><CardHeader><CardTitle>No hay bases de costo</CardTitle><CardDescription>{canEdit ? 'Crea la primera base y selecciona el alcance de rutas que atenderá.' : 'No hay bases disponibles para consulta. Un administrador debe crear la primera.'}</CardDescription></CardHeader></Card>
       )}
 
-      <div id="base-list" className="grid scroll-mt-24 gap-4 lg:grid-cols-2">
-        {bases.map((base) => {
-          const active = base.versions.find((version) => version.isActive)
-          return (
-            <Card key={base.id} className={base.status === 'ARCHIVED' ? 'opacity-70' : ''}>
-              <CardHeader className="border-b bg-muted/20 pb-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="mb-1 flex flex-wrap items-center gap-1.5 text-xs">
-                      <span className="rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary">{SCOPE_LABEL[base.scope]}</span>
-                      <span className="rounded-full border px-2 py-0.5 text-muted-foreground">{BASE_STATUS_LABEL[base.status]}</span>
-                      {base.isDefault && <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 font-medium text-emerald-700 dark:text-emerald-400">predeterminada</span>}
-                    </div>
-                    <CardTitle className="truncate">{base.name}</CardTitle>
-                    <CardDescription>{base.code} · {base.currency} · {base.defaultPolicy === 'WORKBOOK_V3' ? 'Fidelidad de workbook' : 'Modelo operacional V3'}</CardDescription>
-                  </div>
-                  {base.status !== 'ARCHIVED' && <Button variant="outline" size="sm" onClick={() => newVersion.mutate(base.id)} disabled={newVersion.isPending}>Nueva versión</Button>}
-                </div>
-                {base.description && <p className="pt-1 text-sm text-muted-foreground">{base.description}</p>}
-              </CardHeader>
-              <CardContent className="grid gap-3 pt-4">
-                <div className="grid grid-cols-3 gap-2 rounded-md border bg-muted/25 p-3 text-sm">
-                  <Metric label="Versión activa" value={active ? `v${active.version}` : '—'} />
-                  <Metric label="Rutas" value={String(base._count.lanes)} />
-                  <Metric label="Cotizaciones" value={String(base._count.quotes)} />
-                </div>
-                <div className="flex justify-end">
-                  <Link href={`/catalog?base=${base.id}`} className="text-xs font-medium text-primary underline underline-offset-2">Revisar cobertura de parámetros →</Link>
-                </div>
-                <div className="grid gap-1">
-                  {base.versions.map((version) => (
-                    <div key={version.id} className="flex items-center gap-3 rounded-lg border px-3 py-2.5 text-sm">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-1.5 font-medium">Versión {version.version} <VersionBadge status={version.status} /> {version.isActive && <span className="text-xs text-emerald-600">activa</span>}</div>
-                        <div className="truncate text-xs text-muted-foreground">{version._count.params} parámetros · actualizada <RelativeTime iso={version.updatedAt} />{version.publishedBy ? ` · aprobada por ${version.publishedBy.email}` : ''}</div>
-                        {(version.auditEvents?.length ?? 0) > 0 && <VersionHistory events={version.auditEvents ?? []} />}
-                      </div>
-                      <Button variant="ghost" size="sm" onClick={() => openImpact(base, version)} disabled={impact.isPending}>Impacto</Button>
-                      <Link href={`/assumptions/${version.id}`} className="text-xs underline underline-offset-2">{version.status === 'DRAFT' ? 'Editar' : 'Ver'}</Link>
-                      {version.status === 'DRAFT' && base.status !== 'ARCHIVED' && (
-                        <Button variant="ghost" size="sm" disabled={transition.isPending} onClick={() => setVersionAction({ kind: 'publish', baseId: base.id, version })}>Publicar</Button>
-                      )}
-                      {!version.isActive && version.status === 'PUBLISHED' && base.status !== 'ARCHIVED' && (
-                        <Button variant="ghost" size="sm" disabled={activate.isPending} onClick={() => activate.mutate({ baseId: base.id, versionId: version.id })}>Activar</Button>
-                      )}
-                      {!version.isActive && version.status === 'PUBLISHED' && base.status !== 'ARCHIVED' && (
-                        <Button variant="ghost" size="sm" disabled={transition.isPending} onClick={() => setVersionAction({ kind: 'archive', baseId: base.id, version })}>Archivar</Button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )
-        })}
-      </div>
+      {selectedBase && (
+        <CostBaseWorkspace
+          bases={bases}
+          base={selectedBase}
+          selectedBaseId={selectedBase.id}
+          onSelect={setSelectedBaseId}
+          onNewVersion={(baseId) => newVersion.mutate(baseId)}
+          onOpenImpact={openImpact}
+          onVersionAction={(kind, baseId, version) => setVersionAction({ kind, baseId, version })}
+          onActivate={(baseId, versionId) => activate.mutate({ baseId, versionId })}
+          canEdit={canEdit}
+          pending={{
+            newVersion: newVersion.isPending,
+            impact: impact.isPending,
+            transition: transition.isPending,
+            activate: activate.isPending,
+          }}
+        />
+      )}
       <Dialog open={versionAction !== null} onOpenChange={(open) => { if (!open) setVersionAction(null) }}>
         <DialogContent>
           <DialogHeader>
@@ -313,7 +287,7 @@ const COVERAGE_LABEL: Record<CoverageStatus, string> = {
   MISSING: 'Sin cobertura',
 }
 
-function CoverageOverview({ coverage, onCreate }: { coverage: ScopeCoverage[]; onCreate: (scope: Scope) => void }) {
+function CoverageOverview({ coverage, onCreate, canEdit }: { coverage: ScopeCoverage[]; onCreate: (scope: Scope) => void; canEdit: boolean }) {
   const ready = coverage.filter((item) => item.status === 'READY').length
   return (
     <Card className="overflow-hidden">
@@ -346,14 +320,192 @@ function CoverageOverview({ coverage, onCreate }: { coverage: ScopeCoverage[]; o
               <CoverageMetric label="Cotizaciones" value={item.quoteCount} />
             </div>
             <div className="mt-3">
-              {item.status === 'MISSING'
+              {item.status === 'MISSING' && canEdit
                 ? <Button className="w-full" variant="outline" size="sm" onClick={() => onCreate(item.scope)}>Crear base {SCOPE_LABEL[item.scope]}</Button>
-                : <Link href="#base-list" className="block text-center text-xs font-medium text-primary underline underline-offset-2">Revisar bases</Link>}
+                : item.baseCount > 0
+                  ? <Link href="#base-list" className="block text-center text-xs font-medium text-primary underline underline-offset-2">Revisar bases</Link>
+                  : <span className="block text-center text-xs text-muted-foreground">Sin base disponible</span>}
             </div>
           </div>
         ))}
       </CardContent>
     </Card>
+  )
+}
+
+function CostBaseWorkspace({
+  bases,
+  base,
+  selectedBaseId,
+  onSelect,
+  onNewVersion,
+  onOpenImpact,
+  onVersionAction,
+  onActivate,
+  canEdit,
+  pending,
+}: {
+  bases: CostBase[]
+  base: CostBase
+  selectedBaseId: string
+  onSelect: (baseId: string) => void
+  onNewVersion: (baseId: string) => void
+  onOpenImpact: (base: CostBase, version: CostBaseVersion) => void
+  onVersionAction: (kind: 'publish' | 'archive', baseId: string, version: CostBaseVersion) => void
+  onActivate: (baseId: string, versionId: string) => void
+  canEdit: boolean
+  pending: { newVersion: boolean; impact: boolean; transition: boolean; activate: boolean }
+}) {
+  const active = base.versions.find((version) => version.isActive) ?? null
+  const nextDraft = base.versions.find((version) => version.status === 'DRAFT') ?? null
+
+  return (
+    <section
+      id="base-list"
+      aria-label="Administración de bases de costo"
+      className="grid scroll-mt-16 gap-2 lg:grid-cols-[13rem_minmax(0,1fr)]"
+    >
+      <Card className="self-start lg:sticky lg:top-16">
+        <CardHeader className="border-b bg-muted/25">
+          <CardTitle>Bases</CardTitle>
+          <CardDescription>Selecciona una base para revisar versiones y gobierno.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid p-0">
+          {bases.map((item) => {
+            const itemActive = item.versions.find((version) => version.isActive)
+            const selected = item.id === selectedBaseId
+            return (
+              <button
+                key={item.id}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => onSelect(item.id)}
+                className={[
+                  'relative grid gap-0.5 border-b px-3 py-2.5 text-left text-xs transition-colors last:border-b-0',
+                  selected
+                    ? 'bg-accent text-accent-foreground shadow-[inset_3px_0_0_var(--primary)]'
+                    : 'hover:bg-muted/70',
+                  item.status === 'ARCHIVED' ? 'opacity-65' : '',
+                ].join(' ')}
+              >
+                <span className="flex items-center justify-between gap-2">
+                  <strong className="truncate font-medium">{item.name}</strong>
+                  {item.isDefault ? <span className="size-1.5 rounded-full bg-emerald-500" title="Predeterminada" /> : null}
+                </span>
+                <span className="truncate text-[10px] text-muted-foreground">
+                  {SCOPE_LABEL[item.scope]} · {itemActive ? `v${itemActive.version}` : 'sin versión activa'} · {item._count.lanes} rutas
+                </span>
+              </button>
+            )
+          })}
+        </CardContent>
+      </Card>
+
+      <div className="grid min-w-0 gap-2">
+        <Card className={base.status === 'ARCHIVED' ? 'opacity-75' : ''}>
+          <CardHeader className="border-b bg-muted/20">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="mb-1 flex flex-wrap items-center gap-1.5 text-[10px]">
+                  <span className="rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary">{SCOPE_LABEL[base.scope]}</span>
+                  <span className="rounded-full border px-2 py-0.5 text-muted-foreground">{BASE_STATUS_LABEL[base.status]}</span>
+                  {base.isDefault ? <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 font-medium text-emerald-700 dark:text-emerald-400">predeterminada</span> : null}
+                </div>
+                <CardTitle className="truncate text-base">{base.name}</CardTitle>
+                <CardDescription>{base.code} · {base.currency} · {base.defaultPolicy === 'WORKBOOK_V3' ? 'Fidelidad de workbook' : 'Modelo operacional V3'}</CardDescription>
+              </div>
+              {canEdit && base.status !== 'ARCHIVED' ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onNewVersion(base.id)}
+                  disabled={pending.newVersion}
+                >
+                  Nueva versión
+                </Button>
+              ) : null}
+            </div>
+            {base.description ? <p className="pt-1 text-xs text-muted-foreground">{base.description}</p> : null}
+          </CardHeader>
+          <CardContent className="grid grid-cols-2 gap-2 pt-3 sm:grid-cols-4">
+            <Metric label="Versión vigente" value={active ? `v${active.version}` : '—'} />
+            <Metric label="Siguiente versión" value={nextDraft ? `v${nextDraft.version}` : '—'} />
+            <Metric label="Rutas vinculadas" value={String(base._count.lanes)} />
+            <Metric label="Cotizaciones" value={String(base._count.quotes)} />
+          </CardContent>
+        </Card>
+
+        <div className="grid min-w-0 gap-2 xl:grid-cols-[minmax(0,1.2fr)_minmax(15rem,0.8fr)]">
+          <Card>
+            <CardHeader className="border-b bg-muted/20">
+              <CardTitle>Versiones de {base.name}</CardTitle>
+              <CardDescription>Cada versión conserva sus parámetros, aprobación y vigencia.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid p-0">
+              {base.versions.length === 0 ? (
+                <p className="px-3 py-8 text-center text-xs text-muted-foreground">Esta base todavía no tiene versiones.</p>
+              ) : base.versions.map((version) => (
+                <div key={version.id} className="flex flex-wrap items-center gap-2 border-b px-3 py-2.5 text-xs last:border-b-0">
+                  <span className="grid size-9 shrink-0 place-items-center rounded-md bg-muted font-medium tabular-nums">v{version.version}</span>
+                  <div className="min-w-44 flex-1">
+                    <div className="flex flex-wrap items-center gap-1.5 font-medium">
+                      {version.name} <VersionBadge status={version.status} />
+                      {version.isActive ? <span className="text-[10px] text-emerald-600">vigente</span> : null}
+                    </div>
+                    <div className="truncate text-[10px] text-muted-foreground">
+                      {version._count.params} parámetros · actualizada <RelativeTime iso={version.updatedAt} />
+                      {version.publishedBy ? ` · aprobada por ${version.publishedBy.email}` : ''}
+                    </div>
+                    {(version.auditEvents?.length ?? 0) > 0 ? <VersionHistory events={version.auditEvents ?? []} /> : null}
+                  </div>
+                  <div className="flex flex-wrap items-center justify-end gap-1">
+                    <Button variant="ghost" size="xs" onClick={() => onOpenImpact(base, version)} disabled={pending.impact}>Impacto</Button>
+                    <Button variant="ghost" size="xs" render={<Link href={`/assumptions/${version.id}`} />}>{canEdit && version.status === 'DRAFT' ? 'Editar' : 'Ver'}</Button>
+                    {canEdit && version.status === 'DRAFT' && base.status !== 'ARCHIVED' ? (
+                      <Button variant="ghost" size="xs" disabled={pending.transition} onClick={() => onVersionAction('publish', base.id, version)}>Publicar</Button>
+                    ) : null}
+                    {canEdit && !version.isActive && version.status === 'PUBLISHED' && base.status !== 'ARCHIVED' ? (
+                      <Button variant="ghost" size="xs" disabled={pending.activate} onClick={() => onActivate(base.id, version.id)}>Activar</Button>
+                    ) : null}
+                    {canEdit && !version.isActive && version.status === 'PUBLISHED' && base.status !== 'ARCHIVED' ? (
+                      <Button variant="ghost" size="xs" disabled={pending.transition} onClick={() => onVersionAction('archive', base.id, version)}>Archivar</Button>
+                    ) : null}
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card className="self-start">
+            <CardHeader className="border-b bg-muted/20">
+              <CardTitle>Gobierno de la base</CardTitle>
+              <CardDescription>Reglas que delimitan dónde puede utilizarse.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-0 pt-1 text-xs">
+              <GovernanceLine label="Ámbito" value={SCOPE_LABEL[base.scope]} />
+              <GovernanceLine label="Moneda" value={base.currency} />
+              <GovernanceLine label="Modelo" value={base.defaultPolicy === 'WORKBOOK_V3' ? 'Workbook exacto' : 'Operacional V3'} />
+              <GovernanceLine label="Versión de supuestos" value={active ? `v${active.version}` : 'Sin versión vigente'} />
+              <GovernanceLine label="Rutas vinculadas" value={String(base._count.lanes)} />
+              <GovernanceLine label="Estado" value={BASE_STATUS_LABEL[base.status]} />
+              <div className="mt-3 flex flex-wrap gap-2 border-t pt-3">
+                <Button variant="outline" size="sm" render={<Link href={`/catalog?base=${base.id}`} />}>Cobertura</Button>
+                {active ? <Button variant="outline" size="sm" render={<Link href={`/assumptions/${active.id}`} />}>Supuestos</Button> : null}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function GovernanceLine({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-3 border-b py-2 last:border-b-0">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="text-right font-medium">{value}</span>
+    </div>
   )
 }
 

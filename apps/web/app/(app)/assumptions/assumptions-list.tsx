@@ -27,6 +27,16 @@ export interface AssumptionSet {
   notes: string | null
   createdAt: string
   updatedAt?: string
+  status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'
+  sourceVersionId: string | null
+  publishedAt: string | null
+  costBase: {
+    id: string
+    code: string
+    name: string
+    scope: 'CROSS_BORDER' | 'DRAYAGE' | 'LOCAL' | 'INTRA_MEX' | 'INTRA_US'
+    status: 'DRAFT' | 'ACTIVE' | 'ARCHIVED'
+  } | null
   _count?: { params: number }
 }
 
@@ -38,9 +48,12 @@ type DialogState =
 const selectCls =
   'h-9 w-full rounded-md border border-input bg-background px-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
 
-export function AssumptionsList({ initial }: { initial: AssumptionSet[] }) {
+export function AssumptionsList({ initial, canEdit }: { initial: AssumptionSet[]; canEdit: boolean }) {
   const router = useRouter()
   const [items, setItems] = useState(initial)
+  const [selectedId, setSelectedId] = useState(() => (
+    initial.find((item) => item.isActive)?.id ?? initial[0]?.id ?? ''
+  ))
   const [dialog, setDialog] = useState<DialogState>(null)
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState<Set<string>>(new Set())
@@ -48,13 +61,27 @@ export function AssumptionsList({ initial }: { initial: AssumptionSet[] }) {
 
   const needle = search.trim().toLowerCase()
   const filtered = useMemo(
-    () => items.filter((s) => needle === '' || s.name.toLowerCase().includes(needle) || (s.notes ?? '').toLowerCase().includes(needle)),
+    () => items.filter((s) => needle === '' || s.name.toLowerCase().includes(needle) || (s.notes ?? '').toLowerCase().includes(needle) || (s.costBase?.name ?? '').toLowerCase().includes(needle)),
     [items, needle],
   )
+  const selectedItem = items.find((item) => item.id === selectedId) ?? items[0] ?? null
+  const groups = useMemo(() => {
+    const grouped = new Map<string, { label: string; items: AssumptionSet[] }>()
+    for (const item of filtered) {
+      const groupKey = item.costBase?.id ?? 'legacy'
+      const group = grouped.get(groupKey) ?? {
+        label: item.costBase?.name ?? 'Versiones comunes / Legacy',
+        items: [],
+      }
+      group.items.push(item)
+      grouped.set(groupKey, group)
+    }
+    return [...grouped.entries()]
+  }, [filtered])
   const toggleSelect = (id: string) => setSelected((prev) => {
     const next = new Set(prev)
     if (next.has(id)) { next.delete(id); return next }
-    if (next.size >= 2) { toast.error('Select up to 2 sets to compare'); return prev }
+    if (next.size >= 2) { toast.error('Selecciona hasta 2 versiones para comparar'); return prev }
     next.add(id)
     return next
   })
@@ -64,7 +91,8 @@ export function AssumptionsList({ initial }: { initial: AssumptionSet[] }) {
       fetcher<AssumptionSet>('/api/v1/assumptions/sets', { method: 'POST', json: body }),
     onSuccess: (s) => {
       setItems((prev) => [s, ...prev])
-      toast.success(`Created "${s.name}"`)
+      setSelectedId(s.id)
+      toast.success(`Versión "${s.name}" creada`)
       closeDialog()
     },
   })
@@ -76,7 +104,7 @@ export function AssumptionsList({ initial }: { initial: AssumptionSet[] }) {
       }),
     onSuccess: (s) => {
       setItems((prev) => prev.map((x) => (x.id === s.id ? { ...x, name: s.name, notes: s.notes } : x)))
-      toast.success(`Renamed to "${s.name}"`)
+      toast.success(`Versión renombrada a "${s.name}"`)
       closeDialog()
     },
   })
@@ -84,9 +112,16 @@ export function AssumptionsList({ initial }: { initial: AssumptionSet[] }) {
   const activate = useMutation({
     mutationFn: (id: string) =>
       fetcher<AssumptionSet>(`/api/v1/assumptions/sets/${id}/activate`, { method: 'POST', json: {} }),
-    onSuccess: (s) => {
-      setItems((prev) => prev.map((x) => ({ ...x, isActive: x.id === s.id })))
-      toast.success(`Activated "${s.name}"`)
+    onSuccess: (s, activatedId) => {
+      setItems((prev) => {
+        const targetBaseId = prev.find((item) => item.id === activatedId)?.costBase?.id ?? null
+        return prev.map((item) => (
+          (item.costBase?.id ?? null) === targetBaseId
+            ? { ...item, isActive: item.id === s.id }
+            : item
+        ))
+      })
+      toast.success(`Versión "${s.name}" activada`)
     },
   })
 
@@ -96,40 +131,62 @@ export function AssumptionsList({ initial }: { initial: AssumptionSet[] }) {
       return id
     },
     onSuccess: (id) => {
-      setItems((prev) => prev.filter((x) => x.id !== id))
+      setItems((prev) => {
+        const remaining = prev.filter((x) => x.id !== id)
+        if (selectedId === id) setSelectedId(remaining[0]?.id ?? '')
+        return remaining
+      })
       setSelected((prev) => { const n = new Set(prev); n.delete(id); return n })
-      toast.success('Set deleted')
+      toast.success('Versión eliminada')
     },
   })
 
   return (
     <>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+      <div className="mb-3 flex flex-wrap items-end justify-between gap-3 border-b pb-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Assumptions</h1>
-          <p className="text-sm text-muted-foreground">Cost cards, factors, and operating assumptions per set.</p>
+          <p className="mb-1 text-[10px] font-medium uppercase tracking-[0.05em] text-primary">Control de costos</p>
+          <h1 className="text-2xl font-medium tracking-tight">Supuestos por base</h1>
+          <p className="text-xs text-muted-foreground">Versiones auditables de los parámetros que construyen cada costo.</p>
         </div>
         <div className="flex items-center gap-2">
           {items.length > 1 && (
-            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search sets…" className="h-9 w-40" />
+            <Input aria-label="Buscar versión o base" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar versión o base…" className="h-8 w-full sm:w-48" />
           )}
-          <span className="whitespace-nowrap text-sm text-muted-foreground">
-            {needle ? `${filtered.length}/${items.length}` : `${items.length} set${items.length === 1 ? '' : 's'}`}
-          </span>
-          <Button size="sm" onClick={() => setDialog({ kind: 'create' })}>New set</Button>
+          {canEdit
+            ? <Button size="sm" onClick={() => setDialog({ kind: 'create' })}>Nueva versión común</Button>
+            : <span className="rounded-md border px-2 py-1 text-xs text-muted-foreground">Modo consulta</span>}
         </div>
       </div>
 
+      {selectedItem ? (
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2 rounded-md border bg-card px-2 py-1.5 text-xs">
+          <div className="flex flex-wrap items-center gap-1">
+            <Button variant="ghost" size="xs" onClick={() => router.push(`/assumptions/${selectedItem.id}`)}>Valores efectivos</Button>
+            <Button
+              variant="ghost"
+              size="xs"
+              disabled={!selectedItem.sourceVersionId}
+              onClick={() => selectedItem.sourceVersionId && router.push(`/assumptions/diff?a=${selectedItem.sourceVersionId}&b=${selectedItem.id}`)}
+            >
+              Sólo diferencias
+            </Button>
+            <Button variant="ghost" size="xs" onClick={() => setSelected((current) => current.size ? new Set() : new Set([selectedItem.id]))}>Comparar bases</Button>
+          </div>
+          <span className="text-muted-foreground">{filtered.length} de {items.length} versiones visibles</span>
+        </div>
+      ) : null}
+
       {selected.size > 0 && (
-        <div className="mb-4 flex items-center justify-between gap-3 rounded-md border bg-muted/40 px-3 py-2 text-sm">
+        <div className="mb-2 flex items-center justify-between gap-3 rounded-md border bg-muted/40 px-3 py-2 text-xs">
           <span className="text-muted-foreground">
-            {selected.size} selected{selected.size === 1 ? ' — pick one more to compare' : ''}
+            {selected.size} seleccionada{selected.size === 1 ? ' — elige una segunda versión' : 's'}
           </span>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={() => setSelected(new Set())}>Clear</Button>
+            <Button variant="ghost" size="xs" onClick={() => setSelected(new Set())}>Cancelar</Button>
             <Button size="sm" disabled={selected.size !== 2}
               onClick={() => { const [a, b] = [...selected]; router.push(`/assumptions/diff?a=${a}&b=${b}`) }}>
-              Compare
+              Comparar
             </Button>
           </div>
         </div>
@@ -138,10 +195,11 @@ export function AssumptionsList({ initial }: { initial: AssumptionSet[] }) {
       {items.length === 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>No sets yet</CardTitle>
+            <CardTitle>No hay versiones de supuestos</CardTitle>
             <CardDescription>
-              Click <strong>New set</strong> to create your first assumption set. It will be seeded with the V3.0
-              recommended defaults — you can edit any value afterward and mark it active.
+              {canEdit
+                ? 'Crea una base de costo para obtener una versión gobernada con los parámetros canónicos.'
+                : 'No hay versiones disponibles para consulta. Un administrador debe crear la primera.'}
             </CardDescription>
           </CardHeader>
         </Card>
@@ -151,103 +209,101 @@ export function AssumptionsList({ initial }: { initial: AssumptionSet[] }) {
         <Card>
           <CardHeader>
             <CardDescription>
-              No sets match &ldquo;{search}&rdquo;.{' '}
-              <button type="button" onClick={() => setSearch('')} className="underline underline-offset-2 hover:text-foreground">Clear search</button>
+              Ninguna versión coincide con &ldquo;{search}&rdquo;.{' '}
+              <button type="button" onClick={() => setSearch('')} className="underline underline-offset-2 hover:text-foreground">Limpiar búsqueda</button>
             </CardDescription>
           </CardHeader>
         </Card>
       )}
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {filtered.map((s) => (
-          <Card key={s.id} className="flex flex-col">
-            <Link href={`/assumptions/${s.id}`} className="block flex-1 transition hover:bg-muted/30">
-              <CardHeader>
-                <CardTitle className="flex items-baseline justify-between gap-2">
-                  <span className="truncate">{s.name}</span>
-                  {s.isActive && (
-                    <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-400">
-                      active
-                    </span>
-                  )}
-                </CardTitle>
-                <CardDescription>
-                  v{s.version} · {s._count?.params ?? 0} params · updated <RelativeTime iso={s.updatedAt ?? s.createdAt} />
-                </CardDescription>
-              </CardHeader>
-              {s.notes && (
-                <CardContent>
-                  <p className="line-clamp-2 text-sm text-muted-foreground">{s.notes}</p>
-                </CardContent>
-              )}
-            </Link>
-            <div className="flex flex-wrap items-center gap-1 border-t bg-muted/30 px-3 py-2 text-xs">
-              <label className="mr-1 flex cursor-pointer items-center" title="Select to compare">
-                <input type="checkbox" className="h-3.5 w-3.5 accent-primary" checked={selected.has(s.id)} onChange={() => toggleSelect(s.id)} />
-              </label>
-              {!s.isActive && (
-                <Button
-                  variant="ghost" size="sm"
-                  disabled={activate.isPending}
-                  onClick={() => activate.mutate(s.id)}
-                >
-                  Activate
-                </Button>
-              )}
-              <Button
-                variant="ghost" size="sm"
-                onClick={() => setDialog({ kind: 'rename', targetId: s.id, name: s.name, notes: s.notes ?? '' })}
-              >
-                Rename
-              </Button>
-              <Button
-                variant="ghost" size="sm"
-                onClick={() => setDialog({ kind: 'create', cloneFromId: s.id, cloneFromName: s.name })}
-              >
-                Clone
-              </Button>
-              <div className="ml-auto">
-                <AlertDialog>
-                  <AlertDialogTrigger
-                    render={
-                      <Button variant="ghost" size="sm" disabled={remove.isPending || s.isActive}>Delete</Button>
-                    }
-                  />
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Delete &ldquo;{s.name}&rdquo;?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        {s.isActive
-                          ? 'This set is active — activate another set first.'
-                          : 'Every parameter override in this set is removed. Quotes already saved against it keep their snapshot, but cannot recalculate. This cannot be undone.'}
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        disabled={s.isActive}
-                        onClick={() => remove.mutate(s.id)}
-                      >
-                        Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
-            </div>
+      {selectedItem && filtered.length > 0 ? (
+        <div className="grid gap-2 lg:grid-cols-[13rem_minmax(0,1fr)]">
+          <Card className="self-start lg:sticky lg:top-16">
+            <CardHeader className="border-b bg-muted/25">
+              <CardTitle>Capas de supuestos</CardTitle>
+              <CardDescription>Selecciona una base y versión.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid p-0">
+              {groups.map(([groupId, group]) => (
+                <div key={groupId} className="border-b last:border-b-0">
+                  <div className="bg-muted/30 px-3 py-1.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">{group.label}</div>
+                  {group.items.map((item) => (
+                    <div key={item.id} className={`flex items-center border-t ${item.id === selectedItem.id ? 'bg-accent shadow-[inset_3px_0_0_var(--primary)]' : ''}`}>
+                      <button type="button" className="min-w-0 flex-1 px-3 py-2 text-left" onClick={() => setSelectedId(item.id)}>
+                        <span className="block truncate text-xs font-medium">{item.name} · v{item.version}</span>
+                        <span className="block truncate text-[10px] text-muted-foreground">{item._count?.params ?? 0} parámetros · {assumptionStatusLabel(item)}</span>
+                      </button>
+                      <label className="px-2" title="Seleccionar para comparar">
+                        <span className="sr-only">Comparar {item.name} versión {item.version}</span>
+                        <input type="checkbox" className="size-3.5 accent-primary" checked={selected.has(item.id)} onChange={() => toggleSelect(item.id)} />
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </CardContent>
           </Card>
-        ))}
-      </div>
+
+          <div className="grid min-w-0 gap-2">
+            <Card>
+              <CardHeader className="border-b bg-muted/20">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <CardTitle className="text-base">{selectedItem.name} · v{selectedItem.version}</CardTitle>
+                    <CardDescription>{selectedItem.costBase ? `${selectedItem.costBase.code} · ${selectedItem.costBase.name}` : 'Versión común / Legacy'}</CardDescription>
+                  </div>
+                  <AssumptionStatus item={selectedItem} />
+                </div>
+              </CardHeader>
+              <CardContent className="grid gap-3 pt-3">
+                <div className="flex flex-wrap items-center gap-2 rounded-md border bg-muted/20 px-3 py-2 text-xs">
+                  <LineageStep label={selectedItem.sourceVersionId ? 'Versión fuente' : 'Catálogo canónico'} value={selectedItem.sourceVersionId ? selectedItem.sourceVersionId.slice(0, 8) : '210 parámetros'} />
+                  <span className="text-muted-foreground">→</span>
+                  <LineageStep label="Base" value={selectedItem.costBase?.name ?? 'Común / Legacy'} />
+                  <span className="text-muted-foreground">→</span>
+                  <LineageStep label="Aplicación" value="Rutas futuras" />
+                </div>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  <AssumptionMetric label="Parámetros" value={String(selectedItem._count?.params ?? 0)} />
+                  <AssumptionMetric label="Estado" value={assumptionStatusLabel(selectedItem)} />
+                  <AssumptionMetric label="Base activa" value={selectedItem.costBase?.status === 'ACTIVE' ? 'Sí' : 'No'} />
+                  <AssumptionMetric label="Actualización" value={<RelativeTime iso={selectedItem.updatedAt ?? selectedItem.createdAt} />} />
+                </div>
+                {selectedItem.notes ? <p className="rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground">{selectedItem.notes}</p> : null}
+                <div className="flex flex-wrap items-center gap-1 border-t pt-3">
+                  <Button size="sm" render={<Link href={`/assumptions/${selectedItem.id}`} />}>{selectedItem.status === 'DRAFT' ? 'Editar parámetros' : 'Ver parámetros'}</Button>
+                  {canEdit && !selectedItem.isActive ? <Button variant="outline" size="sm" disabled={activate.isPending} onClick={() => activate.mutate(selectedItem.id)}>Activar</Button> : null}
+                  {canEdit ? <Button variant="ghost" size="sm" onClick={() => setDialog({ kind: 'rename', targetId: selectedItem.id, name: selectedItem.name, notes: selectedItem.notes ?? '' })}>Renombrar</Button> : null}
+                  {canEdit ? <Button variant="ghost" size="sm" onClick={() => setDialog({ kind: 'create', cloneFromId: selectedItem.id, cloneFromName: selectedItem.name })}>Clonar borrador</Button> : null}
+                  {canEdit ? <AlertDialog>
+                    <AlertDialogTrigger render={<Button variant="ghost" size="sm" disabled={remove.isPending || selectedItem.isActive || selectedItem.status !== 'DRAFT'}>Eliminar</Button>} />
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>¿Eliminar &ldquo;{selectedItem.name}&rdquo;?</AlertDialogTitle>
+                        <AlertDialogDescription>Se eliminarán los parámetros de este borrador. Las cotizaciones existentes conservan su snapshot. Esta acción no se puede deshacer.</AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction disabled={selectedItem.isActive || selectedItem.status !== 'DRAFT'} onClick={() => remove.mutate(selectedItem.id)}>Eliminar</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog> : null}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      ) : null}
 
       {/* Create / Clone dialog */}
       <Dialog open={dialog?.kind === 'create'} onOpenChange={(o) => { if (!o) closeDialog() }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{dialog?.kind === 'create' && dialog.cloneFromId ? 'Clone set' : 'New assumption set'}</DialogTitle>
+            <DialogTitle>{dialog?.kind === 'create' && dialog.cloneFromId ? 'Clonar versión' : 'Nueva versión de supuestos'}</DialogTitle>
             <DialogDescription>
               {dialog?.kind === 'create' && dialog.cloneFromId
-                ? `Cloning from "${dialog.cloneFromName}". Parameter overrides carry over.`
-                : 'Creates a set with the V3.0 recommended defaults. You can edit values after creation.'}
+                ? `Se clonará "${dialog.cloneFromName}" y se conservarán sus valores para revisión.`
+                : 'Crea una versión con los valores V3.0 recomendados. Podrás revisarlos antes de activarla.'}
             </DialogDescription>
           </DialogHeader>
           <CreateForm
@@ -269,8 +325,8 @@ export function AssumptionsList({ initial }: { initial: AssumptionSet[] }) {
       <Dialog open={dialog?.kind === 'rename'} onOpenChange={(o) => { if (!o) closeDialog() }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Rename set</DialogTitle>
-            <DialogDescription>Edit the name and notes for this assumption set.</DialogDescription>
+            <DialogTitle>Renombrar versión</DialogTitle>
+            <DialogDescription>Edita el nombre y las notas de esta versión de supuestos.</DialogDescription>
           </DialogHeader>
           {dialog?.kind === 'rename' && (
             <RenameForm
@@ -284,6 +340,39 @@ export function AssumptionsList({ initial }: { initial: AssumptionSet[] }) {
         </DialogContent>
       </Dialog>
     </>
+  )
+}
+
+function assumptionStatusLabel(item: AssumptionSet): string {
+  if (item.status === 'ARCHIVED') return 'Archivada'
+  if (item.status === 'PUBLISHED') return item.isActive ? 'Publicada · vigente' : 'Publicada'
+  return item.isActive ? 'Borrador activo' : 'Borrador'
+}
+
+function AssumptionStatus({ item }: { item: AssumptionSet }) {
+  const className = item.status === 'PUBLISHED'
+    ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
+    : item.status === 'ARCHIVED'
+      ? 'bg-muted text-muted-foreground'
+      : 'bg-amber-500/10 text-amber-700 dark:text-amber-400'
+  return <span className={`rounded-full px-2 py-1 text-[10px] font-medium ${className}`}>{assumptionStatusLabel(item)}</span>
+}
+
+function LineageStep({ label, value }: { label: string; value: string }) {
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <span className="text-muted-foreground">{label}</span>
+      <strong className="font-medium">{value}</strong>
+    </span>
+  )
+}
+
+function AssumptionMetric({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="rounded-md border bg-muted/20 px-3 py-2">
+      <div className="text-[10px] text-muted-foreground">{label}</div>
+      <div className="mt-0.5 text-xs font-medium">{value}</div>
+    </div>
   )
 }
 
@@ -305,28 +394,28 @@ function CreateForm({
   return (
     <form onSubmit={submit} className="grid gap-4">
       <div className="grid gap-1.5">
-        <Label htmlFor="set-name">Name</Label>
+        <Label htmlFor="set-name">Nombre</Label>
         <Input
           id="set-name" required autoFocus
           value={name} onChange={(e) => setName(e.target.value)}
-          placeholder={cloneFromId ? 'e.g. Q3 2026 — Carrier A revision' : 'e.g. Q3 2026 Base'}
+          placeholder={cloneFromId ? 'p. ej. Q3 2026 — Revisión transportista A' : 'p. ej. Base Q3 2026'}
         />
       </div>
       <div className="grid gap-1.5">
-        <Label htmlFor="set-notes">Notes (optional)</Label>
+        <Label htmlFor="set-notes">Notas (opcionales)</Label>
         <textarea
           id="set-notes"
           className={`${selectCls} h-20 py-2`}
           value={notes} onChange={(e) => setNotes(e.target.value)}
-          placeholder="Anything worth recording about this revision"
+          placeholder="Registra el motivo o alcance de esta revisión"
         />
       </div>
       <DialogFooter>
         <DialogClose render={<Button variant="outline" type="button" onClick={onCancel} />}>
-          Cancel
+          Cancelar
         </DialogClose>
         <Button type="submit" disabled={pending || !name.trim()}>
-          {pending ? 'Creating…' : cloneFromId ? 'Clone set' : 'Create set'}
+          {pending ? 'Creando…' : cloneFromId ? 'Clonar versión' : 'Crear versión'}
         </Button>
       </DialogFooter>
     </form>
@@ -352,14 +441,14 @@ function RenameForm({
   return (
     <form onSubmit={submit} className="grid gap-4">
       <div className="grid gap-1.5">
-        <Label htmlFor="rename-name">Name</Label>
+        <Label htmlFor="rename-name">Nombre</Label>
         <Input
           id="rename-name" required autoFocus
           value={name} onChange={(e) => setName(e.target.value)}
         />
       </div>
       <div className="grid gap-1.5">
-        <Label htmlFor="rename-notes">Notes</Label>
+        <Label htmlFor="rename-notes">Notas</Label>
         <textarea
           id="rename-notes"
           className={`${selectCls} h-20 py-2`}
@@ -368,10 +457,10 @@ function RenameForm({
       </div>
       <DialogFooter>
         <DialogClose render={<Button variant="outline" type="button" onClick={onCancel} />}>
-          Cancel
+          Cancelar
         </DialogClose>
         <Button type="submit" disabled={pending || !name.trim()}>
-          {pending ? 'Saving…' : 'Save'}
+          {pending ? 'Guardando…' : 'Guardar'}
         </Button>
       </DialogFooter>
     </form>
