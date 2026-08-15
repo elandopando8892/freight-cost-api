@@ -317,3 +317,12 @@ Pendiente para cierre humano al 100%:
 - Historial oculta creación y eliminación para VIEWER; Regeneración de RateBook permanece exclusiva de ADMIN.
 - En organizaciones con un solo ADMIN, una solicitud propia puede decidirse únicamente con una segunda confirmación explícita ligada al identificador de la aprobación.
 - La decisión de administrador único registra el token de confirmación en la evidencia; aprobar todavía no entrega a Rateware y la entrega exige una tercera acción deliberada.
+
+### Sprint 8 — gobierno y entrega Gmail de Quote Desk
+
+- Quote Desk implementa el ciclo real `Borrador -> En revisión -> Aprobada`; sólo ADMIN aprueba y VIEWER permanece en consulta.
+- El panel lateral conserva estado comercial, preview sandbox, conexión Gmail, snapshots y evidencia sin perder el contexto horizontal.
+- Un snapshot preparado no equivale a envío. La acción `Enviar por Gmail` sólo aparece para propuestas aprobadas y exige una confirmación individual.
+- El transporte crea una clave de idempotencia estable, toma un claim exclusivo y conserva recibo, identificadores Gmail, actor y timestamps.
+- Una respuesta ambigua queda `DELIVERY_UNKNOWN` y bloquea reintentos ciegos para evitar duplicados.
+- El receptor `send_fcm_customer_quote_email` todavía debe implementarse y desplegarse en Rateware antes de habilitar producción.

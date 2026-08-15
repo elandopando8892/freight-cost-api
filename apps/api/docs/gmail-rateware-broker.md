@@ -1,6 +1,6 @@
 # Gmail individual via Rateware
 
-Sprint 10 only connects and records a user's Gmail authorization. It does not render a customer template or send a quote; those are Sprint 11 responsibilities.
+Sprint 10 connects and records a user's Gmail authorization. Sprint 11 renders immutable customer-quote drafts and adds the explicit Freight Cost Model delivery contract. Production sending remains disabled until Rateware deploys the matching receiver action and both environments are configured.
 
 ## Identity boundary
 
@@ -30,4 +30,16 @@ The broker also requires its existing `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
 
 ## Operational boundary
 
-`GET /api/integrations/gmail` returns connection status. `POST` with `operation: start` creates a short-lived Rateware OAuth state and redirects the user to Google. `operation: disconnect` clears the local encrypted tokens for that same authenticated mailbox. Sending must later be an explicit, auditable Quote Desk action with an idempotency key and delivery trace.
+`GET /api/integrations/gmail` returns connection status. `POST` with `operation: start` creates a short-lived Rateware OAuth state and redirects the user to Google. `operation: disconnect` clears the local encrypted tokens for that same authenticated mailbox.
+
+Quote Desk preserves a separate lifecycle: `DRAFT -> REVIEW -> APPROVED`. Only an approved proposal can execute `POST /customer-quote-email-drafts/:id/send`. The API forwards the same Kinde bearer token, an immutable `fcm.rateware-gmail-send.v1` package, its `sourceOrganizationId`, and a stable tenant-bound idempotency key to Rateware action `send_fcm_customer_quote_email`.
+
+The local delivery states are:
+
+- `PREPARED`: immutable message snapshot; nothing was sent.
+- `SENDING`: an exclusive claim prevents concurrent double sends.
+- `SENT`: Rateware returned a durable receipt and Gmail provider identifiers.
+- `FAILED`: Rateware rejected the request definitively; a deliberate retry may reuse the same idempotency key.
+- `DELIVERY_UNKNOWN`: provider acceptance is ambiguous. Automatic and manual blind retries are blocked until reconciliation.
+
+Rateware validates the Kinde identity, requires the authorized mailbox, recomputes the payload checksum and tenant-bound idempotency key, deduplicates by `idempotency_key`, sends through Gmail, and returns `accepted`, `receipt_id`, `provider_message_id`, `provider_thread_id`, and optional `duplicate`. The receiver and receipt migration are implemented locally in the isolated Rateware integration worktree; real delivery remains unavailable until those changes are reviewed, merged, migrated, and deployed.

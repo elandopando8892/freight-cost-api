@@ -59,6 +59,10 @@ enum CustomerQuoteStatus {
 
 enum CustomerQuoteEmailStatus {
   PREPARED
+  SENDING
+  SENT
+  FAILED
+  DELIVERY_UNKNOWN
 }
 
 enum RateBookStatus {
@@ -256,6 +260,9 @@ model User {
   pilotVerifications          PilotVerification[]         @relation("PilotVerificationActor")
   pilotGoApprovals            PilotGoApproval[]            @relation("PilotGoApprovalActor")
   customerQuoteEmailDrafts    CustomerQuoteEmailDraft[]   @relation("CustomerQuoteEmailDraftActor")
+  customerQuoteEmailsSent     CustomerQuoteEmailDraft[]   @relation("CustomerQuoteEmailSentBy")
+  customerQuotesSubmitted     CustomerQuote[]             @relation("CustomerQuoteReviewRequestedBy")
+  customerQuotesApproved      CustomerQuote[]             @relation("CustomerQuoteApprovedBy")
   invitationsSent             OrganizationInvitation[]    @relation("OrganizationInvitationInviter")
   invitationsAccepted         OrganizationInvitation[]    @relation("OrganizationInvitationAcceptor")
   memberRoleChangesMade       OrganizationMemberRoleAudit[] @relation("OrganizationMemberRoleAuditActor")
@@ -968,15 +975,23 @@ model CustomerQuote {
   status       CustomerQuoteStatus @default(DRAFT)
   notes        String?
   createdById  String?
+  reviewRequestedAt   DateTime?
+  reviewRequestedById String?
+  approvedAt          DateTime?
+  approvedById        String?
   createdAt    DateTime            @default(now())
   updatedAt    DateTime            @updatedAt
 
-  org         Organization              @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  lines       CustomerQuoteLine[]
-  emailDrafts CustomerQuoteEmailDraft[]
+  org               Organization              @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  reviewRequestedBy User?                     @relation("CustomerQuoteReviewRequestedBy", fields: [reviewRequestedById], references: [id], onDelete: SetNull)
+  approvedBy        User?                     @relation("CustomerQuoteApprovedBy", fields: [approvedById], references: [id], onDelete: SetNull)
+  lines             CustomerQuoteLine[]
+  emailDrafts       CustomerQuoteEmailDraft[]
 
   @@unique([orgId, folio])
   @@index([orgId, status, updatedAt])
+  @@index([reviewRequestedById])
+  @@index([approvedById])
 }
 
 model CustomerQuoteEmailDraft {
@@ -992,14 +1007,27 @@ model CustomerQuoteEmailDraft {
   payloadChecksum String
   status          CustomerQuoteEmailStatus @default(PREPARED)
   createdById     String
+  sentById         String?
+  idempotencyKey   String?
+  responseCode     Int?
+  receiptId        String?
+  providerMessageId String?
+  providerThreadId  String?
+  error             String?
+  attemptedAt       DateTime?
+  sentAt            DateTime?
   createdAt       DateTime                 @default(now())
 
   org           Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
   customerQuote CustomerQuote @relation(fields: [customerQuoteId], references: [id], onDelete: Cascade)
   createdBy     User          @relation("CustomerQuoteEmailDraftActor", fields: [createdById], references: [id], onDelete: Restrict)
+  sentBy        User?         @relation("CustomerQuoteEmailSentBy", fields: [sentById], references: [id], onDelete: SetNull)
 
+  @@unique([orgId, idempotencyKey])
   @@index([orgId, customerQuoteId, createdAt])
+  @@index([orgId, status, attemptedAt])
   @@index([createdById, createdAt])
+  @@index([sentById, attemptedAt])
 }
 
 model CustomerQuoteLine {

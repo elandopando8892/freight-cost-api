@@ -45,7 +45,7 @@ export function buildRatewareCustomerQuoteEmailDraftContract(draft: {
   htmlBody: string;
   textBody: string;
   payloadChecksum: string;
-  status: "PREPARED";
+  status: "PREPARED" | "SENDING" | "SENT" | "FAILED" | "DELIVERY_UNKNOWN";
   createdAt: Date;
   customerQuote: { folio: string };
   createdBy: { email: string };
@@ -61,7 +61,7 @@ export function buildRatewareCustomerQuoteEmailDraftContract(draft: {
       preparedAt: draft.createdAt.toISOString(),
     },
     governance: {
-      status: draft.status,
+      status: "PREPARED",
       delivery: "NOT_SENT",
       payloadChecksum: draft.payloadChecksum,
       template: { id: draft.templateId, name: draft.templateName },

@@ -8,6 +8,8 @@ import {
   buildRatewareCustomerQuoteEmailDraftContract,
   customerQuoteEmailPayloadChecksum,
 } from "./customer-quote-email-outbox.js";
+import { deliverCustomerQuoteEmail } from "./customer-quote-email-delivery.js";
+import { customerQuoteTransitionBlocker } from "./customer-quote-lifecycle.js";
 
 const Line = z.object({
   origin: z.string().trim().min(2),
@@ -37,6 +39,9 @@ const TemplateInput = z.object({
   htmlTemplate: z.string().trim().min(20).max(80_000),
 });
 const PrepareEmailDraft = z.object({ templateId: z.string().min(1) }).strict();
+const TransitionCustomerQuote = z
+  .object({ status: z.enum(["REVIEW", "APPROVED", "ARCHIVED"]) })
+  .strict();
 const SYSTEM_TEMPLATE_ID = "system:marksman-xbf-proposal";
 
 const SYSTEM_TEMPLATE = {
@@ -257,8 +262,16 @@ export async function customerQuotesRoutes(app: FastifyInstance) {
         subject: true,
         payloadChecksum: true,
         status: true,
+        responseCode: true,
+        receiptId: true,
+        providerMessageId: true,
+        providerThreadId: true,
+        error: true,
+        attemptedAt: true,
+        sentAt: true,
         createdAt: true,
         createdBy: { select: { email: true } },
+        sentBy: { select: { email: true } },
       },
       orderBy: { createdAt: "desc" },
       take: 50,
@@ -343,10 +356,80 @@ export async function customerQuotesRoutes(app: FastifyInstance) {
       });
     },
   );
+  app.post(
+    "/customer-quote-email-drafts/:id/send",
+    { preHandler: requireRole("ADMIN", "OPERATOR") },
+    async (request) => {
+      const user = request.user as JwtPayload;
+      const { id } = request.params as { id: string };
+      const actorBearer = request.headers.authorization;
+      if (!actorBearer)
+        throw Object.assign(
+          new Error("A Kinde bearer token is required for Gmail delivery."),
+          { statusCode: 401 },
+        );
+      return deliverCustomerQuoteEmail({
+        orgId: user.orgId,
+        actorId: user.sub,
+        actorBearer,
+        draftId: id,
+      });
+    },
+  );
+  app.patch(
+    "/customer-quotes/:id/status",
+    { preHandler: requireRole("ADMIN", "OPERATOR") },
+    async (request) => {
+      const user = request.user as JwtPayload;
+      const { id } = request.params as { id: string };
+      const { status: target } = TransitionCustomerQuote.parse(request.body);
+      const quote = await prisma.customerQuote.findFirstOrThrow({
+        where: { id, orgId: user.orgId },
+        select: { id: true, status: true },
+      });
+      const blocker = customerQuoteTransitionBlocker({
+        current: quote.status,
+        target,
+        role: user.role,
+      });
+      if (blocker)
+        throw Object.assign(new Error(blocker), { statusCode: 409 });
+      const now = new Date();
+      const changed = await prisma.customerQuote.updateMany({
+        where: { id, orgId: user.orgId, status: quote.status },
+        data: {
+          status: target,
+          ...(target === "REVIEW"
+            ? { reviewRequestedAt: now, reviewRequestedById: user.sub }
+            : {}),
+          ...(target === "APPROVED"
+            ? { approvedAt: now, approvedById: user.sub }
+            : {}),
+        },
+      });
+      if (changed.count !== 1)
+        throw Object.assign(
+          new Error("Customer quote changed while the transition was being applied."),
+          { statusCode: 409 },
+        );
+      return prisma.customerQuote.findFirstOrThrow({
+        where: { id, orgId: user.orgId },
+        include: {
+          lines: { orderBy: { position: "asc" } },
+          reviewRequestedBy: { select: { email: true } },
+          approvedBy: { select: { email: true } },
+        },
+      });
+    },
+  );
   app.get("/customer-quotes", async (request) =>
     prisma.customerQuote.findMany({
       where: { orgId: (request.user as JwtPayload).orgId },
-      include: { lines: true },
+      include: {
+        lines: true,
+        reviewRequestedBy: { select: { email: true } },
+        approvedBy: { select: { email: true } },
+      },
       orderBy: { updatedAt: "desc" },
     }),
   );

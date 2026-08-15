@@ -1,7 +1,18 @@
 "use client";
 import { useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Eye, FileText, Mail, Plus } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -19,6 +30,10 @@ export interface CustomerQuote {
   quoteType: string;
   validUntil: string;
   status: CustomerQuoteStatus;
+  reviewRequestedAt?: string | null;
+  reviewRequestedBy?: { email: string } | null;
+  approvedAt?: string | null;
+  approvedBy?: { email: string } | null;
   lines: {
     id: string;
     origin: string;
@@ -44,23 +59,43 @@ interface Preview {
 }
 interface PreparedEmailDraft {
   id: string;
-  status: "PREPARED";
+  status: EmailDeliveryStatus;
   toEmail: string;
   subject: string;
   payloadChecksum: string;
   createdAt: string;
   policy: string;
 }
+type EmailDeliveryStatus =
+  | "PREPARED"
+  | "SENDING"
+  | "SENT"
+  | "FAILED"
+  | "DELIVERY_UNKNOWN";
 interface EmailDraftHistoryItem {
   id: string;
-  status: "PREPARED";
+  status: EmailDeliveryStatus;
   templateName: string;
   toEmail: string;
   subject: string;
   payloadChecksum: string;
   createdAt: string;
   createdBy: { email: string };
+  sentBy: { email: string } | null;
+  attemptedAt: string | null;
+  sentAt: string | null;
+  receiptId: string | null;
+  providerMessageId: string | null;
+  error: string | null;
 }
+type GmailResponse = {
+  configured?: boolean;
+  rows?: Array<{
+    mailbox_email: string | null;
+    connected: boolean;
+    configured: boolean;
+  }>;
+};
 const blank = () => ({
   origin: "",
   destination: "",
@@ -77,12 +112,13 @@ const blank = () => ({
 export function QuoteDesk({
   initial,
   initialTemplates,
-  canEdit,
+  role,
 }: {
   initial: CustomerQuote[];
   initialTemplates: CustomerQuoteTemplate[];
-  canEdit: boolean;
+  role: "ADMIN" | "OPERATOR" | "VIEWER";
 }) {
+  const canEdit = role !== "VIEWER";
   const queryClient = useQueryClient();
   const lineSequence = useRef(1);
   const [items, setItems] = useState(initial);
@@ -110,6 +146,7 @@ export function QuoteDesk({
   );
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"ALL" | CustomerQuoteStatus>("ALL");
+  const [sendCandidate, setSendCandidate] = useState<EmailDraftHistoryItem | null>(null);
   const save = useMutation({
     mutationFn: () =>
       fetcher<CustomerQuote>("/api/v1/customer-quotes", {
@@ -187,6 +224,15 @@ export function QuoteDesk({
       ),
     enabled: Boolean(previewFor?.id),
   });
+  const gmailConnection = useQuery({
+    queryKey: ["gmail-integration"],
+    queryFn: () => fetcher<GmailResponse>("/api/integrations/gmail"),
+  });
+  const gmailRow = gmailConnection.data?.rows?.[0];
+  const gmailReady = Boolean(
+    (gmailRow?.configured ?? gmailConnection.data?.configured) &&
+      gmailRow?.connected,
+  );
   const prepareGmailDraft = useMutation({
     mutationFn: ({
       quoteId,
@@ -206,6 +252,43 @@ export function QuoteDesk({
       );
       void queryClient.invalidateQueries({
         queryKey: ["customer-quote-email-drafts", variables.quoteId],
+      });
+    },
+  });
+  const transitionQuote = useMutation({
+    mutationFn: ({
+      quoteId,
+      status,
+    }: {
+      quoteId: string;
+      status: "REVIEW" | "APPROVED" | "ARCHIVED";
+    }) =>
+      fetcher<CustomerQuote>(`/api/v1/customer-quotes/${quoteId}/status`, {
+        method: "PATCH",
+        json: { status },
+      }),
+    onSuccess: (quote) => {
+      setItems((current) =>
+        current.map((item) => (item.id === quote.id ? quote : item)),
+      );
+      setPreviewFor(quote);
+    },
+  });
+  const sendGmail = useMutation({
+    mutationFn: (draftId: string) =>
+      fetcher<{ delivery: EmailDraftHistoryItem; duplicate: boolean }>(
+        `/api/v1/customer-quote-email-drafts/${draftId}/send`,
+        { method: "POST", json: {} },
+      ),
+    onSuccess: (result) => {
+      setPreparedMessage(
+        result.duplicate
+          ? "El correo ya contaba con un recibo de entrega."
+          : "Correo aceptado por Gmail y registrado con evidencia.",
+      );
+      setSendCandidate(null);
+      void queryClient.invalidateQueries({
+        queryKey: ["customer-quote-email-drafts", previewFor?.id],
       });
     },
   });
@@ -575,13 +658,36 @@ export function QuoteDesk({
           <CardHeader className="border-b bg-muted/25 px-4 py-3">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <CardTitle>Previsualización — {previewFor.folio}</CardTitle>
+                <div className="flex flex-wrap items-center gap-2">
+                  <CardTitle>Previsualización — {previewFor.folio}</CardTitle>
+                  <QuoteStatusBadge status={previewFor.status} />
+                </div>
                 <p className="mt-1 text-sm text-muted-foreground">
                   {preview.data?.subject || "Generando…"}
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                {canEdit ? <Button
+                {canEdit && previewFor.status === "DRAFT" ? (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={transitionQuote.isPending}
+                    onClick={() => transitionQuote.mutate({ quoteId: previewFor.id, status: "REVIEW" })}
+                  >
+                    Enviar a revisión
+                  </Button>
+                ) : null}
+                {role === "ADMIN" && previewFor.status === "REVIEW" ? (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={transitionQuote.isPending}
+                    onClick={() => transitionQuote.mutate({ quoteId: previewFor.id, status: "APPROVED" })}
+                  >
+                    Aprobar propuesta
+                  </Button>
+                ) : null}
+                {canEdit && previewFor.status !== "ARCHIVED" ? <Button
                   size="sm"
                   disabled={
                     !previewFor.contactEmail ||
@@ -645,15 +751,22 @@ export function QuoteDesk({
                 Descargar paquete Rateware
               </Button>
             )}
+            <div className={`mt-4 rounded-md border px-3 py-2 text-xs ${gmailReady ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-800 dark:text-emerald-300" : "border-amber-500/30 bg-amber-500/5 text-amber-800 dark:text-amber-300"}`}>
+              {gmailReady ? (
+                <>Gmail conectado mediante Rateware: <strong>{gmailRow?.mailbox_email}</strong>. Cada envío requiere confirmación individual.</>
+              ) : (
+                <>Gmail no está listo para enviar. Revisa la conexión en <Link className="font-medium underline underline-offset-2" href="/settings">Configuración → Integraciones</Link>.</>
+              )}
+            </div>
             {emailDraftHistory.isLoading ? (
               <p className="mt-5 text-sm text-muted-foreground">
                 Cargando historial de borradores…
               </p>
             ) : emailDraftHistory.data?.length ? (
               <div className="mt-5 rounded-md border p-3">
-                <h3 className="text-sm font-medium">Historial de borradores</h3>
+                <h3 className="text-sm font-medium">Historial de correo</h3>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Son snapshots preparados; ninguno equivale a correo enviado.
+                  Cada fila conserva el snapshot, estado y recibo de entrega.
                 </p>
                 <div className="mt-3 grid gap-2">
                   {emailDraftHistory.data.map((draft) => (
@@ -662,20 +775,36 @@ export function QuoteDesk({
                       key={draft.id}
                     >
                       <div>
-                        <p className="font-medium">{draft.subject}</p>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="font-medium">{draft.subject}</p>
+                          <EmailStatusBadge status={draft.status} />
+                        </div>
                         <p className="text-xs text-muted-foreground">
                           {draft.toEmail} · {draft.templateName} ·{" "}
                           {new Date(draft.createdAt).toLocaleString("es-MX")} ·{" "}
                           {draft.createdBy.email}
                         </p>
+                        {draft.sentAt ? <p className="mt-1 text-xs text-emerald-700 dark:text-emerald-300">Enviado {new Date(draft.sentAt).toLocaleString("es-MX")} por {draft.sentBy?.email ?? "usuario autorizado"}{draft.receiptId ? ` · recibo ${draft.receiptId}` : ""}</p> : null}
+                        {draft.error ? <p className="mt-1 text-xs text-destructive">{draft.error}</p> : null}
                       </div>
-                      <Button
-                        onClick={() => downloadRatewareDraft(draft.id)}
-                        size="sm"
-                        variant="outline"
-                      >
-                        Exportar
-                      </Button>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Button
+                          onClick={() => downloadRatewareDraft(draft.id)}
+                          size="sm"
+                          variant="outline"
+                        >
+                          Exportar
+                        </Button>
+                        {canEdit && previewFor.status === "APPROVED" && (draft.status === "PREPARED" || draft.status === "FAILED") ? (
+                          <Button
+                            disabled={!gmailReady || sendGmail.isPending}
+                            onClick={() => setSendCandidate(draft)}
+                            size="sm"
+                          >
+                            Enviar por Gmail
+                          </Button>
+                        ) : null}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -688,10 +817,38 @@ export function QuoteDesk({
                   : "No se pudo preparar el borrador."}
               </p>
             )}
+            {transitionQuote.isError ? <p className="mt-3 text-sm text-destructive">No se pudo actualizar el estado de la propuesta.</p> : null}
+            {sendGmail.isError ? <p className="mt-3 text-sm text-destructive">{sendGmail.error instanceof Error ? sendGmail.error.message : "No se pudo entregar el correo."}</p> : null}
           </CardContent>
         </Card>
       )}
       </div>
+      <AlertDialog
+        open={Boolean(sendCandidate)}
+        onOpenChange={(open) => {
+          if (!open && !sendGmail.isPending) setSendCandidate(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar envío por Gmail</AlertDialogTitle>
+            <AlertDialogDescription>
+              Se enviará “{sendCandidate?.subject}” a {sendCandidate?.toEmail} desde la cuenta Gmail conectada. Esta acción queda registrada y no se ejecuta automáticamente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={sendGmail.isPending}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={!sendCandidate || !gmailReady || sendGmail.isPending}
+              onClick={() => {
+                if (sendCandidate) sendGmail.mutate(sendCandidate.id);
+              }}
+            >
+              {sendGmail.isPending ? "Enviando…" : "Confirmar y enviar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
@@ -710,6 +867,19 @@ function QuoteStatusBadge({ status }: { status: CustomerQuoteStatus }) {
       {presentation.label}
     </span>
   );
+}
+
+const EMAIL_STATUS: Record<EmailDeliveryStatus, { label: string; className: string }> = {
+  PREPARED: { label: "Preparado", className: "bg-sky-500/10 text-sky-700 dark:text-sky-300" },
+  SENDING: { label: "Enviando", className: "bg-amber-500/10 text-amber-700 dark:text-amber-300" },
+  SENT: { label: "Enviado", className: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" },
+  FAILED: { label: "Falló", className: "bg-rose-500/10 text-rose-700 dark:text-rose-300" },
+  DELIVERY_UNKNOWN: { label: "Entrega incierta", className: "bg-orange-500/10 text-orange-800 dark:text-orange-300" },
+};
+
+function EmailStatusBadge({ status }: { status: EmailDeliveryStatus }) {
+  const presentation = EMAIL_STATUS[status];
+  return <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${presentation.className}`}>{presentation.label}</span>;
 }
 
 function DeskMetric({
