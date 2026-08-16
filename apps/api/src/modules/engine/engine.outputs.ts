@@ -16,8 +16,20 @@ import { getParam, type ParamMap } from '../assumptions/assumptions.service.js'
 
 const P = (m: ParamMap, section: string, field: string, d: number) => getParam(m, section, field, d)
 
+export interface MaintTiresOptions {
+  includeTrailerTires?: boolean
+}
+
+export interface MonthlyFixedCostOptions {
+  includeCrossborderCosts?: boolean
+  workingCapitalCountry?: 'MX' | 'US'
+  includeTrailerAssets?: boolean
+  includeDollyAssets?: boolean
+}
+
 // ── MAINTENANCE + TIRES per km ─────────────────────────────────────────────
-export function deriveMaintTiresPerKm(m: ParamMap): number {
+export function deriveMaintTiresPerKm(m: ParamMap, options: MaintTiresOptions = {}): number {
+  const includeTrailerTires = options.includeTrailerTires ?? true
   // Scheduled PM: Σ(Qty×PU) per interval, prorated over the interval km
   const pm10000 =
     P(m, 'COST_MAINT', '10k Qty Aceite de Motor', 60) * P(m, 'COST_MAINT', '10k PU Aceite de Motor', 5) +
@@ -47,19 +59,42 @@ export function deriveMaintTiresPerKm(m: ParamMap): number {
 
   // Tires per km = Σ(Qty×PU / lifeKm). NOTE: V3.0 maps PUs one row off (drive↔retread,
   // trailer↔traction); replicated so totals match V3.0 exactly.
-  const tiresPerKm =
+  const tractorTiresPerKm =
     (P(m, 'COST_TIRES', 'Qty Direccion', 2) * P(m, 'COST_TIRES', 'PU Direccion', 600)) / P(m, 'COST_TIRES', 'Life KM Direccion', 180000) +
     (P(m, 'COST_TIRES', 'Qty Traccion', 8) * P(m, 'COST_TIRES', 'PU Recapeadas', 225)) / P(m, 'COST_TIRES', 'Life KM Traccion', 220000) +
-    (P(m, 'COST_TIRES', 'Qty Remolque', 8) * P(m, 'COST_TIRES', 'PU Traccion', 550)) / P(m, 'COST_TIRES', 'Life KM Remolque', 250000) +
     (P(m, 'COST_TIRES', 'Qty Recapeadas', 8) * P(m, 'COST_TIRES', 'PU Remolque', 450)) / P(m, 'COST_TIRES', 'Life KM Recapeadas', 160000)
+  const trailerTiresPerKm = includeTrailerTires
+    ? (P(m, 'COST_TIRES', 'Qty Remolque', 8) * P(m, 'COST_TIRES', 'PU Traccion', 550)) /
+      P(m, 'COST_TIRES', 'Life KM Remolque', 250000)
+    : 0
 
-  return scheduledPerKm + reservePerKm + tiresPerKm
+  return scheduledPerKm + reservePerKm + tractorTiresPerKm + trailerTiresPerKm
 }
 
-export const deriveMaintTiresPerMile = (m: ParamMap): number => deriveMaintTiresPerKm(m) * 1.60934
+export const deriveMaintTiresPerMile = (m: ParamMap, options: MaintTiresOptions = {}): number =>
+  deriveMaintTiresPerKm(m, options) * 1.60934
 
 // ── MONTHLY FIXED COST ─────────────────────────────────────────────────────
-export function deriveMonthlyFixedCost(m: ParamMap): number {
+export function deriveMonthlyFixedCost(
+  m: ParamMap,
+  options: boolean | MonthlyFixedCostOptions = true,
+): number {
+  // A boolean is the legacy signature. Keep it byte-for-byte equivalent for
+  // WORKBOOK_V3 and older callers while allowing operational models to state
+  // country and asset ownership explicitly.
+  const normalized = typeof options === 'boolean'
+    ? {
+        includeCrossborderCosts: options,
+        workingCapitalCountry: 'MX' as const,
+        includeTrailerAssets: true,
+        includeDollyAssets: true,
+      }
+    : {
+        includeCrossborderCosts: options.includeCrossborderCosts ?? true,
+        workingCapitalCountry: options.workingCapitalCountry ?? 'MX',
+        includeTrailerAssets: options.includeTrailerAssets ?? true,
+        includeDollyAssets: options.includeDollyAssets ?? true,
+      }
   const flota = P(m, 'GENERAL_BASE', 'Tamaño de Flota', 50)
   const cargaSocial = P(m, 'LABOR', 'Carga Social', 0.3)
 
@@ -110,11 +145,17 @@ export function deriveMonthlyFixedCost(m: ParamMap): number {
   // Capital = fleet depreciation + fleet asset finance
   const assetValue =
     P(m, 'COST_CAPITAL', 'Qty Tracto', 1) * P(m, 'COST_CAPITAL', 'PU Tracto', 220000) +
-    P(m, 'COST_CAPITAL', 'Qty Remolque', 1) * P(m, 'COST_CAPITAL', 'PU Remolque', 55000) +
-    P(m, 'COST_CAPITAL', 'Qty Dolly', 0) * P(m, 'COST_CAPITAL', 'PU Dolly', 25000)
+    (normalized.includeTrailerAssets
+      ? P(m, 'COST_CAPITAL', 'Qty Remolque', 1) * P(m, 'COST_CAPITAL', 'PU Remolque', 55000)
+      : 0) +
+    (normalized.includeDollyAssets
+      ? P(m, 'COST_CAPITAL', 'Qty Dolly', 0) * P(m, 'COST_CAPITAL', 'PU Dolly', 25000)
+      : 0)
   const residual =
     P(m, 'COST_CAPITAL', 'Qty Rescue Tracto', 1) * P(m, 'COST_CAPITAL', 'PU Rescue Tracto', 60000) +
-    P(m, 'COST_CAPITAL', 'Qty Rescue Remolque', 1) * P(m, 'COST_CAPITAL', 'PU Rescue Remolque', 20000)
+    (normalized.includeTrailerAssets
+      ? P(m, 'COST_CAPITAL', 'Qty Rescue Remolque', 1) * P(m, 'COST_CAPITAL', 'PU Rescue Remolque', 20000)
+      : 0)
   const depPeriod = P(m, 'COST_CAPITAL', 'Periodo Depreciacion', 60)
   const fleetDepreciation = ((assetValue - residual) / depPeriod) * flota
   const ltv = P(m, 'COST_CAPITAL', 'LTV Asset Financing', 0.7)
@@ -135,13 +176,15 @@ export function deriveMonthlyFixedCost(m: ParamMap): number {
     P(m, 'COST_CROSSBORDER', 'GPS', 1500) + P(m, 'COST_CROSSBORDER', 'Capacitacion Operadores', 1000) +
     P(m, 'COST_CROSSBORDER', 'Mantenimientos', 750) + P(m, 'COST_CROSSBORDER', 'TMS', 2500) +
     P(m, 'COST_CROSSBORDER', 'Border Yard Minimum', 1000)
-  const crossborderFixed = monthlyCompliance + monthlyInfra
+  const crossborderFixed = normalized.includeCrossborderCosts ? monthlyCompliance + monthlyInfra : 0
 
   // Working capital (small; uses AR/AP gap × COGS proxy × cost of capital)
   const gapDays = Math.max(
     P(m, 'FINANCE', 'Customer Collection Days', 30) - P(m, 'FINANCE', 'Carrier Payment Days', 14), 0)
   const monthlyCogsProxy = P(m, 'FINANCE', 'Monthly COGS Proxy', 239577)
-  const wcRate = P(m, 'FINANCE', 'Cost of Capital MX', 0.14)
+  const wcRate = normalized.workingCapitalCountry === 'US'
+    ? P(m, 'FINANCE', 'Cost of Capital US', 0.10)
+    : P(m, 'FINANCE', 'Cost of Capital MX', 0.14)
   const workingCapital = (monthlyCogsProxy * gapDays / 30) * wcRate / 12
 
   return insurance + payroll + company + capital + crossborderFixed + workingCapital

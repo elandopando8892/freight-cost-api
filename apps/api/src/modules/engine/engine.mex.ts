@@ -28,6 +28,7 @@ export function calculateMexLeg(
   lane: MexLegInput,
   params: ParamMap,
   policy: EnginePolicy = 'OPERATIONAL_V3',
+  legacyOperational = false,
 ): MexLegOutput {
   const { equipment } = lane
   const workbookExact = policy === 'WORKBOOK_V3'
@@ -35,6 +36,7 @@ export function calculateMexLeg(
   const isRoundtrip = lane.service === 'Roundtrip'
   const isBackhaul = lane.service === 'Backhaul'
   const isTandem = equipment.config === 'Tandem'
+  const includesOwnedTrailer = equipment.trailer !== 'Power Only' && equipment.trailer !== 'Chassis'
 
   // Assumptions
   const deadheadBase = getParam(params, 'UTILIZATION', 'Deadhead Base', 0.15)
@@ -51,9 +53,19 @@ export function calculateMexLeg(
   const tc = getParam(params, 'FINANCE', 'Tipo de Cambio', 17.5)
   const tarifaMx = getParam(params, 'LABOR', 'Tarifa Operador MX', 0.18)
   const gastoAdicional = getParam(params, 'GENERAL_BASE', 'Gasto Adicional sobre Ruta', 0.05)
-  const maintTiresPerKm = deriveMaintTiresPerKm(params)          // derived from editable cost cards
+  const legacyAssetSemantics = workbookExact || legacyOperational
+  const maintTiresPerKm = legacyAssetSemantics
+    ? deriveMaintTiresPerKm(params)
+    : deriveMaintTiresPerKm(params, { includeTrailerTires: includesOwnedTrailer })
   const borderTransactional = getParam(params, 'BORDER', 'Border Transactional Cost', 200)
-  const monthlyFixedCost = deriveMonthlyFixedCost(params)        // derived from editable cost cards
+  const monthlyFixedCost = legacyAssetSemantics
+    ? deriveMonthlyFixedCost(params, true)
+    : deriveMonthlyFixedCost(params, {
+        includeCrossborderCosts: isD2D,
+        workingCapitalCountry: 'MX',
+        includeTrailerAssets: includesOwnedTrailer,
+        includeDollyAssets: isTandem,
+      })
   const operadores = getParam(params, 'GENERAL_BASE', 'Operadores', 52)
   const kmPerOperator = getParam(params, 'GENERAL_BASE', 'Kilómetros promedio x operador', 22000)
   const flota = getParam(params, 'GENERAL_BASE', 'Tamaño de Flota', 50)
@@ -138,7 +150,11 @@ export function calculateMexLeg(
   // ── CVU ──────────────────────────────────────────────────────────────
   const adjLoadedKmL = rendCargado * eq.fuel * (1 - (isTandem ? tandemFuelPenalty : 0))
   const adjEmptyKmL = rendVacio * eq.fuel * (1 - (isTandem ? tandemFuelPenalty : 0))
-  const blendedDieselUsdL = (dieselMx / tc) * mixMx + dieselUs * mixUs
+  // Domestic MX operations purchase MX diesel. The MX/US blend is a D2D
+  // cross-border assumption and must not leak into Intra-Mex or Local bases.
+  const blendedDieselUsdL = workbookExact || legacyOperational || isD2D
+    ? (dieselMx / tc) * mixMx + dieselUs * mixUs
+    : dieselMx / tc
   const fuelUsd = (loadedKm / adjLoadedKmL + emptyKm / adjEmptyKmL) * blendedDieselUsdL * (1 + fuelEscalation)
   // Tolls: outbound + return (roundtrip). Return defaults to same as outbound; override with returnRouteExpensesMxn.
   const outboundTollsMxn = lane.routeExpensesMxn ?? 0

@@ -9,16 +9,18 @@ import { authenticate } from '../../middleware/authenticate.js'
 import { requireRole } from '../../middleware/authorize.js'
 import type { JwtPayload } from '../auth/auth.schema.js'
 import { prisma } from '../../config/prisma.js'
-import { scopeForOperation } from '../cost-bases/cost-bases.service.js'
+import { calculationApplicabilityProfile, resolveCalculationContext, scopeForOperation } from '../cost-bases/cost-bases.service.js'
 import { buildParamMap } from '../assumptions/assumptions.service.js'
 import { calculate } from '../engine/engine.calculator.js'
 import { missingRequiredPricingLegs, normalizeLaneLookup, resolveRoute } from '../engine/lane-resolver.service.js'
 import { buildLaneKey } from '../lanes/lanes.schema.js'
 import { buildQuoteExplanation } from '../quotes/quote-explanation.js'
 import { buildQuoteCalculationSnapshot } from '../quotes/quote-snapshot.js'
-import { Prisma } from '@prisma/client'
+import { Prisma, type CalculationPolicy, type CostBaseScope } from '@prisma/client'
 import { round2, usdToMxn } from '../../utils/currency.js'
 import type { EquipmentSpec, EngineInput } from '../engine/engine.types.js'
+import { assertSingleDraftRouteTransition, draftRouteTransitionWhere } from './production-transition.js'
+import { lockAssumptionVersion, lockCostBaseLifecycle } from '../assumptions/assumption-version-lock.js'
 
 const norm = (origin: string, destination: string) => normalizeLaneLookup(`${origin} - ${destination}`)
 
@@ -93,16 +95,16 @@ function expectedGeography(operation: string) {
 
 const routeInclude = {
   suggestedCostBase: { select: { id: true, code: true, name: true, scope: true, status: true } },
-  confirmedCostBase: { select: { id: true, code: true, name: true, scope: true, status: true } },
-  confirmedAssumptionSet: { select: { id: true, name: true, version: true, status: true, costBaseId: true } },
+  confirmedCostBase: { select: { id: true, code: true, name: true, scope: true, status: true, defaultPolicy: true } },
+  confirmedAssumptionSet: { select: { id: true, name: true, version: true, status: true, costBaseId: true, applicabilityContext: true } },
   supersedesRoute: { select: { id: true, code: true, revision: true, status: true, confirmedAssumptionSet: { select: { version: true } } } },
   auditEvents: { include: { actor: { select: { id: true, email: true } } }, orderBy: { createdAt: 'asc' } },
 } as const
 
 type CatalogRoute = Awaited<ReturnType<typeof prisma.productionRoute.findFirstOrThrow>> & {
   suggestedCostBase: { id: string; code: string; name: string; scope: string; status: string } | null
-  confirmedCostBase: { id: string; code: string; name: string; scope: string; status: string } | null
-  confirmedAssumptionSet: { id: string; name: string; version: number; status: string; costBaseId: string | null } | null
+  confirmedCostBase: { id: string; code: string; name: string; scope: CostBaseScope; status: string; defaultPolicy: CalculationPolicy } | null
+  confirmedAssumptionSet: { id: string; name: string; version: number; status: string; costBaseId: string | null; applicabilityContext: unknown } | null
   supersedesRoute: { id: string; code: string | null; revision: number; status: string; confirmedAssumptionSet: { version: number } | null } | null
   auditEvents: { id: string; action: string; note: string | null; createdAt: Date; actor: { id: string; email: string } | null }[]
 }
@@ -112,19 +114,45 @@ function assessRoute(route: CatalogRoute) {
   const expectedScope = scopeForOperation(route.operation)
   const expectedGeo = expectedGeography(route.operation)
 
-  if (expectedGeo && route.geography !== expectedGeo) reasons.push(`La geografÃ­a debe ser ${expectedGeo} para ${route.operation}.`)
+  if (expectedGeo && route.geography !== expectedGeo) reasons.push(`La geografía debe ser ${expectedGeo} para ${route.operation}.`)
   if (route.geography === 'CROSS_BORDER' && (!route.mexBorder || !route.usaBorder)) {
     reasons.push('Una ruta cross-border requiere ambos cruces fronterizos.')
   }
   if (!route.confirmedCostBase) reasons.push('Confirma una base de costos para la ruta.')
   else {
-    if (route.confirmedCostBase.status !== 'ACTIVE') reasons.push('La base confirmada no estÃ¡ activa.')
+    if (route.confirmedCostBase.status !== 'ACTIVE') reasons.push('La base confirmada no está activa.')
     if (expectedScope && route.confirmedCostBase.scope !== expectedScope) reasons.push(`La base confirmada no corresponde al alcance ${expectedScope}.`)
   }
-  if (!route.confirmedAssumptionSet) reasons.push('Confirma la versiÃ³n de supuestos que gobernarÃ¡ la ruta.')
+  if (!route.confirmedAssumptionSet) reasons.push('Confirma la versión de supuestos que gobernará la ruta.')
   else {
-    if (route.confirmedAssumptionSet.status !== 'PUBLISHED') reasons.push('La versiÃ³n confirmada debe estar publicada.')
-    if (route.confirmedAssumptionSet.costBaseId !== route.confirmedCostBaseId) reasons.push('La versiÃ³n confirmada no pertenece a la base confirmada.')
+    if (route.confirmedAssumptionSet.status !== 'PUBLISHED') reasons.push('La versión confirmada debe estar publicada.')
+    if (route.confirmedAssumptionSet.costBaseId !== route.confirmedCostBaseId) reasons.push('La versión confirmada no pertenece a la base confirmada.')
+    if (route.confirmedAssumptionSet.applicabilityContext == null) {
+      reasons.push('La versión legada sin perfil sólo puede reproducirse desde snapshots históricos.')
+    }
+  }
+
+  if (
+    route.confirmedCostBase &&
+    route.confirmedAssumptionSet &&
+    route.confirmedAssumptionSet.applicabilityContext != null &&
+    route.confirmedAssumptionSet.costBaseId === route.confirmedCostBase.id
+  ) {
+    try {
+      calculationApplicabilityProfile(
+        route.confirmedCostBase.scope,
+        route.confirmedAssumptionSet.applicabilityContext,
+        route.confirmedCostBase.defaultPolicy,
+        {
+          operation: route.operation,
+          service: route.service,
+          equipment: engineEquipment(route),
+        },
+      )
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : 'perfil invalido'
+      reasons.push(`El perfil de aplicabilidad no admite esta ruta: ${detail}`)
+    }
   }
 
   const hasRequiredContext = Boolean(route.origin && route.destination)
@@ -135,30 +163,82 @@ function assessRoute(route: CatalogRoute) {
   return { quality: 'READY' as const, reasons: [] }
 }
 
-async function suggestedBase(orgId: string, operation: string) {
+async function suggestedBase(
+  orgId: string,
+  operation: string,
+  service: string,
+  equipment: Pick<EquipmentSpec, 'truckType' | 'trailer' | 'config' | 'driver'>,
+) {
   const scope = scopeForOperation(operation)
   if (!scope) return null
-  return prisma.costBase.findFirst({
+  const candidates = await prisma.costBase.findMany({
     where: { orgId, scope, status: 'ACTIVE', versions: { some: { isActive: true, status: 'PUBLISHED' } } },
-    select: { id: true },
+    select: {
+      id: true,
+      scope: true,
+      defaultPolicy: true,
+      versions: {
+        where: { isActive: true, status: 'PUBLISHED' },
+        select: { applicabilityContext: true },
+      },
+    },
     orderBy: [{ isDefault: 'desc' }, { updatedAt: 'desc' }],
   })
+  for (const candidate of candidates) {
+    const version = candidate.versions.find((entry) => entry.applicabilityContext != null)
+    if (!version) continue
+    try {
+      calculationApplicabilityProfile(
+        candidate.scope,
+        version.applicabilityContext,
+        candidate.defaultPolicy,
+        { operation, service, equipment },
+      )
+      return { id: candidate.id }
+    } catch {
+      // Continue to the next governed candidate instead of suggesting a base
+      // whose active profile rejects this route.
+    }
+  }
+  return null
 }
 
-async function resolveConfirmation(orgId: string, operation: string, baseId?: string | null, setId?: string | null) {
+async function resolveConfirmation(
+  orgId: string,
+  operation: string,
+  service: string,
+  equipment: Pick<EquipmentSpec, 'truckType' | 'trailer' | 'config' | 'driver'>,
+  baseId?: string | null,
+  setId?: string | null,
+) {
   if (!baseId && !setId) return { confirmedCostBaseId: null, confirmedAssumptionSetId: null }
-  if (!baseId) throw httpError('Selecciona la base de costos antes de confirmar una versiÃ³n.', 422)
+  if (!baseId) throw httpError('Selecciona la base de costos antes de confirmar una versión.', 422)
 
   const base = await prisma.costBase.findFirst({
     where: { id: baseId, orgId },
-    include: { versions: { where: setId ? { id: setId } : { isActive: true, status: 'PUBLISHED' }, select: { id: true, status: true, costBaseId: true } } },
+    include: {
+      versions: {
+        where: setId ? { id: setId } : { isActive: true, status: 'PUBLISHED' },
+        select: { id: true, status: true, costBaseId: true, applicabilityContext: true },
+      },
+    },
   })
-  if (!base) throw httpError('La base de costos no pertenece a tu organizaciÃ³n.', 404)
+  if (!base) throw httpError('La base de costos no pertenece a tu organización.', 404)
+  if (base.status !== 'ACTIVE') throw httpError('La base de costos debe estar activa antes de confirmar una ruta.', 409)
   const expectedScope = scopeForOperation(operation)
   if (expectedScope && base.scope !== expectedScope) throw httpError(`La base no corresponde al alcance ${expectedScope}.`, 422)
   const version = base.versions[0]
-  if (!version) throw httpError('La base no tiene una versiÃ³n publicada activa para confirmar.', 422)
-  if (version.status !== 'PUBLISHED' || version.costBaseId !== base.id) throw httpError('La versiÃ³n confirmada no es vÃ¡lida para esta base.', 422)
+  if (!version) throw httpError('La base no tiene una versión publicada activa para confirmar.', 422)
+  if (version.status !== 'PUBLISHED' || version.costBaseId !== base.id) throw httpError('La versión confirmada no es válida para esta base.', 422)
+  if (version.applicabilityContext == null) {
+    throw httpError('Las versiones legadas sin perfil sólo pueden reproducirse desde snapshots históricos.', 409)
+  }
+  calculationApplicabilityProfile(
+    base.scope,
+    version.applicabilityContext,
+    base.defaultPolicy,
+    { operation, service, equipment },
+  )
   return { confirmedCostBaseId: base.id, confirmedAssumptionSetId: version.id }
 }
 
@@ -190,8 +270,11 @@ export async function productionRoutes(app: FastifyInstance) {
     const user = request.user as JwtPayload
     const { orgId } = user
     const input = ProductionRouteSchema.parse(request.body)
-    const suggestion = await suggestedBase(orgId, input.operation)
-    const confirmation = await resolveConfirmation(orgId, input.operation, input.confirmedCostBaseId, input.confirmedAssumptionSetId)
+    const suggestion = await suggestedBase(orgId, input.operation, input.service, engineEquipment(input))
+    const confirmation = await resolveConfirmation(
+      orgId, input.operation, input.service, engineEquipment(input),
+      input.confirmedCostBaseId, input.confirmedAssumptionSetId,
+    )
     const route = await prisma.productionRoute.create({
       data: { orgId, ...input, routeKey: routeKey(input), suggestedCostBaseId: suggestion?.id ?? null, ...confirmation,
         auditEvents: { create: { orgId, actorId: user.sub, action: 'CREATED', note: 'Production route draft created.' } } },
@@ -212,19 +295,34 @@ export async function productionRoutes(app: FastifyInstance) {
     const confirmation = await resolveConfirmation(
       orgId,
       merged.operation,
+      merged.service,
+      engineEquipment(merged),
       baseChanged ? patch.confirmedCostBaseId : existing.confirmedCostBaseId,
       patch.confirmedAssumptionSetId !== undefined ? patch.confirmedAssumptionSetId : baseChanged ? null : existing.confirmedAssumptionSetId,
     )
-    const suggestion = patch.operation !== undefined ? await suggestedBase(orgId, merged.operation) : undefined
-    const route = await prisma.productionRoute.update({
-      where: { id },
-      data: {
-        ...merged,
-        routeKey: routeKey(merged),
-        ...(suggestion === undefined ? {} : { suggestedCostBaseId: suggestion?.id ?? null }),
-        ...confirmation,
-      },
-      include: routeInclude,
+    const governedDimensionChanged = [
+      patch.operation,
+      patch.service,
+      patch.truckType,
+      patch.trailerType,
+      patch.config,
+      patch.driverType,
+    ].some((value) => value !== undefined)
+    const suggestion = governedDimensionChanged
+      ? await suggestedBase(orgId, merged.operation, merged.service, engineEquipment(merged))
+      : undefined
+    const route = await prisma.$transaction(async (tx) => {
+      const transition = await tx.productionRoute.updateMany({
+        where: draftRouteTransitionWhere(existing),
+        data: {
+          ...merged,
+          routeKey: routeKey(merged),
+          ...(suggestion === undefined ? {} : { suggestedCostBaseId: suggestion?.id ?? null }),
+          ...confirmation,
+        },
+      })
+      assertSingleDraftRouteTransition(transition.count)
+      return tx.productionRoute.findFirstOrThrow({ where: { id, orgId }, include: routeInclude })
     })
     return presentRoute(route)
   })
@@ -237,6 +335,16 @@ export async function productionRoutes(app: FastifyInstance) {
     if (route.status !== 'DRAFT') throw httpError('Only a draft route can enter production.', 409)
     const assessment = assessRoute(route)
     if (assessment.quality !== 'READY') throw httpError(`Route cannot enter production: ${assessment.reasons.join(' ')}`, 422)
+    if (!route.confirmedCostBaseId || !route.confirmedAssumptionSetId) {
+      throw httpError('A confirmed cost base and governed version are required before production.', 422)
+    }
+    await resolveCalculationContext(orgId, {
+      costBaseId: route.confirmedCostBaseId ?? undefined,
+      assumptionSetId: route.confirmedAssumptionSetId ?? undefined,
+      operation: route.operation,
+      service: route.service,
+      equipment: engineEquipment(route),
+    })
     const resolved = await resolveRoute({
       orgId, outboundLocation: route.origin, inboundLocation: route.destination,
       mexBorder: route.mexBorder ?? route.origin, usBorder: route.usaBorder ?? route.destination,
@@ -244,7 +352,28 @@ export async function productionRoutes(app: FastifyInstance) {
     })
     assertCompleteResolution(route.operation, resolved)
     const produced = await prisma.$transaction(async (tx) => {
-      const updated = await tx.productionRoute.update({ where: { id }, data: { status: 'PRODUCTION' }, include: routeInclude })
+      await lockCostBaseLifecycle(tx, orgId, route.confirmedCostBaseId!)
+      await lockAssumptionVersion(tx, orgId, route.confirmedAssumptionSetId!)
+      const governedVersion = await tx.assumptionSet.findFirstOrThrow({
+        where: {
+          id: route.confirmedAssumptionSetId!,
+          orgId,
+          costBaseId: route.confirmedCostBaseId!,
+        },
+        include: { costBase: { select: { status: true } } },
+      })
+      if (governedVersion.costBase?.status !== 'ACTIVE') {
+        throw httpError('The confirmed cost base is no longer active.', 409)
+      }
+      if (governedVersion.status !== 'PUBLISHED' || governedVersion.applicabilityContext == null) {
+        throw httpError('The confirmed assumption version is no longer eligible for production.', 409)
+      }
+      const transition = await tx.productionRoute.updateMany({
+        where: draftRouteTransitionWhere(route),
+        data: { status: 'PRODUCTION' },
+      })
+      assertSingleDraftRouteTransition(transition.count)
+      const updated = await tx.productionRoute.findFirstOrThrow({ where: { id, orgId }, include: routeInclude })
       await tx.productionRouteAuditEvent.create({ data: { orgId, routeId: id, actorId: user.sub, action: 'PRODUCED', note: 'Route entered production.', payload: { revision: updated.revision } } })
       return updated
     })
@@ -262,10 +391,13 @@ export async function productionRoutes(app: FastifyInstance) {
     const source = await prisma.productionRoute.findFirstOrThrow({ where: { id, orgId }, include: routeInclude })
     if (source.status !== 'PRODUCTION') throw httpError('Only a route in production can be replaced.', 409)
 
-    const confirmation = await resolveConfirmation(orgId, source.operation, input.confirmedCostBaseId, input.confirmedAssumptionSetId)
+    const confirmation = await resolveConfirmation(
+      orgId, source.operation, source.service, engineEquipment(source),
+      input.confirmedCostBaseId, input.confirmedAssumptionSetId,
+    )
     const latest = await prisma.productionRoute.aggregate({ where: { orgId, routeKey: source.routeKey }, _max: { revision: true } })
     const revision = (latest._max.revision ?? source.revision) + 1
-    const suggestion = await suggestedBase(orgId, source.operation)
+    const suggestion = await suggestedBase(orgId, source.operation, source.service, engineEquipment(source))
     const replacement = await prisma.$transaction(async (tx) => {
       const created = await tx.productionRoute.create({
       data: {
@@ -314,8 +446,17 @@ export async function productionRoutes(app: FastifyInstance) {
     if (!route.confirmedAssumptionSet || route.confirmedAssumptionSet.status !== 'PUBLISHED' || route.confirmedAssumptionSet.costBaseId !== route.confirmedCostBaseId) {
       throw httpError('The route does not have a published confirmed assumption version.', 409)
     }
+    if (route.confirmedAssumptionSet.applicabilityContext == null) {
+      throw httpError('Legacy versions without an applicability profile can only be replayed from historical snapshots.', 409)
+    }
 
     const equipment = engineEquipment(route)
+    const applicabilityProfile = calculationApplicabilityProfile(
+      route.confirmedCostBase.scope,
+      route.confirmedAssumptionSet.applicabilityContext,
+      route.confirmedCostBase.defaultPolicy,
+      { operation: route.operation, service: route.service, equipment },
+    )
     const resolved = await resolveRoute({
       orgId, outboundLocation: route.origin, inboundLocation: route.destination,
       mexBorder: route.mexBorder ?? route.origin, usBorder: route.usaBorder ?? route.destination,
@@ -325,7 +466,8 @@ export async function productionRoutes(app: FastifyInstance) {
 
     const params = buildParamMap(route.confirmedAssumptionSet.params)
     const input: EngineInput = {
-      policy: route.confirmedCostBase.defaultPolicy === 'WORKBOOK_V3' ? 'WORKBOOK_V3' : 'OPERATIONAL_V3',
+      policy: applicabilityProfile.calculationPolicy,
+      applicabilityProfile,
       operation: route.operation, service: route.service, equipment, params,
       mexLeg: resolved.mexLeg, usaLeg: resolved.usaLeg,
     }

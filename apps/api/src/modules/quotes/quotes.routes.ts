@@ -11,11 +11,12 @@ import { calculate } from '../engine/engine.calculator.js'
 import { defaultService } from '../engine/engine.factors.js'
 import { usdToMxn, round2 } from '../../utils/currency.js'
 import type { EngineInput, EquipmentSpec, MarketCondition } from '../engine/engine.types.js'
-import { resolveCalculationContext } from '../cost-bases/cost-bases.service.js'
+import { assertCalculationOverrides, resolveCalculationContext, scopeForOperation } from '../cost-bases/cost-bases.service.js'
 import { buildQuoteExplanation } from './quote-explanation.js'
 import { buildQuoteCalculationSnapshot, isQuoteCalculationSnapshot, verifyQuoteCalculationSnapshot } from './quote-snapshot.js'
-import { buildRatewareHandoff, confirmationEligibility } from './quote-governance.js'
-import { assessRatewareCandidate } from './rateware-candidate.js'
+import { buildRatewareHandoff, confirmationEligibility, ratewareEconomicsDriftReasons } from './quote-governance.js'
+import { assessRatewareCandidate, assessRatewareReadiness } from './rateware-candidate.js'
+import { pricingInputIssues } from '../engine/engine-input-validation.js'
 
 const MarketConditionEnum = z.enum([
   'Very Tight', 'Moderately Tight', 'Balanced', 'Slightly Loose', 'Very Loose',
@@ -29,7 +30,7 @@ const EquipmentSchema = z.object({
 })
 const EnginePolicySchema = z.enum(['OPERATIONAL_V3', 'WORKBOOK_V3'])
 const MexSchema = z.object({
-  baseKm: z.number().nonnegative(),
+  baseKm: z.number().positive(),
   routeExpensesMxn: z.number().nonnegative().default(0),
   baseHours: z.number().nonnegative().default(0),
   route: z.string().default('Straight & Danger'),
@@ -40,7 +41,7 @@ const MexSchema = z.object({
   returnBaseHours: z.number().nonnegative().optional(),
 })
 const UsaSchema = z.object({
-  loadedMiles: z.number().nonnegative(),
+  loadedMiles: z.number().positive(),
   transitDaysRaw: z.number().nonnegative().default(0),
   driverExpenses: z.number().nonnegative().default(0),
   outState: z.string().default('TX'),
@@ -67,6 +68,81 @@ const CreateQuoteSchema = z.object({
 })
 const ConfirmQuoteSchema = z.object({ note: z.string().trim().min(3).max(2000) })
 const RatewareEnrichmentSchema = z.object({ carrier: z.string().trim().min(2).max(160), effectiveDate: z.string().date(), rateOwner: z.string().trim().min(2).max(160), capacityPerWeek: z.number().int().positive().max(1_000_000).optional(), notes: z.string().trim().max(1000).optional() })
+const RATEWARE_REQUIRED_ENRICHMENT_FIELDS = ['carrier', 'effectiveDate', 'rateOwner'] as const
+
+function ratewareEnrichmentState(value: unknown) {
+  if (value == null) {
+    return {
+      enrichment: null,
+      blockers: [`Falta enriquecimiento Rateware: ${RATEWARE_REQUIRED_ENRICHMENT_FIELDS.join(', ')}.`],
+    }
+  }
+  const parsed = RatewareEnrichmentSchema.safeParse(value)
+  if (parsed.success) return { enrichment: parsed.data, blockers: [] as string[] }
+  const fields = [...new Set(parsed.error.issues.map((issue) => String(issue.path[0] ?? 'payload')))]
+  return {
+    enrichment: null,
+    blockers: [`El enriquecimiento Rateware es incompleto o inválido: ${fields.join(', ')}.`],
+  }
+}
+
+function httpError(message: string, statusCode: number) {
+  return Object.assign(new Error(message), { statusCode })
+}
+
+type QuoteLaneContext = {
+  costBaseId: string | null
+  operationType: string
+  serviceType: string
+  config: string
+  origin: string
+  destination: string
+  equipment?: {
+    truckType: string
+    trailerType: string
+    config: string
+    operationType: string
+    serviceType: string
+    driverType: string
+  } | null
+}
+
+export function assertQuoteLaneCompatible(
+  lane: QuoteLaneContext,
+  expected: {
+    costBaseId: string | null
+    operation: string
+    service: string
+    config: string
+    origin?: string
+    destination?: string
+    equipment: EquipmentSpec
+  },
+) {
+  if (lane.costBaseId !== expected.costBaseId) {
+    throw httpError('La lane seleccionada no pertenece a la misma base de costos de la cotización.', 422)
+  }
+  if (lane.operationType !== expected.operation || lane.serviceType !== expected.service || lane.config !== expected.config) {
+    throw httpError('La lane seleccionada no coincide con la operación, servicio y configuración de la cotización.', 422)
+  }
+  if (lane.equipment && (
+    lane.equipment.truckType !== expected.equipment.truckType
+    || lane.equipment.trailerType !== expected.equipment.trailer
+    || lane.equipment.config !== expected.equipment.config
+    || lane.equipment.operationType !== expected.operation
+    || lane.equipment.serviceType !== expected.service
+    || lane.equipment.driverType !== expected.equipment.driver
+  )) {
+    throw httpError('El equipo guardado en la lane no coincide con el equipo de la cotización.', 422)
+  }
+  const normalized = (value: string) => value.trim().toLocaleUpperCase('en-US')
+  if (expected.origin && normalized(lane.origin) !== normalized(expected.origin)) {
+    throw httpError('El origen capturado no coincide con la lane seleccionada.', 422)
+  }
+  if (expected.destination && normalized(lane.destination) !== normalized(expected.destination)) {
+    throw httpError('El destino capturado no coincide con la lane seleccionada.', 422)
+  }
+}
 
 export async function quotesRoutes(app: FastifyInstance) {
   app.addHook('preHandler', authenticate)
@@ -75,20 +151,58 @@ export async function quotesRoutes(app: FastifyInstance) {
     const user = request.user as JwtPayload
     const { orgId } = user
     const body = CreateQuoteSchema.parse(request.body)
-    if (!body.mex && !body.usa) {
-      return reply.status(422).send({ error: 'Provide at least one of mex or usa leg facts.' })
+    const inputIssues = pricingInputIssues(body.operation, { mex: body.mex, usa: body.usa })
+    if (inputIssues.length > 0) {
+      return reply.status(422).send({ error: inputIssues.join(' '), issues: inputIssues })
     }
 
     // Carrier's choice: explicit service, else the prevailing per-operation default.
     const service = body.service ?? defaultService(body.operation)
 
     let params: ParamMap = {}
-    const { costBase, set, defaultPolicy } = await resolveCalculationContext(orgId, body)
+    const { costBase, set, defaultPolicy, applicabilityProfile } = await resolveCalculationContext(orgId, {
+      costBaseId: body.costBaseId,
+      assumptionSetId: body.assumptionSetId,
+      operation: body.operation,
+      service,
+      policy: body.policy,
+      equipment: body.equipment,
+    })
+    assertCalculationOverrides(costBase?.scope ?? scopeForOperation(body.operation), body.overrides, applicabilityProfile)
     if (set) params = buildParamMap(set.params)
+
+    const selectedLane = body.laneId
+      ? await prisma.lane.findFirst({
+          where: { id: body.laneId, orgId },
+          select: {
+            id: true, costBaseId: true, operationType: true, serviceType: true,
+            config: true, origin: true, destination: true,
+            equipment: {
+              select: {
+                truckType: true, trailerType: true, config: true,
+                operationType: true, serviceType: true, driverType: true,
+              },
+            },
+          },
+        })
+      : null
+    if (body.laneId && !selectedLane) throw httpError('La lane seleccionada no pertenece a tu organización.', 404)
+    if (selectedLane) {
+      assertQuoteLaneCompatible(selectedLane, {
+        costBaseId: costBase?.id ?? null,
+        operation: body.operation,
+        service,
+        config: body.equipment.config,
+        origin: body.origin,
+        destination: body.destination,
+        equipment: body.equipment,
+      })
+    }
 
     const equipment: EquipmentSpec = body.equipment
     const input: EngineInput = {
       policy: body.policy ?? defaultPolicy,
+      applicabilityProfile: applicabilityProfile ?? undefined,
       operation: body.operation,
       service,
       equipment,
@@ -120,7 +234,7 @@ export async function quotesRoutes(app: FastifyInstance) {
     )
 
     // Persist the lane (origin → destination) so History + recent-lanes are meaningful.
-    let laneId = body.laneId
+    let laneId = selectedLane?.id
     if (!laneId && body.origin && body.destination) {
       const laneKey = buildLaneKey(orgId, body.origin, body.destination, undefined, body.operation, service, body.equipment.config, costBase?.id)
       const lane = await prisma.lane.upsert({
@@ -209,13 +323,29 @@ export async function quotesRoutes(app: FastifyInstance) {
     if (quote.status !== 'DRAFT') throw Object.assign(new Error('Only a draft quote can be confirmed.'), { statusCode: 409 })
     const eligibility = confirmationEligibility(quote.explanation)
     if (!eligibility.eligible) throw Object.assign(new Error(`Quote cannot be confirmed: ${eligibility.reasons.join(' ')}`), { statusCode: 422 })
-    return prisma.quote.update({
-      where: { id },
-      data: {
-        status: 'CONFIRMED', confirmedAt: new Date(), confirmedById: user.sub, confirmationNote: note,
-        auditEvents: { create: { orgId: user.orgId, actorId: user.sub, action: 'CONFIRMED', note, payload: { snapshotChecksum: eligibility.snapshot?.checksum ?? null } as Prisma.InputJsonValue } },
-      },
-      include: { confirmedBy: { select: { id: true, email: true } } },
+    const confirmedAt = new Date()
+    return prisma.$transaction(async (transaction) => {
+      const transition = await transaction.quote.updateMany({
+        where: { id, orgId: user.orgId, status: 'DRAFT' },
+        data: { status: 'CONFIRMED', confirmedAt, confirmedById: user.sub, confirmationNote: note },
+      })
+      if (transition.count !== 1) {
+        throw Object.assign(new Error('Quote confirmation lost a concurrent transition; the quote was not confirmed again.'), { statusCode: 409 })
+      }
+      await transaction.quoteAuditEvent.create({
+        data: {
+          orgId: user.orgId,
+          quoteId: id,
+          actorId: user.sub,
+          action: 'CONFIRMED',
+          note,
+          payload: { snapshotChecksum: eligibility.snapshot?.checksum ?? null } as Prisma.InputJsonValue,
+        },
+      })
+      return transaction.quote.findFirstOrThrow({
+        where: { id, orgId: user.orgId },
+        include: { confirmedBy: { select: { id: true, email: true } } },
+      })
     })
   })
 
@@ -224,12 +354,34 @@ export async function quotesRoutes(app: FastifyInstance) {
     const { id } = request.params as { id: string }
     const quote = await prisma.quote.findFirstOrThrow({
       where: { id, orgId },
-      include: { lane: { select: { origin: true, destination: true } }, productionRoute: { select: { id: true, code: true, status: true } }, confirmedBy: { select: { id: true, email: true } } },
+      include: {
+        lane: { select: { origin: true, destination: true } },
+        productionRoute: { select: { id: true, code: true, status: true } },
+        confirmedBy: { select: { id: true, email: true } },
+        auditEvents: { where: { action: 'RATEWARE_ENRICHED' }, orderBy: { createdAt: 'desc' }, take: 1, select: { payload: true } },
+      },
     })
     if (quote.status !== 'CONFIRMED') throw Object.assign(new Error('Only confirmed quotes can be packaged for Rateware.'), { statusCode: 409 })
     const eligibility = confirmationEligibility(quote.explanation)
-    if (!eligibility.eligible || !eligibility.snapshot) throw Object.assign(new Error('The confirmed quote no longer has eligible evidence for a Rateware handoff.'), { statusCode: 409 })
-    return buildRatewareHandoff({ quote, snapshot: eligibility.snapshot, explanation: eligibility.explanation })
+    const handoff = eligibility.snapshot
+      ? buildRatewareHandoff({ quote, snapshot: eligibility.snapshot, explanation: eligibility.explanation })
+      : null
+    const ratewareCandidate = handoff ? assessRatewareCandidate(handoff) : null
+    const packageBlockers = eligibility.snapshot
+      ? ratewareEconomicsDriftReasons(quote, eligibility.snapshot)
+      : []
+    const enrichmentState = ratewareEnrichmentState(quote.auditEvents[0]?.payload ?? null)
+    const readiness = assessRatewareReadiness({
+      confirmationEligibility: eligibility,
+      ratewareCandidate,
+      enrichmentReady: enrichmentState.enrichment !== null,
+      enrichmentBlockers: enrichmentState.blockers,
+      packageBlockers,
+    })
+    if (!readiness.ready || !handoff || !enrichmentState.enrichment) {
+      throw Object.assign(new Error(`Rateware package is not ready: ${readiness.blockers.join(' ')}`), { statusCode: 409 })
+    }
+    return { ...handoff, enrichment: enrichmentState.enrichment }
   })
 
   // Read-only local queue. A consumer may download an individual package only
@@ -248,16 +400,29 @@ export async function quotesRoutes(app: FastifyInstance) {
     })
     const data = quotes.map((quote) => {
       const eligibility = confirmationEligibility(quote.explanation)
-      const enrichment = quote.auditEvents[0]?.payload ?? null
-      const candidate = eligibility.eligible && eligibility.snapshot ? assessRatewareCandidate(buildRatewareHandoff({ quote, snapshot: eligibility.snapshot, explanation: eligibility.explanation })) : null
+      const handoff = eligibility.snapshot
+        ? buildRatewareHandoff({ quote, snapshot: eligibility.snapshot, explanation: eligibility.explanation })
+        : null
+      const candidate = handoff ? assessRatewareCandidate(handoff) : null
+      const packageBlockers = eligibility.snapshot
+        ? ratewareEconomicsDriftReasons(quote, eligibility.snapshot)
+        : []
+      const enrichmentState = ratewareEnrichmentState(quote.auditEvents[0]?.payload ?? null)
+      const readiness = assessRatewareReadiness({
+        confirmationEligibility: eligibility,
+        ratewareCandidate: candidate,
+        enrichmentReady: enrichmentState.enrichment !== null,
+        enrichmentBlockers: enrichmentState.blockers,
+        packageBlockers,
+      })
       return {
         id: quote.id, label: quote.label, operation: quote.operation, service: quote.service,
         requiredTariffUsd: quote.requiredTariffUsd, createdAt: quote.createdAt, confirmedAt: quote.confirmedAt,
         confirmedBy: quote.confirmedBy, lane: quote.lane, productionRoute: quote.productionRoute,
-        ready: eligibility.eligible, blockers: eligibility.reasons,
+        ready: readiness.ready, blockers: readiness.blockers,
         snapshotChecksum: eligibility.snapshot?.checksum ?? null,
         ratewareCandidate: candidate,
-        enrichment,
+        enrichment: enrichmentState.enrichment,
       }
     })
     return { contractVersion: 'fcm.rateware-handoff.v1', total: data.length, ready: data.filter((item) => item.ready).length, data }

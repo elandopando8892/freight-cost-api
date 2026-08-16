@@ -37,9 +37,22 @@ export const BulkUpdateParamsSchema = z.array(
   z.object({
     section: SectionEnum,
     field: z.string().min(1),
-    value: z.number(),
-  }),
-)
+    value: z.number().finite(),
+  }).strict(),
+).superRefine((updates, context) => {
+  const seen = new Set<string>()
+  updates.forEach((update, index) => {
+    const key = `${update.section}__${update.field}`
+    if (seen.has(key)) {
+      context.addIssue({
+        code: 'custom',
+        path: [index, 'field'],
+        message: `${update.section} / ${update.field} is duplicated in this update.`,
+      })
+    }
+    seen.add(key)
+  })
+})
 
 // Reset to V3.0 recommended defaults. Empty/omitted `fields` → reset the whole set.
 export const ResetParamsSchema = z.object({

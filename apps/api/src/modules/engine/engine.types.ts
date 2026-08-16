@@ -1,4 +1,5 @@
 import type { ParamMap } from '../assumptions/assumptions.service.js'
+import type { CostBaseProfile } from '../cost-bases/cost-base-profile.js'
 import type { MarketCondition } from './engine.factors.js'
 
 export type { MarketCondition }
@@ -186,6 +187,10 @@ export interface EngineOutput {
 
 export interface EngineInput {
   policy?: EnginePolicy
+  /** Internal replay mode for snapshots produced before profiled V3 semantics. */
+  compatibilityMode?: 'LEGACY_FCM_V3'
+  /** Immutable applicability context selected with the governed assumption version. */
+  applicabilityProfile?: CostBaseProfile
   operation: string
   service: string
   equipment: EquipmentSpec

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { Layers3, Plus } from 'lucide-react'
+import { Layers3, Pencil, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -12,8 +12,10 @@ import { Label } from '@/components/ui/label'
 import { RelativeTime } from '@/components/relative-time'
 import { fetcher } from '@/lib/fetcher'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { CostBaseWizard, type CostBaseCreateBody, type CostBaseScope } from './cost-base-wizard'
+import type { CostBaseProfile } from './cost-base-profile'
 
-type Scope = 'CROSS_BORDER' | 'DRAYAGE' | 'LOCAL' | 'INTRA_MEX' | 'INTRA_US'
+type Scope = CostBaseScope
 type Status = 'DRAFT' | 'ACTIVE' | 'ARCHIVED'
 
 export interface CostBaseVersion {
@@ -24,6 +26,7 @@ export interface CostBaseVersion {
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'
   notes: string | null
   sourceVersionId: string | null
+  applicabilityContext: CostBaseProfile | null
   publishedAt: string | null
   scenarioReviewSource?: { id: string; status: 'DRAFT' | 'UNDER_REVIEW' | 'APPROVED' | 'REJECTED' | 'CANCELLED'; sourceChecksum: string; quoteId: string } | null
   publishedBy?: { email: string } | null
@@ -35,7 +38,17 @@ export interface CostBaseVersion {
 
 interface VersionAudit {
   id: string
-  action: 'DRAFT_CREATED' | 'PUBLISHED' | 'ARCHIVED'
+  action: 'DRAFT_CREATED' | 'PROFILE_UPDATED' | 'PUBLISHED' | 'ARCHIVED'
+  note: string | null
+  createdAt: string
+  actor?: { email: string } | null
+}
+
+interface BaseAudit {
+  id: string
+  action: 'CREATED' | 'METADATA_UPDATED' | 'VERSION_ACTIVATED' | 'DEFAULT_REPLACED' | 'ARCHIVED'
+  fromStatus: Status | null
+  toStatus: Status | null
   note: string | null
   createdAt: string
   actor?: { email: string } | null
@@ -48,6 +61,7 @@ interface VersionImpact {
   comparison: {
     referenceAvailable: boolean
     changedParameterCount: number
+    applicabilityProfileChanged: boolean
     changes: { section: string; field: string; unit: string; fromValue: number | null; toValue: number | null; delta: number | null }[]
   }
   records: {
@@ -75,7 +89,14 @@ export interface CostBase {
   isDefault: boolean
   updatedAt: string
   versions: CostBaseVersion[]
+  auditEvents?: BaseAudit[]
   _count: { lanes: number; quotes: number }
+}
+
+type CostBaseMetadataUpdate = {
+  name?: string
+  description?: string | null
+  currency?: string
 }
 
 const SCOPE_LABEL: Record<Scope, string> = {
@@ -93,7 +114,15 @@ const VERSION_STATUS_LABEL: Record<CostBaseVersion['status'], string> = {
 }
 
 const AUDIT_ACTION_LABEL: Record<VersionAudit['action'], string> = {
-  DRAFT_CREATED: 'Borrador creado', PUBLISHED: 'Publicada', ARCHIVED: 'Archivada',
+  DRAFT_CREATED: 'Borrador creado', PROFILE_UPDATED: 'Perfil operativo actualizado', PUBLISHED: 'Publicada', ARCHIVED: 'Archivada',
+}
+
+const BASE_AUDIT_ACTION_LABEL: Record<BaseAudit['action'], string> = {
+  CREATED: 'Base creada',
+  METADATA_UPDATED: 'Datos actualizados',
+  VERSION_ACTIVATED: 'Versión activada',
+  DEFAULT_REPLACED: 'Predeterminada sustituida',
+  ARCHIVED: 'Base archivada',
 }
 
 type CoverageStatus = 'READY' | 'IN_PROGRESS' | 'MISSING'
@@ -112,7 +141,10 @@ function buildScopeCoverage(bases: CostBase[]): ScopeCoverage[] {
   return SCOPE_ORDER.map((scope) => {
     const scopedBases = bases.filter((base) => base.scope === scope && base.status !== 'ARCHIVED')
     const readyBases = scopedBases.filter((base) => base.status === 'ACTIVE' && base.versions.some((version) => (
-      version.isActive && version.status === 'PUBLISHED' && version._count.params === 210
+      version.isActive
+      && version.status === 'PUBLISHED'
+      && version._count.params === 210
+      && version.applicabilityContext != null
     )))
     return {
       scope,
@@ -138,18 +170,22 @@ export function CostBasesBoard({ initial, canEdit }: { initial: CostBase[]; canE
   const [createScope, setCreateScope] = useState<Scope>('CROSS_BORDER')
   const [versionAction, setVersionAction] = useState<{ kind: 'publish' | 'archive'; baseId: string; version: CostBaseVersion } | null>(null)
   const [impactTarget, setImpactTarget] = useState<{ base: CostBase; version: CostBaseVersion } | null>(null)
+  const [baseEditTarget, setBaseEditTarget] = useState<CostBase | null>(null)
+  const [baseArchiveTarget, setBaseArchiveTarget] = useState<CostBase | null>(null)
   const coverage = buildScopeCoverage(bases)
   const readyScopeCount = coverage.filter((item) => item.status === 'READY').length
   const selectedBase = bases.find((base) => base.id === selectedBaseId) ?? bases[0] ?? null
 
   const create = useMutation({
-    mutationFn: (body: { code: string; name: string; scope: Scope; defaultPolicy: string; isDefault: boolean }) =>
+    mutationFn: (body: CostBaseCreateBody) =>
       fetcher<CostBase>('/api/v1/cost-bases', { method: 'POST', json: body }),
     onSuccess: (base) => {
-      setBases((items) => [base, ...items.map((item) => base.isDefault && item.scope === base.scope ? { ...item, isDefault: false } : item)])
+      // A new base is still a draft. Its default preference becomes effective
+      // only when a published version is activated, so keep the live default visible.
+      setBases((items) => [base, ...items])
       setSelectedBaseId(base.id)
       setShowCreate(false)
-      toast.success(`Base ${base.code} creada`, { description: 'La versión 1 contiene los 210 parámetros canónicos.' })
+      toast.success(`Base ${base.code} creada`, { description: 'La versión 1 conserva el snapshot canónico y separa los parámetros no aplicables.' })
     },
   })
 
@@ -165,7 +201,15 @@ export function CostBasesBoard({ initial, canEdit }: { initial: CostBase[]; canE
     mutationFn: ({ baseId, versionId }: { baseId: string; versionId: string }) =>
       fetcher<CostBase>(`/api/v1/cost-bases/${baseId}/versions/${versionId}/activate`, { method: 'POST', json: {} }),
     onSuccess: (base) => {
-      setBases((items) => items.map((item) => item.id === base.id ? base : item))
+      setBases((items) => items.map((item) => {
+        if (item.id === base.id) return base
+        if (base.isDefault && base.status === 'ACTIVE' && item.scope === base.scope) return { ...item, isDefault: false }
+        return item
+      }))
+      // The same transaction can replace another default base and append its
+      // audit event. Refresh the collection so that both timelines are visible
+      // without requiring a page reload.
+      void fetcher<CostBase[]>('/api/v1/cost-bases').then(setBases).catch(() => undefined)
       toast.success(`Versión activa de ${base.code} actualizada`)
     },
   })
@@ -184,6 +228,25 @@ export function CostBasesBoard({ initial, canEdit }: { initial: CostBase[]; canE
     mutationFn: ({ baseId, versionId }: { baseId: string; versionId: string }) =>
       fetcher<VersionImpact>(`/api/v1/cost-bases/${baseId}/versions/${versionId}/impact`),
     onError: () => setImpactTarget(null),
+  })
+
+  const archiveBase = useMutation({
+    mutationFn: (baseId: string) => fetcher<CostBase>(`/api/v1/cost-bases/${baseId}/archive`, { method: 'POST', json: {} }),
+    onSuccess: (base) => {
+      setBases((items) => items.map((item) => item.id === base.id ? base : item))
+      setBaseArchiveTarget(null)
+      toast.success(`Base ${base.code} archivada`, { description: 'Permanece visible como historial y ya no puede gobernar trabajo nuevo.' })
+    },
+  })
+
+  const updateBase = useMutation({
+    mutationFn: ({ baseId, body }: { baseId: string; body: CostBaseMetadataUpdate }) =>
+      fetcher<CostBase>(`/api/v1/cost-bases/${baseId}`, { method: 'PATCH', json: body }),
+    onSuccess: (base) => {
+      setBases((items) => items.map((item) => item.id === base.id ? base : item))
+      setBaseEditTarget(null)
+      toast.success(`Datos de ${base.code} actualizados`, { description: 'El cambio quedó registrado en la bitácora de la base.' })
+    },
   })
 
   const openImpact = (base: CostBase, version: CostBaseVersion) => {
@@ -220,7 +283,7 @@ export function CostBasesBoard({ initial, canEdit }: { initial: CostBase[]; canE
 
       <CoverageOverview coverage={coverage} onCreate={openCreate} canEdit={canEdit} />
 
-      {showCreate && <CreateBaseForm key={createScope} initialScope={createScope} pending={create.isPending} onSubmit={(body) => create.mutate(body)} />}
+      {showCreate && <CostBaseWizard key={createScope} initialScope={createScope} existingCodes={bases.map((base) => base.code)} pending={create.isPending} onSubmit={(body) => create.mutate(body)} />}
 
       {bases.length === 0 && !showCreate && (
         <Card><CardHeader><CardTitle>No hay bases de costo</CardTitle><CardDescription>{canEdit ? 'Crea la primera base y selecciona el alcance de rutas que atenderá.' : 'No hay bases disponibles para consulta. Un administrador debe crear la primera.'}</CardDescription></CardHeader></Card>
@@ -236,12 +299,16 @@ export function CostBasesBoard({ initial, canEdit }: { initial: CostBase[]; canE
           onOpenImpact={openImpact}
           onVersionAction={(kind, baseId, version) => setVersionAction({ kind, baseId, version })}
           onActivate={(baseId, versionId) => activate.mutate({ baseId, versionId })}
+          onEditBase={setBaseEditTarget}
+          onArchiveBase={setBaseArchiveTarget}
           canEdit={canEdit}
           pending={{
             newVersion: newVersion.isPending,
             impact: impact.isPending,
             transition: transition.isPending,
             activate: activate.isPending,
+            updateBase: updateBase.isPending,
+            archiveBase: archiveBase.isPending,
           }}
         />
       )}
@@ -271,6 +338,35 @@ export function CostBasesBoard({ initial, canEdit }: { initial: CostBase[]; canE
           ) : impact.data ? <VersionImpactPreview impact={impact.data} /> : null}
         </DialogContent>
       </Dialog>
+      <Dialog open={baseEditTarget !== null} onOpenChange={(open) => { if (!open && !updateBase.isPending) setBaseEditTarget(null) }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar datos de la base</DialogTitle>
+            <DialogDescription>Corrige la identificación administrativa sin alterar el alcance, la política ni las versiones de supuestos.</DialogDescription>
+          </DialogHeader>
+          {baseEditTarget ? (
+            <BaseMetadataForm
+              key={`${baseEditTarget.id}:${baseEditTarget.updatedAt}`}
+              base={baseEditTarget}
+              pending={updateBase.isPending}
+              onCancel={() => setBaseEditTarget(null)}
+              onSubmit={(body) => updateBase.mutate({ baseId: baseEditTarget.id, body })}
+            />
+          ) : null}
+        </DialogContent>
+      </Dialog>
+      <Dialog open={baseArchiveTarget !== null} onOpenChange={(open) => { if (!open && !archiveBase.isPending) setBaseArchiveTarget(null) }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Archivar base de costo</DialogTitle>
+            <DialogDescription>La base dejará de gobernar trabajo nuevo y sus versiones activas perderán vigencia. Las cotizaciones históricas conservarán su snapshot. No se permite si todavía gobierna rutas en producción.</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" disabled={archiveBase.isPending} onClick={() => setBaseArchiveTarget(null)}>Cancelar</Button>
+            <Button variant="destructive" disabled={archiveBase.isPending || !baseArchiveTarget} onClick={() => { if (baseArchiveTarget) archiveBase.mutate(baseArchiveTarget.id) }}>{archiveBase.isPending ? 'Archivando…' : 'Archivar base'}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
@@ -295,7 +391,7 @@ function CoverageOverview({ coverage, onCreate, canEdit }: { coverage: ScopeCove
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <CardTitle className="text-base">Mapa de cobertura</CardTitle>
-            <CardDescription>Cada alcance necesita una base activa y una versión publicada con los 210 parámetros canónicos.</CardDescription>
+            <CardDescription>Cada alcance necesita una base activa, perfil operativo explícito y una versión publicada con los 210 parámetros canónicos.</CardDescription>
           </div>
           <div className="rounded-md bg-background px-3 py-1.5 text-xs font-medium shadow-sm ring-1 ring-border">{ready} de {coverage.length} alcances listos</div>
         </div>
@@ -311,7 +407,7 @@ function CoverageOverview({ coverage, onCreate, canEdit }: { coverage: ScopeCove
               {item.status === 'READY'
                 ? `${item.readyBaseCount} base${item.readyBaseCount === 1 ? '' : 's'} gobernada${item.readyBaseCount === 1 ? '' : 's'} lista para cotizaciones y rutas futuras.`
                 : item.status === 'IN_PROGRESS'
-                  ? `${item.baseCount} base${item.baseCount === 1 ? '' : 's'} existente${item.baseCount === 1 ? '' : 's'}${item.draftVersionCount > 0 ? ` con ${item.draftVersionCount} versión${item.draftVersionCount === 1 ? '' : 'es'} en borrador` : ''}, pero ninguna tiene una versión publicada activa con 210 parámetros.`
+                  ? `${item.baseCount} base${item.baseCount === 1 ? '' : 's'} existente${item.baseCount === 1 ? '' : 's'}${item.draftVersionCount > 0 ? ` con ${item.draftVersionCount} versión${item.draftVersionCount === 1 ? '' : 'es'} en borrador` : ''}, pero ninguna tiene perfil explícito y versión publicada activa con 210 parámetros.`
                   : 'No hay una base gobernada. Las cotizaciones manuales pueden calcularse, pero quedan como Legacy y requieren revisión.'}
             </p>
             <div className="mt-3 grid grid-cols-3 gap-2 border-t pt-2 text-center text-xs">
@@ -342,6 +438,8 @@ function CostBaseWorkspace({
   onOpenImpact,
   onVersionAction,
   onActivate,
+  onEditBase,
+  onArchiveBase,
   canEdit,
   pending,
 }: {
@@ -353,8 +451,10 @@ function CostBaseWorkspace({
   onOpenImpact: (base: CostBase, version: CostBaseVersion) => void
   onVersionAction: (kind: 'publish' | 'archive', baseId: string, version: CostBaseVersion) => void
   onActivate: (baseId: string, versionId: string) => void
+  onEditBase: (base: CostBase) => void
+  onArchiveBase: (base: CostBase) => void
   canEdit: boolean
-  pending: { newVersion: boolean; impact: boolean; transition: boolean; activate: boolean }
+  pending: { newVersion: boolean; impact: boolean; transition: boolean; activate: boolean; updateBase: boolean; archiveBase: boolean }
 }) {
   const active = base.versions.find((version) => version.isActive) ?? null
   const nextDraft = base.versions.find((version) => version.status === 'DRAFT') ?? null
@@ -390,7 +490,12 @@ function CostBaseWorkspace({
               >
                 <span className="flex items-center justify-between gap-2">
                   <strong className="truncate font-medium">{item.name}</strong>
-                  {item.isDefault ? <span className="size-1.5 rounded-full bg-emerald-500" title="Predeterminada" /> : null}
+                  {item.isDefault ? (
+                    <span
+                      className={`size-1.5 rounded-full ${item.status === 'ACTIVE' ? 'bg-emerald-500' : 'bg-amber-500'}`}
+                      title={item.status === 'ACTIVE' ? 'Predeterminada vigente' : 'Será predeterminada al activarse'}
+                    />
+                  ) : null}
                 </span>
                 <span className="truncate text-[10px] text-muted-foreground">
                   {SCOPE_LABEL[item.scope]} · {itemActive ? `v${itemActive.version}` : 'sin versión activa'} · {item._count.lanes} rutas
@@ -409,20 +514,25 @@ function CostBaseWorkspace({
                 <div className="mb-1 flex flex-wrap items-center gap-1.5 text-[10px]">
                   <span className="rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary">{SCOPE_LABEL[base.scope]}</span>
                   <span className="rounded-full border px-2 py-0.5 text-muted-foreground">{BASE_STATUS_LABEL[base.status]}</span>
-                  {base.isDefault ? <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 font-medium text-emerald-700 dark:text-emerald-400">predeterminada</span> : null}
+                  {base.isDefault ? (
+                    <span className={base.status === 'ACTIVE'
+                      ? 'rounded-full bg-emerald-500/10 px-2 py-0.5 font-medium text-emerald-700 dark:text-emerald-400'
+                      : 'rounded-full bg-amber-500/10 px-2 py-0.5 font-medium text-amber-700 dark:text-amber-400'}>
+                      {base.status === 'ACTIVE' ? 'predeterminada vigente' : 'predeterminada al activar'}
+                    </span>
+                  ) : null}
                 </div>
                 <CardTitle className="truncate text-base">{base.name}</CardTitle>
                 <CardDescription>{base.code} · {base.currency} · {base.defaultPolicy === 'WORKBOOK_V3' ? 'Fidelidad de workbook' : 'Modelo operacional V3'}</CardDescription>
               </div>
               {canEdit && base.status !== 'ARCHIVED' ? (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onNewVersion(base.id)}
-                  disabled={pending.newVersion}
-                >
-                  Nueva versión
-                </Button>
+                <div className="flex flex-wrap justify-end gap-2">
+                  <Button variant="outline" size="sm" onClick={() => onEditBase(base)} disabled={pending.updateBase}>
+                    <Pencil className="mr-1 size-3.5" /> Editar datos
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => onNewVersion(base.id)} disabled={pending.newVersion}>Nueva versión</Button>
+                  <Button variant="outline" size="sm" onClick={() => onArchiveBase(base)} disabled={pending.archiveBase}>Archivar base</Button>
+                </div>
               ) : null}
             </div>
             {base.description ? <p className="pt-1 text-xs text-muted-foreground">{base.description}</p> : null}
@@ -451,11 +561,15 @@ function CostBaseWorkspace({
                     <div className="flex flex-wrap items-center gap-1.5 font-medium">
                       {version.name} <VersionBadge status={version.status} />
                       {version.isActive ? <span className="text-[10px] text-emerald-600">vigente</span> : null}
+                      {version.applicabilityContext == null
+                        ? <span className="text-[10px] font-medium text-amber-600">perfil legado</span>
+                        : <span className="text-[10px] text-muted-foreground">perfil explícito</span>}
                     </div>
                     <div className="truncate text-[10px] text-muted-foreground">
                       {version._count.params} parámetros · actualizada <RelativeTime iso={version.updatedAt} />
                       {version.publishedBy ? ` · aprobada por ${version.publishedBy.email}` : ''}
                     </div>
+                    {version.applicabilityContext ? <ProfileSummary profile={version.applicabilityContext} /> : null}
                     {(version.auditEvents?.length ?? 0) > 0 ? <VersionHistory events={version.auditEvents ?? []} /> : null}
                   </div>
                   <div className="flex flex-wrap items-center justify-end gap-1">
@@ -464,7 +578,7 @@ function CostBaseWorkspace({
                     {canEdit && version.status === 'DRAFT' && base.status !== 'ARCHIVED' ? (
                       <Button variant="ghost" size="xs" disabled={pending.transition} onClick={() => onVersionAction('publish', base.id, version)}>Publicar</Button>
                     ) : null}
-                    {canEdit && !version.isActive && version.status === 'PUBLISHED' && base.status !== 'ARCHIVED' ? (
+                    {canEdit && (!version.isActive || base.status !== 'ACTIVE') && version.status === 'PUBLISHED' && base.status !== 'ARCHIVED' ? (
                       <Button variant="ghost" size="xs" disabled={pending.activate} onClick={() => onActivate(base.id, version.id)}>Activar</Button>
                     ) : null}
                     {canEdit && !version.isActive && version.status === 'PUBLISHED' && base.status !== 'ARCHIVED' ? (
@@ -486,17 +600,104 @@ function CostBaseWorkspace({
               <GovernanceLine label="Moneda" value={base.currency} />
               <GovernanceLine label="Modelo" value={base.defaultPolicy === 'WORKBOOK_V3' ? 'Workbook exacto' : 'Operacional V3'} />
               <GovernanceLine label="Versión de supuestos" value={active ? `v${active.version}` : 'Sin versión vigente'} />
+              <GovernanceLine label="Perfil operativo" value={active?.applicabilityContext ? 'Explícito y versionado' : active ? 'Legado · sólo histórico' : 'Sin versión vigente'} />
               <GovernanceLine label="Rutas vinculadas" value={String(base._count.lanes)} />
               <GovernanceLine label="Estado" value={BASE_STATUS_LABEL[base.status]} />
               <div className="mt-3 flex flex-wrap gap-2 border-t pt-3">
                 <Button variant="outline" size="sm" render={<Link href={`/catalog?base=${base.id}`} />}>Cobertura</Button>
                 {active ? <Button variant="outline" size="sm" render={<Link href={`/assumptions/${active.id}`} />}>Supuestos</Button> : null}
               </div>
+              {(base.auditEvents?.length ?? 0) > 0 ? <BaseHistory events={base.auditEvents ?? []} /> : (
+                <p className="mt-3 border-t pt-3 text-muted-foreground">La bitácora inicia con el siguiente cambio gobernado.</p>
+              )}
             </CardContent>
           </Card>
         </div>
       </div>
     </section>
+  )
+}
+
+function BaseMetadataForm({ base, pending, onCancel, onSubmit }: {
+  base: CostBase
+  pending: boolean
+  onCancel: () => void
+  onSubmit: (body: CostBaseMetadataUpdate) => void
+}) {
+  const [name, setName] = useState(base.name)
+  const [description, setDescription] = useState(base.description ?? '')
+  const [currency, setCurrency] = useState(base.currency)
+  const normalizedName = name.trim()
+  const normalizedDescription = description.trim() || null
+  const normalizedCurrency = currency.trim().toUpperCase()
+  const currencyEditable = base.status === 'DRAFT' && !base.versions.some((version) => version.status === 'PUBLISHED')
+  const body: CostBaseMetadataUpdate = {}
+  if (normalizedName !== base.name) body.name = normalizedName
+  if (normalizedDescription !== base.description) body.description = normalizedDescription
+  if (currencyEditable && normalizedCurrency !== base.currency) body.currency = normalizedCurrency
+  const currencyValid = /^[A-Z]{3}$/.test(normalizedCurrency)
+  const canSubmit = !pending
+    && normalizedName.length >= 2
+    && description.length <= 500
+    && currencyValid
+    && Object.keys(body).length > 0
+
+  return (
+    <form className="grid gap-4" onSubmit={(event) => { event.preventDefault(); if (canSubmit) onSubmit(body) }}>
+      <div className="grid gap-1.5">
+        <Label htmlFor="edit-cost-base-name">Nombre</Label>
+        <Input id="edit-cost-base-name" value={name} minLength={2} maxLength={120} required onChange={(event) => setName(event.target.value)} />
+      </div>
+      <div className="grid gap-1.5">
+        <Label htmlFor="edit-cost-base-description">Descripción</Label>
+        <textarea
+          id="edit-cost-base-description"
+          className="min-h-24 w-full resize-y rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          value={description}
+          maxLength={500}
+          onChange={(event) => setDescription(event.target.value)}
+          placeholder="Propósito y límites administrativos de esta base"
+        />
+        <div className="text-right text-[10px] text-muted-foreground">{description.length}/500</div>
+      </div>
+      <div className="grid gap-1.5">
+        <Label htmlFor="edit-cost-base-currency">Moneda de gobierno</Label>
+        <Input
+          id="edit-cost-base-currency"
+          value={currency}
+          minLength={3}
+          maxLength={3}
+          disabled={!currencyEditable}
+          aria-describedby="edit-cost-base-currency-help"
+          onChange={(event) => setCurrency(event.target.value.toUpperCase())}
+        />
+        <p id="edit-cost-base-currency-help" className="text-xs text-muted-foreground">
+          {currencyEditable
+            ? 'Usa el código ISO de tres letras. La moneda quedará congelada al publicar la primera versión.'
+            : 'La moneda está congelada porque ya existe una versión publicada o la base salió de borrador. Para cambiarla, crea otra base gobernada.'}
+        </p>
+      </div>
+      <DialogFooter>
+        <Button type="button" variant="outline" disabled={pending} onClick={onCancel}>Cancelar</Button>
+        <Button type="submit" disabled={!canSubmit}>{pending ? 'Guardando…' : 'Guardar cambios'}</Button>
+      </DialogFooter>
+    </form>
+  )
+}
+
+function ProfileSummary({ profile }: { profile: CostBaseProfile }) {
+  const chips = [
+    `País: ${profile.countries.join(' + ')}`,
+    `Operación: ${profile.operations.join(', ')}`,
+    `Equipo: ${profile.trailerTypes.join(', ')}`,
+    `Servicio: ${profile.services.join(', ')}`,
+    `Operador: ${profile.driverTypes.join(', ')}`,
+    `Factores: ${profile.factorScheduleVersion}`,
+  ]
+  return (
+    <div className="mt-1 flex flex-wrap gap-1" aria-label="Resumen del perfil operativo versionado">
+      {chips.map((chip) => <span key={chip} className="max-w-full truncate rounded-full bg-muted px-1.5 py-0.5 text-[9px] text-muted-foreground" title={chip}>{chip}</span>)}
+    </div>
   )
 }
 
@@ -529,6 +730,29 @@ function VersionHistory({ events }: { events: VersionAudit[] }) {
   )
 }
 
+function BaseHistory({ events }: { events: BaseAudit[] }) {
+  return (
+    <details className="mt-3 border-t pt-3 text-xs text-muted-foreground">
+      <summary className="cursor-pointer font-medium hover:text-foreground">Bitácora de la base ({events.length})</summary>
+      <ol className="mt-2 grid gap-2 border-l pl-3">
+        {events.map((event) => (
+          <li key={event.id}>
+            <div className="font-medium text-foreground">{BASE_AUDIT_ACTION_LABEL[event.action]}</div>
+            <div>
+              <RelativeTime iso={event.createdAt} />
+              {event.actor ? ` · ${event.actor.email}` : ''}
+              {event.fromStatus && event.toStatus && event.fromStatus !== event.toStatus
+                ? ` · ${BASE_STATUS_LABEL[event.fromStatus]} → ${BASE_STATUS_LABEL[event.toStatus]}`
+                : ''}
+            </div>
+            {event.note ? <p className="mt-0.5 leading-relaxed">{event.note}</p> : null}
+          </li>
+        ))}
+      </ol>
+    </details>
+  )
+}
+
 const displayNumber = (value: number | null) => value == null ? '—' : Number.isInteger(value) ? String(value) : String(+value.toFixed(6))
 
 function VersionImpactPreview({ impact }: { impact: VersionImpact }) {
@@ -540,8 +764,14 @@ function VersionImpactPreview({ impact }: { impact: VersionImpact }) {
         <Metric label="Versión candidata" value={`v${impact.candidate.version}`} />
         <Metric label="Referencia activa" value={activeLabel} />
         <Metric label="Parámetros modificados" value={comparison.referenceAvailable ? String(comparison.changedParameterCount) : 'Sin referencia'} />
+        <Metric label="Perfil operativo" value={!comparison.referenceAvailable ? 'Sin referencia' : comparison.applicabilityProfileChanged ? 'Modificado' : 'Sin cambios'} />
         <Metric label="Puede activarse" value={activation.canActivate ? (activation.isAlreadyActive ? 'Ya está activa' : 'Sí, con decisión humana') : 'No, primero publicar'} />
       </div>
+      {comparison.referenceAvailable && comparison.applicabilityProfileChanged ? (
+        <div className="rounded-md border border-blue-500/30 bg-blue-500/5 p-3 text-xs text-muted-foreground">
+          La candidata cambia cobertura de operación, equipo o servicios. Las rutas existentes no se reasignan; las nuevas cotizaciones deberán cumplir el perfil nuevo.
+        </div>
+      ) : null}
       <div className="rounded-md border border-amber-500/30 bg-amber-500/5 p-3 text-xs text-muted-foreground">
         Las rutas de producción y las cotizaciones guardadas conservan su versión y snapshot. Activar esta versión no las recalcula ni las reasigna.
         {activation.requiresHumanRouteReview && ' Hay rutas de producción que requieren revisión humana para sustituirse por una nueva ruta gobernada.'}
@@ -582,31 +812,4 @@ function VersionTransitionForm({ action, version, pending, onCancel, onSubmit }:
 
 function Metric({ label, value }: { label: string; value: string }) {
   return <div><div className="text-xs text-muted-foreground">{label}</div><div className="font-semibold">{value}</div></div>
-}
-
-function CreateBaseForm({ initialScope, pending, onSubmit }: {
-  initialScope: Scope
-  pending: boolean
-  onSubmit: (body: { code: string; name: string; scope: Scope; defaultPolicy: string; isDefault: boolean }) => void
-}) {
-  const [code, setCode] = useState('')
-  const [name, setName] = useState('')
-  const [scope, setScope] = useState<Scope>(initialScope)
-  const [policy, setPolicy] = useState('OPERATIONAL_V3')
-  const [isDefault, setIsDefault] = useState(true)
-  return (
-    <Card className="border-primary/30">
-      <CardHeader><CardTitle>Nueva base de costo</CardTitle><CardDescription>Crea la versión 1 con los 210 parámetros canónicos.</CardDescription></CardHeader>
-      <CardContent>
-        <form className="grid gap-4 md:grid-cols-2 lg:grid-cols-5" onSubmit={(event) => { event.preventDefault(); onSubmit({ code, name, scope, defaultPolicy: policy, isDefault }) }}>
-          <div className="grid gap-1.5"><Label htmlFor="cost-base-code">Código</Label><Input id="cost-base-code" required minLength={2} value={code} onChange={(e) => setCode(e.target.value)} placeholder="XB-2026" /></div>
-          <div className="grid gap-1.5 lg:col-span-2"><Label htmlFor="cost-base-name">Nombre</Label><Input id="cost-base-name" required minLength={2} value={name} onChange={(e) => setName(e.target.value)} placeholder="Cruce fronterizo 2026" /></div>
-          <div className="grid gap-1.5"><Label htmlFor="cost-base-scope">Alcance</Label><select id="cost-base-scope" className={selectCls} value={scope} onChange={(e) => setScope(e.target.value as Scope)}>{Object.entries(SCOPE_LABEL).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></div>
-          <div className="grid gap-1.5"><Label htmlFor="cost-base-model">Modelo</Label><select id="cost-base-model" className={selectCls} value={policy} onChange={(e) => setPolicy(e.target.value)}><option value="OPERATIONAL_V3">Operacional V3</option><option value="WORKBOOK_V3">Workbook exacto</option></select></div>
-          <label htmlFor="cost-base-default" className="flex items-center gap-2 text-sm md:col-span-2"><input id="cost-base-default" type="checkbox" checked={isDefault} onChange={(e) => setIsDefault(e.target.checked)} className="accent-primary" />Predeterminada para este alcance</label>
-          <div className="flex justify-end md:col-span-2 lg:col-span-3"><Button type="submit" disabled={pending || !code.trim() || !name.trim()}>{pending ? 'Creando…' : 'Crear base'}</Button></div>
-        </form>
-      </CardContent>
-    </Card>
-  )
 }

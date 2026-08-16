@@ -47,4 +47,18 @@ describe('quote explanation', () => {
     expect(explanation.decision.disposition).toBe('REVIEW')
     expect(explanation.decision.alerts).toContainEqual(expect.objectContaining({ code: 'VERSION_NOT_PUBLISHED' }))
   })
+
+  it('marks a published version on a draft base as preview-only', () => {
+    const explanation = buildQuoteExplanation(
+      input,
+      result,
+      {
+        costBase: { id: 'base-1', code: 'XB', name: 'Cross border', scope: 'CROSS_BORDER', status: 'DRAFT' },
+        set: { id: 'set-1', name: 'Cross border', version: 4, status: 'PUBLISHED' }, policy: 'OPERATIONAL_V3',
+      }, snapshot,
+    )
+
+    expect(explanation.decision.disposition).toBe('REVIEW')
+    expect(explanation.decision.alerts).toContainEqual(expect.objectContaining({ code: 'BASE_NOT_ACTIVE' }))
+  })
 })

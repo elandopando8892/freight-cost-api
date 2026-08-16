@@ -164,6 +164,14 @@ enum CostBaseStatus {
   ARCHIVED
 }
 
+enum CostBaseAuditAction {
+  CREATED
+  METADATA_UPDATED
+  VERSION_ACTIVATED
+  DEFAULT_REPLACED
+  ARCHIVED
+}
+
 enum AssumptionVersionStatus {
   DRAFT
   PUBLISHED
@@ -172,6 +180,7 @@ enum AssumptionVersionStatus {
 
 enum AssumptionVersionAuditAction {
   DRAFT_CREATED
+  PROFILE_UPDATED
   PUBLISHED
   ARCHIVED
 }
@@ -230,6 +239,7 @@ model Organization {
   carrierUsaLanes          CarrierUsaLane[]
   productionRoutes         ProductionRoute[]
   costBases                CostBase[]
+  costBaseAuditEvents      CostBaseAuditEvent[]
   carrierProfile           CarrierProfile?
   memberRoleAudits         OrganizationMemberRoleAudit[]
 }
@@ -250,6 +260,7 @@ model User {
   confirmedQuotes             Quote[]                     @relation("QuoteConfirmedBy")
   quoteAuditEvents            QuoteAuditEvent[]           @relation("QuoteAuditActor")
   productionRouteAuditEvents  ProductionRouteAuditEvent[] @relation("ProductionRouteAuditActor")
+  costBaseAuditEvents         CostBaseAuditEvent[]         @relation("CostBaseAuditActor")
   ratewareDeliveries          RatewareDelivery[]          @relation("RatewareDeliveryActor")
   requestedApprovals          ApprovalRequest[]           @relation("ApprovalRequester")
   reviewedApprovals           ApprovalRequest[]           @relation("ApprovalReviewer")
@@ -435,6 +446,7 @@ model AssumptionSet {
   isActive        Boolean                 @default(false)
   status          AssumptionVersionStatus @default(DRAFT)
   notes           String?
+  applicabilityContext Json?
   sourceVersionId String?
   publishedAt     DateTime?
   publishedById   String?
@@ -555,10 +567,32 @@ model CostBase {
   suggestedProductionRoutes ProductionRoute[] @relation("ProductionRouteSuggestedBase")
   confirmedProductionRoutes ProductionRoute[] @relation("ProductionRouteConfirmedBase")
   rateBooks                 RateBook[]
+  auditEvents               CostBaseAuditEvent[]
 
   @@unique([orgId, code])
   @@index([orgId, scope, status])
   @@index([orgId, scope, isDefault])
+}
+
+model CostBaseAuditEvent {
+  id         String              @id @default(cuid())
+  orgId      String
+  costBaseId String
+  action     CostBaseAuditAction
+  actorId    String?
+  fromStatus CostBaseStatus?
+  toStatus   CostBaseStatus?
+  note       String?
+  payload    Json?
+  createdAt  DateTime            @default(now())
+
+  org      Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  costBase CostBase     @relation(fields: [costBaseId], references: [id], onDelete: Cascade)
+  actor    User?        @relation("CostBaseAuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([costBaseId, createdAt])
+  @@index([orgId, createdAt])
+  @@index([actorId])
 }
 
 model EquipmentConfig {

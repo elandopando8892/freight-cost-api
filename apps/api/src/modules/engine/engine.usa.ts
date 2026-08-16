@@ -17,15 +17,23 @@ import {
 } from './engine.factors.js'
 import { deriveMonthlyFixedCost, deriveMaintTiresPerMile } from './engine.outputs.js'
 import { buildReferenceKey } from './reference-key.js'
-import type { UsaLegInput, UsaLegOutput } from './engine.types.js'
+import type { EnginePolicy, UsaLegInput, UsaLegOutput } from './engine.types.js'
 
 const KML_TO_MPG = 2.3521458
 const mround = (x: number, m: number) => Math.round(x / m) * m
 
-export function calculateUsaLeg(lane: UsaLegInput, params: ParamMap): UsaLegOutput {
+export function calculateUsaLeg(
+  lane: UsaLegInput,
+  params: ParamMap,
+  policy: EnginePolicy = 'WORKBOOK_V3',
+  legacyOperational = false,
+): UsaLegOutput {
   const { equipment } = lane
+  const workbookExact = policy === 'WORKBOOK_V3'
+  const isD2D = lane.operation === 'D2D Export' || lane.operation === 'D2D Import'
   const isRoundtrip = lane.service === 'Roundtrip'
   const isBackhaul = lane.service === 'Backhaul'
+  const includesOwnedTrailer = equipment.trailer !== 'Chassis' && equipment.trailer !== 'Power Only'
 
   const rendCargado = getParam(params, 'FUEL', 'Rendimiento Cargado', 2.8)
   const rendVacio = getParam(params, 'FUEL', 'Rendimiento Vacío', 3.2)
@@ -33,8 +41,18 @@ export function calculateUsaLeg(lane: UsaLegInput, params: ParamMap): UsaLegOutp
   const deadheadBase = getParam(params, 'UTILIZATION', 'Deadhead Base', 0.15)
   const loadTime = getParam(params, 'UTILIZATION', 'Load Time', 2)
   const unloadTime = getParam(params, 'UTILIZATION', 'Unload Time', 2)
-  const maintTiresPerMile = deriveMaintTiresPerMile(params)      // derived from editable cost cards
-  const monthlyFixedCost = deriveMonthlyFixedCost(params)        // derived from editable cost cards
+  const legacyAssetSemantics = workbookExact || legacyOperational
+  const maintTiresPerMile = legacyAssetSemantics
+    ? deriveMaintTiresPerMile(params)
+    : deriveMaintTiresPerMile(params, { includeTrailerTires: includesOwnedTrailer })
+  const monthlyFixedCost = legacyAssetSemantics
+    ? deriveMonthlyFixedCost(params, true)
+    : deriveMonthlyFixedCost(params, {
+        includeCrossborderCosts: isD2D,
+        workingCapitalCountry: 'US',
+        includeTrailerAssets: includesOwnedTrailer,
+        includeDollyAssets: false,
+      })
   const flota = getParam(params, 'GENERAL_BASE', 'Tamaño de Flota', 50)
   const periodo = getParam(params, 'GENERAL_BASE', 'Periodo de Operación', 26)
   const kmPerOperator = getParam(params, 'GENERAL_BASE', 'Kilómetros promedio x operador', 22000)
@@ -84,12 +102,14 @@ export function calculateUsaLeg(lane: UsaLegInput, params: ParamMap): UsaLegOutp
   const technicalTariffExFuelUsd = (cvuExFuelUsd + cfuUsd) / (1 - utRate)
   const technicalTariffInclFuelUsd = (cvuInclFuelUsd + cfuUsd) / (1 - utRate)
 
-  // ── Risk (swap quirk: op factor keyed off service, svc off operation) ─
+  // ── Risk ─────────────────────────────────────────────────────────────────
+  // WORKBOOK_V3 preserves the source sheet's swapped Service/Operation lookup.
+  // OPERATIONAL_V3 applies each factor to its actual semantic dimension.
   const trailerFac = trailerFactor(equipment.trailer, params)
   const trailerRiskUsd = Math.max(trailerFac - 1, 0) * (cvuInclFuelUsd + cfuUsd)
-  const opFactor = operationFactor(lane.service, params)
+  const opFactor = operationFactor(workbookExact || legacyOperational ? lane.service : lane.operation, params)
   const operationRiskUsd = Math.max(opFactor - 1, 0) * (cvuInclFuelUsd + cfuUsd)
-  const svcFactor = serviceFactor(lane.operation, params)
+  const svcFactor = serviceFactor(workbookExact || legacyOperational ? lane.operation : lane.service, params)
   const serviceRiskUsd = lane.service === 'Expedited' ? Math.max(svcFactor - 1, 0) * (cvuInclFuelUsd + cfuUsd) : 0
   const totalRiskAdjUsd = trailerRiskUsd + operationRiskUsd + serviceRiskUsd
 

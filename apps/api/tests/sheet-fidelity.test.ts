@@ -103,7 +103,11 @@ describe('Operational policy golden — MEX leg / OPERATIONAL_V3 (90 rows)', () 
       ].map((value) => Number(value.toFixed(6)))
     })
     const digest = createHash('sha256').update(JSON.stringify(projection)).digest('hex')
-    expect(digest).toBe('98720311927ff4601d0efd3e34dbfd6abe7a9f454bb408618cb84bcb49726975')
+    // Operational policy 2026-08-15: domestic MX lanes exclude the US-border
+    // diesel mix and cross-border fixed-cost pool; Power Only/Chassis also
+    // exclude owned-trailer capital and tires. WORKBOOK_V3 remains the
+    // immutable workbook-fidelity contract covered above.
+    expect(digest).toBe('56102486a0db13e2118d9f5c50be52e6427c45b060d2d51bbf9ac327e87f4234')
   })
 })
 

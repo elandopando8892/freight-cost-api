@@ -4,8 +4,8 @@ import type { EngineInput, EngineOutput } from '../engine/engine.types.js'
 
 export type QuoteCalculationSnapshot = {
   format: 'fcm.calculation-snapshot.v1'
-  engineVersion: 'fcm-v3'
-  input: Required<Pick<EngineInput, 'operation' | 'service' | 'equipment' | 'params'>> & Pick<EngineInput, 'policy' | 'fxRate' | 'mexLeg' | 'usaLeg' | 'drayageLeg'>
+  engineVersion: 'fcm-v3' | 'fcm-v3.1-profiled'
+  input: Required<Pick<EngineInput, 'operation' | 'service' | 'equipment' | 'params'>> & Pick<EngineInput, 'policy' | 'applicabilityProfile' | 'fxRate' | 'mexLeg' | 'usaLeg' | 'drayageLeg'>
   output: {
     freightBaselineUsd: number
     requiredTariffUsd: number
@@ -19,6 +19,7 @@ export type QuoteCalculationSnapshot = {
 }
 
 type SnapshotPayload = Omit<QuoteCalculationSnapshot, 'checksum'>
+export const CURRENT_QUOTE_ENGINE_VERSION = 'fcm-v3.1-profiled' as const
 type SnapshotOutput = QuoteCalculationSnapshot['output']
 
 export const SNAPSHOT_NUMERIC_TOLERANCE = 1e-9
@@ -57,9 +58,10 @@ export function snapshotOutputDifferences(expected: SnapshotOutput, actual: Snap
 function payloadFor(input: EngineInput, result: EngineOutput): SnapshotPayload {
   return {
     format: 'fcm.calculation-snapshot.v1',
-    engineVersion: 'fcm-v3',
+    engineVersion: CURRENT_QUOTE_ENGINE_VERSION,
     input: {
       policy: result.policy,
+      ...(input.applicabilityProfile ? { applicabilityProfile: input.applicabilityProfile } : {}),
       operation: input.operation,
       service: input.service,
       equipment: input.equipment,
@@ -90,10 +92,23 @@ export function buildQuoteCalculationSnapshot(input: EngineInput, result: Engine
   return { ...payload, checksum: checksum(payload) }
 }
 
+/** Replays quote evidence with the semantics frozen by its engine version. */
+export function calculateForQuoteSnapshot(
+  snapshot: Pick<QuoteCalculationSnapshot, 'engineVersion' | 'input'>,
+  input: EngineInput = snapshot.input,
+): EngineOutput {
+  const versionedInput: EngineInput = { ...input }
+  delete versionedInput.compatibilityMode
+  if (snapshot.engineVersion === 'fcm-v3' && (versionedInput.policy ?? 'OPERATIONAL_V3') === 'OPERATIONAL_V3') {
+    versionedInput.compatibilityMode = 'LEGACY_FCM_V3'
+  }
+  return calculate(versionedInput)
+}
+
 export function verifyQuoteCalculationSnapshot(snapshot: QuoteCalculationSnapshot) {
   const { checksum: storedChecksum, ...payload } = snapshot
   const checksumMatches = checksum(payload) === storedChecksum
-  const replay = calculate(snapshot.input)
+  const replay = calculateForQuoteSnapshot(snapshot)
   const expected = snapshot.output
   const actual = payloadFor(snapshot.input, replay).output
   const differences = snapshotOutputDifferences(expected, actual)
@@ -108,5 +123,9 @@ export function verifyQuoteCalculationSnapshot(snapshot: QuoteCalculationSnapsho
 export function isQuoteCalculationSnapshot(value: unknown): value is QuoteCalculationSnapshot {
   if (!value || typeof value !== 'object') return false
   const candidate = value as Partial<QuoteCalculationSnapshot>
-  return candidate.format === 'fcm.calculation-snapshot.v1' && candidate.engineVersion === 'fcm-v3' && typeof candidate.checksum === 'string' && Boolean(candidate.input) && Boolean(candidate.output)
+  return candidate.format === 'fcm.calculation-snapshot.v1'
+    && (candidate.engineVersion === 'fcm-v3' || candidate.engineVersion === CURRENT_QUOTE_ENGINE_VERSION)
+    && typeof candidate.checksum === 'string'
+    && Boolean(candidate.input)
+    && Boolean(candidate.output)
 }

@@ -101,15 +101,20 @@ export async function currentUsBorderDieselUsdL(): Promise<number | null> {
 }
 
 /**
- * Sync the org's active assumption set "Diesel US Border" (USD/L) to current
- * market, so the MX leg's blended diesel tracks the same EIA fuel as the USA leg.
+ * Legacy compatibility only: sync the org's editable common DRAFT set.
+ * Governed cost-base versions are immutable once published and market refreshes
+ * must never choose one arbitrary active modality or rewrite its evidence.
  */
+export function writableFuelAssumptionSetWhere(orgId: string) {
+  return { orgId, isActive: true, costBaseId: null, status: 'DRAFT' as const }
+}
+
 export async function syncSetDieselUsBorder(
   orgId: string,
 ): Promise<{ setId: string; dieselUsBorderUsdL: number } | null> {
   const usdL = await currentUsBorderDieselUsdL()
   if (usdL == null) return null
-  const set = await prisma.assumptionSet.findFirst({ where: { orgId, isActive: true } })
+  const set = await prisma.assumptionSet.findFirst({ where: writableFuelAssumptionSetWhere(orgId) })
   if (!set) return null
   await prisma.assumptionParam.upsert({
     where: { setId_section_field: { setId: set.id, section: Section.FUEL, field: 'Diesel US Border' } },

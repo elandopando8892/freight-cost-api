@@ -45,6 +45,9 @@ export type QuoteExplanation = {
 export function buildQuoteExplanation(input: QuoteExplanationInput, result: EngineOutput, lineage: Lineage, snapshot: QuoteCalculationSnapshot): QuoteExplanation {
   const alerts: QuoteExplanation['decision']['alerts'] = []
   if (!lineage.costBase) alerts.push({ code: 'LEGACY_LINEAGE', message: 'No cost base was selected; this quote uses legacy assumption lineage.' })
+  if (lineage.costBase && lineage.costBase.status !== 'ACTIVE') {
+    alerts.push({ code: 'BASE_NOT_ACTIVE', message: `Cost base ${lineage.costBase.code} is ${lineage.costBase.status.toLowerCase()}; this calculation is a preview and cannot be confirmed.` })
+  }
   if (lineage.set?.status && lineage.set.status !== 'PUBLISHED') {
     alerts.push({ code: 'VERSION_NOT_PUBLISHED', message: `Assumption version v${lineage.set.version} is ${lineage.set.status.toLowerCase()}; it is not production-governed.` })
   }

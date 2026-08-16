@@ -149,9 +149,9 @@ describe('USA leg — Freight Cost Model V3.0 (usaLaneProd)', () => {
   })
 })
 
-describe('Cross-border assembly — Monterrey → Dallas Flatbed D2D Export = $2,700 (post-E2)', () => {
+describe('Cross-border assembly — Monterrey → Dallas Flatbed D2D Export = $2,800 (operational)', () => {
   const equipment = { truckType: 'Truck Trailer', trailer: 'Flatbed', config: 'Single', driver: 'B1' }
-  it('sums MX flat 1300 + USA flat 1391 → MROUND 2700', () => {
+  it('sums MX flat 1300 + USA flat 1526 → MROUND 2800', () => {
     const r = calculate({
       operation: 'D2D Export', service: 'One Way', equipment, params,
       mexLeg: { baseKm: 225, routeExpensesMxn: 0, baseHours: 0, operation: 'D2D Export', service: 'One Way', route: 'Straight & Danger', equipment },
@@ -162,8 +162,8 @@ describe('Cross-border assembly — Monterrey → Dallas Flatbed D2D Export = $2
       },
     })
     expect(r.mexLeg?.requiredTariffUsd).toBe(1300)
-    expect(r.usaLeg?.flatUsd).toBeCloseTo(1391, 0)
-    expect(r.freightBaselineUsd).toBe(2700)
+    expect(r.usaLeg?.flatUsd).toBeCloseTo(1526, 0)
+    expect(r.freightBaselineUsd).toBe(2800)
   })
 
   it('commercial layer: cost floor < sell tiers, margin & flags', () => {
@@ -178,11 +178,11 @@ describe('Cross-border assembly — Monterrey → Dallas Flatbed D2D Export = $2
     })
     const c = r.commercial
     expect(c.costFloorUsd).toBeGreaterThan(0)
-    expect(c.recommendedSellUsd).toBe(2700)
+    expect(c.recommendedSellUsd).toBe(2800)
     // sell tiers ordered min < target < premium
     expect(c.minSellUsd).toBeLessThan(c.targetSellUsd)
     expect(c.targetSellUsd).toBeLessThan(c.premiumSellUsd)
-    // recommended ($2,600) above cost floor → positive margin, no No-Go
+    // recommended ($2,800) above cost floor → positive margin, no No-Go
     expect(c.grossProfitUsd).toBeGreaterThan(0)
     expect(c.grossMarginPct).toBeGreaterThan(0)
     expect(c.noGoFlag).toBe(false)
@@ -190,6 +190,19 @@ describe('Cross-border assembly — Monterrey → Dallas Flatbed D2D Export = $2
     // recommended lane is clean: none of the V3.0 validations fire on defaults
     expect(c.reviewFlag).toBe(false)
     expect(c.notes).toHaveLength(0)
+  })
+
+  it('fails closed when pathological divisors overflow the calculated output', () => {
+    expect(() => calculate({
+      operation: 'D2D Export', service: 'One Way', equipment,
+      params: { 'GENERAL_BASE__Tamaño de Flota': Number.MIN_VALUE },
+      mexLeg: { baseKm: 225, routeExpensesMxn: 0, baseHours: 0, operation: 'D2D Export', service: 'One Way', route: 'Straight & Danger', equipment },
+      usaLeg: {
+        loadedMiles: 435, transitDaysRaw: 0, driverExpenses: 0, outState: 'TX',
+        dieselUsdGal: 5.152, fscUsdMile: 0.8, originCondition: 'Very Tight', destCondition: 'Very Tight',
+        operation: 'D2D Export', service: 'One Way', equipment,
+      },
+    })).toThrow(/non-finite|non-positive/i)
   })
 })
 
@@ -383,7 +396,9 @@ describe('E5 — Tandem additive CFU + maneuver time (corridor-varying uplift)',
     // Fixed cost dominates short lanes → tandem premium is a bigger fraction there.
     expect(upliftShort).toBeGreaterThan(upliftLong)
     // Not a constant multiplier — the two differ by a real margin.
-    expect(upliftShort - upliftLong).toBeGreaterThan(0.05)
+    // Domestic lanes now exclude cross-border fixed costs, so the percentage
+    // spread narrows while remaining materially corridor-dependent.
+    expect(upliftShort - upliftLong).toBeGreaterThan(0.03)
   })
 
   it('tandem adds hook/unhook maneuver time to the cycle', () => {
@@ -478,5 +493,217 @@ describe('E3 — Roundtrip 2-leg physics', () => {
       returnKm: 350,  // return to a different point
     }, {})
     expect(r.loadedKm).toBe(750)   // 400 + 350
+  })
+})
+
+describe('Operational applicability — country, assets and factor semantics', () => {
+  const usaEquipment = { truckType: 'Truck Trailer', trailer: 'Dry Van', config: 'Single', driver: 'CDL' }
+  const usaLane = {
+    loadedMiles: 435,
+    transitDaysRaw: 1,
+    driverExpenses: 0,
+    outState: 'TX',
+    dieselUsdGal: 5.152,
+    fscUsdMile: 0.8,
+    originCondition: 'Balanced',
+    destCondition: 'Balanced',
+    operation: 'Intra-US',
+    service: 'One Way',
+    equipment: usaEquipment,
+  } as const
+
+  it('uses US working capital for OPERATIONAL_V3 Intra-US while WORKBOOK_V3 keeps the MX legacy', () => {
+    const operational = calculateUsaLeg(usaLane, {}, 'OPERATIONAL_V3')
+    const operationalMxShock = calculateUsaLeg(
+      usaLane,
+      { 'FINANCE__Cost of Capital MX': 0.99 },
+      'OPERATIONAL_V3',
+    )
+    const operationalUsShock = calculateUsaLeg(
+      usaLane,
+      { 'FINANCE__Cost of Capital US': 0.99 },
+      'OPERATIONAL_V3',
+    )
+    expect(operationalMxShock.cfuUsd).toBeCloseTo(operational.cfuUsd, 10)
+    expect(operationalUsShock.cfuUsd).toBeGreaterThan(operational.cfuUsd)
+
+    const workbook = calculateUsaLeg(usaLane, {}, 'WORKBOOK_V3')
+    const workbookUsShock = calculateUsaLeg(
+      usaLane,
+      { 'FINANCE__Cost of Capital US': 0.99 },
+      'WORKBOOK_V3',
+    )
+    const workbookMxShock = calculateUsaLeg(
+      usaLane,
+      { 'FINANCE__Cost of Capital MX': 0.99 },
+      'WORKBOOK_V3',
+    )
+    expect(workbookUsShock.cfuUsd).toBeCloseTo(workbook.cfuUsd, 10)
+    expect(workbookMxShock.cfuUsd).toBeGreaterThan(workbook.cfuUsd)
+  })
+
+  it('excludes trailer capital and trailer tires from operational Drayage', () => {
+    const equipment = { truckType: 'Truck Trailer', trailer: 'Chassis', config: 'Single', driver: 'Interstate' }
+    const lane = {
+      loadedMiles: 40,
+      dieselUsdGal: 5,
+      fscUsdMile: 0.5,
+      outState: 'CA',
+      operation: 'Drayage',
+      service: 'One Way',
+      equipment,
+    } as const
+    const operational = calculateDrayageLeg(lane, {}, 'OPERATIONAL_V3')
+    const trailerCapitalShock = calculateDrayageLeg(
+      lane,
+      { 'COST_CAPITAL__PU Remolque': 5_000_000 },
+      'OPERATIONAL_V3',
+    )
+    const trailerTireShock = calculateDrayageLeg(
+      lane,
+      { 'COST_TIRES__Qty Remolque': 800 },
+      'OPERATIONAL_V3',
+    )
+    expect(trailerCapitalShock.cfuUsd).toBeCloseTo(operational.cfuUsd, 10)
+    expect(trailerTireShock.maintTiresUsd).toBeCloseTo(operational.maintTiresUsd, 10)
+
+    // The explicit fidelity policy still consumes the historical trailer pool.
+    const workbook = calculateDrayageLeg(lane, {}, 'WORKBOOK_V3')
+    const workbookTrailerCapitalShock = calculateDrayageLeg(
+      lane,
+      { 'COST_CAPITAL__PU Remolque': 5_000_000 },
+      'WORKBOOK_V3',
+    )
+    const workbookTrailerTireShock = calculateDrayageLeg(
+      lane,
+      { 'COST_TIRES__Qty Remolque': 800 },
+      'WORKBOOK_V3',
+    )
+    expect(workbookTrailerCapitalShock.cfuUsd).toBeGreaterThan(workbook.cfuUsd)
+    expect(workbookTrailerTireShock.maintTiresUsd).toBeGreaterThan(workbook.maintTiresUsd)
+  })
+
+  it('uses US, not MX, working capital for operational Drayage', () => {
+    const equipment = { truckType: 'Truck Trailer', trailer: 'Chassis', config: 'Single', driver: 'Interstate' }
+    const lane = {
+      loadedMiles: 40,
+      dieselUsdGal: 5,
+      fscUsdMile: 0.5,
+      outState: 'CA',
+      operation: 'Drayage',
+      service: 'One Way',
+      equipment,
+    } as const
+    const baseline = calculateDrayageLeg(lane, {})
+    const mxShock = calculateDrayageLeg(lane, { 'FINANCE__Cost of Capital MX': 0.99 })
+    const usShock = calculateDrayageLeg(lane, { 'FINANCE__Cost of Capital US': 0.99 })
+    expect(mxShock.cfuUsd).toBeCloseTo(baseline.cfuUsd, 10)
+    expect(usShock.cfuUsd).toBeGreaterThan(baseline.cfuUsd)
+  })
+
+  it('does not charge trailer capital or trailer tires to operational MEX Power Only', () => {
+    const equipment = { truckType: 'Truck Trailer', trailer: 'Power Only', config: 'Single', driver: 'B1' }
+    const lane = {
+      baseKm: 500,
+      operation: 'Intra-Mex',
+      service: 'One Way',
+      route: 'Mostly Straight',
+      equipment,
+    } as const
+    const operational = calculateMexLeg(lane, {}, 'OPERATIONAL_V3')
+    const operationalCapitalShock = calculateMexLeg(
+      lane,
+      { 'COST_CAPITAL__PU Remolque': 5_000_000 },
+      'OPERATIONAL_V3',
+    )
+    const operationalTireShock = calculateMexLeg(
+      lane,
+      { 'COST_TIRES__Qty Remolque': 800 },
+      'OPERATIONAL_V3',
+    )
+    expect(operationalCapitalShock.cfuUsd).toBeCloseTo(operational.cfuUsd, 10)
+    expect(operationalTireShock.maintTiresUsd).toBeCloseTo(operational.maintTiresUsd, 10)
+
+    const workbook = calculateMexLeg(lane, {}, 'WORKBOOK_V3')
+    const workbookCapitalShock = calculateMexLeg(
+      lane,
+      { 'COST_CAPITAL__PU Remolque': 5_000_000 },
+      'WORKBOOK_V3',
+    )
+    const workbookTireShock = calculateMexLeg(
+      lane,
+      { 'COST_TIRES__Qty Remolque': 800 },
+      'WORKBOOK_V3',
+    )
+    expect(workbookCapitalShock.cfuUsd).toBeGreaterThan(workbook.cfuUsd)
+    expect(workbookTireShock.maintTiresUsd).toBeGreaterThan(workbook.maintTiresUsd)
+  })
+
+  it('does not charge trailer capital or trailer tires to operational USA Power Only', () => {
+    const lane = {
+      ...usaLane,
+      equipment: { ...usaEquipment, trailer: 'Power Only' },
+    } as const
+    const operational = calculateUsaLeg(lane, {}, 'OPERATIONAL_V3')
+    const operationalCapitalShock = calculateUsaLeg(
+      lane,
+      { 'COST_CAPITAL__PU Remolque': 5_000_000 },
+      'OPERATIONAL_V3',
+    )
+    const operationalTireShock = calculateUsaLeg(
+      lane,
+      { 'COST_TIRES__Qty Remolque': 800 },
+      'OPERATIONAL_V3',
+    )
+    expect(operationalCapitalShock.cfuUsd).toBeCloseTo(operational.cfuUsd, 10)
+    expect(operationalTireShock.maintTiresUsd).toBeCloseTo(operational.maintTiresUsd, 10)
+
+    const workbook = calculateUsaLeg(lane, {}, 'WORKBOOK_V3')
+    const workbookCapitalShock = calculateUsaLeg(
+      lane,
+      { 'COST_CAPITAL__PU Remolque': 5_000_000 },
+      'WORKBOOK_V3',
+    )
+    const workbookTireShock = calculateUsaLeg(
+      lane,
+      { 'COST_TIRES__Qty Remolque': 800 },
+      'WORKBOOK_V3',
+    )
+    expect(workbookCapitalShock.cfuUsd).toBeGreaterThan(workbook.cfuUsd)
+    expect(workbookTireShock.maintTiresUsd).toBeGreaterThan(workbook.maintTiresUsd)
+  })
+
+  it('applies operation/service to their real dimensions only in OPERATIONAL_V3', () => {
+    const expedited = { ...usaLane, operation: 'D2D Export', service: 'Expedited' } as const
+    const operational = calculateUsaLeg(expedited, {}, 'OPERATIONAL_V3')
+    const workbook = calculateUsaLeg(expedited, {}, 'WORKBOOK_V3')
+
+    expect(operational.operationRiskUsd).toBeGreaterThan(0)
+    expect(operational.serviceRiskUsd).toBeGreaterThan(0)
+    expect(workbook.operationRiskUsd).toBe(0)
+    expect(workbook.serviceRiskUsd).toBe(0)
+  })
+
+  it('validates the MX/US fuel mix only for D2D operations', () => {
+    const invalidMix = {
+      'FUEL__Fuel Purchase Mix MX': 0.9,
+      'FUEL__Fuel Purchase Mix US': 0.9,
+    }
+    const domestic = calculate({
+      operation: 'Intra-US',
+      service: 'One Way',
+      equipment: usaEquipment,
+      params: invalidMix,
+      usaLeg: usaLane,
+    })
+    const crossborder = calculate({
+      operation: 'D2D Export',
+      service: 'One Way',
+      equipment: usaEquipment,
+      params: invalidMix,
+      usaLeg: { ...usaLane, operation: 'D2D Export' },
+    })
+    expect(domestic.commercial.notes.some((note) => note.includes('fuel purchase mix'))).toBe(false)
+    expect(crossborder.commercial.notes.some((note) => note.includes('fuel purchase mix'))).toBe(true)
   })
 })

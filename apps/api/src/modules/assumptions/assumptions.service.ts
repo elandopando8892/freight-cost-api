@@ -1,7 +1,11 @@
-import { Section } from '@prisma/client'
+import { Prisma, Section } from '@prisma/client'
 import { prisma } from '../../config/prisma.js'
 import type { CreateSetInput, UpdateSetInput, BulkUpdateInput, ResetParamsInput } from './assumptions.schema.js'
 import { DEFAULT_ASSUMPTIONS } from '../../data/default-assumptions.js'
+import { parameterApplicability, type ParameterApplicability } from '../cost-bases/cost-base-applicability.js'
+import { parseCostBaseProfile } from '../cost-bases/cost-base-profile.js'
+import { assertAssumptionValueDomain } from './assumption-domain.js'
+import { lockAssumptionVersion, lockOrganizationLifecycle } from './assumption-version-lock.js'
 
 // V3.0 recommended defaults, keyed "section__field" — powers reset-to-recommended,
 // range warnings, and the `recommended`/`outOfRange` fields on params.
@@ -38,8 +42,23 @@ function versionLocked(status: string | undefined) {
   return status === 'PUBLISHED' || status === 'ARCHIVED'
 }
 
-async function assertEditableSet(orgId: string, setId: string) {
-  const set = await prisma.assumptionSet.findFirstOrThrow({ where: { id: setId, orgId }, select: { status: true } })
+type AssumptionDatabase = typeof prisma | Prisma.TransactionClient
+
+async function assertEditableSet(orgId: string, setId: string, db: AssumptionDatabase = prisma) {
+  const set = await db.assumptionSet.findFirstOrThrow({
+    where: { id: setId, orgId },
+    select: {
+      status: true,
+      costBaseId: true,
+      applicabilityContext: true,
+      costBase: { select: { scope: true, status: true, defaultPolicy: true } },
+    },
+  })
+  if (set.costBase?.status === 'ARCHIVED') {
+    const err = new Error('This cost base is archived and its versions cannot be modified.') as Error & { statusCode: number }
+    err.statusCode = 409
+    throw err
+  }
   if (versionLocked(set.status)) {
     const err = new Error(`This assumption version is ${set.status.toLowerCase()} and cannot be modified. Create a new draft version first.`) as Error & { statusCode: number }
     err.statusCode = 409
@@ -56,7 +75,8 @@ export async function listSets(orgId: string) {
       id: true, name: true, version: true, isActive: true, notes: true,
       status: true, sourceVersionId: true, publishedAt: true,
       createdAt: true, updatedAt: true,
-      costBase: { select: { id: true, code: true, name: true, scope: true, status: true } },
+      applicabilityContext: true,
+      costBase: { select: { id: true, code: true, name: true, scope: true, status: true, defaultPolicy: true } },
       _count: { select: { params: true } },
     },
   })
@@ -68,6 +88,11 @@ export async function createSet(orgId: string, input: CreateSetInput) {
       where: { id: input.cloneFromId, orgId },
       include: { params: true },
     })
+    if (source.costBaseId) {
+      const err = new Error('A cost-base version cannot be cloned into a legacy assumption set. Create a new version from its cost base instead.') as Error & { statusCode: number }
+      err.statusCode = 409
+      throw err
+    }
 
     const newSet = await prisma.assumptionSet.create({
       data: {
@@ -128,12 +153,22 @@ export async function getSet(orgId: string, id: string) {
 }
 
 export async function updateSet(orgId: string, id: string, input: UpdateSetInput) {
-  await assertEditableSet(orgId, id)
+  const set = await assertEditableSet(orgId, id)
+  if (set.costBaseId) {
+    const err = new Error('Cost-base versions must be managed through the governed cost-base lifecycle.') as Error & { statusCode: number }
+    err.statusCode = 409
+    throw err
+  }
   return prisma.assumptionSet.update({ where: { id }, data: input })
 }
 
 export async function deleteSet(orgId: string, id: string) {
   const set = await prisma.assumptionSet.findFirstOrThrow({ where: { id, orgId } })
+  if (set.costBaseId) {
+    const err = new Error('Cost-base versions cannot be deleted through the legacy assumption-set endpoint.') as Error & { statusCode: number }
+    err.statusCode = 409
+    throw err
+  }
   if (set.isActive) {
     const err = new Error('Cannot delete the active assumption set') as Error & { statusCode: number }
     err.statusCode = 409
@@ -148,7 +183,15 @@ export async function deleteSet(orgId: string, id: string) {
 }
 
 export async function activateSet(orgId: string, id: string) {
-  const target = await prisma.assumptionSet.findFirstOrThrow({ where: { id, orgId }, select: { costBaseId: true } })
+  const target = await prisma.assumptionSet.findFirstOrThrow({
+    where: { id, orgId },
+    select: { costBaseId: true },
+  })
+  if (target.costBaseId) {
+    const err = new Error('Las versiones vinculadas a una base deben publicarse y activarse desde Bases de costo.') as Error & { statusCode: number }
+    err.statusCode = 409
+    throw err
+  }
   await prisma.$transaction([
     prisma.assumptionSet.updateMany({ where: { orgId, costBaseId: target.costBaseId, isActive: true }, data: { isActive: false } }),
     prisma.assumptionSet.update({ where: { id }, data: { isActive: true } }),
@@ -157,7 +200,10 @@ export async function activateSet(orgId: string, id: string) {
 }
 
 export async function getParams(orgId: string, setId: string) {
-  await prisma.assumptionSet.findFirstOrThrow({ where: { id: setId, orgId } })
+  const set = await prisma.assumptionSet.findFirstOrThrow({
+    where: { id: setId, orgId },
+    select: { applicabilityContext: true, costBase: { select: { scope: true, defaultPolicy: true } } },
+  })
   const params = await prisma.assumptionParam.findMany({
     where: { setId },
     orderBy: [{ section: 'asc' }, { field: 'asc' }],
@@ -170,19 +216,33 @@ export async function getParams(orgId: string, setId: string) {
     recommendedLow: number | null
     recommendedHigh: number | null
     outOfRange: boolean
+    applicability: ParameterApplicability
+    applicabilityReason: string
+    applicabilityCondition: string | null
   }
   const grouped: Record<string, Enriched[]> = {}
+  const applicabilityProfile = set.costBase
+    ? parseCostBaseProfile(
+        set.costBase.scope,
+        set.applicabilityContext,
+        set.applicabilityContext == null ? set.costBase.defaultPolicy : undefined,
+      )
+    : null
   for (const p of params) {
     const def = DEFAULTS.get(`${p.section}__${p.field}`)
     const low = p.low ?? def?.low ?? null
     const high = p.high ?? def?.high ?? null
     const outOfRange = (low != null && p.value < low) || (high != null && p.value > high)
+    const applicability = parameterApplicability(set.costBase?.scope, p, applicabilityProfile)
     const enriched: Enriched = {
       ...p,
       recommended: def ? def.value : null,
       recommendedLow: def?.low ?? null,
       recommendedHigh: def?.high ?? null,
       outOfRange,
+      applicability: applicability.applicability,
+      applicabilityReason: applicability.reason,
+      applicabilityCondition: applicability.condition,
     }
     if (!grouped[p.section]) grouped[p.section] = []
     grouped[p.section].push(enriched)
@@ -191,12 +251,35 @@ export async function getParams(orgId: string, setId: string) {
 }
 
 export async function bulkUpdateParams(orgId: string, setId: string, updates: BulkUpdateInput) {
-  await assertEditableSet(orgId, setId)
+  await prisma.$transaction(async (tx) => {
+    await lockOrganizationLifecycle(tx, orgId)
+    await lockAssumptionVersion(tx, orgId, setId)
+    const set = await assertEditableSet(orgId, setId, tx)
+    const applicabilityProfile = set.costBase
+      ? parseCostBaseProfile(
+          set.costBase.scope,
+          set.applicabilityContext,
+          set.applicabilityContext == null ? set.costBase.defaultPolicy : undefined,
+        )
+      : null
+    for (const update of updates) {
+      if (!DEFAULTS.has(`${update.section}__${update.field}`)) {
+        const err = new Error(`${update.field} no pertenece al catálogo canónico y no puede guardarse.`) as Error & { statusCode: number }
+        err.statusCode = 422
+        throw err
+      }
+      assertAssumptionValueDomain(update)
+      const applicability = parameterApplicability(set.costBase?.scope, update, applicabilityProfile)
+      if (applicability.applicability === 'NOT_APPLICABLE') {
+        const err = new Error(`${update.field} no aplica para el alcance de esta base y no puede editarse.`) as Error & { statusCode: number }
+        err.statusCode = 422
+        throw err
+      }
+    }
 
-  await prisma.$transaction(
-    updates.map((u) => {
+    for (const u of updates) {
       const def = DEFAULTS.get(`${u.section}__${u.field}`)
-      return prisma.assumptionParam.upsert({
+      await tx.assumptionParam.upsert({
         where: { setId_section_field: { setId, section: u.section as Section, field: u.field } },
         // On create, carry the V3.0 metadata so a new param isn't bounds-less.
         create: {
@@ -206,8 +289,8 @@ export async function bulkUpdateParams(orgId: string, setId: string, updates: Bu
         },
         update: { value: u.value },
       })
-    }),
-  )
+    }
+  })
 
   // Non-blocking: edits are saved, but we report any that left the recommended range.
   const warnings = updates
@@ -220,8 +303,6 @@ export async function bulkUpdateParams(orgId: string, setId: string, updates: Bu
 
 /** Reset params to their V3.0 recommended values (all, or only the given fields). */
 export async function resetParams(orgId: string, setId: string, fields?: ResetParamsInput['fields']) {
-  await assertEditableSet(orgId, setId)
-
   const targets: DefaultParam[] =
     fields && fields.length > 0
       ? fields
@@ -229,9 +310,12 @@ export async function resetParams(orgId: string, setId: string, fields?: ResetPa
           .filter((d): d is DefaultParam => d !== undefined)
       : DEFAULT_ASSUMPTIONS
 
-  await prisma.$transaction(
-    targets.map((a) =>
-      prisma.assumptionParam.upsert({
+  await prisma.$transaction(async (tx) => {
+    await lockOrganizationLifecycle(tx, orgId)
+    await lockAssumptionVersion(tx, orgId, setId)
+    await assertEditableSet(orgId, setId, tx)
+    for (const a of targets) {
+      await tx.assumptionParam.upsert({
         where: { setId_section_field: { setId, section: a.section as Section, field: a.field } },
         create: {
           setId, section: a.section as Section, field: a.field, value: a.value,
@@ -239,16 +323,19 @@ export async function resetParams(orgId: string, setId: string, fields?: ResetPa
           updateFrequency: a.updateFrequency, costBehavior: a.costBehavior, activation: a.activation,
         },
         update: { value: a.value, low: a.low ?? null, high: a.high ?? null },
-      }),
-    ),
-  )
+      })
+    }
+  })
 
   return getParams(orgId, setId)
 }
 
 export async function getActiveSet(orgId: string) {
   return prisma.assumptionSet.findFirst({
-    where: { orgId, isActive: true },
+    // Cost-base versions have their own active flag. A calculation that did
+    // not select a base may only inherit the explicitly legacy/common set;
+    // otherwise the first active version from an unrelated modality wins.
+    where: { orgId, isActive: true, costBaseId: null },
     include: { params: true },
   })
 }

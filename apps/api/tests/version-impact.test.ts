@@ -23,6 +23,7 @@ describe('version release impact', () => {
     })
 
     expect(impact.comparison.changedParameterCount).toBe(1)
+    expect(impact.comparison.applicabilityProfileChanged).toBe(false)
     expect(impact.comparison.changes[0]).toMatchObject({ field: 'dieselUsd', fromValue: 4, toValue: 4.25, delta: 0.25 })
     expect(impact.activation).toMatchObject({ canActivate: true, existingProductionRoutesRemainFrozen: true, existingQuotesRemainFrozen: true, requiresHumanRouteReview: true })
   })
@@ -33,5 +34,25 @@ describe('version release impact', () => {
       quotes: { savedOnActive: 0, savedOnCandidate: 0, other: 0 },
     })
     expect(impact.activation.canActivate).toBe(false)
+  })
+
+  it('reports a profile-only governance change independently from parameter values', () => {
+    const withProfile = {
+      ...active,
+      applicabilityContext: { services: ['One Way'], trailerTypes: ['Dry Van'] },
+    }
+    const impact = buildVersionImpact({
+      ...withProfile,
+      id: 'v2',
+      version: 2,
+      status: 'DRAFT',
+      isActive: false,
+      applicabilityContext: { trailerTypes: ['Dry Van', 'Power Only'], services: ['One Way'] },
+    }, withProfile, {
+      productionRoutes: { frozenOnActive: 0, alreadyOnCandidate: 0, other: 0 },
+      quotes: { savedOnActive: 0, savedOnCandidate: 0, other: 0 },
+    })
+    expect(impact.comparison.changedParameterCount).toBe(0)
+    expect(impact.comparison.applicabilityProfileChanged).toBe(true)
   })
 })

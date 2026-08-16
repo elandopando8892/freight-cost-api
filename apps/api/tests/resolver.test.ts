@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { missingRequiredPricingLegs, normalizeLaneLookup, usZipPrefix } from '../src/modules/engine/lane-resolver.service.js'
 import { homologateMx, buildReferenceKey } from '../src/modules/engine/reference-key.js'
 import { defaultService } from '../src/modules/engine/engine.factors.js'
+import { pricingInputIssues } from '../src/modules/engine/engine-input-validation.js'
 
 // ZIP → metro resolution: the cusCatalog is keyed by 3-digit ZIP prefix, so the
 // resolver must extract that prefix from a shipper/consignee location string.
@@ -36,6 +37,16 @@ describe('lane-resolver — canonical lane lookup and required legs', () => {
     expect(missingRequiredPricingLegs('Intra-US', { mexLeg: {} })).toEqual(['USA'])
     expect(missingRequiredPricingLegs('US Northbound', { usaLeg: {} })).toEqual([])
     expect(missingRequiredPricingLegs('Intra-Mex', { usaLeg: {} })).toEqual(['MEX'])
+  })
+
+  it('rejects partial and zero-distance pricing inputs before calculation', () => {
+    expect(pricingInputIssues('D2D Export', { mex: { baseKm: 225 } })).toEqual([
+      expect.stringContaining('USA'),
+    ])
+    expect(pricingInputIssues('Intra-US', { usa: { loadedMiles: 0 } })).toEqual([
+      expect.stringContaining('mayor que cero'),
+    ])
+    expect(pricingInputIssues('Drayage', { drayage: { loadedMiles: 25 } })).toEqual([])
   })
 })
 

@@ -4,6 +4,7 @@ import { prisma } from '../../config/prisma.js'
 import { isQuoteCalculationSnapshot, verifyQuoteCalculationSnapshot } from '../quotes/quote-snapshot.js'
 import type { QuoteCalculationSnapshot } from '../quotes/quote-snapshot.js'
 import { buildScenario, unknownScenarioKeys } from '../scenarios/scenario.service.js'
+import { lockAssumptionVersion, lockCostBaseLifecycle } from '../assumptions/assumption-version-lock.js'
 
 export const SCENARIO_REVIEW_POLICY = 'HUMAN_REVIEW_ONLY_NO_AUTOMATIC_APPLY' as const
 
@@ -65,6 +66,18 @@ export function approvedScenarioDraftValues(snapshot: QuoteCalculationSnapshot, 
  */
 export async function createDraftFromApprovedScenarioReview(input: { orgId: string; reviewId: string; actorId: string; note?: string }) {
   return prisma.$transaction(async (tx) => {
+    const initial = await tx.scenarioReview.findFirstOrThrow({
+      where: { id: input.reviewId, orgId: input.orgId },
+      select: { quote: { select: { costBaseId: true, assumptionSetId: true } } },
+    })
+    if (!initial.quote.costBaseId || !initial.quote.assumptionSetId) {
+      throw httpError('The source quote is not governed by both a cost base and an assumption version.', 422)
+    }
+    await lockCostBaseLifecycle(tx, input.orgId, initial.quote.costBaseId)
+    await lockAssumptionVersion(tx, input.orgId, initial.quote.assumptionSetId)
+
+    // Re-read every governed input after the shared locks. A concurrent base
+    // archive or a duplicate draft request must be observed before creation.
     const review = await tx.scenarioReview.findFirstOrThrow({
       where: { id: input.reviewId, orgId: input.orgId },
       include: {
@@ -99,6 +112,9 @@ export async function createDraftFromApprovedScenarioReview(input: { orgId: stri
         version: (newest?.version ?? 0) + 1,
         isActive: false,
         status: AssumptionVersionStatus.DRAFT,
+        applicabilityContext: sourceSet.applicabilityContext == null
+          ? Prisma.DbNull
+          : sourceSet.applicabilityContext as Prisma.InputJsonValue,
         sourceVersionId: sourceSet.id,
         notes: input.note ?? `Draft from approved scenario review ${review.id}; source quote ${review.quote.id}; snapshot ${review.sourceChecksum}.`,
         auditEvents: { create: { orgId: input.orgId, actorId: input.actorId, action: 'DRAFT_CREATED', toStatus: 'DRAFT', note: `Created from approved scenario review ${review.id}.` } },

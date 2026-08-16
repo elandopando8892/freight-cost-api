@@ -22,21 +22,37 @@ import {
 } from './engine.factors.js'
 import { deriveMonthlyFixedCost, deriveMaintTiresPerMile } from './engine.outputs.js'
 import { buildReferenceKey } from './reference-key.js'
-import type { DrayageLegInput, DrayageReturnMode, UsaLegOutput } from './engine.types.js'
+import type { DrayageLegInput, DrayageReturnMode, EnginePolicy, UsaLegOutput } from './engine.types.js'
 
 const KML_TO_MPG = 2.3521458
 const mround = (x: number, m: number) => Math.round(x / m) * m
 
-export function calculateDrayageLeg(lane: DrayageLegInput, params: ParamMap): UsaLegOutput {
+export function calculateDrayageLeg(
+  lane: DrayageLegInput,
+  params: ParamMap,
+  policy: EnginePolicy = 'OPERATIONAL_V3',
+  legacyOperational = false,
+): UsaLegOutput {
   const { equipment } = lane
   const P = lane.loadedMiles                       // loaded linehaul (port → delivery)
+  const workbookExact = policy === 'WORKBOOK_V3'
 
   // Assumptions
   const rendCargado = getParam(params, 'FUEL', 'Rendimiento Cargado', 2.8)
   const rendVacio = getParam(params, 'FUEL', 'Rendimiento Vacío', 3.2)
   const tarifaUs = getParam(params, 'LABOR', 'Tarifa Operador US', 0.6)
-  const maintTiresPerMile = deriveMaintTiresPerMile(params)
-  const monthlyFixedCost = deriveMonthlyFixedCost(params)
+  const legacyAssetSemantics = workbookExact || legacyOperational
+  const maintTiresPerMile = legacyAssetSemantics
+    ? deriveMaintTiresPerMile(params)
+    : deriveMaintTiresPerMile(params, { includeTrailerTires: false })
+  const monthlyFixedCost = legacyAssetSemantics
+    ? deriveMonthlyFixedCost(params, false)
+    : deriveMonthlyFixedCost(params, {
+        includeCrossborderCosts: false,
+        workingCapitalCountry: 'US',
+        includeTrailerAssets: false,
+        includeDollyAssets: false,
+      })
   const flota = getParam(params, 'GENERAL_BASE', 'Tamaño de Flota', 50)
   const periodo = getParam(params, 'GENERAL_BASE', 'Periodo de Operación', 26)
   const kmPerOperator = getParam(params, 'GENERAL_BASE', 'Kilómetros promedio x operador', 22000)

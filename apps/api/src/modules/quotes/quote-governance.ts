@@ -1,4 +1,5 @@
-import { isQuoteCalculationSnapshot, verifyQuoteCalculationSnapshot, type QuoteCalculationSnapshot } from './quote-snapshot.js'
+import { round2, usdToMxn } from '../../utils/currency.js'
+import { isQuoteCalculationSnapshot, SNAPSHOT_NUMERIC_TOLERANCE, verifyQuoteCalculationSnapshot, type QuoteCalculationSnapshot } from './quote-snapshot.js'
 
 type SavedExplanation = {
   snapshot?: unknown
@@ -24,6 +25,32 @@ export function confirmationEligibility(value: unknown) {
   return { eligible: reasons.length === 0, reasons, snapshot: explanation.snapshot, explanation }
 }
 
+type StoredQuoteEconomics = {
+  freightBaselineUsd: number
+  requiredTariffUsd: number
+  requiredTariffMxn: number
+  fxRateUsed: number
+}
+
+export function ratewareEconomicsDriftReasons(
+  quote: StoredQuoteEconomics,
+  snapshot: QuoteCalculationSnapshot,
+) {
+  const expected = {
+    freightBaselineUsd: snapshot.output.freightBaselineUsd,
+    requiredTariffUsd: snapshot.output.requiredTariffUsd,
+    requiredTariffMxn: round2(usdToMxn(snapshot.output.requiredTariffUsd, snapshot.output.fxRateUsed)),
+    fxRateUsed: snapshot.output.fxRateUsed,
+  }
+  return (Object.keys(expected) as (keyof StoredQuoteEconomics)[]).flatMap((field) => {
+    const stored = quote[field]
+    const snapshotValue = expected[field]
+    return Number.isFinite(stored) && Math.abs(stored - snapshotValue) <= SNAPSHOT_NUMERIC_TOLERANCE
+      ? []
+      : [`Quote economics ${field} drifted from the verified calculation snapshot.`]
+  })
+}
+
 export function buildRatewareHandoff(input: {
   quote: {
     id: string; label: string | null; operation: string; service: string; freightBaselineUsd: number; requiredTariffUsd: number; requiredTariffMxn: number; fxRateUsed: number; createdAt: Date; confirmedAt: Date | null; confirmationNote: string | null
@@ -35,6 +62,7 @@ export function buildRatewareHandoff(input: {
   explanation: SavedExplanation
 }) {
   const { quote, snapshot, explanation } = input
+  const requiredTariffMxn = round2(usdToMxn(snapshot.output.requiredTariffUsd, snapshot.output.fxRateUsed))
   return {
     contractVersion: 'fcm.rateware-handoff.v1',
     mode: 'READ_ONLY',
@@ -52,10 +80,10 @@ export function buildRatewareHandoff(input: {
       productionRoute: quote.productionRoute ? { id: quote.productionRoute.id, code: quote.productionRoute.code, status: quote.productionRoute.status } : null,
     },
     economics: {
-      currency: { primary: 'USD', secondary: 'MXN', fxRateUsed: quote.fxRateUsed },
-      freightBaselineUsd: quote.freightBaselineUsd,
-      requiredTariffUsd: quote.requiredTariffUsd,
-      requiredTariffMxn: quote.requiredTariffMxn,
+      currency: { primary: 'USD', secondary: 'MXN', fxRateUsed: snapshot.output.fxRateUsed },
+      freightBaselineUsd: snapshot.output.freightBaselineUsd,
+      requiredTariffUsd: snapshot.output.requiredTariffUsd,
+      requiredTariffMxn,
       costFloorUsd: snapshot.output.costFloorUsd,
       recommendedSellUsd: snapshot.output.recommendedSellUsd,
     },

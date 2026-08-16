@@ -11,6 +11,7 @@ export interface ImpactVersion {
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'
   isActive: boolean
   params: ImpactParam[]
+  applicabilityContext?: unknown
 }
 
 export interface VersionImpactCounts {
@@ -19,6 +20,17 @@ export interface VersionImpactCounts {
 }
 
 const keyFor = (param: Pick<ImpactParam, 'section' | 'field'>) => `${param.section}::${param.field}`
+
+function canonicalProfile(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(canonicalProfile).sort().join(',')}]`
+  if (value && typeof value === 'object') {
+    return `{${Object.entries(value as Record<string, unknown>)
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([key, item]) => `${JSON.stringify(key)}:${canonicalProfile(item)}`)
+      .join(',')}}`
+  }
+  return JSON.stringify(value) ?? 'undefined'
+}
 
 /**
  * Computes a read-only release preview. It deliberately describes the
@@ -46,6 +58,8 @@ export function buildVersionImpact(
       delta: from && to ? to.value - from.value : null,
     }]
   })
+  const applicabilityProfileChanged = canonicalProfile(active?.applicabilityContext ?? null) !==
+    canonicalProfile(candidate.applicabilityContext ?? null)
 
   return {
     candidate: { id: candidate.id, version: candidate.version, status: candidate.status, isActive: candidate.isActive },
@@ -53,6 +67,7 @@ export function buildVersionImpact(
     comparison: {
       referenceAvailable: active !== null,
       changedParameterCount: changes.length,
+      applicabilityProfileChanged,
       changes,
     },
     records: counts,

@@ -41,6 +41,22 @@ vi.mock("../src/config/prisma.js", () => {
     updatedAt: new Date(),
     params: [],
   };
+  const governedProfile = {
+    schemaVersion: "FCM_APPLICABILITY_V1",
+    factorScheduleVersion: "FCM_V3_FACTORS_2026_1",
+    scope: "CROSS_BORDER",
+    calculationPolicy: "WORKBOOK_V3",
+    countries: ["MX", "US"],
+    operations: ["D2D Export", "D2D Import"],
+    truckTypes: ["Truck Trailer"],
+    driverTypes: ["B1", "Licencia E", "Interstate", "Intrastate", "CDL"],
+    trailerTypes: ["Dry Van", "Flatbed"],
+    configurations: ["Single"],
+    services: ["One Way", "Roundtrip", "Backhaul"],
+    ownershipModels: ["OWNED_FINANCED"],
+    costAllocationModel: "FULL_FLEET",
+    borderProcess: "THROUGH_TRACTOR",
+  };
   const lane = {
     id: "lane-1",
     orgId: "org-1",
@@ -89,8 +105,9 @@ vi.mock("../src/config/prisma.js", () => {
     isDefault: true,
     createdAt: new Date(),
     updatedAt: new Date(),
+    auditEvents: [],
     versions: [
-      { ...assumptionSet, costBaseId: "base-1", _count: { params: 210 } },
+      { ...assumptionSet, costBaseId: "base-1", status: "PUBLISHED", isActive: true, applicabilityContext: governedProfile, _count: { params: 210 } },
     ],
     _count: { lanes: 1, quotes: 1 },
   };
@@ -191,7 +208,17 @@ vi.mock("../src/config/prisma.js", () => {
       findFirstOrThrow: vi
         .fn()
         .mockResolvedValue({ ...assumptionSet, params: [] }),
-      findFirst: vi.fn().mockResolvedValue({ ...assumptionSet, params: [] }),
+      findFirst: vi.fn().mockImplementation(async (args?: { where?: { costBaseId?: string | null } }) =>
+        args?.where?.costBaseId
+          ? {
+              ...assumptionSet,
+              costBaseId: args.where.costBaseId,
+              status: "PUBLISHED",
+              applicabilityContext: governedProfile,
+              params: [],
+            }
+          : { ...assumptionSet, costBaseId: null, params: [] },
+      ),
       update: vi.fn().mockResolvedValue(assumptionSet),
       updateMany: vi.fn().mockResolvedValue({ count: 1 }),
       delete: vi.fn().mockResolvedValue(assumptionSet),
@@ -209,6 +236,10 @@ vi.mock("../src/config/prisma.js", () => {
     assumptionVersionAudit: {
       create: vi.fn().mockResolvedValue({ id: "audit-1" }),
     },
+    costBaseAuditEvent: {
+      create: vi.fn().mockResolvedValue({ id: "cost-base-audit-1" }),
+      createMany: vi.fn().mockResolvedValue({ count: 1 }),
+    },
     equipmentConfig: {
       findMany: vi.fn().mockResolvedValue([equipment]),
       findFirstOrThrow: vi.fn().mockResolvedValue(equipment),
@@ -223,9 +254,12 @@ vi.mock("../src/config/prisma.js", () => {
     },
     lane: {
       findMany: vi.fn().mockResolvedValue([lane]),
+      findFirst: vi.fn().mockResolvedValue(lane),
       findFirstOrThrow: vi.fn().mockResolvedValue(lane),
       upsert: vi.fn().mockResolvedValue(lane),
+      updateMany: vi.fn().mockResolvedValue({ count: 1 }),
       update: vi.fn().mockResolvedValue(lane),
+      deleteMany: vi.fn().mockResolvedValue({ count: 1 }),
       delete: vi.fn().mockResolvedValue(lane),
     },
     productionRoute: {
@@ -233,6 +267,7 @@ vi.mock("../src/config/prisma.js", () => {
       findMany: vi.fn().mockResolvedValue([productionRoute]),
       create: vi.fn().mockResolvedValue(productionRoute),
       findFirstOrThrow: vi.fn().mockResolvedValue(productionRoute),
+      updateMany: vi.fn().mockResolvedValue({ count: 1 }),
       update: vi.fn().mockResolvedValue(productionRoute),
     },
     productionRouteAuditEvent: {
@@ -327,7 +362,11 @@ vi.mock("../src/config/prisma.js", () => {
         status: "DRAFT",
         explanation: null,
       }),
+      updateMany: vi.fn().mockResolvedValue({ count: 1 }),
       delete: vi.fn().mockResolvedValue({ id: "q-1" }),
+    },
+    quoteAuditEvent: {
+      create: vi.fn().mockResolvedValue({ id: "quote-audit-1" }),
     },
     $transaction: vi.fn(),
     $queryRaw: vi.fn().mockResolvedValue([]),
@@ -432,6 +471,35 @@ const pilotQuoteExplanation = {
     },
   },
 };
+
+const completeRatewareEnrichment = {
+  carrier: "Marksman Logistics",
+  effectiveDate: "2026-09-01",
+  rateOwner: "sales@heymarksman.com",
+};
+
+function confirmedRatewareQuote(overrides: Record<string, unknown> = {}) {
+  return {
+    id: "quote-rateware-1",
+    label: "Monterrey to Saltillo",
+    operation: "Intra-Mex",
+    service: "One Way",
+    freightBaselineUsd: pilotQuoteResult.freightBaselineUsd,
+    requiredTariffUsd: pilotQuoteResult.requiredTariffUsd,
+    requiredTariffMxn: pilotQuoteResult.requiredTariffUsd * 17.5,
+    fxRateUsed: 17.5,
+    status: "CONFIRMED",
+    explanation: pilotQuoteExplanation,
+    createdAt: new Date("2026-08-15T10:00:00.000Z"),
+    confirmedAt: new Date("2026-08-15T11:00:00.000Z"),
+    confirmationNote: "Reviewed by pricing.",
+    confirmedBy: { id: "user-1", email: "sales@heymarksman.com" },
+    lane: { origin: "Monterrey, NL", destination: "Saltillo, COA" },
+    productionRoute: null,
+    auditEvents: [],
+    ...overrides,
+  };
+}
 
 let app: FastifyInstance;
 // Fixed token recognised by the mocked verifyKindeToken (see vi.mock above).
@@ -592,6 +660,170 @@ describe("Organization invitations", () => {
 });
 
 describe("Production route catalog", () => {
+  it("marks a route with a legacy null applicability profile as needing review", async () => {
+    vi.mocked(prisma.productionRoute.findMany).mockResolvedValueOnce([{
+      id: "route-legacy",
+      orgId: "org-1",
+      status: "DRAFT",
+      origin: "Monterrey, NL",
+      destination: "Saltillo, CO",
+      geography: "MX",
+      operation: "Intra-Mex",
+      service: "One Way",
+      truckType: "Truck",
+      trailerType: "Trailer",
+      config: "Single",
+      driverType: "Company",
+      confirmedCostBaseId: "base-1",
+      confirmedCostBase: { id: "base-1", scope: "INTRA_MEX", status: "ACTIVE", defaultPolicy: "OPERATIONAL_V3" },
+      confirmedAssumptionSet: { id: "set-legacy", status: "PUBLISHED", costBaseId: "base-1", applicabilityContext: null },
+      suggestedCostBase: null,
+      supersedesRoute: null,
+      auditEvents: [],
+    } as never]);
+
+    const res = await app.inject({
+      method: "GET",
+      url: "/production/routes",
+      headers: { authorization: `Bearer ${token}` },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.json()[0].quality).toBe("NEEDS_REVIEW");
+    expect(res.json()[0].reasons.join(" ")).toMatch(/snapshots históricos/i);
+  });
+
+  it("rejects a new quote from a production route governed by a legacy null profile", async () => {
+    vi.mocked(prisma.productionRoute.findFirstOrThrow).mockResolvedValueOnce({
+      id: "route-legacy",
+      orgId: "org-1",
+      status: "PRODUCTION",
+      confirmedCostBaseId: "base-1",
+      confirmedCostBase: { id: "base-1", status: "ACTIVE" },
+      confirmedAssumptionSet: { id: "set-legacy", status: "PUBLISHED", costBaseId: "base-1", applicabilityContext: null },
+    } as never);
+    vi.mocked(prisma.quote.create).mockClear();
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/production/routes/route-legacy/quotes",
+      headers: { authorization: `Bearer ${token}` },
+      payload: {},
+    });
+
+    expect(res.statusCode).toBe(409);
+    expect(res.json().error).toMatch(/historical snapshots/i);
+    expect(prisma.quote.create).not.toHaveBeenCalled();
+  });
+
+  it("does not suggest an active base whose version profile rejects the route equipment", async () => {
+    const { defaultCostBaseProfile } = await import("../src/modules/cost-bases/cost-base-profile.js");
+    vi.mocked(prisma.costBase.findMany).mockResolvedValueOnce([{
+      id: "base-mx-dry",
+      scope: "INTRA_MEX",
+      defaultPolicy: "OPERATIONAL_V3",
+      versions: [{ applicabilityContext: defaultCostBaseProfile("INTRA_MEX", "OPERATIONAL_V3") }],
+    }] as never);
+    vi.mocked(prisma.productionRoute.create).mockClear();
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/production/routes",
+      headers: { authorization: `Bearer ${token}` },
+      payload: {
+        origin: "Monterrey, NL",
+        destination: "Saltillo, CO",
+        geography: "MX",
+        operation: "Intra-Mex",
+        service: "One Way",
+        truckType: "Truck",
+        trailerType: "Reefer",
+        config: "Single",
+        driverType: "Company",
+      },
+    });
+
+    expect(res.statusCode).toBe(201);
+    expect(vi.mocked(prisma.productionRoute.create).mock.calls[0][0].data.suggestedCostBaseId).toBeNull();
+  });
+
+  it("recomputes the suggested base when a governed non-operation dimension changes", async () => {
+    vi.mocked(prisma.costBase.findMany).mockClear();
+    vi.mocked(prisma.costBase.findMany).mockResolvedValueOnce([]);
+
+    const res = await app.inject({
+      method: "PATCH",
+      url: "/production/routes/route-1",
+      headers: { authorization: `Bearer ${token}` },
+      payload: { service: "Roundtrip" },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(prisma.costBase.findMany).toHaveBeenCalled();
+    expect(vi.mocked(prisma.productionRoute.updateMany).mock.calls.at(-1)?.[0].data).toMatchObject({
+      suggestedCostBaseId: null,
+    });
+  });
+
+  it("rejects a route confirmation that its published applicability profile does not support", async () => {
+    const baseId = "ckx11111111111111111111111";
+    const setId = "ckx22222222222222222222222";
+    vi.mocked(prisma.costBase.findMany).mockResolvedValueOnce([]);
+    vi.mocked(prisma.costBase.findFirst)
+      .mockResolvedValueOnce({
+        id: baseId,
+        orgId: "org-1",
+        scope: "INTRA_MEX",
+        status: "ACTIVE",
+        defaultPolicy: "OPERATIONAL_V3",
+        versions: [{
+          id: setId,
+          status: "PUBLISHED",
+          costBaseId: baseId,
+          applicabilityContext: {
+            schemaVersion: "FCM_APPLICABILITY_V1",
+            factorScheduleVersion: "FCM_V3_FACTORS_2026_1",
+            scope: "INTRA_MEX",
+            calculationPolicy: "OPERATIONAL_V3",
+            countries: ["MX"],
+            operations: ["Intra-Mex", "MX Northbound", "MX Southbound"],
+            truckTypes: ["Truck Trailer"],
+            driverTypes: ["B1", "Licencia E"],
+            trailerTypes: ["Dry Van"],
+            configurations: ["Single"],
+            services: ["One Way"],
+            ownershipModels: ["OWNED_FINANCED"],
+            costAllocationModel: "FULL_FLEET",
+            borderProcess: null,
+          },
+        }],
+      } as never);
+    vi.mocked(prisma.productionRoute.create).mockClear();
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/production/routes",
+      headers: { authorization: `Bearer ${token}` },
+      payload: {
+        origin: "Monterrey, NL",
+        destination: "Saltillo, CO",
+        geography: "MX",
+        operation: "Intra-Mex",
+        service: "One Way",
+        truckType: "Truck",
+        trailerType: "Reefer",
+        config: "Single",
+        driverType: "Company",
+        confirmedCostBaseId: baseId,
+        confirmedAssumptionSetId: setId,
+      },
+    });
+
+    expect(res.statusCode).toBe(422);
+    expect(res.json().error).toMatch(/Trailer Reefer is not enabled/i);
+    expect(prisma.productionRoute.create).not.toHaveBeenCalled();
+  });
+
   it("does not allow a draft route without a confirmed published version into production", async () => {
     const res = await app.inject({
       method: "POST",
@@ -662,6 +894,56 @@ describe("Quote confirmation", () => {
     expect(res.statusCode).toBe(422);
     expect(res.json().error).toMatch(/no reproducible calculation snapshot/i);
   });
+
+  it("commits one DRAFT to CONFIRMED compare-and-set and one audit in the same transaction", async () => {
+    const draft = confirmedRatewareQuote({ status: "DRAFT" });
+    const confirmed = confirmedRatewareQuote({ status: "CONFIRMED" });
+    vi.mocked(prisma.quote.findFirstOrThrow)
+      .mockResolvedValueOnce(draft as never)
+      .mockResolvedValueOnce(confirmed as never);
+    vi.mocked(prisma.quote.updateMany).mockResolvedValueOnce({ count: 1 });
+    vi.mocked(prisma.quoteAuditEvent.create).mockClear();
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/quotes/quote-rateware-1/confirm",
+      headers: { authorization: `Bearer ${token}` },
+      payload: { note: "Reviewed once by pricing." },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(prisma.quote.updateMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: "quote-rateware-1", orgId: "org-1", status: "DRAFT" },
+      data: expect.objectContaining({ status: "CONFIRMED", confirmedById: "user-1" }),
+    }));
+    expect(prisma.quoteAuditEvent.create).toHaveBeenCalledTimes(1);
+    expect(prisma.quoteAuditEvent.create).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({
+        quoteId: "quote-rateware-1",
+        action: "CONFIRMED",
+        payload: { snapshotChecksum: pilotQuoteExplanation.snapshot.checksum },
+      }),
+    }));
+  });
+
+  it("rejects a stale concurrent confirmer without writing a second audit", async () => {
+    vi.mocked(prisma.quote.findFirstOrThrow).mockResolvedValueOnce(
+      confirmedRatewareQuote({ status: "DRAFT" }) as never,
+    );
+    vi.mocked(prisma.quote.updateMany).mockResolvedValueOnce({ count: 0 });
+    vi.mocked(prisma.quoteAuditEvent.create).mockClear();
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/quotes/quote-rateware-1/confirm",
+      headers: { authorization: `Bearer ${token}` },
+      payload: { note: "Concurrent stale confirmation." },
+    });
+
+    expect(res.statusCode).toBe(409);
+    expect(res.json().error).toMatch(/concurrent transition/i);
+    expect(prisma.quoteAuditEvent.create).not.toHaveBeenCalled();
+  });
 });
 
 describe("Rateware handoff queue", () => {
@@ -678,6 +960,115 @@ describe("Rateware handoff queue", () => {
       ready: 0,
       data: [],
     });
+  });
+
+  it("does not call a structurally valid quote ready before required enrichment exists", async () => {
+    vi.mocked(prisma.quote.findMany).mockResolvedValueOnce([
+      confirmedRatewareQuote(),
+    ] as never);
+
+    const res = await app.inject({
+      method: "GET",
+      url: "/integration/rateware/quotes",
+      headers: { authorization: `Bearer ${token}` },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toMatchObject({
+      total: 1,
+      ready: 0,
+      data: [{
+        ready: false,
+        ratewareCandidate: { structurallyReady: true },
+        enrichment: null,
+      }],
+    });
+    expect(res.json().data[0].blockers.join(" ")).toMatch(/carrier.*effectiveDate.*rateOwner/i);
+  });
+
+  it("does not call an enriched quote ready when origin or package fields are incomplete", async () => {
+    vi.mocked(prisma.quote.findMany).mockResolvedValueOnce([
+      confirmedRatewareQuote({
+        lane: { origin: " ", destination: "Saltillo, COA" },
+        auditEvents: [{ payload: completeRatewareEnrichment }],
+      }),
+    ] as never);
+
+    const res = await app.inject({
+      method: "GET",
+      url: "/integration/rateware/quotes",
+      headers: { authorization: `Bearer ${token}` },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toMatchObject({
+      ready: 0,
+      data: [{ ready: false, ratewareCandidate: { structurallyReady: false } }],
+    });
+    expect(res.json().data[0].blockers).toContain("Falta origen.");
+  });
+
+  it("refuses the individual package until all readiness gates pass", async () => {
+    vi.mocked(prisma.quote.findFirstOrThrow).mockResolvedValueOnce(
+      confirmedRatewareQuote() as never,
+    );
+
+    const res = await app.inject({
+      method: "GET",
+      url: "/integration/rateware/quotes/quote-rateware-1",
+      headers: { authorization: `Bearer ${token}` },
+    });
+
+    expect(res.statusCode).toBe(409);
+    expect(res.json().error).toMatch(/not ready.*carrier/i);
+  });
+
+  it("returns the individual package with its validated enrichment only when truly ready", async () => {
+    vi.mocked(prisma.quote.findFirstOrThrow).mockResolvedValueOnce(
+      confirmedRatewareQuote({ auditEvents: [{ payload: completeRatewareEnrichment }] }) as never,
+    );
+
+    const res = await app.inject({
+      method: "GET",
+      url: "/integration/rateware/quotes/quote-rateware-1",
+      headers: { authorization: `Bearer ${token}` },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toMatchObject({
+      contractVersion: "fcm.rateware-handoff.v1",
+      mode: "READ_ONLY",
+      lane: { origin: "Monterrey, NL", destination: "Saltillo, COA" },
+      enrichment: completeRatewareEnrichment,
+      economics: {
+        freightBaselineUsd: pilotQuoteExplanation.snapshot.output.freightBaselineUsd,
+        requiredTariffUsd: pilotQuoteExplanation.snapshot.output.requiredTariffUsd,
+        requiredTariffMxn: Math.round(
+          pilotQuoteExplanation.snapshot.output.requiredTariffUsd
+          * pilotQuoteExplanation.snapshot.output.fxRateUsed
+          * 100,
+        ) / 100,
+        currency: { fxRateUsed: pilotQuoteExplanation.snapshot.output.fxRateUsed },
+      },
+    });
+  });
+
+  it("rejects an individual package when stored quote economics drift from its verified snapshot", async () => {
+    vi.mocked(prisma.quote.findFirstOrThrow).mockResolvedValueOnce(
+      confirmedRatewareQuote({
+        requiredTariffUsd: pilotQuoteExplanation.snapshot.output.requiredTariffUsd + 100,
+        auditEvents: [{ payload: completeRatewareEnrichment }],
+      }) as never,
+    );
+
+    const res = await app.inject({
+      method: "GET",
+      url: "/integration/rateware/quotes/quote-rateware-1",
+      headers: { authorization: `Bearer ${token}` },
+    });
+
+    expect(res.statusCode).toBe(409);
+    expect(res.json().error).toMatch(/requiredTariffUsd drifted from the verified calculation snapshot/i);
   });
 
   it("does not make a Rateware delivery attempt without an approved request", async () => {
@@ -1335,6 +1726,87 @@ describe("Assumptions", () => {
     expect(res.statusCode).toBe(400);
   });
 
+  it("does not clone a governed cost-base version into a legacy assumption set", async () => {
+    vi.mocked(prisma.assumptionSet.findFirstOrThrow).mockResolvedValueOnce({
+      id: "ckx11111111111111111111111",
+      orgId: "org-1",
+      costBaseId: "base-1",
+      params: [],
+    } as never);
+    vi.mocked(prisma.assumptionSet.create).mockClear();
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/assumptions/sets",
+      headers: { authorization: `Bearer ${token}` },
+      payload: {
+        name: "Governance bypass",
+        cloneFromId: "ckx11111111111111111111111",
+      },
+    });
+
+    expect(res.statusCode).toBe(409);
+    expect(res.json().error).toMatch(/new version from its cost base/i);
+    expect(prisma.assumptionSet.create).not.toHaveBeenCalled();
+  });
+
+  it("does not bypass governed cost-base publication through the legacy activation endpoint", async () => {
+    vi.mocked(prisma.assumptionSet.findFirstOrThrow).mockResolvedValueOnce({
+      id: "set-governed",
+      orgId: "org-1",
+      costBaseId: "base-1",
+    } as never);
+    vi.mocked(prisma.$transaction).mockClear();
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/assumptions/sets/set-governed/activate",
+      headers: { authorization: `Bearer ${token}` },
+    });
+
+    expect(res.statusCode).toBe(409);
+    expect(res.json().error).toContain("Bases de costo");
+    expect(prisma.$transaction).not.toHaveBeenCalled();
+  });
+
+  it("does not rename or delete a cost-base version through legacy set endpoints", async () => {
+    vi.mocked(prisma.assumptionSet.findFirstOrThrow)
+      .mockResolvedValueOnce({
+        id: "set-governed",
+        orgId: "org-1",
+        costBaseId: "base-1",
+        status: "DRAFT",
+        applicabilityContext: null,
+        costBase: { scope: "INTRA_MEX", status: "DRAFT", defaultPolicy: "OPERATIONAL_V3" },
+      } as never)
+      .mockResolvedValueOnce({
+        id: "set-governed",
+        orgId: "org-1",
+        costBaseId: "base-1",
+        status: "DRAFT",
+        isActive: false,
+      } as never);
+    vi.mocked(prisma.assumptionSet.update).mockClear();
+    vi.mocked(prisma.assumptionSet.delete).mockClear();
+
+    const renamed = await app.inject({
+      method: "PUT",
+      url: "/assumptions/sets/set-governed",
+      headers: { authorization: `Bearer ${token}` },
+      payload: { name: "Bypass" },
+    });
+    const deleted = await app.inject({
+      method: "DELETE",
+      url: "/assumptions/sets/set-governed",
+      headers: { authorization: `Bearer ${token}` },
+    });
+
+    expect(renamed.statusCode).toBe(409);
+    expect(deleted.statusCode).toBe(409);
+    expect(prisma.assumptionSet.update).not.toHaveBeenCalled();
+    expect(prisma.assumptionSet.delete).not.toHaveBeenCalled();
+  });
+
   it("GET /assumptions/sets/set-1/params → 200 grouped params", async () => {
     const res = await app.inject({
       method: "GET",
@@ -1345,6 +1817,7 @@ describe("Assumptions", () => {
   });
 
   it("PATCH /assumptions/sets/set-1/params → 200 updates values", async () => {
+    vi.mocked(prisma.$queryRaw).mockClear();
     const res = await app.inject({
       method: "PATCH",
       url: "/assumptions/sets/set-1/params",
@@ -1355,6 +1828,7 @@ describe("Assumptions", () => {
       ],
     });
     expect(res.statusCode).toBe(200);
+    expect(prisma.$queryRaw).toHaveBeenCalledTimes(2);
   });
 
   it("PATCH /assumptions/sets/set-1/params with invalid section → 400", async () => {
@@ -1365,6 +1839,22 @@ describe("Assumptions", () => {
       payload: [{ section: "INVALID_SECTION", field: "Diesel MX", value: 30 }],
     });
     expect(res.statusCode).toBe(400);
+  });
+
+  it("PATCH /assumptions/sets/set-1/params rejects duplicate fields before persistence", async () => {
+    vi.mocked(prisma.assumptionParam.upsert).mockClear();
+    const res = await app.inject({
+      method: "PATCH",
+      url: "/assumptions/sets/set-1/params",
+      headers: { authorization: `Bearer ${token}` },
+      payload: [
+        { section: "FUEL", field: "Diesel MX", value: 30 },
+        { section: "FUEL", field: "Diesel MX", value: 31 },
+      ],
+    });
+
+    expect(res.statusCode).toBe(400);
+    expect(prisma.assumptionParam.upsert).not.toHaveBeenCalled();
   });
 
   it("PATCH cost-card section (COST_CAPITAL) → 200 with warnings array", async () => {
@@ -1396,7 +1886,36 @@ describe("Assumptions", () => {
     ).toBe(true);
   });
 
+  it("PATCH mathematical divisor at zero → 422 without persistence", async () => {
+    vi.mocked(prisma.assumptionParam.upsert).mockClear();
+    const res = await app.inject({
+      method: "PATCH",
+      url: "/assumptions/sets/set-1/params",
+      headers: { authorization: `Bearer ${token}` },
+      payload: [{ section: "GENERAL_BASE", field: "Tamaño de Flota", value: 0 }],
+    });
+
+    expect(res.statusCode).toBe(422);
+    expect(res.json().error).toMatch(/greater than 0/i);
+    expect(prisma.assumptionParam.upsert).not.toHaveBeenCalled();
+  });
+
+  it("PATCH unknown factor → 422 without creating a hidden parameter", async () => {
+    vi.mocked(prisma.assumptionParam.upsert).mockClear();
+    const res = await app.inject({
+      method: "PATCH",
+      url: "/assumptions/sets/set-1/params",
+      headers: { authorization: `Bearer ${token}` },
+      payload: [{ section: "FACTORS", field: "Hidden Override", value: 1.5 }],
+    });
+
+    expect(res.statusCode).toBe(422);
+    expect(res.json().error).toMatch(/catálogo canónico/i);
+    expect(prisma.assumptionParam.upsert).not.toHaveBeenCalled();
+  });
+
   it("POST /assumptions/sets/set-1/params/reset → 200", async () => {
+    vi.mocked(prisma.$queryRaw).mockClear();
     const res = await app.inject({
       method: "POST",
       url: "/assumptions/sets/set-1/params/reset",
@@ -1404,6 +1923,7 @@ describe("Assumptions", () => {
       payload: { fields: [{ section: "FUEL", field: "Diesel MX" }] },
     });
     expect(res.statusCode).toBe(200);
+    expect(prisma.$queryRaw).toHaveBeenCalledTimes(2);
   });
 });
 
@@ -1425,6 +1945,7 @@ describe("Cost bases and versions", () => {
   it("POST /cost-bases creates an initial 210-parameter version", async () => {
     const { prisma } = await import("../src/config/prisma.js");
     vi.mocked(prisma.costBase.create).mockClear();
+    vi.mocked(prisma.costBase.updateMany).mockClear();
     const res = await app.inject({
       method: "POST",
       url: "/cost-bases",
@@ -1439,7 +1960,337 @@ describe("Cost bases and versions", () => {
     expect(res.statusCode).toBe(201);
     const create = vi.mocked(prisma.costBase.create).mock.calls[0][0].data;
     expect(create.code).toBe("XB-2026");
+    expect(create.status).toBe("DRAFT");
+    expect(create.isDefault).toBe(true);
+    expect(create.versions?.create.isActive).toBe(false);
     expect(create.versions?.create.params.create).toHaveLength(210);
+    expect(create.auditEvents?.create).toMatchObject({
+      orgId: "org-1",
+      actorId: "user-1",
+      action: "CREATED",
+      toStatus: "DRAFT",
+    });
+    expect(prisma.costBase.updateMany).not.toHaveBeenCalled();
+  });
+
+  it("POST /cost-bases recommended quick-start inherits preset defaults server-side", async () => {
+    vi.mocked(prisma.costBase.create).mockClear();
+    const res = await app.inject({
+      method: "POST",
+      url: "/cost-bases",
+      headers: { authorization: `Bearer ${token}` },
+      payload: {
+        code: "MX-QUICK",
+        name: "Mexico quick start",
+        scope: "INTRA_MEX",
+        setupMode: "RECOMMENDED_TEMPLATE",
+        presetId: "std-ftl-intra-mex-v1",
+      },
+    });
+
+    expect(res.statusCode).toBe(201);
+    const create = vi.mocked(prisma.costBase.create).mock.calls[0][0].data;
+    expect(create).toMatchObject({
+      currency: "MXN",
+      defaultPolicy: "OPERATIONAL_V3",
+      isDefault: true,
+      status: "DRAFT",
+    });
+    expect(create.versions?.create.notes).toMatch(/deviations: none/i);
+  });
+
+  it("POST /cost-bases rejects duplicate assumption overrides", async () => {
+    vi.mocked(prisma.costBase.create).mockClear();
+    const res = await app.inject({
+      method: "POST",
+      url: "/cost-bases",
+      headers: { authorization: `Bearer ${token}` },
+      payload: {
+        code: "MX-DUP",
+        name: "Duplicate override",
+        scope: "INTRA_MEX",
+        assumptionOverrides: [
+          { section: "FUEL", field: "Diesel MX", value: 25 },
+          { section: "FUEL", field: "Diesel MX", value: 26 },
+        ],
+      },
+    });
+
+    expect(res.statusCode).toBe(400);
+    expect(prisma.costBase.create).not.toHaveBeenCalled();
+  });
+
+  it("POST /cost-bases preserves the source lineage on a cloned initial version", async () => {
+    const { prisma } = await import("../src/config/prisma.js");
+    const { DEFAULT_ASSUMPTIONS } = await import("../src/data/default-assumptions.js");
+    vi.mocked(prisma.assumptionSet.findFirstOrThrow).mockResolvedValueOnce({
+      id: "source-version-7",
+      name: "Governed source",
+      version: 7,
+      params: DEFAULT_ASSUMPTIONS.map(({ section, field, value }) => ({ section, field, value })),
+    } as never);
+    vi.mocked(prisma.costBase.create).mockClear();
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/cost-bases",
+      headers: { authorization: `Bearer ${token}` },
+      payload: {
+        code: "MX-CLONED",
+        name: "Mexico cloned baseline",
+        scope: "INTRA_MEX",
+        cloneFromSetId: "source-version-7",
+      },
+    });
+
+    expect(res.statusCode).toBe(201);
+    const create = vi.mocked(prisma.costBase.create).mock.calls[0][0].data;
+    expect(create.versions?.create.sourceVersionId).toBe("source-version-7");
+    expect(create.versions?.create.isActive).toBe(false);
+  });
+
+  it("POST /cost-bases rejects an unsafe assumption override before creating data", async () => {
+    vi.mocked(prisma.costBase.create).mockClear();
+    const res = await app.inject({
+      method: "POST",
+      url: "/cost-bases",
+      headers: { authorization: `Bearer ${token}` },
+      payload: {
+        code: "MX-INVALID-DOMAIN",
+        name: "Mexico invalid domain",
+        scope: "INTRA_MEX",
+        assumptionOverrides: [
+          { section: "TECHNICAL_MARGIN", field: "UT Rate One Way", value: 1 },
+        ],
+      },
+    });
+
+    expect(res.statusCode).toBe(422);
+    expect(res.json().error).toMatch(/less than 1/i);
+    expect(prisma.costBase.create).not.toHaveBeenCalled();
+  });
+
+  it("keeps the first draft inactive until a non-default base is published and activated", async () => {
+    vi.mocked(prisma.costBase.create).mockClear();
+    const res = await app.inject({
+      method: "POST",
+      url: "/cost-bases",
+      headers: { authorization: `Bearer ${token}` },
+      payload: {
+        code: "mx-review",
+        name: "MX under review",
+        scope: "INTRA_MEX",
+        isDefault: false,
+      },
+    });
+
+    expect(res.statusCode).toBe(201);
+    const create = vi.mocked(prisma.costBase.create).mock.calls[0][0].data;
+    expect(create.status).toBe("DRAFT");
+    expect(create.versions?.create.isActive).toBe(false);
+  });
+
+  it("PATCH /cost-bases rejects all calculation-policy mutation", async () => {
+    vi.mocked(prisma.costBase.update).mockClear();
+
+    const res = await app.inject({
+      method: "PATCH",
+      url: "/cost-bases/base-1",
+      headers: { authorization: `Bearer ${token}` },
+      payload: { defaultPolicy: "WORKBOOK_V3" },
+    });
+
+    expect(res.statusCode).toBe(400);
+    expect(prisma.costBase.update).not.toHaveBeenCalled();
+  });
+
+  it("PATCH /cost-bases cannot activate, archive, or make a base effectively default", async () => {
+    vi.mocked(prisma.costBase.update).mockClear();
+    for (const payload of [{ status: "ACTIVE" }, { status: "ARCHIVED" }, { isDefault: true }]) {
+      const res = await app.inject({
+        method: "PATCH",
+        url: "/cost-bases/base-1",
+        headers: { authorization: `Bearer ${token}` },
+        payload,
+      });
+      expect(res.statusCode).toBe(400);
+    }
+    expect(prisma.costBase.update).not.toHaveBeenCalled();
+  });
+
+  it("PATCH /cost-bases records actual metadata changes with the actor", async () => {
+    vi.mocked(prisma.costBase.updateMany).mockClear();
+    vi.mocked(prisma.costBaseAuditEvent.create).mockClear();
+
+    const res = await app.inject({
+      method: "PATCH",
+      url: "/cost-bases/base-1",
+      headers: { authorization: `Bearer ${token}` },
+      payload: { name: "Cross-border governed" },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(prisma.costBase.updateMany).toHaveBeenCalledWith({
+      where: { id: "base-1", orgId: "org-1", status: { not: "ARCHIVED" } },
+      data: { name: "Cross-border governed" },
+    });
+    expect(prisma.costBaseAuditEvent.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        orgId: "org-1",
+        costBaseId: "base-1",
+        actorId: "user-1",
+        action: "METADATA_UPDATED",
+        fromStatus: "ACTIVE",
+        toStatus: "ACTIVE",
+        payload: expect.objectContaining({ changedFields: ["name"] }),
+      }),
+    });
+  });
+
+  it("PATCH /cost-bases freezes currency after the base leaves DRAFT", async () => {
+    vi.mocked(prisma.costBase.updateMany).mockClear();
+    vi.mocked(prisma.costBaseAuditEvent.create).mockClear();
+
+    const res = await app.inject({
+      method: "PATCH",
+      url: "/cost-bases/base-1",
+      headers: { authorization: `Bearer ${token}` },
+      payload: { currency: "MXN" },
+    });
+
+    expect(res.statusCode).toBe(409);
+    expect(res.json().error).toMatch(/currency is frozen/i);
+    expect(prisma.costBase.updateMany).not.toHaveBeenCalled();
+    expect(prisma.costBaseAuditEvent.create).not.toHaveBeenCalled();
+  });
+
+  it("PATCH /cost-bases permits and audits a currency correction while DRAFT", async () => {
+    vi.mocked(prisma.costBase.findFirstOrThrow).mockResolvedValueOnce({
+      id: "base-1",
+      orgId: "org-1",
+      status: "DRAFT",
+      name: "Cross-border Base",
+      description: null,
+      currency: "USD",
+      versions: [],
+    } as never);
+    vi.mocked(prisma.costBase.updateMany).mockClear();
+    vi.mocked(prisma.costBaseAuditEvent.create).mockClear();
+
+    const res = await app.inject({
+      method: "PATCH",
+      url: "/cost-bases/base-1",
+      headers: { authorization: `Bearer ${token}` },
+      payload: { currency: "mxn" },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(prisma.costBase.updateMany).toHaveBeenCalledWith(expect.objectContaining({
+      data: { currency: "MXN" },
+    }));
+    expect(prisma.costBaseAuditEvent.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        action: "METADATA_UPDATED",
+        fromStatus: "DRAFT",
+        toStatus: "DRAFT",
+        payload: expect.objectContaining({ changedFields: ["currency"] }),
+      }),
+    });
+  });
+
+  it("PATCH /cost-bases freezes currency once its first version is published", async () => {
+    vi.mocked(prisma.costBase.findFirstOrThrow).mockResolvedValueOnce({
+      id: "base-1",
+      orgId: "org-1",
+      status: "DRAFT",
+      name: "Cross-border Base",
+      description: null,
+      currency: "USD",
+      versions: [{ id: "set-published" }],
+    } as never);
+    vi.mocked(prisma.costBase.updateMany).mockClear();
+    vi.mocked(prisma.costBaseAuditEvent.create).mockClear();
+
+    const res = await app.inject({
+      method: "PATCH",
+      url: "/cost-bases/base-1",
+      headers: { authorization: `Bearer ${token}` },
+      payload: { currency: "MXN" },
+    });
+
+    expect(res.statusCode).toBe(409);
+    expect(res.json().error).toMatch(/first version is published/i);
+    expect(prisma.costBase.updateMany).not.toHaveBeenCalled();
+    expect(prisma.costBaseAuditEvent.create).not.toHaveBeenCalled();
+  });
+
+  it("PATCH /cost-bases does not create audit noise when metadata is unchanged", async () => {
+    vi.mocked(prisma.costBase.updateMany).mockClear();
+    vi.mocked(prisma.costBaseAuditEvent.create).mockClear();
+
+    const res = await app.inject({
+      method: "PATCH",
+      url: "/cost-bases/base-1",
+      headers: { authorization: `Bearer ${token}` },
+      payload: { name: "Cross-border Base" },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(prisma.costBase.updateMany).not.toHaveBeenCalled();
+    expect(prisma.costBaseAuditEvent.create).not.toHaveBeenCalled();
+  });
+
+  it("POST /cost-bases/:id/archive uses the governed transition and clears active/default state", async () => {
+    vi.mocked(prisma.productionRoute.count).mockResolvedValueOnce(0);
+    vi.mocked(prisma.costBase.updateMany).mockClear();
+    vi.mocked(prisma.assumptionSet.updateMany).mockClear();
+    vi.mocked(prisma.costBaseAuditEvent.create).mockClear();
+    vi.mocked(prisma.$queryRaw).mockClear();
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/cost-bases/base-1/archive",
+      headers: { authorization: `Bearer ${token}` },
+      payload: {},
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(prisma.$queryRaw).toHaveBeenCalledTimes(2);
+    expect(prisma.assumptionSet.updateMany).toHaveBeenCalledWith({
+      where: { orgId: "org-1", costBaseId: "base-1", isActive: true },
+      data: { isActive: false },
+    });
+    expect(prisma.costBase.updateMany).toHaveBeenCalledWith(expect.objectContaining({
+      data: { status: "ARCHIVED", isDefault: false },
+    }));
+    expect(prisma.costBaseAuditEvent.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        orgId: "org-1",
+        costBaseId: "base-1",
+        actorId: "user-1",
+        action: "ARCHIVED",
+        fromStatus: "ACTIVE",
+        toStatus: "ARCHIVED",
+      }),
+    });
+  });
+
+  it("POST /cost-bases/:id/archive rejects a base still governing production routes", async () => {
+    vi.mocked(prisma.productionRoute.count).mockResolvedValueOnce(1);
+    vi.mocked(prisma.costBase.updateMany).mockClear();
+    vi.mocked(prisma.costBaseAuditEvent.create).mockClear();
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/cost-bases/base-1/archive",
+      headers: { authorization: `Bearer ${token}` },
+      payload: {},
+    });
+
+    expect(res.statusCode).toBe(409);
+    expect(res.json().error).toMatch(/routes in production/i);
+    expect(prisma.costBase.updateMany).not.toHaveBeenCalled();
+    expect(prisma.costBaseAuditEvent.create).not.toHaveBeenCalled();
   });
 
   it("POST /cost-bases/:id/versions clones a new inactive version", async () => {
@@ -1454,6 +2305,7 @@ describe("Cost bases and versions", () => {
 
   it("activates a version only inside its own base", async () => {
     const { prisma } = await import("../src/config/prisma.js");
+    const { defaultCostBaseProfile } = await import("../src/modules/cost-bases/cost-base-profile.js");
     vi.mocked(prisma.assumptionSet.updateMany).mockClear();
     vi.mocked(prisma.assumptionSet.findFirstOrThrow).mockResolvedValueOnce({
       id: "set-1",
@@ -1461,6 +2313,8 @@ describe("Cost bases and versions", () => {
       costBaseId: "base-1",
       isActive: true,
       status: "PUBLISHED",
+      applicabilityContext: defaultCostBaseProfile("CROSS_BORDER", "WORKBOOK_V3"),
+      costBase: { scope: "CROSS_BORDER", status: "ACTIVE", isDefault: true },
     } as never);
     const res = await app.inject({
       method: "POST",
@@ -1473,9 +2327,58 @@ describe("Cost bases and versions", () => {
     ).toMatchObject({ orgId: "org-1", costBaseId: "base-1" });
   });
 
+  it("makes a preferred base the only default only when its published version activates", async () => {
+    const { defaultCostBaseProfile } = await import("../src/modules/cost-bases/cost-base-profile.js");
+    vi.mocked(prisma.costBase.updateMany).mockClear();
+    vi.mocked(prisma.costBase.findMany).mockResolvedValueOnce([
+      { id: "base-old-default", status: "ACTIVE" },
+    ] as never);
+    vi.mocked(prisma.costBaseAuditEvent.create).mockClear();
+    vi.mocked(prisma.costBaseAuditEvent.createMany).mockClear();
+    vi.mocked(prisma.assumptionSet.findFirstOrThrow).mockResolvedValueOnce({
+      id: "set-1",
+      orgId: "org-1",
+      costBaseId: "base-1",
+      isActive: false,
+      status: "PUBLISHED",
+      applicabilityContext: defaultCostBaseProfile("INTRA_MEX", "OPERATIONAL_V3"),
+      costBase: { scope: "INTRA_MEX", status: "ACTIVE", isDefault: true },
+    } as never);
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/cost-bases/base-1/versions/set-1/activate",
+      headers: { authorization: `Bearer ${token}` },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(prisma.costBase.updateMany).toHaveBeenCalledWith({
+      where: { orgId: "org-1", scope: "INTRA_MEX", isDefault: true, id: { not: "base-1" } },
+      data: { isDefault: false },
+    });
+    expect(prisma.costBaseAuditEvent.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        costBaseId: "base-1",
+        actorId: "user-1",
+        action: "VERSION_ACTIVATED",
+        toStatus: "ACTIVE",
+      }),
+    });
+    expect(prisma.costBaseAuditEvent.createMany).toHaveBeenCalledWith({
+      data: [expect.objectContaining({
+        costBaseId: "base-old-default",
+        actorId: "user-1",
+        action: "DEFAULT_REPLACED",
+      })],
+    });
+  });
+
   it("requires an approval note to publish and records the approval", async () => {
     const { prisma } = await import("../src/config/prisma.js");
+    const { DEFAULT_ASSUMPTIONS } = await import("../src/data/default-assumptions.js");
     vi.mocked(prisma.assumptionVersionAudit.create).mockClear();
+    vi.mocked(prisma.assumptionSet.updateMany).mockClear();
+    vi.mocked(prisma.$queryRaw).mockClear();
     const invalid = await app.inject({
       method: "POST",
       url: "/cost-bases/base-1/versions/set-1/publish",
@@ -1484,6 +2387,33 @@ describe("Cost bases and versions", () => {
     });
     expect(invalid.statusCode).toBe(400);
 
+    vi.mocked(prisma.assumptionSet.findFirstOrThrow).mockResolvedValueOnce({
+      id: "set-1",
+      orgId: "org-1",
+      status: "DRAFT",
+      costBaseId: "base-1",
+      applicabilityContext: {
+        schemaVersion: "FCM_APPLICABILITY_V1",
+        factorScheduleVersion: "FCM_V3_FACTORS_2026_1",
+        scope: "CROSS_BORDER",
+        calculationPolicy: "WORKBOOK_V3",
+        countries: ["MX", "US"],
+        operations: ["D2D Export", "D2D Import"],
+        truckTypes: ["Truck Trailer"],
+        driverTypes: ["B1", "Licencia E", "Interstate", "Intrastate", "CDL"],
+        trailerTypes: ["Dry Van"],
+        configurations: ["Single"],
+        services: ["One Way"],
+        ownershipModels: ["OWNED_FINANCED"],
+        costAllocationModel: "FULL_FLEET",
+        borderProcess: "THROUGH_TRACTOR",
+      },
+      costBase: { scope: "CROSS_BORDER" },
+      params: DEFAULT_ASSUMPTIONS.map(({ section, field, value }) => ({ section, field, value })),
+      _count: { params: 210 },
+      scenarioReviewSource: null,
+    } as never);
+
     const res = await app.inject({
       method: "POST",
       url: "/cost-bases/base-1/versions/set-1/publish",
@@ -1491,8 +2421,9 @@ describe("Cost bases and versions", () => {
       payload: { note: "Approved after Q3 cost review" },
     });
     expect(res.statusCode).toBe(200);
+    expect(prisma.$queryRaw).toHaveBeenCalledTimes(2);
     expect(
-      vi.mocked(prisma.assumptionSet.update).mock.calls.at(-1)?.[0].data,
+      vi.mocked(prisma.assumptionSet.updateMany).mock.calls.find((call) => call[0].data.status === "PUBLISHED")?.[0].data,
     ).toMatchObject({ status: "PUBLISHED", publishedById: "user-1" });
     expect(
       vi.mocked(prisma.assumptionVersionAudit.create).mock.calls[0][0].data,
@@ -1502,6 +2433,94 @@ describe("Cost bases and versions", () => {
       action: "PUBLISHED",
       note: "Approved after Q3 cost review",
     });
+  });
+
+  it("requires an explicit applicability profile before publishing a legacy draft", async () => {
+    vi.mocked(prisma.assumptionSet.findFirstOrThrow).mockResolvedValueOnce({
+      id: "set-1",
+      orgId: "org-1",
+      status: "DRAFT",
+      costBaseId: "base-1",
+      applicabilityContext: null,
+      costBase: { scope: "CROSS_BORDER" },
+      _count: { params: 210 },
+      scenarioReviewSource: null,
+    } as never);
+    vi.mocked(prisma.assumptionSet.update).mockClear();
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/cost-bases/base-1/versions/set-1/publish",
+      headers: { authorization: `Bearer ${token}` },
+      payload: { note: "Approved after explicit applicability review" },
+    });
+
+    expect(res.statusCode).toBe(422);
+    expect(res.json().error).toMatch(/applicability profile/i);
+    expect(prisma.assumptionSet.update).not.toHaveBeenCalled();
+  });
+
+  it("rejects publication when 210 rows hide an unknown factor and omit a canonical assumption", async () => {
+    const { DEFAULT_ASSUMPTIONS } = await import("../src/data/default-assumptions.js");
+    const { defaultCostBaseProfile } = await import("../src/modules/cost-bases/cost-base-profile.js");
+    const params = DEFAULT_ASSUMPTIONS.slice(1).map(({ section, field, value }) => ({ section, field, value }));
+    params.push({ section: "FACTORS", field: "Hidden Override", value: 1.5 } as never);
+    vi.mocked(prisma.assumptionSet.findFirstOrThrow).mockResolvedValueOnce({
+      id: "set-1",
+      orgId: "org-1",
+      status: "DRAFT",
+      costBaseId: "base-1",
+      applicabilityContext: defaultCostBaseProfile("CROSS_BORDER", "WORKBOOK_V3"),
+      costBase: { scope: "CROSS_BORDER" },
+      params,
+      _count: { params: 210 },
+      scenarioReviewSource: null,
+    } as never);
+    vi.mocked(prisma.assumptionSet.update).mockClear();
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/cost-bases/base-1/versions/set-1/publish",
+      headers: { authorization: `Bearer ${token}` },
+      payload: { note: "Approved after canonical identity review" },
+    });
+
+    expect(res.statusCode).toBe(422);
+    expect(res.json().error).toMatch(/Missing canonical assumptions|Unknown assumptions/i);
+    expect(prisma.assumptionSet.update).not.toHaveBeenCalled();
+  });
+
+  it("rejects publication when a stored canonical divisor is zero", async () => {
+    const { DEFAULT_ASSUMPTIONS } = await import("../src/data/default-assumptions.js");
+    const { defaultCostBaseProfile } = await import("../src/modules/cost-bases/cost-base-profile.js");
+    const params = DEFAULT_ASSUMPTIONS.map(({ section, field, value }) => ({
+      section,
+      field,
+      value: section === "GENERAL_BASE" && field === "Tamaño de Flota" ? 0 : value,
+    }));
+    vi.mocked(prisma.assumptionSet.findFirstOrThrow).mockResolvedValueOnce({
+      id: "set-1",
+      orgId: "org-1",
+      status: "DRAFT",
+      costBaseId: "base-1",
+      applicabilityContext: defaultCostBaseProfile("CROSS_BORDER", "WORKBOOK_V3"),
+      costBase: { scope: "CROSS_BORDER" },
+      params,
+      _count: { params: 210 },
+      scenarioReviewSource: null,
+    } as never);
+    vi.mocked(prisma.assumptionSet.update).mockClear();
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/cost-bases/base-1/versions/set-1/publish",
+      headers: { authorization: `Bearer ${token}` },
+      payload: { note: "Approved after mathematical domain review" },
+    });
+
+    expect(res.statusCode).toBe(422);
+    expect(res.json().error).toMatch(/greater than 0/i);
+    expect(prisma.assumptionSet.update).not.toHaveBeenCalled();
   });
 
   it("rejects direct parameter changes on a published version", async () => {
@@ -1582,12 +2601,47 @@ describe("Cost bases and versions", () => {
           baseHours: 0,
           route: "Straight & Danger",
         },
+        usa: {
+          loadedMiles: 435,
+          dieselUsdGal: 5.152,
+          fscUsdMile: 0.8,
+          originCondition: "Very Tight",
+          destCondition: "Very Tight",
+        },
       },
     });
     expect(res.statusCode).toBe(200);
     expect(res.json().costBaseId).toBe("base-1");
     expect(res.json().assumptionSetId).toBe("set-1");
     expect(res.json().policy).toBe("WORKBOOK_V3");
+  });
+
+  it("rejects a new calculation against a linked legacy null-profile version", async () => {
+    vi.mocked(prisma.assumptionSet.findFirst).mockResolvedValueOnce({
+      id: "set-legacy",
+      orgId: "org-1",
+      costBaseId: "base-1",
+      status: "PUBLISHED",
+      applicabilityContext: null,
+      params: [],
+    } as never);
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/engine/calculate",
+      headers: { authorization: `Bearer ${token}` },
+      payload: {
+        costBaseId: "base-1",
+        operation: "D2D Export",
+        service: "One Way",
+        equipment: { truckType: "Truck Trailer", trailer: "Flatbed", config: "Single", driver: "B1" },
+        mex: { baseKm: 225 },
+        usa: { loadedMiles: 435 },
+      },
+    });
+
+    expect(res.statusCode).toBe(409);
+    expect(res.json().error).toMatch(/historical snapshot replay/i);
   });
 
   it("rejects using a cross-border base for a drayage route", async () => {
@@ -1653,6 +2707,13 @@ describe("Cost bases and versions", () => {
           routeExpensesMxn: 0,
           baseHours: 0,
           route: "Straight & Danger",
+        },
+        usa: {
+          loadedMiles: 435,
+          dieselUsdGal: 5.152,
+          fscUsdMile: 0.8,
+          originCondition: "Very Tight",
+          destCondition: "Very Tight",
         },
       },
     });
@@ -1789,6 +2850,62 @@ describe("Lanes", () => {
     });
     expect(res.statusCode).toBe(400);
   });
+
+  it("does not mutate lane identity after a quote has frozen its lineage", async () => {
+    vi.mocked(prisma.lane.findFirstOrThrow).mockResolvedValueOnce({
+      id: "lane-1",
+      orgId: "org-1",
+      costBaseId: null,
+      equipmentId: null,
+      origin: "Monterrey, NL",
+      destination: "Laredo, TX",
+      operationType: "D2D Export",
+      serviceType: "One Way",
+      config: "Single",
+      _count: { quotes: 1 },
+    } as never);
+    vi.mocked(prisma.lane.update).mockClear();
+
+    const res = await app.inject({
+      method: "PUT",
+      url: "/lanes/lane-1",
+      headers: { authorization: `Bearer ${token}` },
+      payload: { origin: "Nuevo Laredo, TM" },
+    });
+
+    expect(res.statusCode).toBe(409);
+    expect(prisma.lane.update).not.toHaveBeenCalled();
+  });
+
+  it("fails a lane identity edit if a quote is inserted after the initial read", async () => {
+    vi.mocked(prisma.lane.findFirstOrThrow).mockResolvedValueOnce({
+      id: "lane-1",
+      orgId: "org-1",
+      laneKey: "old-key",
+      costBaseId: null,
+      equipmentId: null,
+      origin: "Monterrey, NL",
+      destination: "Laredo, TX",
+      operationType: "D2D Export",
+      serviceType: "One Way",
+      config: "Single",
+      updatedAt: new Date("2026-08-15T12:00:00.000Z"),
+      _count: { quotes: 0 },
+    } as never);
+    vi.mocked(prisma.lane.updateMany).mockResolvedValueOnce({ count: 0 });
+
+    const res = await app.inject({
+      method: "PUT",
+      url: "/lanes/lane-1",
+      headers: { authorization: `Bearer ${token}` },
+      payload: { origin: "Nuevo Laredo, TM" },
+    });
+
+    expect(res.statusCode).toBe(409);
+    expect(prisma.lane.updateMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({ id: "lane-1", orgId: "org-1", quotes: { none: {} } }),
+    }));
+  });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1819,7 +2936,8 @@ describe("Engine /calculate", () => {
     },
   };
 
-  it("POST /engine/calculate → 200, Monterrey→Dallas Flatbed = $2,700 (post-E2)", async () => {
+  it("POST /engine/calculate → 200, Monterrey→Dallas Flatbed = $2,800 (operational factors)", async () => {
+    vi.mocked(prisma.assumptionSet.findFirst).mockClear();
     const res = await app.inject({
       method: "POST",
       url: "/engine/calculate",
@@ -1829,9 +2947,14 @@ describe("Engine /calculate", () => {
     expect(res.statusCode).toBe(200);
     const body = res.json();
     expect(body.mexLeg.requiredTariffUsd).toBe(1300);
-    expect(body.usaLeg.flatUsd).toBeCloseTo(1391, 0);
-    expect(body.freightBaselineUsd).toBe(2700);
+    expect(body.usaLeg.flatUsd).toBeCloseTo(1526, 0);
+    expect(body.freightBaselineUsd).toBe(2800);
     expect(body.policy).toBe("OPERATIONAL_V3");
+    expect(vi.mocked(prisma.assumptionSet.findFirst).mock.calls.at(-1)?.[0].where).toMatchObject({
+      orgId: "org-1",
+      isActive: true,
+      costBaseId: null,
+    });
   });
 
   it("POST /engine/calculate can reproduce the source workbook explicitly", async () => {
@@ -1913,6 +3036,7 @@ describe("Engine /calculate", () => {
         operation: "D2D Import",
         equipment: { trailer: "Dry Van" },
         mex: { baseKm: 910 },
+        usa: { loadedMiles: 435 },
       },
     });
     expect(res.statusCode).toBe(200);
@@ -1929,6 +3053,7 @@ describe("Engine /calculate", () => {
         service: "One Way",
         equipment: { trailer: "Dry Van" },
         mex: { baseKm: 910 },
+        usa: { loadedMiles: 435 },
       },
     });
     expect(res.statusCode).toBe(200);
@@ -1973,6 +3098,95 @@ describe("Engine /calculate", () => {
         payload: { source: "MANUAL" },
       },
     });
+  });
+
+  it("rejects an explicit quote lane outside the authenticated organization", async () => {
+    vi.mocked(prisma.lane.findFirst).mockResolvedValueOnce(null);
+    vi.mocked(prisma.quote.create).mockClear();
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/quotes",
+      headers: { authorization: `Bearer ${token}` },
+      payload: {
+        laneId: "lane-from-another-org",
+        operation: "Intra-Mex",
+        service: "One Way",
+        equipment: { truckType: "Truck Trailer", trailer: "Dry Van", config: "Single", driver: "B1" },
+        mex: { baseKm: 225 },
+      },
+    });
+
+    expect(res.statusCode).toBe(404);
+    expect(prisma.quote.create).not.toHaveBeenCalled();
+  });
+
+  it("rejects a quote lane governed by another cost base", async () => {
+    vi.mocked(prisma.lane.findFirst).mockResolvedValueOnce({
+      id: "lane-1",
+      orgId: "org-1",
+      costBaseId: "base-other",
+      operationType: "Intra-Mex",
+      serviceType: "One Way",
+      config: "Single",
+      origin: "Monterrey, NL",
+      destination: "Saltillo, CO",
+    } as never);
+    vi.mocked(prisma.quote.create).mockClear();
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/quotes",
+      headers: { authorization: `Bearer ${token}` },
+      payload: {
+        laneId: "lane-1",
+        operation: "Intra-Mex",
+        service: "One Way",
+        equipment: { truckType: "Truck Trailer", trailer: "Dry Van", config: "Single", driver: "B1" },
+        mex: { baseKm: 225 },
+      },
+    });
+
+    expect(res.statusCode).toBe(422);
+    expect(prisma.quote.create).not.toHaveBeenCalled();
+  });
+
+  it("rejects a quote lane whose saved equipment differs from the quote", async () => {
+    vi.mocked(prisma.lane.findFirst).mockResolvedValueOnce({
+      id: "lane-1",
+      orgId: "org-1",
+      costBaseId: null,
+      operationType: "Intra-Mex",
+      serviceType: "One Way",
+      config: "Single",
+      origin: "Monterrey, NL",
+      destination: "Saltillo, CO",
+      equipment: {
+        truckType: "Truck Trailer",
+        trailerType: "Flatbed",
+        config: "Single",
+        operationType: "Intra-Mex",
+        serviceType: "One Way",
+        driverType: "B1",
+      },
+    } as never);
+    vi.mocked(prisma.quote.create).mockClear();
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/quotes",
+      headers: { authorization: `Bearer ${token}` },
+      payload: {
+        laneId: "lane-1",
+        operation: "Intra-Mex",
+        service: "One Way",
+        equipment: { truckType: "Truck Trailer", trailer: "Dry Van", config: "Single", driver: "B1" },
+        mex: { baseKm: 225 },
+      },
+    });
+
+    expect(res.statusCode).toBe(422);
+    expect(prisma.quote.create).not.toHaveBeenCalled();
   });
 });
 

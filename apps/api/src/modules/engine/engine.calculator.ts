@@ -18,6 +18,37 @@ import type { EngineInput, EngineOutput, MexLegOutput, UsaLegOutput, DrayageLegI
 
 const mround = (x: number, m: number) => Math.round(x / m) * m
 
+function assertFiniteEngineNumbers(value: unknown, path = 'output'): void {
+  if (typeof value === 'number') {
+    if (!Number.isFinite(value)) {
+      throw Object.assign(new Error(`Engine produced a non-finite value at ${path}.`), { statusCode: 422 })
+    }
+    return
+  }
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => assertFiniteEngineNumbers(item, `${path}[${index}]`))
+    return
+  }
+  if (value && typeof value === 'object') {
+    for (const [key, child] of Object.entries(value)) {
+      assertFiniteEngineNumbers(child, `${path}.${key}`)
+    }
+  }
+}
+
+function assertViableEngineOutput(output: EngineOutput): EngineOutput {
+  assertFiniteEngineNumbers(output)
+  if (
+    output.freightBaselineUsd <= 0
+    || output.requiredTariffUsd <= 0
+    || output.commercial.costFloorUsd <= 0
+    || output.commercial.recommendedSellUsd <= 0
+  ) {
+    throw Object.assign(new Error('Engine produced a non-positive cost or tariff.'), { statusCode: 422 })
+  }
+  return output
+}
+
 // Adapt a resolver-produced USA leg (origin→dest miles) into a drayage cycle
 // input. The cycle's deadhead legs + billable time come from params (defaults),
 // so an unenriched resolver lane still gets correct drayage pricing.
@@ -57,21 +88,22 @@ function legsFor(operation: string): { mex: boolean; usa: boolean } {
 export function calculate(input: EngineInput): EngineOutput {
   const params: ParamMap = Object.assign({}, input.params, input.overrides ?? {})
   const policy = input.policy ?? 'OPERATIONAL_V3'
+  const legacyOperational = input.compatibilityMode === 'LEGACY_FCM_V3' && policy === 'OPERATIONAL_V3'
   const { operation } = input
   const fxRate = input.fxRate && input.fxRate > 0 ? input.fxRate : 17.5
   const need = legsFor(operation)
 
   let mexLeg: MexLegOutput | null = null
-  if (need.mex && input.mexLeg) mexLeg = calculateMexLeg(input.mexLeg, params, policy)
+  if (need.mex && input.mexLeg) mexLeg = calculateMexLeg(input.mexLeg, params, policy, legacyOperational)
 
   // Drayage runs its own cycle engine (fills the USA-side slot). It accepts an
   // explicit drayageLeg, or adapts a resolver-produced usaLeg into one.
   let usaLeg: UsaLegOutput | null = null
   if (operation === 'Drayage') {
     const dray = input.drayageLeg ?? (input.usaLeg ? usaToDrayage(input.usaLeg) : null)
-    if (dray) usaLeg = calculateDrayageLeg(dray, params)
+    if (dray) usaLeg = calculateDrayageLeg(dray, params, policy, legacyOperational)
   } else if (need.usa && input.usaLeg) {
-    usaLeg = calculateUsaLeg(input.usaLeg, params)
+    usaLeg = calculateUsaLeg(input.usaLeg, params, policy, legacyOperational)
   }
 
   // Leg flats (what the quote sums). MX flat = required tariff; USA flat = miles×(RPM+FSC).
@@ -98,11 +130,13 @@ export function calculate(input: EngineInput): EngineOutput {
     marketReferenceUsd,
     loadedMiles,
     cycleDays,
-    fuelMixOk: Math.abs(mixMx + mixUs - 1) < 1e-6,
+    fuelMixOk: !legacyOperational && operation !== 'D2D Export' && operation !== 'D2D Import'
+      ? true
+      : Math.abs(mixMx + mixUs - 1) < 1e-6,
     params,
   })
 
-  return {
+  return assertViableEngineOutput({
     policy,
     operation,
     mexLeg,
@@ -111,5 +145,5 @@ export function calculate(input: EngineInput): EngineOutput {
     commercial,
     requiredTariffUsd: freightBaselineUsd,
     fxRateUsed: fxRate,
-  }
+  })
 }

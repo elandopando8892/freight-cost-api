@@ -271,8 +271,9 @@ export function AssumptionsList({ initial, canEdit }: { initial: AssumptionSet[]
                 </div>
                 {selectedItem.notes ? <p className="rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground">{selectedItem.notes}</p> : null}
                 <div className="flex flex-wrap items-center gap-1 border-t pt-3">
-                  <Button size="sm" render={<Link href={`/assumptions/${selectedItem.id}`} />}>{selectedItem.status === 'DRAFT' ? 'Editar parámetros' : 'Ver parámetros'}</Button>
-                  {canEdit && !selectedItem.isActive ? <Button variant="outline" size="sm" disabled={activate.isPending} onClick={() => activate.mutate(selectedItem.id)}>Activar</Button> : null}
+                  <Button size="sm" render={<Link href={`/assumptions/${selectedItem.id}`} />}>{canEdit && selectedItem.status === 'DRAFT' ? 'Editar parámetros' : 'Ver parámetros'}</Button>
+                  {canEdit && !selectedItem.isActive && !selectedItem.costBase ? <Button variant="outline" size="sm" disabled={activate.isPending} onClick={() => activate.mutate(selectedItem.id)}>Activar</Button> : null}
+                  {canEdit && !selectedItem.isActive && selectedItem.costBase ? <Button variant="outline" size="sm" render={<Link href="/cost-bases" />}>Administrar activación</Button> : null}
                   {canEdit ? <Button variant="ghost" size="sm" onClick={() => setDialog({ kind: 'rename', targetId: selectedItem.id, name: selectedItem.name, notes: selectedItem.notes ?? '' })}>Renombrar</Button> : null}
                   {canEdit ? <Button variant="ghost" size="sm" onClick={() => setDialog({ kind: 'create', cloneFromId: selectedItem.id, cloneFromName: selectedItem.name })}>Clonar borrador</Button> : null}
                   {canEdit ? <AlertDialog>

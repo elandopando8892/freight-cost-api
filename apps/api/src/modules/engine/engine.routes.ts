@@ -7,7 +7,8 @@ import { calculate } from './engine.calculator.js'
 import { resolveRoute } from './lane-resolver.service.js'
 import { defaultService } from './engine.factors.js'
 import type { EngineInput, EquipmentSpec, MarketCondition } from './engine.types.js'
-import { resolveCalculationContext } from '../cost-bases/cost-bases.service.js'
+import { assertCalculationOverrides, resolveCalculationContext, scopeForOperation } from '../cost-bases/cost-bases.service.js'
+import { pricingInputIssues } from './engine-input-validation.js'
 
 const MarketConditionEnum = z.enum([
   'Very Tight', 'Moderately Tight', 'Balanced', 'Slightly Loose', 'Very Loose',
@@ -24,7 +25,7 @@ const EquipmentSchema = z.object({
 const EnginePolicySchema = z.enum(['OPERATIONAL_V3', 'WORKBOOK_V3'])
 
 const MexSchema = z.object({
-  baseKm: z.number().nonnegative(),
+  baseKm: z.number().positive(),
   routeExpensesMxn: z.number().nonnegative().default(0),
   baseHours: z.number().nonnegative().default(0),
   route: z.string().default('Straight & Danger'),
@@ -36,7 +37,7 @@ const MexSchema = z.object({
 })
 
 const UsaSchema = z.object({
-  loadedMiles: z.number().nonnegative(),
+  loadedMiles: z.number().positive(),
   transitDaysRaw: z.number().nonnegative().default(0),
   driverExpenses: z.number().nonnegative().default(0),
   outState: z.string().default('TX'),
@@ -47,7 +48,7 @@ const UsaSchema = z.object({
 })
 
 const DrayageSchema = z.object({
-  loadedMiles: z.number().nonnegative(),
+  loadedMiles: z.number().positive(),
   portPickupMiles: z.number().nonnegative().optional(),
   emptyReturnMiles: z.number().nonnegative().optional(),
   finalRepositionMiles: z.number().nonnegative().optional(),
@@ -86,20 +87,34 @@ export async function engineRoutes(app: FastifyInstance) {
     const { orgId } = request.user as JwtPayload
     const body = CalculateSchema.parse(request.body)
 
-    if (!body.mex && !body.usa && !body.drayage) {
-      return reply.status(422).send({ error: 'Provide at least one of mex, usa, or drayage leg facts.' })
+    const inputIssues = pricingInputIssues(body.operation, {
+      mex: body.mex,
+      usa: body.usa,
+      drayage: body.drayage,
+    })
+    if (inputIssues.length > 0) {
+      return reply.status(422).send({ error: inputIssues.join(' '), issues: inputIssues })
     }
 
     // Carrier's choice: explicit service, else the prevailing per-operation default.
     const service = body.service ?? defaultService(body.operation)
 
     let params: ParamMap = {}
-    const { costBase, set, defaultPolicy } = await resolveCalculationContext(orgId, body)
+    const { costBase, set, defaultPolicy, applicabilityProfile } = await resolveCalculationContext(orgId, {
+      costBaseId: body.costBaseId,
+      assumptionSetId: body.assumptionSetId,
+      operation: body.operation,
+      service,
+      policy: body.policy,
+      equipment: body.equipment,
+    })
+    assertCalculationOverrides(costBase?.scope ?? scopeForOperation(body.operation), body.overrides, applicabilityProfile)
     if (set) params = buildParamMap(set.params)
 
     const equipment: EquipmentSpec = body.equipment
     const input: EngineInput = {
       policy: body.policy ?? defaultPolicy,
+      applicabilityProfile: applicabilityProfile ?? undefined,
       operation: body.operation,
       service,
       equipment,
@@ -125,7 +140,12 @@ export async function engineRoutes(app: FastifyInstance) {
     }
 
     const result = calculate(input)
-    return reply.send({ ...result, costBaseId: costBase?.id ?? null, assumptionSetId: set?.id ?? null })
+    return reply.send({
+      ...result,
+      costBaseId: costBase?.id ?? null,
+      assumptionSetId: set?.id ?? null,
+      applicabilityProfile,
+    })
   })
 
   // ── Quote by route name — resolves leg facts from V3.0 reference tables ───
@@ -162,16 +182,29 @@ export async function engineRoutes(app: FastifyInstance) {
       route: body.route,
     })
 
-    if (!resolved.mexLeg && !resolved.usaLeg) {
-      return reply.status(422).send({ error: 'Could not resolve any leg for this route.', warnings: resolved.warnings })
+    const inputIssues = pricingInputIssues(body.operation, {
+      mex: resolved.mexLeg,
+      usa: resolved.usaLeg,
+    })
+    if (inputIssues.length > 0) {
+      return reply.status(422).send({ error: inputIssues.join(' '), issues: inputIssues, warnings: resolved.warnings })
     }
 
     let params: ParamMap = {}
-    const { costBase, set, defaultPolicy } = await resolveCalculationContext(orgId, body)
+    const { costBase, set, defaultPolicy, applicabilityProfile } = await resolveCalculationContext(orgId, {
+      costBaseId: body.costBaseId,
+      assumptionSetId: body.assumptionSetId,
+      operation: body.operation,
+      service,
+      policy: body.policy,
+      equipment: body.equipment,
+    })
+    assertCalculationOverrides(costBase?.scope ?? scopeForOperation(body.operation), body.overrides, applicabilityProfile)
     if (set) params = buildParamMap(set.params)
 
     const result = calculate({
       policy: body.policy ?? defaultPolicy,
+      applicabilityProfile: applicabilityProfile ?? undefined,
       operation: body.operation,
       service,
       equipment: body.equipment,
@@ -188,6 +221,7 @@ export async function engineRoutes(app: FastifyInstance) {
       warnings: resolved.warnings,
       costBaseId: costBase?.id ?? null,
       assumptionSetId: set?.id ?? null,
+      applicabilityProfile,
     })
   })
 }

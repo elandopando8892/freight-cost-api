@@ -1,5 +1,4 @@
-import { calculate } from '../engine/engine.calculator.js'
-import type { QuoteCalculationSnapshot } from '../quotes/quote-snapshot.js'
+import { calculateForQuoteSnapshot, type QuoteCalculationSnapshot } from '../quotes/quote-snapshot.js'
 import { PARAMETER_DEFINITIONS } from '../../data/parameter-catalog.js'
 
 export const SCENARIO_FIELDS = [
@@ -39,7 +38,7 @@ export function unknownScenarioKeys(snapshot: QuoteCalculationSnapshot, changes:
   return changes.map((change) => change.key).filter((key) => !(key in snapshot.input.params))
 }
 
-function summary(result: ReturnType<typeof calculate>) {
+function summary(result: ReturnType<typeof calculateForQuoteSnapshot>) {
   return {
     freightBaselineUsd: result.freightBaselineUsd,
     requiredTariffUsd: result.requiredTariffUsd,
@@ -56,9 +55,9 @@ function delta(baseline: number, proposed: number) {
 
 /** Calculates an in-memory what-if from immutable quote evidence. */
 export function buildScenario(snapshot: QuoteCalculationSnapshot, changes: ScenarioChange[]) {
-  const baselineResult = calculate(snapshot.input)
+  const baselineResult = calculateForQuoteSnapshot(snapshot)
   const overrides = Object.fromEntries(changes.map((change) => [change.key, change.value]))
-  const proposedResult = calculate({ ...snapshot.input, params: { ...snapshot.input.params, ...overrides } })
+  const proposedResult = calculateForQuoteSnapshot(snapshot, { ...snapshot.input, overrides })
   const baseline = summary(baselineResult)
   const proposed = summary(proposedResult)
   return {

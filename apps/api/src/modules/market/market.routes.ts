@@ -164,11 +164,12 @@ export async function marketRoutes(app: FastifyInstance) {
       })
     }
     const refresh = await refreshFuelSurcharge()
-    const dieselSync = await syncSetDieselUsBorder(orgId) // MX leg tracks US diesel too
+    const dieselSync = await syncSetDieselUsBorder(orgId) // legacy common DRAFT only
     return reply.send({ updatedRegions: body.regions.length, ...refresh, dieselSync })
   })
 
-  // One refresh recomputes USA FSC (all states) AND syncs the MX leg's Diesel US Border.
+  // Recompute USA FSC globally; only an editable legacy common DRAFT receives
+  // the compatibility Diesel US Border sync.
   app.post('/market/fuel/refresh', { preHandler: requireRole('ADMIN') }, async (request) => {
     const { orgId } = request.user as JwtPayload
     const refresh = await refreshFuelSurcharge()
@@ -176,8 +177,8 @@ export async function marketRoutes(app: FastifyInstance) {
     return { ...refresh, dieselSync }
   })
 
-  // Live EIA pull: fetch diesel-by-region (EIA RSS) → update RegionDiesel →
-  // refresh USA FSC → sync MX Diesel US Border. One call = current fuel everywhere.
+  // Live EIA pull updates market observations and USA FSC. Governed cost-base
+  // versions remain immutable; only a legacy common DRAFT may be synchronized.
   app.post('/market/fuel/fetch-eia', { preHandler: requireRole('ADMIN') }, async (request, reply) => {
     const { orgId } = request.user as JwtPayload
     try {

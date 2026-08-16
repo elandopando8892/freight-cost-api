@@ -31,9 +31,11 @@ export async function cronRoutes(app: FastifyInstance) {
     try {
       const eia = await fetchEiaCurrentDiesel()
       const refresh = await refreshFuelSurcharge()
-      // Sync the MX leg's diesel for every org that has an active assumption set.
+      // Legacy common drafts may still opt into automatic sync. Governed,
+      // published cost-base versions remain immutable and consume market data
+      // only through an explicitly reviewed next version.
       const orgs = await prisma.assumptionSet.findMany({
-        where: { isActive: true },
+        where: { isActive: true, costBaseId: null, status: 'DRAFT' },
         select: { orgId: true },
         distinct: ['orgId'],
       })

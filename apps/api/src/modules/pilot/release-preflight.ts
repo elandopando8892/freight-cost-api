@@ -15,6 +15,7 @@ export const REQUIRED_RELEASE_MIGRATIONS = [
   "20260811002500_customer_quote_email_outbox",
   "20260812000100_pilot_verification_evidence",
   "20260812000200_pilot_go_dual_approval",
+  "20260815000100_assumption_applicability_context",
 ] as const;
 
 type ReleasePreflightInput = {

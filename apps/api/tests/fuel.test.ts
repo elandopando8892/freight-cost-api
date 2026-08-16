@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { parseDieselRss } from '../src/modules/market/fuel.service.js'
+import { parseDieselRss, writableFuelAssumptionSetWhere } from '../src/modules/market/fuel.service.js'
 
 const FIXTURE = `<![CDATA[<br/>
 Regular Gasoline Retail Price <br/>
@@ -23,5 +23,16 @@ describe('EIA diesel RSS parser', () => {
     expect(p['West Coast']).toBe(6.524)              // not 5.920 (less California line)
     expect(p['West Coast less California']).toBe(5.920)
     expect(p['California']).toBe(7.222)              // not 5.920
+  })
+})
+
+describe('fuel assumption sync governance', () => {
+  it('targets only the editable legacy common draft, never a governed cost-base version', () => {
+    expect(writableFuelAssumptionSetWhere('org-1')).toEqual({
+      orgId: 'org-1',
+      isActive: true,
+      costBaseId: null,
+      status: 'DRAFT',
+    })
   })
 })
