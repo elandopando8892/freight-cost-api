@@ -180,6 +180,7 @@ export function CostBaseWizard({ initialScope, existingCodes, pending, onSubmit 
   const [issues, setIssues] = useState<Issue[]>([])
   const [applicability, setApplicability] = useState<ConsultantResult['applicability']>(null)
   const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null)
+  const [touchedFields, setTouchedFields] = useState({ code: false, name: false })
   const presets = useQuery({
     queryKey: ['cost-base-presets'],
     queryFn: () => fetcher<RecommendedPreset[]>('/api/v1/cost-bases/presets'),
@@ -198,6 +199,8 @@ export function CostBaseWizard({ initialScope, existingCodes, pending, onSubmit 
   const nameError = !draft.name?.trim() || draft.name.trim().length < 2
     ? 'Ingresa un nombre de al menos 2 caracteres.'
     : null
+  const showCodeError = touchedFields.code && Boolean(codeError)
+  const showNameError = touchedFields.name && Boolean(nameError)
   const canCreate = blockers === 0
   const selectedPreset = presets.data?.find((preset) => preset.id === selectedPresetId) ?? null
   const applicabilityPreview = useQuery({
@@ -330,6 +333,7 @@ export function CostBaseWizard({ initialScope, existingCodes, pending, onSubmit 
     })
     setApplicability(preset.applicability)
     setIssues([])
+    setTouchedFields({ code: false, name: false })
     setMessages((items) => [...items, {
       role: 'assistant',
       content: `Cargué el estándar ${preset.label}. Es un borrador editable con los valores recomendados V3.0; ahora confirma qué debe adaptarse a tu operación real.`,
@@ -382,22 +386,26 @@ export function CostBaseWizard({ initialScope, existingCodes, pending, onSubmit 
           </div>
         </div>
       </CardHeader>
-      <CardContent className="grid gap-0 p-0 lg:grid-cols-[minmax(0,1.08fr)_minmax(22rem,0.92fr)]">
-        <div className="grid content-start gap-4 border-b p-4 lg:border-b-0 lg:border-r">
+      <CardContent className="p-0">
+        <section className="border-b p-4" aria-labelledby="cost-base-presets-title">
           <div>
             <div className="mb-2 flex items-end justify-between gap-3">
-              <div><p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">Inicio rápido</p><p className="text-sm font-medium">Estándares recomendados</p></div>
+              <div><p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">Inicio rápido</p><p id="cost-base-presets-title" className="text-sm font-medium">Estándares recomendados</p></div>
               <span className="text-[10px] text-muted-foreground">Editables antes de crear</span>
             </div>
             {presets.isPending ? <div className="rounded-lg border bg-muted/20 p-3 text-xs text-muted-foreground">Cargando estándares…</div> : presets.isError ? <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-xs text-muted-foreground">No fue posible cargar los estándares. Puedes continuar con el asistente o el formulario manual.</div> : (
-              <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1" aria-label="Estándares recomendados de bases de costo">
+              <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5" aria-label="Estándares recomendados de bases de costo">
                 {presets.data?.map((preset) => {
                   const selected = selectedPresetId === preset.id
-                  return <button key={preset.id} type="button" aria-pressed={selected} onClick={() => applyPreset(preset)} className={`min-w-52 flex-1 rounded-lg border p-3 text-left transition-colors ${selected ? 'border-primary bg-primary/8 shadow-[inset_3px_0_0_var(--primary)]' : 'hover:bg-muted/40'}`}><span className="flex items-center justify-between gap-2 text-sm font-medium">{preset.label}{selected ? <CheckCircle2 className="size-4 text-primary" /> : null}</span><span className="mt-1 block text-[11px] text-muted-foreground">{preset.applicability.counts.REQUIRED} requeridos · {preset.applicability.counts.CONDITIONAL} condicionales</span><span className="mt-2 flex flex-wrap items-center gap-1.5 text-[10px]"><span className="rounded-full bg-muted px-1.5 py-0.5">{preset.currency}</span><span className={`rounded-full px-1.5 py-0.5 ${preset.applicability.border === 'REQUIRED' ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400' : 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'}`}>Border: {preset.applicability.border === 'REQUIRED' ? 'requerido' : 'no aplica'}</span></span></button>
+                  return <button key={preset.id} type="button" aria-pressed={selected} onClick={() => applyPreset(preset)} className={`min-w-0 rounded-lg border p-3 text-left transition-colors ${selected ? 'border-primary bg-primary/8 shadow-[inset_3px_0_0_var(--primary)]' : 'hover:bg-muted/40'}`}><span className="flex items-center justify-between gap-2 text-sm font-medium">{preset.label}{selected ? <CheckCircle2 className="size-4 shrink-0 text-primary" /> : null}</span><span className="mt-1 block text-[11px] text-muted-foreground">{preset.applicability.counts.REQUIRED} requeridos · {preset.applicability.counts.CONDITIONAL} condicionales</span><span className="mt-2 flex flex-wrap items-center gap-1.5 text-[10px]"><span className="rounded-full bg-muted px-1.5 py-0.5">{preset.currency}</span><span className={`rounded-full px-1.5 py-0.5 ${preset.applicability.border === 'REQUIRED' ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400' : 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'}`}>Border: {preset.applicability.border === 'REQUIRED' ? 'requerido' : 'no aplica'}</span></span></button>
                 })}
               </div>
             )}
           </div>
+        </section>
+
+        <div className="grid min-w-0 gap-0 lg:grid-cols-[minmax(0,1.08fr)_minmax(22rem,0.92fr)]">
+        <div className="grid min-w-0 content-start gap-4 border-b p-4 lg:border-b-0 lg:border-r">
 
           <div className="border-t pt-4">
             <p className="mb-2 text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">1. Tipo de operación</p>
@@ -430,16 +438,16 @@ export function CostBaseWizard({ initialScope, existingCodes, pending, onSubmit 
           ) : <div className="rounded-lg border bg-muted/20 p-3 text-sm text-muted-foreground">Modo manual activo. Las mismas reglas deterministas evitarán mezclar Border con una operación doméstica.</div>}
         </div>
 
-        <div className="grid content-start gap-4 p-4">
+        <div className="grid min-w-0 content-start gap-4 p-4">
           <div className="flex items-center justify-between gap-3">
             <div><p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">2. Borrador estructurado</p><p className="text-sm font-medium">{selectedScope?.label ?? 'Selecciona el alcance'}</p>{selectedPreset ? <p className="mt-0.5 text-[10px] text-primary">Basado en {selectedPreset.label} · {selectedPreset.version} · editable</p> : null}</div>
             <span className={`rounded-full px-2.5 py-1 text-[10px] font-medium ${canCreate ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 'bg-amber-500/10 text-amber-700 dark:text-amber-400'}`}>{canCreate ? 'Coherente para crear' : `${blockers} pendiente${blockers === 1 ? '' : 's'}`}</span>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
-            <div className="grid gap-1.5"><Label htmlFor="wizard-base-code">Código</Label><Input id="wizard-base-code" required aria-invalid={Boolean(codeError)} aria-describedby={codeError ? 'wizard-base-code-error' : undefined} value={draft.code ?? ''} onChange={(event) => setDraft((current) => ({ ...current, code: event.target.value.toUpperCase() }))} placeholder="FTL-MX-2026" />{codeError ? <p id="wizard-base-code-error" className="text-[11px] text-destructive">{codeError}</p> : null}</div>
+            <div className="grid gap-1.5"><Label htmlFor="wizard-base-code">Código</Label><Input id="wizard-base-code" required aria-invalid={showCodeError} aria-describedby={showCodeError ? 'wizard-base-code-error' : undefined} value={draft.code ?? ''} onBlur={() => setTouchedFields((current) => ({ ...current, code: true }))} onChange={(event) => setDraft((current) => ({ ...current, code: event.target.value.toUpperCase() }))} placeholder="Ej. FTL-MX-2026" />{showCodeError ? <p id="wizard-base-code-error" className="text-[11px] text-destructive">{codeError}</p> : null}</div>
             <div className="grid gap-1.5"><Label htmlFor="wizard-base-currency">Moneda de gobierno</Label><select id="wizard-base-currency" className={selectCls} value={draft.currency} onChange={(event) => setDraft((current) => ({ ...current, currency: event.target.value }))}><option value="USD">USD</option><option value="MXN">MXN</option></select></div>
-            <div className="grid gap-1.5 sm:col-span-2"><Label htmlFor="wizard-base-name">Nombre</Label><Input id="wizard-base-name" required aria-invalid={Boolean(nameError)} aria-describedby={nameError ? 'wizard-base-name-error' : undefined} value={draft.name ?? ''} onChange={(event) => setDraft((current) => ({ ...current, name: event.target.value }))} placeholder="FTL Intra-México 2026" />{nameError ? <p id="wizard-base-name-error" className="text-[11px] text-destructive">{nameError}</p> : null}</div>
+            <div className="grid gap-1.5 sm:col-span-2"><Label htmlFor="wizard-base-name">Nombre</Label><Input id="wizard-base-name" required aria-invalid={showNameError} aria-describedby={showNameError ? 'wizard-base-name-error' : undefined} value={draft.name ?? ''} onBlur={() => setTouchedFields((current) => ({ ...current, name: true }))} onChange={(event) => setDraft((current) => ({ ...current, name: event.target.value }))} placeholder="Ej. FTL Intra-México 2026" />{showNameError ? <p id="wizard-base-name-error" className="text-[11px] text-destructive">{nameError}</p> : null}</div>
             <div className="grid gap-1.5 sm:col-span-2"><Label htmlFor="wizard-base-description">Contexto operativo</Label><textarea id="wizard-base-description" value={draft.description ?? ''} onChange={(event) => setDraft((current) => ({ ...current, description: event.target.value }))} maxLength={500} rows={3} className={`${selectCls} h-auto py-2`} placeholder="Cobertura, equipo, criterios o exclusiones que debe conocer el equipo." /></div>
             <div className="grid gap-1.5 sm:col-span-2"><Label htmlFor="wizard-base-model">Modelo de cálculo</Label><select id="wizard-base-model" className={selectCls} value={draft.defaultPolicy} onChange={(event) => updatePolicy(event.target.value as Policy)}><option value="OPERATIONAL_V3">Operacional V3</option><option value="WORKBOOK_V3">Workbook exacto</option></select><p className="text-[11px] text-muted-foreground">La política matemática queda congelada con la base. Si más adelante necesitas otra, crea una base separada para conservar trazabilidad.</p></div>
           </div>
@@ -475,6 +483,7 @@ export function CostBaseWizard({ initialScope, existingCodes, pending, onSubmit 
           <label htmlFor="wizard-base-default" className="flex items-start gap-2 rounded-md border p-3 text-sm"><input id="wizard-base-default" type="checkbox" checked={draft.isDefault} onChange={(event) => setDraft((current) => ({ ...current, isDefault: event.target.checked }))} className="mt-1 accent-primary" /><span><strong className="block font-medium">Predeterminada para este alcance</strong><span className="text-xs text-muted-foreground">No reemplaza bases de otros alcances.</span></span></label>
 
           <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-4"><p id="wizard-create-help" className="max-w-md text-xs text-muted-foreground" aria-live="polite">{canCreate ? 'Crear genera una versión 1 en borrador. La IA no publica, activa ni modifica rutas.' : `Corrige ${blockers} pendiente${blockers === 1 ? '' : 's'} señalado${blockers === 1 ? '' : 's'} arriba antes de crear.`}</p><Button type="button" aria-describedby="wizard-create-help" onClick={submitBase} disabled={pending || !canCreate}>{pending ? 'Creando borrador…' : 'Crear base y revisar supuestos'}</Button></div>
+        </div>
         </div>
       </CardContent>
     </Card>
