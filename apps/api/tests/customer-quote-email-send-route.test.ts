@@ -209,6 +209,30 @@ describe("customer quote gmail send route checks payload freshness", () => {
     expect(deliveryMock).not.toHaveBeenCalled();
   });
 
+  it("rejects malformed expectedPayloadChecksum when non-string", async () => {
+    const res = await app.inject({
+      method: "POST",
+      url: "/customer-quote-email-drafts/draft-1/send",
+      headers: { authorization: "Bearer x" },
+      payload: { expectedPayloadChecksum: 123 },
+    });
+
+    expect(res.statusCode).toBe(400);
+    expect(deliveryMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects unknown fields in send payload", async () => {
+    const res = await app.inject({
+      method: "POST",
+      url: "/customer-quote-email-drafts/draft-1/send",
+      headers: { authorization: "Bearer x" },
+      payload: { expectedPayloadChecksum: "checksum-current", extra: "block" },
+    });
+
+    expect(res.statusCode).toBe(400);
+    expect(deliveryMock).not.toHaveBeenCalled();
+  });
+
   it("rejects stale UI session token when expected checksum does not match current draft", async () => {
     vi.mocked((await import("../src/config/prisma.js")).prisma.customerQuoteEmailDraft.findFirstOrThrow)
       .mockResolvedValue({ ...draft, payloadChecksum: "checksum-current" });

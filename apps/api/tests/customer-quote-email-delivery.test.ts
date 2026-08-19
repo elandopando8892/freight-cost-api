@@ -138,4 +138,35 @@ describe("customer quote Gmail delivery", () => {
     expect(fetchMock).not.toHaveBeenCalled();
     expect(customerQuoteEmailDraft.updateMany).not.toHaveBeenCalled();
   });
+
+  it("does not send a draft already in progress", async () => {
+    customerQuoteEmailDraft.findFirstOrThrow.mockResolvedValue({
+      ...draft,
+      status: "SENDING",
+    });
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(deliverCustomerQuoteEmail(input)).rejects.toMatchObject({
+      statusCode: 409,
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("returns duplicate and keeps no extra calls when draft is already sent", async () => {
+    customerQuoteEmailDraft.findFirstOrThrow.mockResolvedValue({
+      ...draft,
+      status: "SENT",
+      receiptId: "receipt-1",
+      sentAt: new Date("2026-08-14T13:00:00.000Z"),
+    });
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await deliverCustomerQuoteEmail(input);
+
+    expect(result.duplicate).toBe(true);
+    expect(result.delivery).toMatchObject({ status: "SENT", receiptId: "receipt-1" });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
 });
