@@ -139,6 +139,25 @@ describe("customer quote Gmail delivery", () => {
     expect(customerQuoteEmailDraft.updateMany).not.toHaveBeenCalled();
   });
 
+  it("rejects provider payload missing durable receipt and marks delivery as unknown", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({ accepted: true, duplicate: true }),
+        { status: 200 },
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(deliverCustomerQuoteEmail(input)).rejects.toMatchObject({
+      statusCode: 502,
+    });
+    expect(customerQuoteEmailDraft.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ status: "DELIVERY_UNKNOWN" }),
+      }),
+    );
+  });
+
   it("does not send a draft already in progress", async () => {
     customerQuoteEmailDraft.findFirstOrThrow.mockResolvedValue({
       ...draft,
