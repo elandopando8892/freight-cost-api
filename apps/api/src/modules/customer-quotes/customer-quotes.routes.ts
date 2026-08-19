@@ -318,9 +318,14 @@ export async function customerQuotesRoutes(app: FastifyInstance) {
       const template =
         templateId === SYSTEM_TEMPLATE_ID
           ? SYSTEM_TEMPLATE
-          : await prisma.customerQuoteTemplate.findFirstOrThrow({
+          : await prisma.customerQuoteTemplate.findFirst({
               where: { id: templateId, orgId: user.orgId },
             });
+      if (!template)
+        throw Object.assign(
+          new Error("Selected email template was not found in this organization."),
+          { statusCode: 404 },
+        );
       const sender = await prisma.user.findUnique({
         where: { id: user.sub },
         select: { email: true },
