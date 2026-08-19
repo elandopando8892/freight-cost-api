@@ -180,6 +180,7 @@ export function CostBaseWizard({ initialScope, existingCodes, pending, onSubmit 
   const [issues, setIssues] = useState<Issue[]>([])
   const [applicability, setApplicability] = useState<ConsultantResult['applicability']>(null)
   const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null)
+  const [presetScopeFilter, setPresetScopeFilter] = useState<'ALL' | CostBaseScope>(initialScope)
   const [touchedFields, setTouchedFields] = useState({ code: false, name: false })
   const presets = useQuery({
     queryKey: ['cost-base-presets'],
@@ -203,6 +204,18 @@ export function CostBaseWizard({ initialScope, existingCodes, pending, onSubmit 
   const showNameError = touchedFields.name && Boolean(nameError)
   const canCreate = blockers === 0
   const selectedPreset = presets.data?.find((preset) => preset.id === selectedPresetId) ?? null
+  const filteredPresets = presets.data?.filter((preset) => presetScopeFilter === 'ALL' || preset.scope === presetScopeFilter) ?? []
+  const presetScopeCounts = {
+    ALL: presets.data?.length ?? 0,
+    CROSS_BORDER: 0,
+    INTRA_MEX: 0,
+    INTRA_US: 0,
+    DRAYAGE: 0,
+    LOCAL: 0,
+  }
+  for (const preset of presets.data ?? []) {
+    presetScopeCounts[preset.scope] += 1
+  }
   const applicabilityPreview = useQuery({
     queryKey: ['cost-base-applicability-preview', draft.scope, JSON.stringify(profile)],
     queryFn: () => fetcher<ApplicabilitySummary>('/api/v1/cost-bases/applicability-preview', {
@@ -223,6 +236,7 @@ export function CostBaseWizard({ initialScope, existingCodes, pending, onSubmit 
     onSuccess: (result, message) => {
       if (selectedPreset?.scope !== result.draft.scope) setSelectedPresetId(null)
       const resultScope = result.draft.scope ?? initialScope
+      setPresetScopeFilter(resultScope)
       setDraft({
         ...result.draft,
         applicabilityProfile: result.draft.applicabilityProfile ?? defaultProfile(resultScope, result.draft.defaultPolicy),
@@ -247,6 +261,7 @@ export function CostBaseWizard({ initialScope, existingCodes, pending, onSubmit 
     if (draft.scope !== scope && draft.assumptionOverrides.length > 0) {
       toast.info('Se retiraron los valores propios del alcance anterior para evitar combinaciones incompatibles.')
     }
+    setPresetScopeFilter(scope)
     setDraft((current) => ({
       ...current,
       scope,
@@ -320,6 +335,7 @@ export function CostBaseWizard({ initialScope, existingCodes, pending, onSubmit 
 
   const applyPreset = (preset: RecommendedPreset) => {
     setSelectedPresetId(preset.id)
+    setPresetScopeFilter(preset.scope)
     setDraft({
       scope: preset.scope,
       code: nextAvailableCode(preset.code, existingCodes),
@@ -394,11 +410,58 @@ export function CostBaseWizard({ initialScope, existingCodes, pending, onSubmit 
               <span className="text-[10px] text-muted-foreground">Editables antes de crear</span>
             </div>
             {presets.isPending ? <div className="rounded-lg border bg-muted/20 p-3 text-xs text-muted-foreground">Cargando estándares…</div> : presets.isError ? <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-xs text-muted-foreground">No fue posible cargar los estándares. Puedes continuar con el asistente o el formulario manual.</div> : (
-              <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5" aria-label="Estándares recomendados de bases de costo">
-                {presets.data?.map((preset) => {
-                  const selected = selectedPresetId === preset.id
-                  return <button key={preset.id} type="button" aria-pressed={selected} onClick={() => applyPreset(preset)} className={`min-w-0 rounded-lg border p-3 text-left transition-colors ${selected ? 'border-primary bg-primary/8 shadow-[inset_3px_0_0_var(--primary)]' : 'hover:bg-muted/40'}`}><span className="flex items-center justify-between gap-2 text-sm font-medium">{preset.label}{selected ? <CheckCircle2 className="size-4 shrink-0 text-primary" /> : null}</span><span className="mt-1 block text-[11px] text-muted-foreground">{preset.applicability.counts.REQUIRED} requeridos · {preset.applicability.counts.CONDITIONAL} condicionales</span><span className="mt-2 flex flex-wrap items-center gap-1.5 text-[10px]"><span className="rounded-full bg-muted px-1.5 py-0.5">{preset.currency}</span><span className={`rounded-full px-1.5 py-0.5 ${preset.applicability.border === 'REQUIRED' ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400' : 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'}`}>Border: {preset.applicability.border === 'REQUIRED' ? 'requerido' : 'no aplica'}</span></span></button>
-                })}
+              <div>
+                <div className="mb-2 flex flex-wrap items-center gap-2 text-xs" role="tablist" aria-label="Filtro de alcance de estándares">
+                  <button
+                    type="button"
+                    role="tab"
+                    onClick={() => {
+                      setPresetScopeFilter('ALL')
+                      setSelectedPresetId(null)
+                    }}
+                    aria-pressed={presetScopeFilter === 'ALL'}
+                    className={`rounded-full border px-3 py-1.5 transition-colors ${presetScopeFilter === 'ALL' ? 'border-primary bg-primary/12 text-primary' : 'border-border hover:bg-muted/30 text-muted-foreground'}`}
+                  >
+                    Todos ({presetScopeCounts.ALL})
+                  </button>
+                  {SCOPE.map((item) => (
+                    <button
+                      key={item.value}
+                      type="button"
+                      role="tab"
+                    onClick={() => {
+                      setPresetScopeFilter(item.value)
+                      setSelectedPresetId(null)
+                    }}
+                      aria-pressed={presetScopeFilter === item.value}
+                      disabled={presetScopeCounts[item.value] === 0}
+                      title={presetScopeCounts[item.value] === 0 ? 'No hay estándares para este alcance' : undefined}
+                      className={`rounded-full border px-3 py-1.5 transition-colors ${presetScopeFilter === item.value ? 'border-primary bg-primary/12 text-primary' : 'border-border hover:bg-muted/30 text-muted-foreground'} ${presetScopeCounts[item.value] === 0 ? 'cursor-not-allowed opacity-50' : ''}`}
+                    >
+                      {item.label} ({presetScopeCounts[item.value]})
+                    </button>
+                  ))}
+                </div>
+                <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5" aria-label="Estándares recomendados de bases de costo">
+                {filteredPresets.length === 0 ? (
+                  <div className="rounded-lg border bg-muted/20 p-3 text-xs text-muted-foreground">No hay estándares para este filtro. Puedes crear uno con el asistente.</div>
+                ) : (
+                  filteredPresets.map((preset) => {
+                    const selected = selectedPresetId === preset.id
+                    return <button key={preset.id} type="button" aria-pressed={selected} onClick={() => applyPreset(preset)} className={`min-w-0 rounded-lg border p-3 text-left transition-colors ${selected ? 'border-primary bg-primary/8 shadow-[inset_3px_0_0_var(--primary)]' : 'hover:bg-muted/40'}`}>
+                      <span className="flex items-center justify-between gap-2 text-sm font-medium">
+                        {preset.label}{selected ? <CheckCircle2 className="size-4 shrink-0 text-primary" /> : null}
+                      </span>
+                      <span className="mt-1 block text-[11px] text-muted-foreground">{preset.applicability.counts.REQUIRED} requeridos · {preset.applicability.counts.CONDITIONAL} condicionales</span>
+                      <span className="mt-2 flex flex-wrap items-center gap-1.5 text-[10px]">
+                        <span className="rounded-full bg-muted px-1.5 py-0.5">{preset.currency}</span>
+                        <span className={`rounded-full px-1.5 py-0.5 ${preset.applicability.border === 'REQUIRED' ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400' : 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'}`}>Border: {preset.applicability.border === 'REQUIRED' ? 'requerido' : 'no aplica'}</span>
+                      </span>
+                      <span className={`mt-2 block text-[11px] leading-relaxed ${selected ? 'text-primary/85' : 'text-muted-foreground'}`}>{preset.rationale?.[0] ?? preset.description}</span>
+                    </button>
+                  })
+                )}
+                </div>
               </div>
             )}
           </div>
