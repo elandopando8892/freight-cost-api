@@ -39,6 +39,11 @@ const TemplateInput = z.object({
   htmlTemplate: z.string().trim().min(20).max(80_000),
 });
 const PrepareEmailDraft = z.object({ templateId: z.string().min(1) }).strict();
+const SendEmailDraft = z
+  .object({
+    expectedPayloadChecksum: z.string().trim().min(1).optional(),
+  })
+  .strict();
 const TransitionCustomerQuote = z
   .object({ status: z.enum(["REVIEW", "APPROVED", "ARCHIVED"]) })
   .strict();
@@ -362,12 +367,69 @@ export async function customerQuotesRoutes(app: FastifyInstance) {
     async (request) => {
       const user = request.user as JwtPayload;
       const { id } = request.params as { id: string };
+      const { expectedPayloadChecksum } = SendEmailDraft.parse(request.body || {});
       const actorBearer = request.headers.authorization;
       if (!actorBearer)
         throw Object.assign(
           new Error("A Kinde bearer token is required for Gmail delivery."),
           { statusCode: 401 },
         );
+      const actor = await prisma.user.findUnique({
+        where: { id: user.sub },
+        select: { email: true },
+      });
+      const draft = await prisma.customerQuoteEmailDraft.findFirstOrThrow({
+        where: { id, orgId: user.orgId },
+        include: {
+          customerQuote: {
+            include: { lines: { orderBy: { position: "asc" } } },
+          },
+        },
+      });
+      if (!draft.customerQuote.contactEmail) {
+        throw Object.assign(
+          new Error(
+            "The recipient email is missing. Prepare a new draft after updating contact email.",
+          ),
+          { statusCode: 409 },
+        );
+      }
+      if (!draft.customerQuote.lines.length) {
+        throw Object.assign(
+          new Error("The quote has no route lines to compute a fresh payload."),
+          { statusCode: 409 },
+        );
+      }
+      const template =
+        draft.templateId === SYSTEM_TEMPLATE_ID
+          ? SYSTEM_TEMPLATE
+          : await prisma.customerQuoteTemplate.findFirstOrThrow({
+              where: { id: draft.templateId, orgId: user.orgId },
+            });
+      const quote = draft.customerQuote;
+      const rendered = renderTemplate(template, quote, actor?.email || "Cotizaciones");
+      const currentPayloadChecksum = customerQuoteEmailPayloadChecksum({
+        toEmail: draft.customerQuote.contactEmail,
+        subject: rendered.subject,
+        html: rendered.html,
+        text: rendered.text,
+      });
+      if (currentPayloadChecksum !== draft.payloadChecksum) {
+        throw Object.assign(
+          new Error(
+            "El contenido del correo cambió desde la preparación; prepara de nuevo antes de enviar.",
+          ),
+          { statusCode: 409 },
+        );
+      }
+      if (expectedPayloadChecksum && expectedPayloadChecksum !== draft.payloadChecksum) {
+        throw Object.assign(
+          new Error(
+            "La sesión de envío cambió mientras preparabas el borrador. Vuelve a preparar.",
+          ),
+          { statusCode: 409 },
+        );
+      }
       return deliverCustomerQuoteEmail({
         orgId: user.orgId,
         actorId: user.sub,

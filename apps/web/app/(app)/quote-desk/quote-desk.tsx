@@ -275,10 +275,10 @@ export function QuoteDesk({
     },
   });
   const sendGmail = useMutation({
-    mutationFn: (draftId: string) =>
+    mutationFn: (payload: { draftId: string; expectedPayloadChecksum?: string }) =>
       fetcher<{ delivery: EmailDraftHistoryItem; duplicate: boolean }>(
-        `/api/v1/customer-quote-email-drafts/${draftId}/send`,
-        { method: "POST", json: {} },
+        `/api/v1/customer-quote-email-drafts/${payload.draftId}/send`,
+        { method: "POST", json: payload },
       ),
     onSuccess: (result) => {
       setPreparedMessage(
@@ -312,6 +312,12 @@ export function QuoteDesk({
   const draftCount = items.filter((item) => item.status === "DRAFT").length;
   const reviewCount = items.filter((item) => item.status === "REVIEW").length;
   const approvedCount = items.filter((item) => item.status === "APPROVED").length;
+  const sendCandidateOutdated = Boolean(
+    sendCandidate &&
+      preparedDraft &&
+      (sendCandidate.id !== preparedDraft.id ||
+        sendCandidate.payloadChecksum !== preparedDraft.payloadChecksum),
+  );
   const needle = search.trim().toLowerCase();
   const visibleItems = useMemo(() => items.filter((item) => {
     if (statusFilter !== "ALL" && item.status !== statusFilter) return false;
@@ -830,20 +836,35 @@ export function QuoteDesk({
         }}
       >
         <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar envío por Gmail</AlertDialogTitle>
-            <AlertDialogDescription>
-              Se enviará “{sendCandidate?.subject}” a {sendCandidate?.toEmail} desde la cuenta Gmail conectada. Esta acción queda registrada y no se ejecuta automáticamente.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={sendGmail.isPending}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              disabled={!sendCandidate || !gmailReady || sendGmail.isPending}
-              onClick={() => {
-                if (sendCandidate) sendGmail.mutate(sendCandidate.id);
-              }}
-            >
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirmar envío por Gmail</AlertDialogTitle>
+              <AlertDialogDescription>
+                Se enviará “{sendCandidate?.subject}” a {sendCandidate?.toEmail} desde la cuenta Gmail conectada. Esta acción queda registrada y no se ejecuta automáticamente.
+                {sendCandidateOutdated ? (
+                  <span className="mt-2 block text-amber-700 dark:text-amber-300">
+                    Este borrador ya no coincide con el último draft preparado. Re-haz “Preparar para Gmail” para evitar desfasaje.
+                  </span>
+                ) : null}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={sendGmail.isPending}>Cancelar</AlertDialogCancel>
+              <AlertDialogAction
+                disabled={
+                  !sendCandidate ||
+                  !gmailReady ||
+                  sendGmail.isPending ||
+                  sendCandidateOutdated
+                }
+                onClick={() => {
+                  if (sendCandidate) {
+                    sendGmail.mutate({
+                      draftId: sendCandidate.id,
+                      expectedPayloadChecksum: sendCandidate.payloadChecksum,
+                    });
+                  }
+                }}
+              >
               {sendGmail.isPending ? "Enviando…" : "Confirmar y enviar"}
             </AlertDialogAction>
           </AlertDialogFooter>
