@@ -34,7 +34,7 @@ vi.mock("../src/middleware/authenticate.js", () => ({
 }));
 
 vi.mock("../src/middleware/authorize.js", () => ({
-  requireRole: () => () => undefined,
+  requireRole: () => async () => undefined,
 }));
 
 vi.mock("../src/config/prisma.js", () => ({
@@ -94,7 +94,7 @@ describe("customer quote Gmail draft route", () => {
     });
 
     expect(res.statusCode).toBe(404);
-    expect((await res.json()).error).toContain("not be found");
+    expect((await res.json()).message).toContain("not found");
   });
 
   it("allows preparing a system template without touching storage", async () => {

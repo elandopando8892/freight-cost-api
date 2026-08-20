@@ -2,8 +2,22 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const customerQuoteEmailDraft = {
   findFirstOrThrow: vi.fn(),
+  findFirst: vi.fn(),
   updateMany: vi.fn(),
   update: vi.fn(),
+};
+
+const transactionClient = {
+  customerQuoteEmailDraft,
+  $queryRaw: vi.fn(),
+};
+
+const prismaMock = {
+  customerQuoteEmailDraft,
+  $transaction: vi.fn(
+    (callback: (client: typeof transactionClient) => Promise<unknown>) =>
+      callback(transactionClient),
+  ),
 };
 
 vi.mock("../src/config/env.js", () => ({
@@ -14,10 +28,14 @@ vi.mock("../src/config/env.js", () => ({
 }));
 
 vi.mock("../src/config/prisma.js", () => ({
-  prisma: { customerQuoteEmailDraft },
+  prisma: prismaMock,
 }));
 
-const { buildCustomerQuoteEmailDeliveryEnvelope, deliverCustomerQuoteEmail } =
+const {
+  buildCustomerQuoteEmailDeliveryEnvelope,
+  deliverCustomerQuoteEmail,
+  reconcileCustomerQuoteEmailDelivery,
+} =
   await import(
     "../src/modules/customer-quotes/customer-quote-email-delivery.js"
   );
@@ -51,6 +69,7 @@ describe("customer quote Gmail delivery", () => {
     vi.clearAllMocks();
     vi.unstubAllGlobals();
     customerQuoteEmailDraft.findFirstOrThrow.mockResolvedValue(draft);
+    customerQuoteEmailDraft.findFirst.mockResolvedValue(null);
     customerQuoteEmailDraft.updateMany.mockResolvedValue({ count: 1 });
     customerQuoteEmailDraft.update.mockImplementation(
       ({ data }: { data: Record<string, unknown> }) =>
@@ -187,5 +206,89 @@ describe("customer quote Gmail delivery", () => {
     expect(result.duplicate).toBe(true);
     expect(result.delivery).toMatchObject({ status: "SENT", receiptId: "receipt-1" });
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("blocks a second draft while the same payload has an uncertain delivery", async () => {
+    customerQuoteEmailDraft.findFirst.mockResolvedValue({
+      id: "draft-unknown",
+      status: "DELIVERY_UNKNOWN",
+    });
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(deliverCustomerQuoteEmail(input)).rejects.toMatchObject({
+      statusCode: 409,
+    });
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(customerQuoteEmailDraft.updateMany).not.toHaveBeenCalled();
+  });
+
+  it("reconciles an attempt that never reached Gmail as retryable FAILED", async () => {
+    customerQuoteEmailDraft.findFirstOrThrow.mockResolvedValue({
+      ...draft,
+      status: "DELIVERY_UNKNOWN",
+    });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            reconciled: true,
+            outcome: "NOT_ATTEMPTED",
+            retryable: true,
+          }),
+          { status: 200 },
+        ),
+      ),
+    );
+
+    const result = await reconcileCustomerQuoteEmailDelivery(input);
+
+    expect(result).toMatchObject({ outcome: "NOT_ATTEMPTED", retryable: true });
+    expect(customerQuoteEmailDraft.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ status: "FAILED" }),
+      }),
+    );
+  });
+
+  it("reconciles a durable Gmail receipt as SENT without sending again", async () => {
+    customerQuoteEmailDraft.findFirstOrThrow.mockResolvedValue({
+      ...draft,
+      status: "DELIVERY_UNKNOWN",
+    });
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          reconciled: true,
+          outcome: "SENT",
+          retryable: false,
+          receipt_id: "receipt-2",
+          provider_message_id: "gmail-message-2",
+          provider_thread_id: "gmail-thread-2",
+          sent_at: "2026-08-20T09:11:55.384Z",
+        }),
+        { status: 200 },
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await reconcileCustomerQuoteEmailDelivery(input);
+
+    expect(result).toMatchObject({ outcome: "SENT", retryable: false });
+    expect(customerQuoteEmailDraft.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          status: "SENT",
+          receiptId: "receipt-2",
+          providerMessageId: "gmail-message-2",
+        }),
+      }),
+    );
+    const request = fetchMock.mock.calls[0][1] as RequestInit;
+    expect(JSON.parse(String(request.body)).action).toBe(
+      "reconcile_fcm_customer_quote_email",
+    );
   });
 });

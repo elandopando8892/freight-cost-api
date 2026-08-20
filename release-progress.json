@@ -1,0 +1,92 @@
+{
+  "schemaVersion": "fcm.release-progress.v1",
+  "updatedAt": "2026-08-20",
+  "target": "production",
+  "method": "weighted-workstreams",
+  "currentSprint": {
+    "number": 12,
+    "status": "UI_UX_AUTHENTICATED_VISUAL_QA_NEXT",
+    "candidateSha": "5065f87710577fa76df4cce6db049b9d4de22685",
+    "evidencePath": "../pilot-evidence/2026-08-20/452cdb5/sprint-11-quote-desk-pilot-sent.json"
+  },
+  "tracks": [
+    {
+      "key": "core-governance",
+      "label": "Motor, datos y gobierno",
+      "weight": 20,
+      "progress": 94,
+      "status": "NEAR_COMPLETE",
+      "evidence": "Motor OPERATIONAL_V3 y gobierno endurecidos; candidato f62e6f7 pasó 411 pruebas, typecheck y validaciones estáticas.",
+      "blockers": ["Falta desplegar el SHA candidato para convertir la validación local en evidencia remota del mismo artefacto."],
+      "nextAction": "Conservar f62e6f7 inmutable y usarlo como baseline de los smokes de integración."
+    },
+    {
+      "key": "ui-ux",
+      "label": "UI/UX Rateware y wireframes",
+      "weight": 15,
+      "progress": 86,
+      "status": "LOCAL_COMPLETE_VISUAL_QA_PENDING",
+      "evidence": "Sprints 1–7 implementados localmente, shell horizontal, master-detail, tablas compactas y accesibilidad focal.",
+      "blockers": ["Faltan capturas y aprobación humana autenticada en 1440x900, 1280x800 y 390x844."],
+      "nextAction": "Ejecutar revisión visual autenticada y registrar evidencia por pantalla."
+    },
+    {
+      "key": "cost-bases-wizard",
+      "label": "Bases, presets y wizard consultivo",
+      "weight": 15,
+      "progress": 90,
+      "status": "IMPLEMENTED_HARDENING",
+      "evidence": "Perfiles multimodales, presets recomendados, preview de aplicabilidad, IA/manual con contrato común y validación server-side.",
+      "blockers": ["Validar con datos de usuario las cinco modalidades y cerrar cualquier ajuste de cobertura."],
+      "nextAction": "Recorrer Intra-Mex, Intra-US, Local, Drayage y Cross-border con un ADMIN."
+    },
+    {
+      "key": "quotes-quote-desk",
+      "label": "Cotización y Quote Desk",
+      "weight": 15,
+      "progress": 98,
+      "status": "PILOT_SENT_VERIFIED_RECONCILIATION_LOCAL",
+      "evidence": "CQ-2026-F49BD6B7 fue enviada una sola vez desde sales@heymarksman.com a jgonzalez@xbfreight.com; Gmail SENT y el ledger coinciden con el recibo 96335a0f-b1cd-43a2-9b90-421ac10aad34.",
+      "blockers": ["Falta promover el endurecimiento de reconciliación y bloqueo de borradores equivalentes."],
+      "nextAction": "Versionar y promover el contrato de reconciliación antes del corte productivo."
+    },
+    {
+      "key": "ratebook-rateware",
+      "label": "RateBook e integración Rateware",
+      "weight": 15,
+      "progress": 88,
+      "status": "GMAIL_PILOT_PASS_RATEBOOK_QA_PENDING",
+      "evidence": "Rateware staging entregó el piloto con Gmail desde el tenant canónico; rateware-api v441 persistió recibo y provider message id sin exponer tokens.",
+      "blockers": ["Falta validar el handoff RateBook real y promover el contrato mediante el flujo de release de Rateware."],
+      "nextAction": "Conservar la evidencia del receiver y ejecutar el handoff RateBook en el Sprint 13."
+    },
+    {
+      "key": "auth-security",
+      "label": "Kinde, roles y seguridad",
+      "weight": 10,
+      "progress": 95,
+      "status": "ADMIN_BFF_AND_OAUTH_CONNECTED_PASS",
+      "evidence": "sales@heymarksman.com verificado como ADMIN y remitente Gmail; callback consumido una sola vez, sin estados activos pendientes y sin exponer tokens.",
+      "blockers": ["Falta completar el cierre humano de permisos/logout y comprobar revocación en un entorno controlado."],
+      "nextAction": "Completar el smoke humano restante sin desconectar la cuenta antes del piloto."
+    },
+    {
+      "key": "qa-release",
+      "label": "QA, evidencia y release",
+      "weight": 10,
+      "progress": 94,
+      "status": "SPRINT_11_PILOT_EVIDENCE_COMPLETE",
+      "evidence": "El paquete del Sprint 11 conserva autorización, actor, destinatario, asunto, recibo Rateware y Gmail provider message id; una sola copia SENT fue verificada.",
+      "blockers": ["Faltan QA visual autenticada, handoff RateBook y promoción del candidato final."],
+      "nextAction": "Iniciar Sprint 12 y registrar evidencia visual autenticada por breakpoint."
+    }
+  ],
+  "productionGates": [
+    {"key": "code", "label": "Código y contratos", "status": "PASS_LOCAL_F62E6F7", "progress": 94},
+    {"key": "ui-visual", "label": "QA visual autenticada", "status": "PENDING", "progress": 55},
+    {"key": "auth", "label": "Kinde y roles en staging", "status": "OAUTH_CONNECTED_HUMAN_CLOSE_PENDING", "progress": 86},
+    {"key": "gmail", "label": "Gmail + receiver Rateware", "status": "PASS_STAGING_PILOT_VERIFIED", "progress": 100},
+    {"key": "rateware", "label": "Handoff Rateware real", "status": "GMAIL_PASS_RATEBOOK_PENDING", "progress": 70},
+    {"key": "release", "label": "Preflight, migraciones y evidencia", "status": "SPRINT_11_EVIDENCE_COMPLETE", "progress": 93}
+  ]
+}

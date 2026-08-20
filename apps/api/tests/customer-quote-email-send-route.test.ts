@@ -1,6 +1,7 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { FastifyInstance } from "fastify";
 import Fastify from "fastify";
+import { ZodError } from "zod";
 
 const quote = {
   id: "quote-1",
@@ -42,6 +43,11 @@ const draft = {
   createdBy: { email: "sales@heymarksman.com" },
 };
 
+const deliveryModuleMocks = vi.hoisted(() => ({
+  deliverCustomerQuoteEmail: vi.fn(),
+  reconcileCustomerQuoteEmailDelivery: vi.fn(),
+}));
+
 vi.mock("../src/middleware/authenticate.js", () => ({
   authenticate: async (request: { user?: { sub: string; orgId: string; role: string } }) => {
     request.user = { sub: "user-1", orgId: "org-1", role: "ADMIN" };
@@ -49,7 +55,7 @@ vi.mock("../src/middleware/authenticate.js", () => ({
 }));
 
 vi.mock("../src/middleware/authorize.js", () => ({
-  requireRole: () => () => undefined,
+  requireRole: () => async () => undefined,
 }));
 
 vi.mock("../src/config/prisma.js", () => ({
@@ -86,14 +92,16 @@ vi.mock("../src/modules/customer-quotes/customer-quote-email-outbox.js", () => (
   customerQuoteEmailPayloadChecksum: vi.fn(() => "checksum-current"),
 }));
 
+vi.mock("../src/modules/customer-quotes/customer-quote-email-delivery.js", () =>
+  deliveryModuleMocks,
+);
+
 const { customerQuotesRoutes } = await import(
   "../src/modules/customer-quotes/customer-quotes.routes.js"
 );
-const { deliverCustomerQuoteEmail } = await import(
-  "../src/modules/customer-quotes/customer-quote-email-delivery.js"
-);
-
-const deliveryMock = vi.mocked(deliverCustomerQuoteEmail);
+const deliveryMock = deliveryModuleMocks.deliverCustomerQuoteEmail;
+const reconciliationMock =
+  deliveryModuleMocks.reconcileCustomerQuoteEmailDelivery;
 
 describe("customer quote gmail send route checks payload freshness", () => {
   let app: FastifyInstance;
@@ -107,8 +115,19 @@ describe("customer quote gmail send route checks payload freshness", () => {
       quote,
     );
     app = Fastify({ logger: false });
+    app.setErrorHandler((error, _request, reply) => {
+      if (error instanceof ZodError)
+        return reply.status(400).send({ error: "Validation error" });
+      return reply
+        .status((error as Error & { statusCode?: number }).statusCode ?? 500)
+        .send({ message: error.message });
+    });
     await app.register(customerQuotesRoutes);
     await app.ready();
+  });
+
+  afterEach(async () => {
+    await app.close();
   });
 
   it("rejects send when the draft payload changed since preparation", async () => {
@@ -247,5 +266,27 @@ describe("customer quote gmail send route checks payload freshness", () => {
     expect(res.statusCode).toBe(409);
     expect((await res.json()).message).toContain("La sesión de envío cambió");
     expect(deliveryMock).not.toHaveBeenCalled();
+  });
+
+  it("reconciles an uncertain delivery through the authenticated Rateware contract", async () => {
+    reconciliationMock.mockResolvedValueOnce({
+      delivery: { ...draft, status: "FAILED" },
+      outcome: "NOT_ATTEMPTED",
+      retryable: true,
+    });
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/customer-quote-email-drafts/draft-1/reconcile",
+      headers: { authorization: "Bearer x" },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(reconciliationMock).toHaveBeenCalledWith({
+      orgId: "org-1",
+      actorId: "user-1",
+      actorBearer: "Bearer x",
+      draftId: "draft-1",
+    });
   });
 });

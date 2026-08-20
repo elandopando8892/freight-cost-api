@@ -25,6 +25,7 @@
     "smoke:staging:auth": "tsx apps/api/scripts/staging-auth-bff-smoke.ts",
     "e2e:staging:pilot": "tsx apps/api/scripts/staging-pilot-go-e2e.ts",
     "preflight:staging:infra": "tsx apps/api/scripts/staging-infrastructure-preflight.ts",
+    "progress:release": "tsx apps/api/scripts/release-progress.ts",
     "db:migrate:staging": "tsx apps/api/scripts/migrate-staging.ts",
     "db:seed:staging": "tsx apps/api/scripts/seed-staging.ts",
     "verify:ci": "npm run secrets:scan && npm run lint && npm run test && npm run typecheck && npm run db:validate -w freight-cost-api && npm run migrations:verify && npm run migrations:contract && npm run migrations:go-approval-contract && npm run migrations:invitation-contract && npm run migrations:member-role-contract && npm run security:headers && npm run build && npm run audit:production && git diff --check && git diff --cached --check",

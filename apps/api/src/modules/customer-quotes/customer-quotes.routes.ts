@@ -8,7 +8,10 @@ import {
   buildRatewareCustomerQuoteEmailDraftContract,
   customerQuoteEmailPayloadChecksum,
 } from "./customer-quote-email-outbox.js";
-import { deliverCustomerQuoteEmail } from "./customer-quote-email-delivery.js";
+import {
+  deliverCustomerQuoteEmail,
+  reconcileCustomerQuoteEmailDelivery,
+} from "./customer-quote-email-delivery.js";
 import { customerQuoteTransitionBlocker } from "./customer-quote-lifecycle.js";
 
 const Line = z.object({
@@ -436,6 +439,26 @@ export async function customerQuotesRoutes(app: FastifyInstance) {
         );
       }
       return deliverCustomerQuoteEmail({
+        orgId: user.orgId,
+        actorId: user.sub,
+        actorBearer,
+        draftId: id,
+      });
+    },
+  );
+  app.post(
+    "/customer-quote-email-drafts/:id/reconcile",
+    { preHandler: requireRole("ADMIN", "OPERATOR") },
+    async (request) => {
+      const user = request.user as JwtPayload;
+      const { id } = request.params as { id: string };
+      const actorBearer = request.headers.authorization;
+      if (!actorBearer)
+        throw Object.assign(
+          new Error("A Kinde bearer token is required for Gmail reconciliation."),
+          { statusCode: 401 },
+        );
+      return reconcileCustomerQuoteEmailDelivery({
         orgId: user.orgId,
         actorId: user.sub,
         actorBearer,

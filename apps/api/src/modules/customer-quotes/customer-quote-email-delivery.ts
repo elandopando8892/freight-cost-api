@@ -14,6 +14,12 @@ type EmailDraftStatus =
   | "FAILED"
   | "DELIVERY_UNKNOWN";
 
+type ReconciliationOutcome =
+  | "SENT"
+  | "FAILED"
+  | "NOT_ATTEMPTED"
+  | "DELIVERY_UNKNOWN";
+
 type DeliverableEmailDraft = {
   id: string;
   orgId: string;
@@ -74,6 +80,46 @@ class RatewareEmailDeliveryError extends Error {
   }
 }
 
+async function claimExclusivePayloadDelivery(input: {
+  orgId: string;
+  actorId: string;
+  draft: DeliverableEmailDraft;
+  idempotencyKey: string;
+  attemptedAt: Date;
+}) {
+  return prisma.$transaction(async (tx) => {
+    const deliveryGroup = `${input.orgId}:${input.draft.customerQuoteId}:${input.draft.payloadChecksum}`;
+    await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${deliveryGroup}, 0))`;
+    const blocker = await tx.customerQuoteEmailDraft.findFirst({
+      where: {
+        id: { not: input.draft.id },
+        orgId: input.orgId,
+        customerQuoteId: input.draft.customerQuoteId,
+        payloadChecksum: input.draft.payloadChecksum,
+        status: { in: ["SENT", "SENDING", "DELIVERY_UNKNOWN"] },
+      },
+      select: { id: true, status: true },
+    });
+    if (blocker) return { claimed: false as const, blocker };
+
+    const claim = await tx.customerQuoteEmailDraft.updateMany({
+      where: {
+        id: input.draft.id,
+        orgId: input.orgId,
+        status: { in: ["PREPARED", "FAILED"] },
+      },
+      data: {
+        status: "SENDING",
+        idempotencyKey: input.idempotencyKey,
+        sentById: input.actorId,
+        attemptedAt: input.attemptedAt,
+        error: null,
+      },
+    });
+    return { claimed: claim.count === 1, blocker: null };
+  });
+}
+
 export async function deliverCustomerQuoteEmail(input: {
   orgId: string;
   actorId: string;
@@ -119,21 +165,23 @@ export async function deliverCustomerQuoteEmail(input: {
       draft,
     });
   const attemptedAt = new Date();
-  const claim = await prisma.customerQuoteEmailDraft.updateMany({
-    where: {
-      id: draft.id,
-      orgId: input.orgId,
-      status: { in: ["PREPARED", "FAILED"] },
-    },
-    data: {
-      status: "SENDING",
-      idempotencyKey,
-      sentById: input.actorId,
-      attemptedAt,
-      error: null,
-    },
+  const claim = await claimExclusivePayloadDelivery({
+    orgId: input.orgId,
+    actorId: input.actorId,
+    draft,
+    idempotencyKey,
+    attemptedAt,
   });
-  if (claim.count !== 1)
+  if (claim.blocker)
+    throw Object.assign(
+      new Error(
+        claim.blocker.status === "SENT"
+          ? "This quote payload was already sent from another prepared draft."
+          : "Another draft for this quote payload is sending or requires reconciliation.",
+      ),
+      { statusCode: 409 },
+    );
+  if (!claim.claimed)
     throw Object.assign(
       new Error("Gmail delivery could not acquire an exclusive send claim."),
       { statusCode: 409 },
@@ -234,4 +282,158 @@ export async function deliverCustomerQuoteEmail(input: {
     },
   });
   return { delivery, duplicate: Boolean(receipt.duplicate) };
+}
+
+export async function reconcileCustomerQuoteEmailDelivery(input: {
+  orgId: string;
+  actorId: string;
+  actorBearer: string;
+  draftId: string;
+}) {
+  const endpoint = trustedRatewareEndpoint(env.RATEWARE_API_URL, env.NODE_ENV);
+  if (!endpoint)
+    throw Object.assign(
+      new Error("Rateware Gmail delivery is not configured for this environment."),
+      { statusCode: 503 },
+    );
+
+  const draft = (await prisma.customerQuoteEmailDraft.findFirstOrThrow({
+    where: { id: input.draftId, orgId: input.orgId },
+    include: {
+      customerQuote: { select: { folio: true, status: true } },
+      createdBy: { select: { email: true } },
+    },
+  })) as DeliverableEmailDraft;
+  if (draft.status === "SENT")
+    return { delivery: draft, outcome: "SENT" as const, retryable: false };
+  if (draft.status !== "DELIVERY_UNKNOWN")
+    throw Object.assign(
+      new Error("Only a delivery with an uncertain outcome can be reconciled."),
+      { statusCode: 409 },
+    );
+
+  const { idempotencyKey, payload } = buildCustomerQuoteEmailDeliveryEnvelope({
+    orgId: input.orgId,
+    actorId: input.actorId,
+    draft,
+  });
+  let response: Response;
+  try {
+    response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        authorization: input.actorBearer,
+        "content-type": "application/json",
+        "x-idempotency-key": idempotencyKey,
+      },
+      body: JSON.stringify({
+        action: "reconcile_fcm_customer_quote_email",
+        idempotency_key: idempotencyKey,
+        package: payload,
+      }),
+      signal: AbortSignal.timeout(15_000),
+    });
+  } catch (error) {
+    throw Object.assign(
+      new Error(
+        boundedError(
+          error instanceof Error
+            ? error.message
+            : "Rateware reconciliation did not return a response.",
+        ),
+      ),
+      { statusCode: 502 },
+    );
+  }
+
+  const raw = await response.text();
+  let receipt: {
+    reconciled?: boolean;
+    outcome?: ReconciliationOutcome;
+    retryable?: boolean;
+    receipt_id?: string | null;
+    provider_message_id?: string | null;
+    provider_thread_id?: string | null;
+    sent_at?: string | null;
+    error?: string | null;
+  } = {};
+  try {
+    receipt = raw ? JSON.parse(raw) : {};
+  } catch {
+    throw Object.assign(
+      new Error("Rateware Gmail returned an invalid reconciliation response."),
+      { statusCode: 502 },
+    );
+  }
+  if (!response.ok || !receipt.reconciled || !receipt.outcome)
+    throw Object.assign(
+      new Error(
+        boundedError(
+          receipt.error ||
+            `Rateware Gmail reconciliation failed (HTTP ${response.status}).`,
+        ),
+      ),
+      { statusCode: 502 },
+    );
+
+  if (receipt.outcome === "SENT") {
+    if (!receipt.receipt_id || !receipt.provider_message_id)
+      throw Object.assign(
+        new Error("Rateware reconciliation returned SENT without a durable Gmail receipt."),
+        { statusCode: 502 },
+      );
+    const delivery = await prisma.customerQuoteEmailDraft.update({
+      where: { id: draft.id },
+      data: {
+        status: "SENT",
+        responseCode: response.status,
+        receiptId: receipt.receipt_id,
+        providerMessageId: receipt.provider_message_id,
+        providerThreadId: receipt.provider_thread_id,
+        error: null,
+        sentAt: receipt.sent_at ? new Date(receipt.sent_at) : new Date(),
+      },
+    });
+    return { delivery, outcome: "SENT" as const, retryable: false };
+  }
+
+  if (receipt.outcome === "NOT_ATTEMPTED" || receipt.outcome === "FAILED") {
+    const message = boundedError(
+      receipt.error ||
+        (receipt.outcome === "NOT_ATTEMPTED"
+          ? "Rateware confirmed Gmail was not attempted; a deliberate retry is allowed."
+          : "Rateware confirmed the previous Gmail attempt failed before acceptance."),
+    );
+    const delivery = await prisma.customerQuoteEmailDraft.update({
+      where: { id: draft.id },
+      data: {
+        status: "FAILED",
+        responseCode: response.status,
+        receiptId: receipt.receipt_id,
+        providerMessageId: receipt.provider_message_id,
+        providerThreadId: receipt.provider_thread_id,
+        error: message,
+      },
+    });
+    return {
+      delivery,
+      outcome: receipt.outcome,
+      retryable: Boolean(receipt.retryable),
+    };
+  }
+
+  const delivery = await prisma.customerQuoteEmailDraft.update({
+    where: { id: draft.id },
+    data: {
+      status: "DELIVERY_UNKNOWN",
+      responseCode: response.status,
+      receiptId: receipt.receipt_id,
+      providerMessageId: receipt.provider_message_id,
+      providerThreadId: receipt.provider_thread_id,
+      error: boundedError(
+        receipt.error || "Gmail delivery remains uncertain; do not retry.",
+      ),
+    },
+  });
+  return { delivery, outcome: "DELIVERY_UNKNOWN" as const, retryable: false };
 }

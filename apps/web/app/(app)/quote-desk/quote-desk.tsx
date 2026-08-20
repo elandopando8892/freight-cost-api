@@ -2,7 +2,7 @@
 import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Eye, FileText, Mail, Plus } from "lucide-react";
+import { Eye, FileText, Mail, Plus, RefreshCw } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -287,6 +287,28 @@ export function QuoteDesk({
           : "Correo aceptado por Gmail y registrado con evidencia.",
       );
       setSendCandidate(null);
+      void queryClient.invalidateQueries({
+        queryKey: ["customer-quote-email-drafts", previewFor?.id],
+      });
+    },
+  });
+  const reconcileGmail = useMutation({
+    mutationFn: (draftId: string) =>
+      fetcher<{
+        delivery: EmailDraftHistoryItem;
+        outcome: "SENT" | "FAILED" | "NOT_ATTEMPTED" | "DELIVERY_UNKNOWN";
+        retryable: boolean;
+      }>(`/api/v1/customer-quote-email-drafts/${draftId}/reconcile`, {
+        method: "POST",
+      }),
+    onSuccess: (result) => {
+      setPreparedMessage(
+        result.outcome === "SENT"
+          ? "La reconciliación confirmó el recibo existente de Gmail."
+          : result.retryable
+            ? "Rateware confirmó que Gmail no aceptó ese intento; el borrador quedó disponible para un reintento deliberado."
+            : "La entrega continúa incierta y permanece bloqueada para evitar duplicados.",
+      );
       void queryClient.invalidateQueries({
         queryKey: ["customer-quote-email-drafts", previewFor?.id],
       });
@@ -775,7 +797,16 @@ export function QuoteDesk({
                   Cada fila conserva el snapshot, estado y recibo de entrega.
                 </p>
                 <div className="mt-3 grid gap-2">
-                  {emailDraftHistory.data.map((draft) => (
+                  {emailDraftHistory.data.map((draft) => {
+                    const siblingBlocker = emailDraftHistory.data.find(
+                      (candidate) =>
+                        candidate.id !== draft.id &&
+                        candidate.payloadChecksum === draft.payloadChecksum &&
+                        (candidate.status === "SENT" ||
+                          candidate.status === "SENDING" ||
+                          candidate.status === "DELIVERY_UNKNOWN"),
+                    );
+                    return (
                     <div
                       className="flex flex-wrap items-center justify-between gap-2 rounded border px-3 py-2 text-sm"
                       key={draft.id}
@@ -792,6 +823,13 @@ export function QuoteDesk({
                         </p>
                         {draft.sentAt ? <p className="mt-1 text-xs text-emerald-700 dark:text-emerald-300">Enviado {new Date(draft.sentAt).toLocaleString("es-MX")} por {draft.sentBy?.email ?? "usuario autorizado"}{draft.receiptId ? ` · recibo ${draft.receiptId}` : ""}</p> : null}
                         {draft.error ? <p className="mt-1 text-xs text-destructive">{draft.error}</p> : null}
+                        {siblingBlocker && (draft.status === "PREPARED" || draft.status === "FAILED") ? (
+                          <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">
+                            {siblingBlocker.status === "SENT"
+                              ? "Este mismo contenido ya fue enviado desde otro borrador."
+                              : "Otro borrador con el mismo contenido debe reconciliarse antes de enviar."}
+                          </p>
+                        ) : null}
                       </div>
                       <div className="flex flex-wrap items-center gap-2">
                         <Button
@@ -801,7 +839,18 @@ export function QuoteDesk({
                         >
                           Exportar
                         </Button>
-                        {canEdit && previewFor.status === "APPROVED" && (draft.status === "PREPARED" || draft.status === "FAILED") ? (
+                        {canEdit && draft.status === "DELIVERY_UNKNOWN" ? (
+                          <Button
+                            disabled={reconcileGmail.isPending}
+                            onClick={() => reconcileGmail.mutate(draft.id)}
+                            size="sm"
+                            variant="outline"
+                          >
+                            <RefreshCw className="mr-1 h-4 w-4" />
+                            {reconcileGmail.isPending ? "Reconciliando…" : "Reconciliar"}
+                          </Button>
+                        ) : null}
+                        {canEdit && previewFor.status === "APPROVED" && !siblingBlocker && (draft.status === "PREPARED" || draft.status === "FAILED") ? (
                           <Button
                             disabled={!gmailReady || sendGmail.isPending}
                             onClick={() => setSendCandidate(draft)}
@@ -812,7 +861,8 @@ export function QuoteDesk({
                         ) : null}
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             ) : null}
@@ -825,6 +875,7 @@ export function QuoteDesk({
             )}
             {transitionQuote.isError ? <p className="mt-3 text-sm text-destructive">No se pudo actualizar el estado de la propuesta.</p> : null}
             {sendGmail.isError ? <p className="mt-3 text-sm text-destructive">{sendGmail.error instanceof Error ? sendGmail.error.message : "No se pudo entregar el correo."}</p> : null}
+            {reconcileGmail.isError ? <p className="mt-3 text-sm text-destructive">{reconcileGmail.error instanceof Error ? reconcileGmail.error.message : "No se pudo reconciliar la entrega."}</p> : null}
           </CardContent>
         </Card>
       )}
