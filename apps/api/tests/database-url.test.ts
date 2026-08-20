@@ -3,6 +3,7 @@ import {
   assertIsolatedNeonStagingTarget,
   resolveDatabaseUrl,
 } from "../src/config/database-url.js";
+import * as databaseConfig from "../src/config/database-url.js";
 
 describe("database URL isolation", () => {
   it("uses the isolated Neon URL for a Vercel Preview", () => {
@@ -36,6 +37,17 @@ describe("database URL isolation", () => {
 });
 
 describe("staging migration target guard", () => {
+  it("accepts distinct Vercel Preview URLs without exposing a Neon project id", () => {
+    expect(
+      assertIsolatedNeonStagingTarget({
+        productionDatabaseUrl:
+          "postgresql://app:secret@ep-production.us-east-2.aws.neon.tech/fcm",
+        stagingDatabaseUrl:
+          "postgresql://app:secret@ep-staging.us-east-2.aws.neon.tech/fcm",
+      }),
+    ).toContain("ep-staging");
+  });
+
   it("accepts a distinct Neon staging endpoint", () => {
     expect(
       assertIsolatedNeonStagingTarget({
@@ -97,5 +109,33 @@ describe("staging migration target guard", () => {
         stagingNeonProjectId: "unexpected-project",
       }),
     ).toThrow("project identity does not match");
+  });
+
+  it("selects migrations only for the staging Preview branch", () => {
+    const selectTarget = (
+      databaseConfig as typeof databaseConfig & {
+        resolveVercelStagingMigrationTarget?: (
+          environment: Record<string, string | undefined>,
+        ) => string | null;
+      }
+    ).resolveVercelStagingMigrationTarget;
+    const environment = {
+      VERCEL_ENV: "preview",
+      VERCEL_GIT_COMMIT_REF: "staging",
+      DATABASE_URL:
+        "postgresql://app:secret@ep-production.us-east-2.aws.neon.tech/fcm",
+      STAGING_DATABASE_URL:
+        "postgresql://app:secret@ep-staging.us-east-2.aws.neon.tech/fcm",
+    };
+
+    expect(selectTarget?.(environment)).toBe(
+      environment.STAGING_DATABASE_URL,
+    );
+    expect(
+      selectTarget?.({ ...environment, VERCEL_GIT_COMMIT_REF: "feature/x" }),
+    ).toBeNull();
+    expect(
+      selectTarget?.({ ...environment, VERCEL_ENV: "production" }),
+    ).toBeNull();
   });
 });

@@ -2,6 +2,7 @@ type DatabaseEnvironment = {
   DATABASE_URL?: string;
   STAGING_DATABASE_URL?: string;
   VERCEL_ENV?: string;
+  VERCEL_GIT_COMMIT_REF?: string;
 };
 
 function present(value: string | undefined) {
@@ -46,10 +47,17 @@ export function assertIsolatedNeonStagingTarget(input: {
   const productionValue = present(input.productionDatabaseUrl);
   const expectedProjectId = present(input.expectedNeonProjectId);
   const stagingProjectId = present(input.stagingNeonProjectId);
-  if (!stagingValue || !expectedProjectId || !stagingProjectId) {
-    throw new Error("Staging URL and Neon project identity are required.");
+  if (!stagingValue) {
+    throw new Error("Staging URL is required.");
   }
-  if (stagingProjectId !== expectedProjectId) {
+  if (Boolean(expectedProjectId) !== Boolean(stagingProjectId)) {
+    throw new Error("Both Neon project identities are required together.");
+  }
+  if (
+    expectedProjectId &&
+    stagingProjectId &&
+    stagingProjectId !== expectedProjectId
+  ) {
     throw new Error("Staging Neon project identity does not match.");
   }
 
@@ -75,6 +83,25 @@ export function assertIsolatedNeonStagingTarget(input: {
     if (databaseIdentity(staging) === databaseIdentity(production)) {
       throw new Error("Staging database must not resolve to the Production target.");
     }
+  } else if (!expectedProjectId) {
+    throw new Error(
+      "Production URL or verified Neon project identity is required.",
+    );
   }
   return stagingValue;
+}
+
+export function resolveVercelStagingMigrationTarget(
+  environment: DatabaseEnvironment,
+) {
+  if (
+    environment.VERCEL_ENV !== "preview" ||
+    environment.VERCEL_GIT_COMMIT_REF !== "staging"
+  ) {
+    return null;
+  }
+  return assertIsolatedNeonStagingTarget({
+    productionDatabaseUrl: environment.DATABASE_URL,
+    stagingDatabaseUrl: environment.STAGING_DATABASE_URL,
+  });
 }

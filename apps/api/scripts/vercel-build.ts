@@ -6,6 +6,7 @@ import {
   productionBaselineConfirmation,
   productionMigrationConfirmation,
 } from "../src/config/production-migration-confirmation.js";
+import { resolveVercelStagingMigrationTarget } from "../src/config/database-url.js";
 
 const schema = "prisma/schema.prisma";
 const baselineSchema = "prisma/baseline.prisma";
@@ -37,6 +38,29 @@ function requireSuccess(label: string, result: ReturnType<typeof prisma>) {
 }
 
 requireSuccess("Prisma generate", prisma(["generate", "--schema", schema]));
+
+const stagingMigrationTarget =
+  resolveVercelStagingMigrationTarget(process.env);
+if (stagingMigrationTarget) {
+  process.env.DATABASE_URL = stagingMigrationTarget;
+  const stagingStatus = prisma(["migrate", "status", "--schema", schema]);
+  if (
+    stagingStatus.status !== 0 &&
+    !stagingStatus.output.includes("have not yet been applied")
+  ) {
+    throw new Error("Staging migration status could not be verified.");
+  }
+  requireSuccess(
+    "Staging migration deploy",
+    prisma(["migrate", "deploy", "--schema", schema]),
+  );
+  requireSuccess(
+    "Staging migration verification",
+    prisma(["migrate", "status", "--schema", schema]),
+  );
+  process.stdout.write("Staging migrations applied and verified.\n");
+  process.exit(0);
+}
 
 if (process.env.VERCEL_ENV !== "production") {
   process.stdout.write("Production migrations skipped outside Vercel Production.\n");
