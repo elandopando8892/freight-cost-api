@@ -636,7 +636,7 @@ export function QuoteDesk({
         </select>
         <span className="text-xs text-muted-foreground sm:ml-auto">{visibleItems.length} de {items.length}</span>
       </div>
-      <div className={previewFor ? "grid gap-3 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] xl:items-start" : ""}>
+      <div className={previewFor ? "grid min-w-0 gap-3 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] xl:items-start" : "min-w-0"}>
       <Card className="min-w-0 overflow-hidden">
         <CardContent className="overflow-x-auto p-0">
           <table className="w-full min-w-[760px] text-xs">

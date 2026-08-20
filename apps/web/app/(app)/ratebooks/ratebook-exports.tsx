@@ -98,7 +98,7 @@ export function RateBookExports({
         Exportar o entregar tarifario publicado:
       </span>
       {books.map((book) => (
-        <span key={book.id} className="flex gap-1">
+        <span key={book.id} className="flex flex-wrap justify-end gap-1">
           <Button variant="outline" size="sm" onClick={() => download(book)}>
             <Download className="mr-1 h-4 w-4" />
             {book.code} CSV

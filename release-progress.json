@@ -5,9 +5,9 @@
   "method": "weighted-workstreams",
   "currentSprint": {
     "number": 12,
-    "status": "LOCAL_FIXES_VALIDATED_VISUAL_RECAPTURE_PENDING",
-    "candidateSha": "bbf4716a6b33aa72681717a9a9bcbb01d9ed0c1c",
-    "evidencePath": "../pilot-evidence/2026-08-20/bbf4716/visual/audit-status.json"
+    "status": "FOLLOWUP_RESPONSIVE_FIX_LOCAL_STAGING_PENDING",
+    "candidateSha": "b4ed41974cfc315c4d0cbe774b1107ba9d26ea4a",
+    "evidencePath": "../pilot-evidence/2026-08-20/b4ed419/visual/capture-blocker.json"
   },
   "tracks": [
     {
@@ -16,19 +16,19 @@
       "weight": 20,
       "progress": 96,
       "status": "STAGING_RELEASE_VERIFIED",
-      "evidence": "Motor OPERATIONAL_V3 y gobierno endurecidos; staging sirve bbf4716 y /health + /ready acreditan el mismo release con base conectada.",
+      "evidence": "Motor OPERATIONAL_V3 y gobierno endurecidos; staging sirve b4ed419 y /health + /ready acreditan el mismo release con base conectada.",
       "blockers": ["Falta completar los gates autenticados y el corte productivo del artefacto candidato."],
-      "nextAction": "Conservar bbf4716 inmutable como baseline de los smokes restantes."
+      "nextAction": "Conservar b4ed419 inmutable como baseline remoto hasta publicar el follow-up responsive."
     },
     {
       "key": "ui-ux",
       "label": "UI/UX Rateware y wireframes",
       "weight": 15,
       "progress": 90,
-      "status": "LOCAL_FIXES_VALIDATED_VISUAL_RECAPTURE_PENDING",
-      "evidence": "La revisión autenticada confirmó la arquitectura horizontal y detectó tres P2: selector sin nombre accesible, reconciliación en inglés y overflow móvil en Quote Desk/RateBook. Los tres fixes pasan pruebas focales, typecheck y ESLint local.",
-      "blockers": ["Falta publicar los fixes en staging, recapturar la matriz 1440x900, 1280x800 y 390x844 y obtener aceptación humana."],
-      "nextAction": "Publicar el parche acotado en staging y repetir la captura visual autenticada."
+      "status": "FOLLOWUP_RESPONSIVE_FIX_LOCAL_STAGING_PENDING",
+      "evidence": "El selector accesible ya pasa en staging. La primera corrección de ancho no cerró el overflow móvil: la traza remota aisló el wrapper grid de Quote Desk y el grupo no-wrap de acciones RateBook; el follow-up mínimo pasa typecheck y ESLint local.",
+      "blockers": ["Falta publicar el follow-up responsive, verificar Quote Desk/RateBook a 390x844 y completar las capturas con aceptación humana."],
+      "nextAction": "Publicar las dos correcciones raíz en staging y repetir el gate responsive."
     },
     {
       "key": "cost-bases-wizard",
@@ -82,8 +82,8 @@
     }
   ],
   "productionGates": [
-    {"key": "code", "label": "Código y contratos", "status": "PASS_STAGING_BBF4716", "progress": 96},
-    {"key": "ui-visual", "label": "QA visual autenticada", "status": "LOCAL_FIXES_PASS_RECAPTURE_PENDING", "progress": 75},
+    {"key": "code", "label": "Código y contratos", "status": "PASS_STAGING_B4ED419", "progress": 96},
+    {"key": "ui-visual", "label": "QA visual autenticada", "status": "FOLLOWUP_RESPONSIVE_FIX_LOCAL_STAGING_PENDING", "progress": 75},
     {"key": "auth", "label": "Kinde y roles en staging", "status": "OAUTH_CONNECTED_HUMAN_CLOSE_PENDING", "progress": 86},
     {"key": "gmail", "label": "Gmail + receiver Rateware", "status": "PASS_STAGING_PILOT_VERIFIED", "progress": 100},
     {"key": "rateware", "label": "Handoff Rateware real", "status": "GMAIL_PASS_RATEBOOK_PENDING", "progress": 70},
