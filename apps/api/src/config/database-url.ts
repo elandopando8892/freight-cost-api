@@ -1,8 +1,10 @@
 type DatabaseEnvironment = {
   DATABASE_URL?: string;
   STAGING_DATABASE_URL?: string;
+  FCM_STAGING_MIGRATION_CONFIRMATION?: string;
   VERCEL_ENV?: string;
   VERCEL_GIT_COMMIT_REF?: string;
+  VERCEL_GIT_COMMIT_SHA?: string;
 };
 
 function present(value: string | undefined) {
@@ -37,6 +39,22 @@ function databaseIdentity(value: URL) {
   return `${value.hostname.toLowerCase().replace("-pooler.", ".")}${value.pathname}`;
 }
 
+function parseNeonStagingUrl(stagingValue: string) {
+  let staging: URL;
+  try {
+    staging = new URL(stagingValue);
+  } catch {
+    throw new Error("Staging database URL is invalid.");
+  }
+  if (!["postgres:", "postgresql:"].includes(staging.protocol)) {
+    throw new Error("Staging database must use PostgreSQL.");
+  }
+  if (!staging.hostname.toLowerCase().endsWith(".neon.tech")) {
+    throw new Error("Staging database must be a Neon endpoint.");
+  }
+  return staging;
+}
+
 export function assertIsolatedNeonStagingTarget(input: {
   expectedNeonProjectId?: string;
   productionDatabaseUrl?: string;
@@ -61,18 +79,7 @@ export function assertIsolatedNeonStagingTarget(input: {
     throw new Error("Staging Neon project identity does not match.");
   }
 
-  let staging: URL;
-  try {
-    staging = new URL(stagingValue);
-  } catch {
-    throw new Error("Staging database URL is invalid.");
-  }
-  if (!["postgres:", "postgresql:"].includes(staging.protocol)) {
-    throw new Error("Staging database must use PostgreSQL.");
-  }
-  if (!staging.hostname.toLowerCase().endsWith(".neon.tech")) {
-    throw new Error("Staging database must be a Neon endpoint.");
-  }
+  const staging = parseNeonStagingUrl(stagingValue);
   if (productionValue && productionValue !== "[SENSITIVE]") {
     let production: URL;
     try {
@@ -100,8 +107,20 @@ export function resolveVercelStagingMigrationTarget(
   ) {
     return null;
   }
-  return assertIsolatedNeonStagingTarget({
-    productionDatabaseUrl: environment.DATABASE_URL,
-    stagingDatabaseUrl: environment.STAGING_DATABASE_URL,
-  });
+  const releaseSha = present(environment.VERCEL_GIT_COMMIT_SHA);
+  const stagingValue = present(environment.STAGING_DATABASE_URL);
+  const expectedConfirmation = releaseSha
+    ? `APPLY_STAGING_MIGRATIONS:${releaseSha}`
+    : null;
+  if (
+    !expectedConfirmation ||
+    environment.FCM_STAGING_MIGRATION_CONFIRMATION !== expectedConfirmation
+  ) {
+    throw new Error(
+      "Staging migration confirmation does not match the release.",
+    );
+  }
+  if (!stagingValue) throw new Error("Staging URL is required.");
+  parseNeonStagingUrl(stagingValue);
+  return stagingValue;
 }

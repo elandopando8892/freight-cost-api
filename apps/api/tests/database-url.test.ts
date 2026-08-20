@@ -122,10 +122,13 @@ describe("staging migration target guard", () => {
     const environment = {
       VERCEL_ENV: "preview",
       VERCEL_GIT_COMMIT_REF: "staging",
+      VERCEL_GIT_COMMIT_SHA: "abcdef1234567890",
       DATABASE_URL:
-        "postgresql://app:secret@ep-production.us-east-2.aws.neon.tech/fcm",
+        "postgresql://app:secret@ep-staging.us-east-2.aws.neon.tech/fcm",
       STAGING_DATABASE_URL:
         "postgresql://app:secret@ep-staging.us-east-2.aws.neon.tech/fcm",
+      FCM_STAGING_MIGRATION_CONFIRMATION:
+        "APPLY_STAGING_MIGRATIONS:abcdef1234567890",
     };
 
     expect(selectTarget?.(environment)).toBe(
@@ -137,5 +140,29 @@ describe("staging migration target guard", () => {
     expect(
       selectTarget?.({ ...environment, VERCEL_ENV: "production" }),
     ).toBeNull();
+  });
+
+  it("fails closed when staging migration confirmation does not match the release", () => {
+    const selectTarget = (
+      databaseConfig as typeof databaseConfig & {
+        resolveVercelStagingMigrationTarget?: (
+          environment: Record<string, string | undefined>,
+        ) => string | null;
+      }
+    ).resolveVercelStagingMigrationTarget;
+
+    expect(() =>
+      selectTarget?.({
+        VERCEL_ENV: "preview",
+        VERCEL_GIT_COMMIT_REF: "staging",
+        VERCEL_GIT_COMMIT_SHA: "release-a",
+        DATABASE_URL:
+          "postgresql://app:secret@ep-staging.us-east-2.aws.neon.tech/fcm",
+        STAGING_DATABASE_URL:
+          "postgresql://app:secret@ep-staging.us-east-2.aws.neon.tech/fcm",
+        FCM_STAGING_MIGRATION_CONFIRMATION:
+          "APPLY_STAGING_MIGRATIONS:release-b",
+      }),
+    ).toThrow("confirmation");
   });
 });
