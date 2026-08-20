@@ -51,6 +51,7 @@ describe("Rateware delivery envelope", () => {
     const retry = buildRatewareDeliveryEnvelope({ orgId: "org-1", book });
 
     expect(retry).toEqual(first);
+    expect(first.payload.source.organizationId).toBe("org-1");
     expect(first.payload.source.exportedAt).toBe(
       book.updatedAt.toISOString(),
     );
@@ -70,5 +71,19 @@ describe("Rateware delivery envelope", () => {
 
     expect(next.idempotencyKey).not.toBe(first.idempotencyKey);
     expect(next.payloadChecksum).not.toBe(first.payloadChecksum);
+  });
+
+  it("changes the tenant-bound envelope when only payload lineage changes", () => {
+    const first = buildRatewareDeliveryEnvelope({ orgId: "org-1", book });
+    const drifted = buildRatewareDeliveryEnvelope({
+      orgId: "org-1",
+      book: {
+        ...book,
+        costBase: { ...book.costBase, name: "Renamed after approval" },
+      },
+    });
+
+    expect(drifted.payloadChecksum).not.toBe(first.payloadChecksum);
+    expect(drifted.idempotencyKey).not.toBe(first.idempotencyKey);
   });
 });

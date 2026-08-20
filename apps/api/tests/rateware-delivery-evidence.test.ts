@@ -15,6 +15,8 @@ describe("Rateware delivery evidence export", () => {
           responseCode: 202,
           receiptId: "receipt-1",
           payloadChecksum: "abc123",
+          remotePayloadChecksum: "abc123",
+          receiverRevision: "receiver-deployment-1",
           error: "=none",
           approvalRequest: {
             id: "approval-1",
@@ -30,6 +32,8 @@ describe("Rateware delivery evidence export", () => {
     });
     expect(csv).toContain('"Receipt ID"');
     expect(csv).toContain('"receipt-1"');
+    expect(csv).toContain('"Remote Payload Checksum"');
+    expect(csv).toContain('"receiver-deployment-1"');
     expect(csv).toContain('"\'=none"');
     expect(csv.startsWith("\uFEFF")).toBe(true);
   });

@@ -9,6 +9,7 @@ import { buildRatewareRateBookContract } from "./rateware-ratebook-contract.js";
 import { deliverRateBookToRateware } from "./rateware-delivery.js";
 import { ratewareDeliveryApprovalBlocker } from "./rateware-delivery-approval.js";
 import { ratewareDeliveryEvidenceCsv } from "./rateware-delivery-evidence.js";
+import { buildRatewareDeliveryEnvelope } from "./rateware-delivery-envelope.js";
 
 const CreateRateBook = z.object({
   code: z
@@ -315,7 +316,7 @@ export async function rateBooksRoutes(app: FastifyInstance) {
         "Only a published RateBook can be packaged for Rateware.",
         409,
       );
-    return buildRatewareRateBookContract(book);
+    return buildRatewareRateBookContract(book, new Date(), orgId);
   });
   app.get("/integration/rateware/ratebooks/:id/deliveries", async (request) => {
     const { orgId } = request.user as JwtPayload;
@@ -349,6 +350,8 @@ export async function rateBooksRoutes(app: FastifyInstance) {
           responseCode: true,
           receiptId: true,
           payloadChecksum: true,
+          remotePayloadChecksum: true,
+          receiverRevision: true,
           error: true,
           approvalRequest: {
             select: {
@@ -428,11 +431,22 @@ export async function rateBooksRoutes(app: FastifyInstance) {
           action: "RATEWARE_DELIVERY",
           status: "APPROVED",
         },
-        select: { id: true, reviewedAt: true },
+        select: { id: true, reviewedAt: true, payloadChecksum: true },
         orderBy: { reviewedAt: "desc" },
       });
-      const approvalBlocker = ratewareDeliveryApprovalBlocker(approval);
-      if (approvalBlocker || !approval)
+      if (!approval?.reviewedAt) {
+        throw httpError(
+          ratewareDeliveryApprovalBlocker(approval, "") ??
+            "Rateware delivery requires an approved delivery request.",
+          422,
+        );
+      }
+      const currentEnvelope = buildRatewareDeliveryEnvelope({ orgId, book });
+      const approvalBlocker = ratewareDeliveryApprovalBlocker(
+        approval,
+        currentEnvelope.payloadChecksum,
+      );
+      if (approvalBlocker)
         throw httpError(
           approvalBlocker ??
             "Rateware delivery requires an approved delivery request.",
@@ -443,6 +457,7 @@ export async function rateBooksRoutes(app: FastifyInstance) {
         actorId: (request.user as JwtPayload).sub,
         actorBearer,
         approvalRequestId: approval.id,
+        approvedPayloadChecksum: approval.payloadChecksum!,
         book,
       });
     },

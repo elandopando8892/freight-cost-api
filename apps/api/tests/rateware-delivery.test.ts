@@ -19,6 +19,9 @@ vi.mock("../src/config/prisma.js", () => ({
 const { deliverRateBookToRateware } = await import(
   "../src/modules/ratebooks/rateware-delivery.js"
 );
+const { buildRatewareDeliveryEnvelope } = await import(
+  "../src/modules/ratebooks/rateware-delivery-envelope.js"
+);
 
 const book = {
   id: "rb-1",
@@ -64,11 +67,17 @@ const book = {
   ],
 };
 
+const deliveryEnvelope = buildRatewareDeliveryEnvelope({
+  orgId: "org-1",
+  book,
+});
+
 const deliveryInput = {
   orgId: "org-1",
   actorId: "admin-1",
   actorBearer: "Bearer test-kinde-token",
   approvalRequestId: "approval-1",
+  approvedPayloadChecksum: deliveryEnvelope.payloadChecksum,
   book,
 };
 
@@ -92,6 +101,8 @@ describe("Rateware delivery transport", () => {
             accepted: true,
             duplicate: true,
             receipt_id: "receipt-1",
+            payload_checksum: deliveryEnvelope.payloadChecksum,
+            receiver_revision: "receiver-deployment-1",
           }),
           { status: 200, headers: { "content-type": "application/json" } },
         ),
@@ -114,6 +125,39 @@ describe("Rateware delivery transport", () => {
     );
     expect(retry.duplicate).toBe(true);
     expect(ratewareDelivery.upsert).toHaveBeenCalledTimes(2);
+    expect(ratewareDelivery.upsert.mock.calls[1][0].create).toMatchObject({
+      remotePayloadChecksum: deliveryEnvelope.payloadChecksum,
+      receiverRevision: "receiver-deployment-1",
+    });
+  });
+
+  it("fails closed when Rateware acknowledges a different payload checksum", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            accepted: true,
+            duplicate: false,
+            receipt_id: "receipt-drifted",
+            payload_checksum: "f".repeat(64),
+            receiver_revision: "receiver-deployment-2",
+          }),
+          { status: 202, headers: { "content-type": "application/json" } },
+        ),
+      ),
+    );
+
+    await expect(deliverRateBookToRateware(deliveryInput)).rejects.toThrow(
+      "Rateware receipt checksum does not match",
+    );
+    expect(ratewareDelivery.upsert).toHaveBeenCalledTimes(1);
+    expect(ratewareDelivery.upsert.mock.calls[0][0].create).toMatchObject({
+      status: "FAILED",
+      receiptId: "receipt-drifted",
+      remotePayloadChecksum: "f".repeat(64),
+      receiverRevision: "receiver-deployment-2",
+    });
   });
 
   it("does not transmit a revision already confirmed locally", async () => {

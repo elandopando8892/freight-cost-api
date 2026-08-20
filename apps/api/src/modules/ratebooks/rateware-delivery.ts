@@ -19,6 +19,7 @@ export async function deliverRateBookToRateware(input: {
   actorId: string;
   actorBearer: string;
   approvalRequestId: string;
+  approvedPayloadChecksum: string;
   book: DeliveryBook;
 }) {
   const endpoint = trustedRatewareEndpoint(
@@ -32,6 +33,12 @@ export async function deliverRateBookToRateware(input: {
     );
   const { idempotencyKey, payload, payloadChecksum } =
     buildRatewareDeliveryEnvelope({ orgId: input.orgId, book: input.book });
+  if (input.approvedPayloadChecksum !== payloadChecksum) {
+    throw Object.assign(
+      new Error("The RateBook package changed after approval. Review the current checksum before delivery."),
+      { statusCode: 409 },
+    );
+  }
   const prior = await prisma.ratewareDelivery.findUnique({
     where: { orgId_idempotencyKey: { orgId: input.orgId, idempotencyKey } },
   });
@@ -39,6 +46,9 @@ export async function deliverRateBookToRateware(input: {
     return { delivery: prior, duplicate: true };
 
   let responseCode: number | undefined;
+  let receiptId: string | undefined;
+  let remotePayloadChecksum: string | undefined;
+  let receiverRevision: string | undefined;
   try {
     const response = await fetch(endpoint, {
       method: "POST",
@@ -60,6 +70,8 @@ export async function deliverRateBookToRateware(input: {
       ? (JSON.parse(raw) as {
           accepted?: boolean;
           receipt_id?: string;
+          payload_checksum?: string;
+          receiver_revision?: string;
           duplicate?: boolean;
           error?: string;
         })
@@ -69,6 +81,17 @@ export async function deliverRateBookToRateware(input: {
         receipt.error ||
           `Rateware rejected the package (HTTP ${response.status}).`,
       );
+    receiptId = receipt.receipt_id;
+    remotePayloadChecksum = receipt.payload_checksum;
+    receiverRevision = receipt.receiver_revision;
+    if (remotePayloadChecksum !== payloadChecksum) {
+      throw new Error(
+        "Rateware receipt checksum does not match the delivered RateBook package.",
+      );
+    }
+    if (!receiverRevision?.trim()) {
+      throw new Error("Rateware receipt is missing the receiver revision.");
+    }
     const delivery = await prisma.ratewareDelivery.upsert({
       where: { orgId_idempotencyKey: { orgId: input.orgId, idempotencyKey } },
       create: {
@@ -81,7 +104,9 @@ export async function deliverRateBookToRateware(input: {
         payloadChecksum,
         status: "DELIVERED",
         responseCode,
-        receiptId: receipt.receipt_id,
+        receiptId,
+        remotePayloadChecksum,
+        receiverRevision,
         deliveredAt: new Date(),
       },
       update: {
@@ -90,7 +115,9 @@ export async function deliverRateBookToRateware(input: {
         payloadChecksum,
         status: "DELIVERED",
         responseCode,
-        receiptId: receipt.receipt_id,
+        receiptId,
+        remotePayloadChecksum,
+        receiverRevision,
         error: null,
         attemptedAt: new Date(),
         deliveredAt: new Date(),
@@ -115,6 +142,9 @@ export async function deliverRateBookToRateware(input: {
         payloadChecksum,
         status: "FAILED",
         responseCode,
+        receiptId,
+        remotePayloadChecksum,
+        receiverRevision,
         error: message,
       },
       update: {
@@ -123,6 +153,9 @@ export async function deliverRateBookToRateware(input: {
         payloadChecksum,
         status: "FAILED",
         responseCode,
+        receiptId,
+        remotePayloadChecksum,
+        receiverRevision,
         error: message,
         attemptedAt: new Date(),
         deliveredAt: null,

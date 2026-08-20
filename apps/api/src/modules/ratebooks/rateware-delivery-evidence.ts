@@ -6,6 +6,8 @@ export type RatewareDeliveryEvidenceRow = {
   responseCode: number | null;
   receiptId: string | null;
   payloadChecksum: string;
+  remotePayloadChecksum: string | null;
+  receiverRevision: string | null;
   error: string | null;
   approvalRequest: {
     id: string;
@@ -39,6 +41,8 @@ export function ratewareDeliveryEvidenceCsv(input: {
     "HTTP Response",
     "Receipt ID",
     "Payload Checksum",
+    "Remote Payload Checksum",
+    "Receiver Revision",
     "Approval ID",
     "Approval Status",
     "Requested By",
@@ -57,6 +61,8 @@ export function ratewareDeliveryEvidenceCsv(input: {
     delivery.responseCode,
     delivery.receiptId,
     delivery.payloadChecksum,
+    delivery.remotePayloadChecksum,
+    delivery.receiverRevision,
     delivery.approvalRequest?.id ?? null,
     delivery.approvalRequest?.status ?? null,
     delivery.approvalRequest?.requestedBy.email ?? null,

@@ -3,7 +3,7 @@ import { z } from 'zod'
 export const RatewareRateBookContractSchema = z.object({
   contractVersion: z.literal('fcm.rateware-ratebook.v1'),
   mode: z.literal('READ_ONLY'),
-  source: z.object({ system: z.literal('Freight Cost Model'), rateBookId: z.string(), exportedAt: z.string().datetime() }),
+  source: z.object({ system: z.literal('Freight Cost Model'), organizationId: z.string(), rateBookId: z.string(), exportedAt: z.string().datetime() }),
   governance: z.object({ status: z.literal('PUBLISHED'), publishedAt: z.string().datetime().nullable(), publicationNote: z.string().nullable() }),
   rateBook: z.object({ code: z.string(), name: z.string(), currency: z.string(), effectiveFrom: z.string().datetime(), effectiveUntil: z.string().datetime().nullable() }),
   lineage: z.object({
@@ -25,12 +25,12 @@ type ExportableRateBook = {
 }
 
 /** Pure, versioned mapping. Transport and Rateware-side writes are intentionally excluded. */
-export function buildRatewareRateBookContract(book: ExportableRateBook, exportedAt = new Date()) {
+export function buildRatewareRateBookContract(book: ExportableRateBook, exportedAt: Date, organizationId: string) {
   if (book.status !== 'PUBLISHED') throw new Error('Only published RateBooks can be packaged for Rateware.')
   return RatewareRateBookContractSchema.parse({
     contractVersion: 'fcm.rateware-ratebook.v1',
     mode: 'READ_ONLY',
-    source: { system: 'Freight Cost Model', rateBookId: book.id, exportedAt: exportedAt.toISOString() },
+    source: { system: 'Freight Cost Model', organizationId, rateBookId: book.id, exportedAt: exportedAt.toISOString() },
     governance: { status: 'PUBLISHED', publishedAt: book.publishedAt?.toISOString() ?? null, publicationNote: book.publicationNote },
     rateBook: { code: book.code, name: book.name, currency: book.currency, effectiveFrom: book.effectiveFrom.toISOString(), effectiveUntil: book.effectiveUntil?.toISOString() ?? null },
     lineage: { costBase: book.costBase, assumptionSet: book.set },

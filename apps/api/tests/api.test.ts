@@ -285,10 +285,15 @@ vi.mock("../src/config/prisma.js", () => {
     approvalRequest: {
       count: vi.fn().mockResolvedValue(0),
       findFirst: vi.fn().mockResolvedValue(null),
+      findFirstOrThrow: vi.fn(),
+      create: vi.fn().mockResolvedValue({ id: "approval-1" }),
+      update: vi.fn(),
     },
     ratewareDelivery: {
       count: vi.fn().mockResolvedValue(0),
       findMany: vi.fn().mockResolvedValue([]),
+      findUnique: vi.fn().mockResolvedValue(null),
+      upsert: vi.fn(),
     },
     scenarioReview: { count: vi.fn().mockResolvedValue(0) },
     pilotDecision: {
@@ -411,6 +416,7 @@ vi.mock("../src/config/env.js", () => ({
     OPENAI_API_KEY: "unit-test-provider-key",
     OPENAI_KEY_ROTATED_AT: "2026-08-12T00:00:00.000Z",
     OPENAI_MODEL: "gpt-4.1-mini",
+    RATEWARE_API_URL: "http://127.0.0.1:8787/receive",
   },
 }));
 
@@ -421,6 +427,9 @@ const { prisma } = await import("../src/config/prisma.js");
 const { calculate } = await import("../src/modules/engine/engine.calculator.js");
 const { buildQuoteCalculationSnapshot } = await import(
   "../src/modules/quotes/quote-snapshot.js"
+);
+const { buildRatewareDeliveryEnvelope } = await import(
+  "../src/modules/ratebooks/rateware-delivery-envelope.js"
 );
 
 const pilotQuoteInput = {
@@ -497,6 +506,52 @@ function confirmedRatewareQuote(overrides: Record<string, unknown> = {}) {
     lane: { origin: "Monterrey, NL", destination: "Saltillo, COA" },
     productionRoute: null,
     auditEvents: [],
+    ...overrides,
+  };
+}
+
+function publishedRateBookForDelivery(overrides: Record<string, unknown> = {}) {
+  return {
+    id: "ratebook-1",
+    code: "XBF-XB-PILOT-2026-08",
+    name: "XBF Cross-border Pilot",
+    currency: "USD",
+    effectiveFrom: new Date("2026-08-01T00:00:00.000Z"),
+    effectiveUntil: null,
+    status: "PUBLISHED",
+    publishedAt: new Date("2026-08-12T20:00:00.000Z"),
+    publicationNote: "Approved pilot RateBook.",
+    updatedAt: new Date("2026-08-12T20:01:00.000Z"),
+    costBase: {
+      id: "base-1",
+      code: "XBF-XB-PILOT",
+      name: "XBF Cross-border Pilot",
+      scope: "CROSS_BORDER",
+      status: "ACTIVE",
+    },
+    set: {
+      id: "set-1",
+      name: "Pilot assumptions",
+      version: 1,
+      status: "PUBLISHED",
+    },
+    entries: [{
+      id: "entry-1",
+      sourceQuoteId: "quote-1",
+      sourceQuoteVersion: 1,
+      sourceProductionRouteId: "route-1",
+      origin: "Monterrey, NL",
+      destination: "Dallas, TX",
+      operation: "D2D Export",
+      service: "One Way",
+      equipment: "Truck / Dry Van",
+      config: "Single",
+      publishedTariff: 2100,
+      currency: "USD",
+      sourceTariffUsd: 2100,
+      sourceTariffMxn: 39900,
+      fxRateUsed: 19,
+    }],
     ...overrides,
   };
 }
@@ -1079,6 +1134,64 @@ describe("Rateware handoff queue", () => {
     });
     expect(res.statusCode).toBe(422);
     expect(res.json().error).toMatch(/requires an approved delivery request/i);
+  });
+
+  it("binds a Rateware delivery approval request to the exact package checksum", async () => {
+    const book = publishedRateBookForDelivery();
+    const expected = buildRatewareDeliveryEnvelope({ orgId: "org-1", book });
+    vi.mocked(prisma.rateBook.findFirstOrThrow).mockResolvedValueOnce(book as never);
+    vi.mocked(prisma.approvalRequest.findFirst).mockResolvedValueOnce(null);
+    vi.mocked(prisma.approvalRequest.create).mockImplementationOnce(async ({ data }) => ({
+      id: "approval-ratebook-1",
+      ...data,
+    }) as never);
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/ratebooks/ratebook-1/approval-requests",
+      headers: { authorization: `Bearer ${token}` },
+      payload: { action: "RATEWARE_DELIVERY", note: "Approve exact pilot package." },
+    });
+
+    expect(res.statusCode).toBe(201);
+    expect(prisma.approvalRequest.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ payloadChecksum: expected.payloadChecksum }),
+      }),
+    );
+  });
+
+  it("delivers only when the reviewed approval checksum matches the current package", async () => {
+    const book = publishedRateBookForDelivery();
+    const expected = buildRatewareDeliveryEnvelope({ orgId: "org-1", book });
+    vi.mocked(prisma.rateBook.findFirstOrThrow).mockResolvedValueOnce(book as never);
+    vi.mocked(prisma.approvalRequest.findFirst).mockResolvedValueOnce({
+      id: "approval-ratebook-1",
+      reviewedAt: new Date("2026-08-20T13:00:00.000Z"),
+      payloadChecksum: expected.payloadChecksum,
+    } as never);
+    vi.mocked(prisma.ratewareDelivery.findUnique).mockResolvedValueOnce(null);
+    vi.mocked(prisma.ratewareDelivery.upsert).mockResolvedValueOnce({
+      id: "delivery-ratebook-1",
+      status: "DELIVERED",
+      receiptId: "receipt-ratebook-1",
+    } as never);
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({
+      accepted: true,
+      duplicate: false,
+      receipt_id: "receipt-ratebook-1",
+      payload_checksum: expected.payloadChecksum,
+      receiver_revision: "receiver-deployment-api-test",
+    }), { status: 202, headers: { "content-type": "application/json" } })));
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/integration/rateware/ratebooks/ratebook-1/deliver",
+      headers: { authorization: `Bearer ${token}` },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.json().delivery.receiptId).toBe("receipt-ratebook-1");
   });
 
   it("exports Rateware delivery evidence without attempting an external write", async () => {

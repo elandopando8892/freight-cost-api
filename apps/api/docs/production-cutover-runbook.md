@@ -54,7 +54,7 @@ remotos. Nunca copies secretos a archivos versionados ni a la evidencia de QA.
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
 | API               | `DATABASE_URL`, `KINDE_ISSUER_URL`, `KINDE_AUDIENCE`, `CORS_ORIGINS`, `OPENAI_API_KEY`, `OPENAI_KEY_ROTATED_AT`, `OPENAI_MODEL`, `LOG_LEVEL`, `RATE_LIMIT_MAX`, `RATE_LIMIT_WINDOW` | La clave AI expuesta está revocada, el modelo es explícito, CORS contiene el origen HTTPS del Web y la fecha es ISO-8601. |
 | Web               | `API_URL`, `KINDE_CLIENT_ID`, `KINDE_CLIENT_SECRET`, `KINDE_ISSUER_URL`, `KINDE_AUDIENCE`, URLs de callback y logout                                                | Kinde permite el dominio productivo y emite access tokens para el audience de la API.             |
-| Rateware opcional | `RATEWARE_API_URL` en API; `RATEWARE_GMAIL_API_URL` en Web si se usa el broker Gmail                                                                                | El endpoint receptor, contrato y cuenta de prueba fueron aprobados.                               |
+| Rateware opcional | `RATEWARE_API_URL` en API apuntando a `/functions/v1/fcm-ratebook-receiver`; `RATEWARE_GMAIL_API_URL` en Web si se usa el broker Gmail                               | El endpoint receptor, contrato, acción gobernada y cuenta de prueba fueron aprobados.             |
 
 `API_URL` del Web debe apuntar al dominio HTTPS de la API productiva. El BFF
 rechaza una URL HTTP en producción y segmentos de ruta ambiguos; además reenvía

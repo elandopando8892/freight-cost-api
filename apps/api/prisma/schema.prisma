@@ -1153,6 +1153,8 @@ model RatewareDelivery {
   status            RatewareDeliveryStatus
   responseCode      Int?
   receiptId         String?
+  remotePayloadChecksum String?
+  receiverRevision  String?
   error             String?
   attemptedAt       DateTime               @default(now())
   deliveredAt       DateTime?
@@ -1179,6 +1181,7 @@ model ApprovalRequest {
   rateBookId    String
   action        ApprovalAction
   status        ApprovalStatus @default(PENDING)
+  payloadChecksum String?
   requestNote   String
   decisionNote  String?
   requestedById String
@@ -1195,6 +1198,7 @@ model ApprovalRequest {
 
   @@index([orgId, status, createdAt])
   @@index([rateBookId, action, status])
+  @@index([payloadChecksum])
   @@index([requestedById, status, createdAt])
   @@index([reviewedById])
 }

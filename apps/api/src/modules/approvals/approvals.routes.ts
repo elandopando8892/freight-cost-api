@@ -5,6 +5,7 @@ import { requireRole } from '../../middleware/authorize.js'
 import { prisma } from '../../config/prisma.js'
 import type { JwtPayload } from '../auth/auth.schema.js'
 import { approvalReviewBlocker, singleAdminApprovalConfirmation } from './approval-rules.js'
+import { buildRatewareDeliveryEnvelope } from '../ratebooks/rateware-delivery-envelope.js'
 
 const RequestApproval = z.object({ action: z.enum(['RATEBOOK_PUBLISH', 'RATEWARE_DELIVERY']), note: z.string().trim().min(3).max(2000) })
 const DecideApproval = z.object({
@@ -43,12 +44,22 @@ export async function approvalsRoutes(app: FastifyInstance) {
     const user = request.user as JwtPayload
     const { id: rateBookId } = request.params as { id: string }
     const input = RequestApproval.parse(request.body)
-    const book = await prisma.rateBook.findFirstOrThrow({ where: { id: rateBookId, orgId: user.orgId }, select: { id: true, status: true } })
+    const book = await prisma.rateBook.findFirstOrThrow({
+      where: { id: rateBookId, orgId: user.orgId },
+      include: {
+        costBase: { select: { id: true, code: true, name: true, scope: true, status: true } },
+        set: { select: { id: true, name: true, version: true, status: true } },
+        entries: { orderBy: [{ operation: 'asc' }, { origin: 'asc' }, { destination: 'asc' }, { id: 'asc' }] },
+      },
+    })
     if (input.action === 'RATEBOOK_PUBLISH' && book.status !== 'DRAFT') throw httpError('Only a draft RateBook can request publication approval.', 409)
     if (input.action === 'RATEWARE_DELIVERY' && book.status !== 'PUBLISHED') throw httpError('Only a published RateBook can request Rateware delivery approval.', 409)
     const pending = await prisma.approvalRequest.findFirst({ where: { orgId: user.orgId, rateBookId, action: input.action, status: 'PENDING' }, select: { id: true } })
     if (pending) throw httpError('There is already a pending approval for this RateBook action.', 409)
-    const approval = await prisma.approvalRequest.create({ data: { orgId: user.orgId, rateBookId, action: input.action, requestNote: input.note, requestedById: user.sub }, include: approvalInclude })
+    const payloadChecksum = input.action === 'RATEWARE_DELIVERY'
+      ? buildRatewareDeliveryEnvelope({ orgId: user.orgId, book }).payloadChecksum
+      : null
+    const approval = await prisma.approvalRequest.create({ data: { orgId: user.orgId, rateBookId, action: input.action, payloadChecksum, requestNote: input.note, requestedById: user.sub }, include: approvalInclude })
     return reply.status(201).send(approval)
   })
 

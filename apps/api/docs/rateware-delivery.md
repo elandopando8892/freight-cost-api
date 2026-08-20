@@ -6,8 +6,10 @@ entrega.
 
 `POST /integration/rateware/ratebooks/:id/deliver` requiere que el RateBook
 este publicado y que exista una solicitud `RATEWARE_DELIVERY` aprobada. La
-revision de esa solicitud impide que quien la solicita la apruebe; la entrega
-guarda la referencia de aprobacion, checksum, idempotency key y recibo externo.
+revision de esa solicitud impide que quien la solicita la apruebe y congela el
+checksum exacto revisado. La entrega guarda la referencia de aprobacion,
+checksum local y remoto, idempotency key, recibo externo y revision del
+receptor. Cualquier diferencia de checksum bloquea el resultado exitoso.
 
 Un recibo `DELIVERED` prueba unicamente que Rateware acepto el paquete bajo el
 contrato actual. No prueba que Rateware haya publicado, activado o aplicado las

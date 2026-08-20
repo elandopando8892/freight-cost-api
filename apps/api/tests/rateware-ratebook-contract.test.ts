@@ -9,12 +9,12 @@ const source = {
 
 describe('Rateware RateBook contract', () => {
   it('packages a published RateBook with immutable lineage and source evidence', () => {
-    const result = buildRatewareRateBookContract(source, new Date('2026-08-11T00:00:00.000Z'))
-    expect(result).toMatchObject({ contractVersion: 'fcm.rateware-ratebook.v1', mode: 'READ_ONLY', source: { rateBookId: 'rb_1', exportedAt: '2026-08-11T00:00:00.000Z' }, lineage: { costBase: { code: 'INTRA-US' }, assumptionSet: { version: 4 } } })
+    const result = buildRatewareRateBookContract(source, new Date('2026-08-11T00:00:00.000Z'), 'org-1')
+    expect(result).toMatchObject({ contractVersion: 'fcm.rateware-ratebook.v1', mode: 'READ_ONLY', source: { organizationId: 'org-1', rateBookId: 'rb_1', exportedAt: '2026-08-11T00:00:00.000Z' }, lineage: { costBase: { code: 'INTRA-US' }, assumptionSet: { version: 4 } } })
     expect(result.entries[0]).toMatchObject({ sourceQuoteId: 'quote_1', sourceProductionRouteId: null, fxRateUsed: 17.24 })
   })
 
   it('does not package a non-published RateBook', () => {
-    expect(() => buildRatewareRateBookContract({ ...source, status: 'DRAFT' })).toThrow('Only published RateBooks')
+    expect(() => buildRatewareRateBookContract({ ...source, status: 'DRAFT' }, new Date(), 'org-1')).toThrow('Only published RateBooks')
   })
 })

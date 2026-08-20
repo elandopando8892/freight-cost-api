@@ -13,22 +13,23 @@ type DeliveryBook = Parameters<typeof buildRatewareRateBookContract>[0] & {
 /**
  * Build the immutable transport envelope for one local RateBook revision.
  *
- * `updatedAt` is part of the idempotency key, so it is also the contract's
- * export timestamp. A retry for the same revision therefore sends exactly the
- * same JSON and checksum even when the previous response was lost.
+ * `updatedAt` is the frozen export timestamp. The idempotency key binds the
+ * tenant, RateBook id and complete payload checksum, so any lineage or tariff
+ * drift creates a different key while an exact retry remains byte-identical.
  */
 export function buildRatewareDeliveryEnvelope(input: {
   orgId: string;
   book: DeliveryBook;
 }) {
-  const idempotencyKey = sha256(
-    `${RATEWARE_RATEBOOK_CONTRACT_VERSION}:${input.orgId}:${input.book.id}:${input.book.updatedAt.toISOString()}`,
-  );
   const payload = buildRatewareRateBookContract(
     input.book,
     input.book.updatedAt,
+    input.orgId,
   );
   const payloadChecksum = sha256(JSON.stringify(payload));
+  const idempotencyKey = sha256(
+    `${RATEWARE_RATEBOOK_CONTRACT_VERSION}:${input.orgId}:${input.book.id}:${payloadChecksum}`,
+  );
 
   return { idempotencyKey, payload, payloadChecksum };
 }

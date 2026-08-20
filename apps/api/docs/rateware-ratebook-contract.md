@@ -10,6 +10,7 @@ cotización, ruta fuente y FX usado. Las entradas se ordenan de forma
 determinista por operación, origen, destino e identificador.
 
 Este endpoint no llama a Rateware, no genera una tarifa en Rateware ni acepta
-actualizaciones desde Rateware. La transmisión real, la autenticación entre
-sistemas, idempotencia y confirmación de recepción pertenecen al Sprint 17 de
-integración y deberán pasar una revisión humana antes de cualquier envío.
+actualizaciones desde Rateware. La transmisión real usa el receptor aislado
+`fcm-ratebook-receiver`, requiere aprobación humana vinculada al checksum y
+conserva un recibo remoto. La recepción sigue siendo una bandeja privada: no
+publica ni activa tarifas dentro de Rateware.
