@@ -401,8 +401,8 @@ export async function reconcileCustomerQuoteEmailDelivery(input: {
     const message = boundedError(
       receipt.error ||
         (receipt.outcome === "NOT_ATTEMPTED"
-          ? "Rateware confirmed Gmail was not attempted; a deliberate retry is allowed."
-          : "Rateware confirmed the previous Gmail attempt failed before acceptance."),
+          ? "Rateware confirmó que Gmail no intentó el envío; se permite un reintento deliberado."
+          : "Rateware confirmó que el intento anterior de Gmail falló antes de ser aceptado."),
     );
     const delivery = await prisma.customerQuoteEmailDraft.update({
       where: { id: draft.id },

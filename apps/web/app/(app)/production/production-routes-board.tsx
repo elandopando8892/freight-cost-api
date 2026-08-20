@@ -107,7 +107,7 @@ export function ProductionRoutesBoard({ initialRoutes, costBases, canEdit }: { i
           <p className="text-sm text-muted-foreground">La base sugerida orienta; la base y versión confirmadas gobiernan la producción.</p>
         </div>
         <div className="flex items-center gap-2">
-          <select value={filter} onChange={(event) => setFilter(event.target.value as typeof filter)} className="h-9 rounded-md border bg-background px-2 text-sm">
+          <select aria-label="Filtrar rutas por calidad" value={filter} onChange={(event) => setFilter(event.target.value as typeof filter)} className="h-9 rounded-md border bg-background px-2 text-sm">
             <option value="ALL">Todas ({routes.length})</option>
             <option value="READY">Listas</option>
             <option value="NEEDS_REVIEW">Revisar</option>

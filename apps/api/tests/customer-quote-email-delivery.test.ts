@@ -248,7 +248,11 @@ describe("customer quote Gmail delivery", () => {
     expect(result).toMatchObject({ outcome: "NOT_ATTEMPTED", retryable: true });
     expect(customerQuoteEmailDraft.update).toHaveBeenCalledWith(
       expect.objectContaining({
-        data: expect.objectContaining({ status: "FAILED" }),
+        data: expect.objectContaining({
+          status: "FAILED",
+          error:
+            "Rateware confirmó que Gmail no intentó el envío; se permite un reintento deliberado.",
+        }),
       }),
     );
   });

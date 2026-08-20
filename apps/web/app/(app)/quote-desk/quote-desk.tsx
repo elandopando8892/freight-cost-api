@@ -355,7 +355,7 @@ export function QuoteDesk({
   }), [items, needle, statusFilter]);
 
   return (
-    <div className="grid gap-3">
+    <div className="grid min-w-0 gap-3">
       <header className="flex flex-col justify-between gap-3 border-b pb-3 sm:flex-row sm:items-end">
         <div>
           <p className="mb-1 text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">Propuestas comerciales</p>

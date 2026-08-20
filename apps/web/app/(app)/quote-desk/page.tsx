@@ -9,5 +9,5 @@ export default async function QuoteDeskPage() {
     api<CustomerQuoteTemplate[]>('/customer-quote-templates'),
     api<{ role: 'ADMIN' | 'OPERATOR' | 'VIEWER' }>('/auth/me'),
   ])
-  return <main className="mx-auto w-full max-w-[1440px] px-3 py-4 sm:px-4"><QuoteDesk initial={quotes} initialTemplates={templates} role={user.role} /></main>
+  return <main className="mx-auto min-w-0 w-full max-w-[1440px] px-3 py-4 sm:px-4"><QuoteDesk initial={quotes} initialTemplates={templates} role={user.role} /></main>
 }

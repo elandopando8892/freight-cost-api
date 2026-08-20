@@ -5,8 +5,8 @@ Fuente operativa: [`release-progress.json`](./release-progress.json)
 Comando: `npm run progress:release`
 
 Sprint activo: **12 — QA visual autenticada contra wireframes**
-Candidato remoto verificado: `5065f87710577fa76df4cce6db049b9d4de22685`
-Evidencia: [`../pilot-evidence/2026-08-20/452cdb5/sprint-11-quote-desk-pilot-sent.json`](../pilot-evidence/2026-08-20/452cdb5/sprint-11-quote-desk-pilot-sent.json)
+Candidato remoto verificado: `bbf4716a6b33aa72681717a9a9bcbb01d9ed0c1c`
+Evidencia: [`../pilot-evidence/2026-08-20/bbf4716/visual/audit-status.json`](../pilot-evidence/2026-08-20/bbf4716/visual/audit-status.json)
 
 ## Lectura actual
 
@@ -14,23 +14,27 @@ El avance general se calcula como promedio ponderado de siete frentes. La ponder
 
 | Frente | Peso | Avance | Estado |
 |---|---:|---:|---|
-| Motor, datos y gobierno | 20% | 94% | Casi terminado |
-| UI/UX Rateware y wireframes | 15% | 86% | Implementado; QA visual pendiente |
+| Motor, datos y gobierno | 20% | 96% | Release verificado en staging |
+| UI/UX Rateware y wireframes | 15% | 90% | Tres P2 corregidos localmente; recaptura pendiente |
 | Bases, presets y wizard consultivo | 15% | 90% | Implementado; validación con datos reales pendiente |
-| Cotización y Quote Desk | 15% | 98% | Piloto enviado y verificado; hardening local pendiente de promoción |
+| Cotización y Quote Desk | 15% | 100% | Piloto y reconciliación PASS en staging |
 | RateBook e integración Rateware | 15% | 88% | Piloto Gmail PASS; handoff RateBook pendiente |
 | Kinde, roles y seguridad | 10% | 95% | ADMIN, BFF y OAuth conectado |
-| QA, evidencia y release | 10% | 94% | Evidencia del Sprint 11 completa |
+| QA, evidencia y release | 10% | 95% | Promoción de Sprint 11 verificada |
 
-**Avance general ponderado actual: 92.0%.**
+**Avance general ponderado actual: 93.4%.**
 
-Sprint 10 dejó el receiver Gmail activo en Rateware staging, la migración `20260814000300` aplicada, una sola rama preview de Supabase, CORS exacto, rechazo anónimo `401/no-store` y el BFF autenticado funcionando con `sales@heymarksman.com` como ADMIN. API y Web de staging están READY sobre el SHA `5065f87`; `/health` y `/ready` coinciden con ese release y la base responde conectada.
+El Sprint 12 ya recorrió autenticadamente Dashboard, Bases, Supuestos, Producción, Quote Desk y RateBook. A 1280 px las seis superficies conservaron el shell horizontal sin overflow de página. A 390 px, cuatro pasaron y Quote Desk/RateBook revelaron que el ancho mínimo de sus tablas podía expandir el contenedor raíz; también se confirmó un selector de Producción sin nombre accesible y un mensaje de reconciliación en inglés. Los tres defectos P2 quedaron corregidos localmente y pasan 10/10 pruebas focales del correo, typecheck API/Web, ESLint focal y `git diff --check`.
+
+La aceptación visual aún no está cerrada: los fixes deben publicarse en staging y recapturarse en los tres breakpoints. La herramienta de captura agotó el tiempo después de conservar cinco capturas aceptadas de 1440×900, por lo que este avance no se presenta como PASS final.
+
+Sprint 10 dejó el receiver Gmail activo en Rateware staging, la migración `20260814000300` aplicada, una sola rama preview de Supabase, CORS exacto, rechazo anónimo `401/no-store` y el BFF autenticado funcionando. API y Web de staging están READY sobre el SHA `bbf4716`; `/health` y `/ready` coinciden con ese release y la base responde conectada.
 
 Los secretos OAuth están presentes en el preview aislado. La función `rateware-api` v439 y `gmail-oauth-callback` v65 completaron el consentimiento para `sales@heymarksman.com`: Settings muestra **Conectado**, los tokens de acceso y renovación están cifrados, no existe error y no quedó un estado OAuth activo pendiente. La base de staging recibió las tres migraciones que le faltaban y el API fue redeplegado con `DATABASE_URL` aislada por la rama `staging`; producción no cambió.
 
 La cotización `CQ-2026-F49BD6B7` fue enviada una sola vez desde `sales@heymarksman.com` hacia `jgonzalez@xbfreight.com`, con la ruta Monterrey → Dallas, tarifa USD 2,100 y vigencia al 27 de agosto de 2026. Gmail `SENT` y el ledger de Rateware coinciden con el recibo `96335a0f-b1cd-43a2-9b90-421ac10aad34` y provider message id `1a01e70f80887783`. El avance sube a 92.0%.
 
-El piloto descubrió y acotó un intento previo que falló antes de llamar a Gmail. El hardening local añade reconciliación por clave idempotente y bloqueo transaccional de borradores equivalentes; todavía debe versionarse y promoverse antes de producción.
+El piloto descubrió y acotó un intento previo que falló antes de llamar a Gmail. El hardening ya está publicado en FCM staging y Rateware `rateware-api` v443: la reconciliación devolvió `NOT_ATTEMPTED`, marcó el intento como fallido y bloqueó borradores equivalentes porque existe una entrega SENT. Gmail y el ledger conservan una sola copia.
 
 Este porcentaje significa “trabajo implementado y verificable localmente”, no “listo para publicar”. El producto no puede marcarse 100% mientras exista un gate externo en estado pendiente o bloqueado.
 
@@ -38,9 +42,8 @@ Este porcentaje significa “trabajo implementado y verificable localmente”, n
 
 1. QA visual autenticada de las pantallas principales en 1440×900, 1280×800 y 390×844, comparada contra el wireframe horizontal.
 2. Smoke autenticado con `sales@heymarksman.com` como ADMIN principal: login, Settings, Gmail, permisos y logout.
-3. Versionar y promover el hardening de reconciliación Gmail probado localmente.
-4. Ejecutar handoff real de un RateBook a Rateware y conservar payload, respuesta, checksum y actor.
-5. Generar el paquete de evidencia del SHA candidato y ejecutar el preflight/release gate completo, incluyendo migraciones y configuración de producción.
+3. Ejecutar handoff real de un RateBook a Rateware y conservar payload, respuesta, checksum y actor.
+4. Generar el paquete de evidencia del SHA candidato y ejecutar el preflight/release gate completo, incluyendo migraciones y configuración de producción.
 
 ## Sprints de cierre
 

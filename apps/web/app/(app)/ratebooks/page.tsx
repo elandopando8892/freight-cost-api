@@ -15,7 +15,7 @@ export default async function RateBooksPage() {
     api<{ role: 'ADMIN' | 'OPERATOR' | 'VIEWER' }>('/approvals/context'),
   ])
   return (
-    <main className="mx-auto w-full max-w-[1440px] px-3 py-4 sm:px-4">
+    <main className="mx-auto min-w-0 w-full max-w-[1440px] px-3 py-4 sm:px-4">
       <RateBooksBoard
         initial={books}
         bases={bases}
