@@ -54,6 +54,26 @@ creación de usuarios, envío comercial ni consumo de IA durante esta ventana.
 
 ## Rollback
 
+## Conciliación posterior autorizada
+
+Con la continuación del usuario se consultaron únicamente las identidades Auth
+correspondientes a las dos cuentas pendientes. Una coincidencia tenía correo
+confirmado, no era anónima y no estaba eliminada. Se enlazó mediante actualización
+condicionada a supabaseId NULL, id interno, correo exacto normalizado y rol
+OPERATOR. No se creó una identidad Auth ni se cambió el rol.
+
+Resultado: 2 de 3 usuarios enlazados; la cuenta restante no existe en Supabase
+y requiere registro y verificación por su titular. Los identificadores internos,
+organización, correos, roles y los tres vínculos Kinde se compararon nuevamente
+contra el respaldo y permanecen iguales. La renovación real por expiración
+continúa pendiente; este enlace administrativo no demuestra login del operador.
+
+Rollback de este enlace: restaurar únicamente supabaseId=NULL para la fila
+enlazada, previa comprobación del sujeto y ausencia de cambios posteriores,
+en una ventana autorizada. No requiere borrar el usuario ni cambiar su rol.
+
+## Procedimiento de rollback del esquema
+
 El esquema aditivo conserva kindeId, por lo que el release Kinde anterior sigue
 siendo compatible. Para rollback funcional, volver al frontend/API Kinde
 anterior y conservar la columna opcional y el índice: no hace falta restaurar
