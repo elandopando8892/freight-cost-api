@@ -72,7 +72,7 @@ de `staging` para esto porque ese deployment continúa en Kinde.
   la guía vigente y propaga cookies renovadas. No se esperó la expiración ni se
   extrajo/forzó un refresh token, así que la renovación real por expiración queda
   como prueba autenticada pendiente y no se declara aprobada.
-- Pruebas focalizadas: 10/10; typecheck API y scan de secretos: PASS.
+- Pruebas focalizadas iniciales: 10/10; typecheck API y scan de secretos: PASS.
 - Gate vivo posterior: el preview `qcp...` pasó por su URL exacta y una nueva
   URL candidata del proyecto/equipo pasó por el patrón limitado. No se creó un
   deployment nuevo porque la infraestructura quedó fuera del alcance.
@@ -80,6 +80,40 @@ de `staging` para esto porque ese deployment continúa en Kinde.
   Node 20.14 disponible en el host; se encapsuló en `main()` y el ensayo vivo
   pasó. Una invocación de Vitest con rutas relativas al monorepo no encontró
   archivos desde el workspace API; la repetición con rutas del workspace pasó.
+
+## Cierre reproducible del preview — 2026-09-06
+
+- El worktree quedó consolidado en la rama `codex/supabase-auth-slice`, commit
+  `b4bdd4dba227ab27c863e2b8dcf1cea049aa9a9e`.
+- Vercel creó el deployment preview `dpl_Hc4UxVh7ijRva53vsNcTTLqKK9H1` en estado
+  `READY`: `https://freight-cost-5mavzkc8d-elandopando8892s-projects.vercel.app`.
+- El gate remoto de sólo lectura devolvió `PASS`: el callback de ese deployment
+  está cubierto por el patrón limitado al proyecto/equipo; `rateware-prod`
+  devolvió `ACTIVE_HEALTHY`; no cambió el `Site URL` ni se ejecutó otra mutación.
+- Probes anónimos: `/login` 200, `/` 307 a login, callback sin código 307 a error
+  no-cache y `/api/v1/auth/me` 401 JSON no-store.
+- Prueba autenticada real del preview nuevo: Vercel registró `POST /login`,
+  `GET /auth/callback` y `GET /`; el panel mostró la cuenta Supabase existente.
+  Abrir nuevamente la raíz en el mismo origen conservó la sesión.
+- El login móvil se revisó en un viewport real 390 x 844: `innerWidth=390` y
+  `scrollWidth=375`, sin desbordamiento horizontal visible.
+- Gate local completo: 51 archivos de prueba y 436 pruebas PASS, typecheck y
+  build API/Web PASS, 37 migraciones verificadas estáticamente, y audit de
+  dependencias de producción con 0 vulnerabilidades. Fastify quedó fijado en
+  5.12.3 para retirar el advisory de la versión anterior.
+
+### No-go de integración API
+
+El login Web, el intercambio de código y la persistencia de sesión sí están
+probados. La integración BFF/API no: los logs del API preview muestran que la
+consulta falla porque `User.supabaseId` todavía no existe en la base conectada,
+y el API responde 401. Esto es evidencia esperada del gate de migración, no un
+fallo de cobertura OAuth. No se aplicó ninguna migración, no se desplegó un API
+nuevo y no se modificaron usuarios o datos.
+
+La renovación real por expiración tampoco se fuerza ni se declara aprobada.
+Permanece cubierta sólo por revisión de configuración/código hasta que exista
+una ventana autenticada autorizada con el esquema aditivo aplicado.
 
 ## Gate de release
 
@@ -112,3 +146,5 @@ transición. Para revertir sólo los controles locales, retirar los archivos
 | Revisión redirect, callback, PKCE y refresh | Codex / GPT-5 | Alto |
 | Prueba autenticada del preview existente | Codex / GPT-5 | Medio |
 | Gate, tests, evidencia y rollback | Codex / GPT-5 | Alto |
+| Consolidación, CI y diagnóstico BFF | Codex / GPT-5 | Alto |
+| QA visual 390 x 844 | Codex / GPT-5 | Medio |

@@ -48,4 +48,8 @@ The branded slice is available as a reversible, non-production Vercel preview at
 
 Google Sign-In was exercised end to end against the shared Rateware Supabase project. The exact preview `/auth/callback` entry was added to the existing allowlist while preserving the production and earlier preview callbacks. The authenticated desktop shell and sign-out path were visually verified at 1280 x 720; evidence is stored in `tmp/brand-audit/06-dashboard-brand-preview.png`.
 
-The selected in-app browser did not honor the requested 390 x 844 viewport, so mobile visual acceptance remains pending. This preview is not a production deployment or production-acceptance claim.
+The first in-app browser did not honor the requested 390 x 844 viewport. A later
+clean preview was verified with an explicit Chrome viewport at that exact size:
+the login remained legible and had no horizontal overflow. The authenticated
+shell still needs mobile acceptance. This preview is not a production deployment
+or production-acceptance claim.

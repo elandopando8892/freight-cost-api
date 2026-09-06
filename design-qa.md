@@ -66,7 +66,10 @@ No actionable P0, P1, or P2 visual mismatch remains for the desktop login slice.
 
 - [P3] Exact font fidelity remains pending the approved `New Black Typeface` and `Lenia Mono` webfont files and their web-use license.
 - The authenticated shell is visually accepted only at the available 1280 x 720 browser surface. Alternate desktop sizes remain a follow-up acceptance gate.
-- The in-app browser capture surface ignored a requested 390 x 844 viewport and remained fixed at 1280 x 720. Responsive classes were code-reviewed, but mobile visual acceptance remains pending rather than inferred.
+- The clean preview `5mav...` was later exercised with an explicit 390 x 844
+  Chrome viewport. The login had `innerWidth=390`, `scrollWidth=375`, no visible
+  horizontal overflow, and retained the complete MARKSMAN hierarchy and auth
+  actions. The authenticated shell at that viewport remains pending.
 
 ## Implementation checklist
 
@@ -78,6 +81,7 @@ No actionable P0, P1, or P2 visual mismatch remains for the desktop login slice.
 - [x] Non-production Vercel preview deployed and Google Sign-In verified end to end.
 - [x] Authenticated desktop shell captured and visually accepted at 1280 x 720.
 - [ ] Supply and approve licensed brand webfonts.
-- [ ] Capture authenticated shell at 1440 x 900, 1280 x 800, and 390 x 844 when the selected browser exposes viewport control.
+- [x] Capture and inspect unauthenticated login at 390 x 844 with a verified viewport.
+- [ ] Capture authenticated shell at 1440 x 900, 1280 x 800, and 390 x 844.
 
 final result: passed
