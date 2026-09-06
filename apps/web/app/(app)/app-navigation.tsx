@@ -92,7 +92,7 @@ function NavigationLink({
       className={[
         'group relative flex items-center gap-2 rounded-md px-3 py-2 text-xs transition-colors',
         active
-          ? 'bg-sidebar-accent font-medium text-foreground shadow-[inset_3px_0_0_var(--sidebar-primary)]'
+          ? 'bg-sidebar-accent font-semibold text-sidebar-accent-foreground shadow-[inset_3px_0_0_var(--sidebar-primary)]'
           : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
       ].join(' ')}
     >
@@ -114,7 +114,7 @@ export function AppNavigation({
       {navigation.map((group, index) => (
         <section key={group.label} aria-label={group.label} className={`grid gap-0.5 ${index > 0 && !compact ? 'border-t pt-3' : ''}`}>
           {!compact && (
-            <h2 className="px-2 pb-1 text-[10px] font-medium tracking-[0.04em] text-muted-foreground uppercase">
+            <h2 className="px-2 pb-1 font-mono text-[9px] font-bold tracking-[0.12em] text-sidebar-foreground/55 uppercase">
               {group.label}
             </h2>
           )}
@@ -124,7 +124,7 @@ export function AppNavigation({
         </section>
       ))}
       <section aria-label="Cuenta" className="grid gap-0.5 border-t pt-3">
-        {!compact && <h2 className="px-2.5 pb-1 text-[10px] font-medium tracking-[0.12em] text-muted-foreground uppercase">Cuenta</h2>}
+        {!compact && <h2 className="px-2.5 pb-1 font-mono text-[9px] font-bold tracking-[0.12em] text-sidebar-foreground/55 uppercase">Cuenta</h2>}
         {accountLinks.map((item) => (
           <NavigationLink key={item.href} {...item} closeOnNavigate={closeOnNavigate} />
         ))}

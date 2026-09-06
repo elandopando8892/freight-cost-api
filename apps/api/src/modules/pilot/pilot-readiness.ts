@@ -29,7 +29,7 @@ function verificationDetail(
   kind: "smoke" | "human",
   status: PilotReadinessInput["stagingSmokeStatus"],
 ) {
-  const label = kind === "smoke" ? "smoke" : "recorrido Kinde/BFF";
+  const label = kind === "smoke" ? "smoke" : "recorrido Supabase/BFF";
   switch (status) {
     case "PASS":
       return `La evidencia PASS más reciente del ${label} corresponde al RELEASE_SHA actual y tiene menos de 24 horas.`;

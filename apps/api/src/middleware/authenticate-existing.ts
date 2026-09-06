@@ -1,6 +1,6 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { prisma } from "../config/prisma.js";
-import { verifyKindeToken } from "../modules/auth/kinde.service.js";
+import { verifySupabaseToken } from "../modules/auth/supabase.service.js";
 import type { JwtPayload } from "../modules/auth/auth.schema.js";
 
 /**
@@ -16,12 +16,12 @@ export async function authenticateExisting(
     return reply.status(401).send({ error: "Unauthorized" });
   }
   try {
-    const claims = await verifyKindeToken(auth.slice("Bearer ".length).trim());
+    const claims = await verifySupabaseToken(auth.slice("Bearer ".length).trim());
     const user = await prisma.user.findUnique({
-      where: { kindeId: claims.sub },
-      select: { id: true, orgId: true, role: true, kindeId: true },
+      where: { supabaseId: claims.sub },
+      select: { id: true, orgId: true, role: true, supabaseId: true },
     });
-    if (!user?.kindeId) {
+    if (!user?.supabaseId) {
       return reply.status(403).send({
         error: "Staging actor must be provisioned before read-only preflight.",
       });
@@ -30,7 +30,7 @@ export async function authenticateExisting(
       sub: user.id,
       orgId: user.orgId,
       role: user.role,
-      kindeId: user.kindeId,
+      supabaseId: user.supabaseId,
     } as JwtPayload;
   } catch (err) {
     request.log.warn(

@@ -62,7 +62,7 @@
     },
     {
       "key": "auth-security",
-      "label": "Kinde, roles y seguridad",
+      "label": "Supabase Auth, roles y seguridad",
       "weight": 10,
       "progress": 95,
       "status": "ADMIN_BFF_AND_OAUTH_CONNECTED_PASS",
@@ -84,7 +84,7 @@
   "productionGates": [
     {"key": "code", "label": "Código y contratos", "status": "PASS_STAGING_B4ED419", "progress": 96},
     {"key": "ui-visual", "label": "QA visual autenticada", "status": "FOLLOWUP_RESPONSIVE_FIX_LOCAL_STAGING_PENDING", "progress": 75},
-    {"key": "auth", "label": "Kinde y roles en staging", "status": "OAUTH_CONNECTED_HUMAN_CLOSE_PENDING", "progress": 86},
+    {"key": "auth", "label": "Supabase Auth y roles en staging", "status": "LOCAL_SLICE_READY_PREVIEW_PENDING", "progress": 82},
     {"key": "gmail", "label": "Gmail + receiver Rateware", "status": "PASS_STAGING_PILOT_VERIFIED", "progress": 100},
     {"key": "rateware", "label": "Handoff Rateware real", "status": "GMAIL_PASS_RATEBOOK_PENDING", "progress": 70},
     {"key": "release", "label": "Preflight, migraciones y evidencia", "status": "SPRINT_11_STAGING_PROMOTION_COMPLETE", "progress": 95}

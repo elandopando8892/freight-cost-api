@@ -55,17 +55,17 @@ describe("organization invitation acceptance", () => {
 
   it("joins the invited tenant and marks the invitation accepted atomically", async () => {
     await expect(
-      acceptPendingOrganizationInvitation("kinde-pilot", " Pilot@Example.com "),
+      acceptPendingOrganizationInvitation("supabase-pilot", " Pilot@Example.com "),
     ).resolves.toEqual({
       id: "user-pilot",
       orgId: "org-pilot",
       role: "ADMIN",
-      kindeId: "kinde-pilot",
+      supabaseId: "supabase-pilot",
     });
     expect(tx.user.create).toHaveBeenCalledWith({
       data: {
         orgId: "org-pilot",
-        kindeId: "kinde-pilot",
+        supabaseId: "supabase-pilot",
         email: "pilot@example.com",
         passwordHash: null,
         role: "ADMIN",
@@ -86,7 +86,7 @@ describe("organization invitation acceptance", () => {
       expiresAt: new Date(Date.now() - 1),
     });
     await expect(
-      acceptPendingOrganizationInvitation("kinde-pilot", "pilot@example.com"),
+      acceptPendingOrganizationInvitation("supabase-pilot", "pilot@example.com"),
     ).resolves.toBeNull();
     expect(prisma.$transaction).not.toHaveBeenCalled();
   });

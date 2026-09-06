@@ -13,8 +13,10 @@ export type StagingInfrastructureCheck = {
 const API_REQUIRED = [
   "STAGING_DATABASE_URL",
   "NODE_ENV",
-  "KINDE_ISSUER_URL",
-  "KINDE_AUDIENCE",
+  "SUPABASE_URL",
+  "SUPABASE_PUBLISHABLE_KEY",
+  "SUPABASE_EXPECTED_PROJECT_REF",
+  "SUPABASE_JWT_AUDIENCE",
   "CORS_ORIGINS",
   "OPENAI_API_KEY",
   "OPENAI_KEY_ROTATED_AT",
@@ -23,13 +25,9 @@ const API_REQUIRED = [
 
 const WEB_REQUIRED = [
   "API_URL",
-  "KINDE_CLIENT_ID",
-  "KINDE_CLIENT_SECRET",
-  "KINDE_ISSUER_URL",
-  "KINDE_SITE_URL",
-  "KINDE_POST_LOGIN_REDIRECT_URL",
-  "KINDE_POST_LOGOUT_REDIRECT_URL",
-  "KINDE_AUDIENCE",
+  "NEXT_PUBLIC_SUPABASE_URL",
+  "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+  "NEXT_PUBLIC_SITE_URL",
 ] as const;
 
 function missingKeys(
@@ -66,9 +64,11 @@ export function evaluateStagingInfrastructure(input: {
     entryFor(input.api, "STAGING_DATABASE_URL"),
   );
   const isolatedApiUrl = isPreviewOnly(entryFor(input.web, "API_URL"));
-  const isolatedWebKindeSecret = isPreviewOnly(
-    entryFor(input.web, "KINDE_CLIENT_SECRET"),
-  );
+  const isolatedSupabaseProject =
+    isPreviewOnly(entryFor(input.api, "SUPABASE_URL")) &&
+    isPreviewOnly(entryFor(input.api, "SUPABASE_PUBLISHABLE_KEY")) &&
+    isPreviewOnly(entryFor(input.web, "NEXT_PUBLIC_SUPABASE_URL")) &&
+    isPreviewOnly(entryFor(input.web, "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"));
   const checks: StagingInfrastructureCheck[] = [
     {
       key: "API_PREVIEW_CONFIGURATION",
@@ -99,11 +99,11 @@ export function evaluateStagingInfrastructure(input: {
         : "API_URL debe apuntar al alias estable del API de staging y existir sólo en Preview.",
     },
     {
-      key: "KINDE_CLIENT_ISOLATION",
-      status: isolatedWebKindeSecret ? "PASS" : "BLOCK",
-      detail: isolatedWebKindeSecret
-        ? "El secreto cliente de Kinde está limitado a Preview."
-        : "KINDE_CLIENT_SECRET debe ser una credencial de staging limitada a Preview.",
+      key: "SUPABASE_AUTH_ISOLATION",
+      status: isolatedSupabaseProject ? "PASS" : "BLOCK",
+      detail: isolatedSupabaseProject
+        ? "Los registros de configuración Supabase para el Preview están limitados a Preview; el proyecto rateware-prod compartido es deliberado."
+        : "Los registros Vercel de URL y llave Supabase para API/Web deben existir sólo en Preview, aunque apunten al proyecto rateware-prod compartido.",
     },
   ];
   return {

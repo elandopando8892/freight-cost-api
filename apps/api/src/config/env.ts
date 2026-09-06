@@ -50,11 +50,14 @@ export const env = cleanEnv(
   // Shared secret Vercel Cron sends as `Authorization: Bearer <CRON_SECRET>`.
   // Empty → cron endpoints fail closed (401). Set in Vercel env, never commit.
   CRON_SECRET: str({ default: "" }),
-  // Kinde identity — the API verifies access tokens against this issuer's JWKS
-  // and (optionally) checks the audience. Empty issuer → auth fails closed.
-  KINDE_ISSUER_URL: str({ default: "" }),
-  KINDE_AUDIENCE: str({ default: "" }),
-  // Rateware receives a human-authorized RateBook package using the same Kinde
+  // Supabase Auth identity. The API verifies asymmetric access tokens against
+  // the project's JWKS and requires the authenticated audience. Empty URL
+  // keeps every protected route fail-closed.
+  SUPABASE_URL: str({ default: "" }),
+  SUPABASE_PUBLISHABLE_KEY: str({ default: "" }),
+  SUPABASE_EXPECTED_PROJECT_REF: str({ default: "" }),
+  SUPABASE_JWT_AUDIENCE: str({ default: "authenticated" }),
+  // Rateware receives a human-authorized RateBook package using the same Supabase
   // bearer token. Empty means delivery is disabled and fails closed.
   RATEWARE_API_URL: str({ default: "" }),
   // Server-only credential for the supervised assistant. It is intentionally

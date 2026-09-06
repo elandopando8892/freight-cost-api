@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { lstatSync, readFileSync } from "node:fs";
+import { existsSync, lstatSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 type Finding = { file: string; kind: string };
@@ -24,7 +24,7 @@ function findingsForFile(file: string, content: string): Finding[] {
     .filter(({ expression }) => expression.test(content))
     .map(({ kind }) => ({ file, kind }));
 
-  const environmentAssignment = /^(OPENAI_API_KEY|KINDE_CLIENT_SECRET)\s*=\s*["']?([^"'\r\n]*)/gim;
+  const environmentAssignment = /^(OPENAI_API_KEY|KINDE_CLIENT_SECRET|SUPABASE_SECRET_KEY)\s*=\s*["']?([^"'\r\n]*)/gim;
   for (const match of content.matchAll(environmentAssignment)) {
     if (!isAllowedPlaceholder(match[2].trim())) {
       findings.push({ file, kind: `${match[1]} assignment` });
@@ -47,6 +47,8 @@ const findings: Finding[] = [];
 
 for (const file of files) {
   const absolutePath = resolve(repositoryRoot, file);
+  // `git ls-files --cached` includes staged/working-tree deletions until commit.
+  if (!existsSync(absolutePath)) continue;
   const metadata = lstatSync(absolutePath);
   if (!metadata.isFile()) continue;
   const content = readFileSync(absolutePath, "utf8");

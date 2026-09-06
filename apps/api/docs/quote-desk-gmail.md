@@ -1,6 +1,6 @@
 # Quote Desk y Gmail
 
-El inicio de sesion con Kinde y la autorizacion de Gmail son flujos distintos.
+El inicio de sesion con Supabase Auth y la autorizacion de Gmail son flujos distintos.
 La conexion Gmail se gestiona en Settings mediante el broker OAuth cifrado de
 Rateware; Freight Cost Model no almacena refresh tokens ni credenciales Gmail.
 

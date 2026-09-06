@@ -151,7 +151,7 @@ export function TeamMembers({
                   </td>
                   <td className="px-3 py-2">{roleLabel[member.role]}</td>
                   <td className="px-3 py-2 text-xs text-muted-foreground">
-                    {member.identityLinked ? 'Kinde vinculado' : 'Pendiente de primer acceso'}
+                    {member.identityLinked ? 'Supabase vinculado' : 'Pendiente de primer acceso'}
                   </td>
                   <td className="px-3 py-2">
                     <select

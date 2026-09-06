@@ -10,8 +10,10 @@ const preview = (key: string) => ({
 const api = [
   "STAGING_DATABASE_URL",
   "NODE_ENV",
-  "KINDE_ISSUER_URL",
-  "KINDE_AUDIENCE",
+  "SUPABASE_URL",
+  "SUPABASE_PUBLISHABLE_KEY",
+  "SUPABASE_EXPECTED_PROJECT_REF",
+  "SUPABASE_JWT_AUDIENCE",
   "CORS_ORIGINS",
   "OPENAI_API_KEY",
   "OPENAI_KEY_ROTATED_AT",
@@ -19,17 +21,13 @@ const api = [
 ].map(preview);
 const web = [
   "API_URL",
-  "KINDE_CLIENT_ID",
-  "KINDE_CLIENT_SECRET",
-  "KINDE_ISSUER_URL",
-  "KINDE_SITE_URL",
-  "KINDE_POST_LOGIN_REDIRECT_URL",
-  "KINDE_POST_LOGOUT_REDIRECT_URL",
-  "KINDE_AUDIENCE",
+  "NEXT_PUBLIC_SUPABASE_URL",
+  "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+  "NEXT_PUBLIC_SITE_URL",
 ].map(preview);
 
 describe("staging infrastructure gate", () => {
-  it("passes only with complete Preview-only database, API and Kinde configuration", () => {
+  it("passes only with complete Preview-only database, API and Supabase configuration", () => {
     expect(evaluateStagingInfrastructure({ api, web })).toMatchObject({
       ready: true,
       blockers: 0,
@@ -58,7 +56,7 @@ describe("staging infrastructure gate", () => {
       "WEB_PREVIEW_CONFIGURATION",
       "DATABASE_ISOLATION",
       "WEB_TO_API_ISOLATION",
-      "KINDE_CLIENT_ISOLATION",
+      "SUPABASE_AUTH_ISOLATION",
     ]);
   });
 
@@ -77,16 +75,29 @@ describe("staging infrastructure gate", () => {
     expect(result).toMatchObject({ ready: true, blockers: 0 });
   });
 
-  it("blocks production-shared web API and Kinde client credentials", () => {
+  it("blocks production-shared web API and Supabase project credentials", () => {
     const result = evaluateStagingInfrastructure({
       api,
       web: web.map((entry) =>
-        ["API_URL", "KINDE_CLIENT_SECRET"].includes(entry.key)
+        ["API_URL", "NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"].includes(entry.key)
           ? { ...entry, target: ["production", "preview"] }
           : entry,
       ),
     });
     expect(result.ready).toBe(false);
     expect(result.blockers).toBe(2);
+  });
+
+  it("blocks a Supabase API identity shared with Production", () => {
+    const result = evaluateStagingInfrastructure({
+      api: api.map((entry) =>
+        entry.key === "SUPABASE_URL"
+          ? { ...entry, target: ["production", "preview"] }
+          : entry,
+      ),
+      web,
+    });
+    expect(result.ready).toBe(false);
+    expect(result.checks.find((check) => check.key === "SUPABASE_AUTH_ISOLATION")?.status).toBe("BLOCK");
   });
 });

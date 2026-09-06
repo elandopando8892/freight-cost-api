@@ -19,7 +19,7 @@ El avance general se calcula como promedio ponderado de siete frentes. La ponder
 | Bases, presets y wizard consultivo | 15% | 90% | Implementado; validación con datos reales pendiente |
 | Cotización y Quote Desk | 15% | 100% | Piloto y reconciliación PASS en staging |
 | RateBook e integración Rateware | 15% | 88% | Piloto Gmail PASS; handoff RateBook pendiente |
-| Kinde, roles y seguridad | 10% | 95% | ADMIN, BFF y OAuth conectado |
+| Supabase Auth, roles y seguridad | 10% | 82% | Slice local lista; preview, MFA y receptor Rateware pendientes |
 | QA, evidencia y release | 10% | 95% | Promoción de Sprint 11 verificada |
 
 **Avance general ponderado actual: 93.4%.**

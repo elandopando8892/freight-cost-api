@@ -51,7 +51,7 @@ export function GmailIntegrationCard({ email }: { email: string }) {
             <div>
               <div className="flex items-center gap-2 font-medium"><span>Gmail</span>{row?.connected && <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs text-emerald-700 dark:text-emerald-300">Conectado</span>}</div>
               <p className="mt-1 text-sm text-muted-foreground">
-                {row?.connected ? `Remitente autorizado: ${row.mailbox_email}` : `Autoriza únicamente la cuenta Gmail que coincide con tu identidad Kinde (${email || 'tu cuenta'}).`}
+                {row?.connected ? `Remitente autorizado: ${row.mailbox_email}` : `Autoriza únicamente la cuenta Gmail que coincide con tu identidad Supabase (${email || 'tu cuenta'}).`}
               </p>
               {row?.last_error && <p className="mt-2 text-sm text-destructive">Se requiere reconectar: {row.last_error}</p>}
               {connection.isError && <p className="mt-2 text-sm text-destructive">No se pudo cargar el estado Gmail de Rateware. No se modificó ninguna conexión.</p>}
@@ -64,7 +64,7 @@ export function GmailIntegrationCard({ email }: { email: string }) {
             )}
           </div>
         </div>
-        <p className="flex gap-2 rounded-md bg-muted/40 p-3 text-xs text-muted-foreground"><ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0" />El inicio de sesión Kinde no otorga acceso a la bandeja. Google muestra los permisos solicitados y Rateware guarda los tokens de renovación cifrados. Desconectar revoca la conexión local; desde aquí no se envía ninguna cotización.</p>
+        <p className="flex gap-2 rounded-md bg-muted/40 p-3 text-xs text-muted-foreground"><ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0" />El inicio de sesión Supabase no otorga acceso a la bandeja. Google muestra los permisos solicitados y Rateware guarda los tokens de renovación cifrados. Desconectar revoca la conexión local; desde aquí no se envía ninguna cotización.</p>
       </CardContent>
     </Card>
   )

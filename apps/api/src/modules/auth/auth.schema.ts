@@ -1,10 +1,10 @@
-// Identity is handled by Kinde; the API maps the Kinde subject to our User/Org.
+// Identity is handled by Supabase Auth; the API maps its subject to our User/Org.
 // request.user carries our internal identity in this shape.
 export interface JwtPayload {
   sub: string       // our internal userId
   orgId: string
   role: Role
-  kindeId?: string  // Kinde subject (sub)
+  supabaseId?: string  // Supabase Auth user UUID (sub)
   iat?: number
   exp?: number
 }

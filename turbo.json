@@ -4,13 +4,13 @@
     "build": {
       "dependsOn": ["^build"],
       "env": [
-        "KINDE_AUDIENCE",
-        "KINDE_CLIENT_ID",
-        "KINDE_CLIENT_SECRET",
-        "KINDE_ISSUER_URL",
-        "KINDE_POST_LOGIN_REDIRECT_URL",
-        "KINDE_POST_LOGOUT_REDIRECT_URL",
-        "KINDE_SITE_URL"
+        "SUPABASE_URL",
+        "SUPABASE_PUBLISHABLE_KEY",
+        "SUPABASE_EXPECTED_PROJECT_REF",
+        "SUPABASE_JWT_AUDIENCE",
+        "NEXT_PUBLIC_SUPABASE_URL",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+        "NEXT_PUBLIC_SITE_URL"
       ],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },

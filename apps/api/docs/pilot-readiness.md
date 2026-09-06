@@ -35,7 +35,7 @@ datos a Rateware/Gmail.
 
 1. Ejecutar `npm run verify:release` desde la raíz. Para un piloto con Rateware,
    usar `npm run verify:release:rateware`. Un resultado local no comprueba
-   Vercel, Neon, Kinde, OAuth ni integraciones remotas.
+   Vercel, Neon, Supabase Auth, OAuth ni integraciones remotas.
 2. Mantener secretos exclusivamente en el gestor autorizado y registrar las
    constancias de rotación requeridas sin imprimir valores.
 3. Respaldar la base y comprobar conectividad real antes de aplicar migraciones.

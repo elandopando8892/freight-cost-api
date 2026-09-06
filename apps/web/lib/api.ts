@@ -1,9 +1,9 @@
 /**
  * Server-side typed client for the Fastify API.
- * Attaches the user's Kinde access token as Bearer.
+ * Attaches the user's verified Supabase access token as Bearer.
  * Use ONLY from Route Handlers / Server Components / Server Actions.
  */
-import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
+import { verifiedAccessToken } from '@/lib/supabase/session'
 
 const API_URL = process.env.API_URL ?? 'http://localhost:3000'
 
@@ -14,11 +14,10 @@ export class ApiError extends Error {
 }
 
 async function bearerToken(): Promise<string | null> {
-  const { getAccessTokenRaw } = getKindeServerSession()
-  return (await getAccessTokenRaw()) ?? null
+  return verifiedAccessToken()
 }
 
-/** Forward an arbitrary request to the Fastify API with the user's Kinde token. */
+/** Forward an arbitrary request to the Fastify API with the user's Supabase token. */
 export async function api<T = unknown>(
   path: string,
   init: RequestInit & { json?: unknown } = {},

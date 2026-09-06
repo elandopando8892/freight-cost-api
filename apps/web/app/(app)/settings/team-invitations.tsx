@@ -85,7 +85,7 @@ export function TeamInvitations({ invitations }: { invitations: Invitation[] }) 
       <div>
         <h3 id="team-invitations-heading" className="text-sm font-medium">Invitaciones al equipo</h3>
         <p className="mt-1 text-xs text-muted-foreground">
-          Primero revisa la invitación. El correo se integra a esta organización en su primer acceso con Kinde y vence después de siete días.
+          Primero revisa la invitación. El correo se integra a esta organización en su primer acceso con Supabase y vence después de siete días.
         </p>
       </div>
 

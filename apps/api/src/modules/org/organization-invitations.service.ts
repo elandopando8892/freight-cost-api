@@ -5,12 +5,12 @@ import {
 } from "./organization-invitations.js";
 
 /**
- * Consume a pending invite during Kinde sign-in. If a valid invite exists, the
+ * Consume a pending invite during Supabase sign-in. If a valid invite exists, the
  * identity joins that tenant atomically; a failed acceptance never falls
  * through to creation of a different organization.
  */
 export async function acceptPendingOrganizationInvitation(
-  kindeSub: string,
+  supabaseSub: string,
   rawEmail: string,
 ): Promise<OrganizationInvitationActor | null> {
   const email = normalizeInvitationEmail(rawEmail);
@@ -43,7 +43,7 @@ export async function acceptPendingOrganizationInvitation(
       const user = await tx.user.create({
         data: {
           orgId: invitation.orgId,
-          kindeId: kindeSub,
+          supabaseId: supabaseSub,
           email,
           passwordHash: null,
           role: invitation.role,
@@ -61,17 +61,17 @@ export async function acceptPendingOrganizationInvitation(
         id: user.id,
         orgId: user.orgId,
         role: user.role,
-        kindeId: kindeSub,
+        supabaseId: supabaseSub,
       };
     });
   } catch {
-    const raced = await prisma.user.findUnique({ where: { kindeId: kindeSub } });
+    const raced = await prisma.user.findUnique({ where: { supabaseId: supabaseSub } });
     if (raced) {
       return {
         id: raced.id,
         orgId: raced.orgId,
         role: raced.role,
-        kindeId: kindeSub,
+        supabaseId: supabaseSub,
       };
     }
     throw new Error("Failed to accept organization invitation.");

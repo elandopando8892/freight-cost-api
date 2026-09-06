@@ -41,7 +41,7 @@ const checkLabels: Record<string, string> = {
   API_HEALTH: "API /health",
   API_READY: "API /ready",
   API_CORS: "CORS API ↔ Web",
-  LOGIN_CALLBACK: "Login y callback Kinde",
+  LOGIN_CALLBACK: "Login y callback Supabase",
   SETTINGS_IDENTITY: "Identidad en Settings",
   BFF_AUTHENTICATED: "BFF con sesión",
   LOGOUT: "Logout y sesión cerrada",

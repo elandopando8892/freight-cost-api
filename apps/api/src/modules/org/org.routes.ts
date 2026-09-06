@@ -89,12 +89,12 @@ export async function orgRoutes(app: FastifyInstance) {
     const { orgId } = request.user as JwtPayload
     const members = await prisma.user.findMany({
       where: { orgId },
-      select: { id: true, email: true, role: true, kindeId: true, createdAt: true },
+      select: { id: true, email: true, role: true, supabaseId: true, createdAt: true },
       orderBy: { createdAt: 'asc' },
     })
-    return members.map(({ kindeId, ...member }) => ({
+    return members.map(({ supabaseId, ...member }) => ({
       ...member,
-      identityLinked: Boolean(kindeId),
+      identityLinked: Boolean(supabaseId),
     }))
   })
 

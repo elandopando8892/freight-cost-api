@@ -247,9 +247,9 @@ model Organization {
 model User {
   id           String   @id @default(cuid())
   orgId        String
-  kindeId      String?  @unique // Kinde subject (sub); null for legacy/local users
+  supabaseId   String   @unique // Supabase Auth user UUID; required after the controlled cutover
   email        String   @unique
-  passwordHash String? // null for Kinde-managed identities
+  passwordHash String? // null for identities managed by an external auth provider
   role         Role     @default(OPERATOR)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

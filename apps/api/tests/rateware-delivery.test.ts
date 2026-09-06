@@ -75,7 +75,7 @@ const deliveryEnvelope = buildRatewareDeliveryEnvelope({
 const deliveryInput = {
   orgId: "org-1",
   actorId: "admin-1",
-  actorBearer: "Bearer test-kinde-token",
+  actorBearer: "Bearer test-supabase-token",
   approvalRequestId: "approval-1",
   approvedPayloadChecksum: deliveryEnvelope.payloadChecksum,
   book,

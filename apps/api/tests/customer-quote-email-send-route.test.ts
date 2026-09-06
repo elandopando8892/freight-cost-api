@@ -224,7 +224,7 @@ describe("customer quote gmail send route checks payload freshness", () => {
     });
 
     expect(res.statusCode).toBe(401);
-    expect((await res.json()).message).toContain("Kinde bearer token");
+    expect((await res.json()).message).toContain("Supabase bearer token");
     expect(deliveryMock).not.toHaveBeenCalled();
   });
 

@@ -60,7 +60,7 @@ const draft = {
 const input = {
   orgId: "org-1",
   actorId: "admin-1",
-  actorBearer: "Bearer kinde-token",
+  actorBearer: "Bearer supabase-token",
   draftId: "draft-1",
 };
 

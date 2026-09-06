@@ -384,19 +384,25 @@ vi.mock("../src/config/prisma.js", () => {
   return { prisma };
 });
 
-// ── Mock Kinde token verification (no network / JWKS) ────────────────────────
-// `authenticate` calls verifyKindeToken + resolveUser; the mock accepts a single
+// ── Mock Supabase token verification (no network / JWKS) ────────────────────
+// `authenticate` calls verifySupabaseToken + resolveUser; the mock accepts a single
 // fixed token and maps it to our seeded test user/org.
-vi.mock("../src/modules/auth/kinde.service.js", () => ({
-  verifyKindeToken: vi.fn(async (t: string) => {
-    if (t === "valid-kinde-token") return { sub: "kinde-sub-1" };
+vi.mock("../src/modules/auth/supabase.service.js", () => ({
+  verifySupabaseToken: vi.fn(async (t: string) => {
+    if (t === "valid-supabase-token") return {
+      sub: "supabase-sub-1",
+      email: "test@carrier.com",
+      role: "authenticated",
+      session_id: "session-1",
+      is_anonymous: false,
+    };
     throw new Error("invalid token");
   }),
   resolveUser: vi.fn(async () => ({
     id: "user-1",
     orgId: "org-1",
     role: "ADMIN",
-    kindeId: "kinde-sub-1",
+    supabaseId: "supabase-sub-1",
   })),
 }));
 
@@ -411,8 +417,8 @@ vi.mock("../src/config/env.js", () => ({
     RATE_LIMIT_WINDOW: "1 minute",
     EIA_API_KEY: "",
     CRON_SECRET: "test-cron-secret",
-    KINDE_ISSUER_URL: "https://test.kinde.com",
-    KINDE_AUDIENCE: "https://test-api",
+    SUPABASE_URL: "https://test.supabase.co",
+    SUPABASE_JWT_AUDIENCE: "authenticated",
     OPENAI_API_KEY: "unit-test-provider-key",
     OPENAI_KEY_ROTATED_AT: "2026-08-12T00:00:00.000Z",
     OPENAI_MODEL: "gpt-4.1-mini",
@@ -422,7 +428,7 @@ vi.mock("../src/config/env.js", () => ({
 
 // ── Now import the app ───────────────────────────────────────────────────────
 const { buildApp } = await import("../src/app.js");
-const { resolveUser } = await import("../src/modules/auth/kinde.service.js");
+const { resolveUser } = await import("../src/modules/auth/supabase.service.js");
 const { prisma } = await import("../src/config/prisma.js");
 const { calculate } = await import("../src/modules/engine/engine.calculator.js");
 const { buildQuoteCalculationSnapshot } = await import(
@@ -557,8 +563,8 @@ function publishedRateBookForDelivery(overrides: Record<string, unknown> = {}) {
 }
 
 let app: FastifyInstance;
-// Fixed token recognised by the mocked verifyKindeToken (see vi.mock above).
-const token = "valid-kinde-token";
+// Fixed token recognised by the mocked verifySupabaseToken (see vi.mock above).
+const token = "valid-supabase-token";
 
 beforeAll(async () => {
   app = buildApp();
@@ -1225,7 +1231,7 @@ describe("Pilot decision ledger", () => {
       id: "user-1",
       orgId: "org-1",
       role: "ADMIN",
-      kindeId: "kinde-sub-1",
+      supabaseId: "supabase-sub-1",
     } as never);
     const res = await app.inject({
       method: "GET",
@@ -1240,7 +1246,7 @@ describe("Pilot decision ledger", () => {
       releaseId: "abc1234",
     });
     expect(res.body).not.toContain("email");
-    expect(res.body).not.toContain("kinde");
+    expect(res.body).not.toContain("supabaseId");
   });
 
   it("records a human NO_GO together with an evaluated evidence snapshot", async () => {
@@ -1399,7 +1405,7 @@ describe("Pilot decision ledger", () => {
         id: "user-2",
         orgId: "org-1",
         role: "ADMIN",
-        kindeId: "kinde-sub-2",
+        supabaseId: "supabase-sub-2",
       });
       vi.mocked(prisma.pilotDecision.create).mockResolvedValueOnce({
         id: "pilot-go-decision-1",
@@ -1528,7 +1534,7 @@ describe("Pilot verification ledger", () => {
       id: "user-2",
       orgId: "org-2",
       role: "ADMIN",
-      kindeId: "kinde-sub-2",
+      supabaseId: "supabase-sub-2",
     });
 
     const res = await app.inject({
@@ -1582,7 +1588,7 @@ describe("Canonical parameter catalog", () => {
 // ─────────────────────────────────────────────────────────────────────────────
 // AUTH
 // ─────────────────────────────────────────────────────────────────────────────
-describe("Auth (Kinde)", () => {
+describe("Auth (Supabase)", () => {
   it("GET /auth/me without token → 401", async () => {
     const res = await app.inject({ method: "GET", url: "/auth/me" });
     expect(res.statusCode).toBe(401);
@@ -1597,12 +1603,12 @@ describe("Auth (Kinde)", () => {
     expect(res.statusCode).toBe(401);
   });
 
-  it("GET /auth/me with valid Kinde token → 200 (resolved user)", async () => {
+  it("GET /auth/me with valid Supabase token → 200 (resolved user)", async () => {
     const { prisma } = await import("../src/config/prisma.js");
     vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({
       id: "user-1",
       orgId: "org-1",
-      kindeId: "kinde-sub-1",
+      supabaseId: "supabase-sub-1",
       email: "test@carrier.com",
       passwordHash: null,
       role: "ADMIN",
@@ -1628,7 +1634,7 @@ describe("Role authorization", () => {
       id: "user-1",
       orgId: "org-1",
       role,
-      kindeId: "kinde-sub-1",
+      supabaseId: "supabase-sub-1",
     });
   };
 

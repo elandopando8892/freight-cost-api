@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
-import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
-import { LogoutLink } from '@kinde-oss/kinde-auth-nextjs/components'
 import { api } from '@/lib/api'
+import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { buttonVariants } from '@/components/ui/button'
 import { RelativeTime } from '@/components/relative-time'
@@ -9,6 +8,7 @@ import { OrgNameForm } from './org-name-form'
 import { GmailIntegrationCard } from './gmail-integration-card'
 import { TeamInvitations } from './team-invitations'
 import { TeamMembers, type MemberRoleAudit, type TeamMember } from './team-members'
+import { logout } from '../../auth/actions'
 
 export const dynamic = 'force-dynamic'
 export const metadata: Metadata = { title: 'Configuración' }
@@ -24,17 +24,18 @@ function initials(name: string, email: string): string {
 }
 
 export default async function SettingsPage() {
-  const { getUser } = getKindeServerSession()
-  const [org, members, me, invitations, roleAudits, user] = await Promise.all([
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  const [org, members, me, invitations, roleAudits] = await Promise.all([
     api<Org>('/org').catch(() => null),
     api<TeamMember[]>('/org/members').catch(() => [] as TeamMember[]),
     api<Me>('/auth/me').catch(() => null),
     api<Invitation[]>('/org/invitations').catch(() => [] as Invitation[]),
     api<MemberRoleAudit[]>('/org/member-role-audits').catch(() => [] as MemberRoleAudit[]),
-    getUser(),
   ])
 
-  const name = [user?.given_name, user?.family_name].filter(Boolean).join(' ') || (user?.email ?? '')
+  const metadataName = typeof user?.user_metadata?.full_name === 'string' ? user.user_metadata.full_name : ''
+  const name = metadataName || (user?.email ?? '')
   const email = user?.email ?? me?.email ?? ''
 
   return (
@@ -79,7 +80,7 @@ export default async function SettingsPage() {
       <Card>
         <CardHeader className="border-b bg-muted/25 pb-4">
           <CardTitle>Cuenta</CardTitle>
-          <CardDescription>Tu identidad está administrada por Kinde.</CardDescription>
+          <CardDescription>Tu identidad está administrada por Supabase Auth.</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
           <div className="flex items-center gap-3">
@@ -95,10 +96,12 @@ export default async function SettingsPage() {
             )}
           </div>
           <p className="text-sm text-muted-foreground">
-            La contraseña, correo y autenticación multifactor se administran desde Kinde. Cierra sesión e ingresa de nuevo para actualizarlos.
+            El acceso, correo y autenticación multifactor se administran desde Supabase Auth. Los roles y la organización permanecen en Freight Cost Model.
           </p>
           <div>
-            <LogoutLink className={buttonVariants({ variant: 'outline', size: 'sm' })}>Cerrar sesión</LogoutLink>
+            <form action={logout}>
+              <button className={buttonVariants({ variant: 'outline', size: 'sm' })}>Cerrar sesión</button>
+            </form>
           </div>
         </CardContent>
       </Card>

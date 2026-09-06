@@ -1,3 +1,5 @@
+import { parseTrustedOrigins } from "../../config/cors.js";
+
 export type ReleasePreflightStatus = "PASS" | "WARN" | "BLOCK";
 
 export type ReleasePreflightCheck = {
@@ -16,7 +18,11 @@ export const REQUIRED_RELEASE_MIGRATIONS = [
   "20260812000100_pilot_verification_evidence",
   "20260812000200_pilot_go_dual_approval",
   "20260815000100_assumption_applicability_context",
+  "20260830000100_add_supabase_identity",
+  "20260830000200_finalize_supabase_identity",
 ] as const;
+
+export const APPROVED_SUPABASE_PROJECT_REF = "alqjqzqagdmcywpjtnnr";
 
 type ReleasePreflightInput = {
   environment: Record<string, string | undefined>;
@@ -29,12 +35,12 @@ type ReleasePreflightInput = {
 };
 
 function meetsMinimumNodeVersion(value: string) {
-  const [major = 0, minor = 0, patch = 0] = value
+  const [major = 0] = value
     .replace(/^v/, "")
     .split(".")
     .map(Number);
   return (
-    major > 20 || (major === 20 && (minor > 19 || (minor === 19 && patch >= 0)))
+    major >= 22
   );
 }
 
@@ -100,23 +106,23 @@ function originOf(value: string | undefined) {
   }
 }
 
-function isSameHttpsOrigin(value: string | undefined, origin: string | null) {
-  return Boolean(origin && originOf(value) === origin);
-}
-
 export function buildReleasePreflight(input: ReleasePreflightInput) {
   const missingMigrations = REQUIRED_RELEASE_MIGRATIONS.filter(
     (migration) => !input.migrationArtifacts.includes(migration),
   );
-  const webSiteOrigin = originOf(input.webEnvironment.KINDE_SITE_URL);
-  const webKindeReady =
-    hasConfiguredValue(input.webEnvironment.KINDE_CLIENT_ID) &&
-    hasConfiguredValue(input.webEnvironment.KINDE_CLIENT_SECRET) &&
-    isHttpsUrl(input.webEnvironment.KINDE_ISSUER_URL) &&
-    isHttpsUrl(input.webEnvironment.KINDE_AUDIENCE) &&
-    isSameHttpsOrigin(input.webEnvironment.KINDE_POST_LOGIN_REDIRECT_URL, webSiteOrigin) &&
-    isSameHttpsOrigin(input.webEnvironment.KINDE_POST_LOGOUT_REDIRECT_URL, webSiteOrigin) &&
-    isIsoDate(input.webEnvironment.KINDE_SECRET_ROTATED_AT);
+  const webSiteOrigin = originOf(input.webEnvironment.NEXT_PUBLIC_SITE_URL);
+  const webSupabaseReady =
+    isHttpsUrl(input.webEnvironment.NEXT_PUBLIC_SUPABASE_URL) &&
+    hasConfiguredValue(input.webEnvironment.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY);
+  const apiAndWebSupabaseMatch =
+    originOf(input.environment.SUPABASE_URL) !== null &&
+    originOf(input.environment.SUPABASE_URL) ===
+      originOf(input.webEnvironment.NEXT_PUBLIC_SUPABASE_URL);
+  const approvedSupabaseProject =
+    input.environment.SUPABASE_EXPECTED_PROJECT_REF ===
+      APPROVED_SUPABASE_PROJECT_REF &&
+    originOf(input.environment.SUPABASE_URL) ===
+      `https://${APPROVED_SUPABASE_PROJECT_REF}.supabase.co`;
   const webOriginInCors =
     webSiteOrigin !== null &&
     parseTrustedOrigins(input.environment.CORS_ORIGINS).includes(webSiteOrigin);
@@ -126,8 +132,8 @@ export function buildReleasePreflight(input: ReleasePreflightInput) {
       status: meetsMinimumNodeVersion(input.nodeVersion) ? "PASS" : "BLOCK",
       label: "Runtime Node.js",
       detail: meetsMinimumNodeVersion(input.nodeVersion)
-        ? `Node ${input.nodeVersion} cumple el mínimo 20.19.0.`
-        : `Node ${input.nodeVersion} es menor al mínimo 20.19.0 requerido para el release.`,
+        ? `Node ${input.nodeVersion} cumple el mínimo 22.0.0.`
+        : `Node ${input.nodeVersion} es menor al mínimo 22.0.0 requerido para Supabase Auth.`,
     },
     {
       key: "WORKTREE",
@@ -170,18 +176,22 @@ export function buildReleasePreflight(input: ReleasePreflightInput) {
         : "Falta DATABASE_URL válida o aún contiene el placeholder local.",
     },
     {
-      key: "KINDE",
+      key: "SUPABASE_AUTH",
       status:
-        isHttpsUrl(input.environment.KINDE_ISSUER_URL) &&
-        isHttpsUrl(input.environment.KINDE_AUDIENCE)
+        isHttpsUrl(input.environment.SUPABASE_URL) &&
+        hasConfiguredValue(input.environment.SUPABASE_PUBLISHABLE_KEY) &&
+        approvedSupabaseProject &&
+        input.environment.SUPABASE_JWT_AUDIENCE === "authenticated"
           ? "PASS"
           : "BLOCK",
-      label: "Autenticación Kinde",
+      label: "Autenticación Supabase",
       detail:
-        isHttpsUrl(input.environment.KINDE_ISSUER_URL) &&
-        isHttpsUrl(input.environment.KINDE_AUDIENCE)
-          ? "Issuer y audience HTTPS están configurados."
-          : "Falta KINDE_ISSUER_URL o KINDE_AUDIENCE HTTPS.",
+        isHttpsUrl(input.environment.SUPABASE_URL) &&
+        hasConfiguredValue(input.environment.SUPABASE_PUBLISHABLE_KEY) &&
+        approvedSupabaseProject &&
+        input.environment.SUPABASE_JWT_AUDIENCE === "authenticated"
+          ? "Rateware Supabase, llave publicable y audience authenticated están configurados."
+          : "La configuración debe fijar Auth al proyecto aprobado rateware-prod, con llave publicable y audience authenticated.",
     },
     {
       key: "CORS",
@@ -204,20 +214,20 @@ export function buildReleasePreflight(input: ReleasePreflightInput) {
         : "Falta API_URL HTTPS para el BFF del Web.",
     },
     {
-      key: "WEB_KINDE",
-      status: webKindeReady ? "PASS" : "BLOCK",
-      label: "Kinde del Web",
-      detail: webKindeReady
-        ? "Cliente, secreto rotado, issuer, audience y callbacks HTTPS son consistentes."
-        : "Faltan valores Kinde del Web, KINDE_SECRET_ROTATED_AT ISO o callbacks HTTPS del mismo origen.",
+      key: "WEB_SUPABASE_AUTH",
+      status: webSupabaseReady && apiAndWebSupabaseMatch ? "PASS" : "BLOCK",
+      label: "Supabase Auth del Web",
+      detail: webSupabaseReady && apiAndWebSupabaseMatch
+        ? "Web y API apuntan al mismo proyecto Supabase Auth con llave publicable."
+        : "Falta la configuración Supabase del Web o Web/API apuntan a proyectos distintos.",
     },
     {
       key: "CORS_WEB_ORIGIN",
       status: webOriginInCors ? "PASS" : "BLOCK",
       label: "Origen Web en CORS",
       detail: webOriginInCors
-          ? "El origen Kinde del Web coincide con el allowlist CORS de la API."
-          : "KINDE_SITE_URL del Web debe ser HTTPS y estar en CORS_ORIGINS de la API.",
+          ? "El origen del Web coincide con el allowlist CORS de la API."
+          : "NEXT_PUBLIC_SITE_URL debe ser HTTPS y estar en CORS_ORIGINS de la API.",
     },
     {
       key: "AI_KEY",
@@ -267,4 +277,3 @@ export function buildReleasePreflight(input: ReleasePreflightInput) {
     warnings: checks.filter((check) => check.status === "WARN").length,
   };
 }
-import { parseTrustedOrigins } from "../../config/cors.js";

@@ -7,21 +7,21 @@ const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] })
 
 const DESCRIPTION =
-  'Cross-border MX–US freight pricing — cost buildup, risk-adjusted tariffs, and commercial sell tiers per lane.'
+  'MARKSMAN Freight Cost Model — estructura, calcula y gobierna tarifas con precisión operativa.'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://freight-cost-web.vercel.app'),
   title: {
-    default: 'Freight Cost Model',
-    template: '%s · Freight Cost Model',
+    default: 'MARKSMAN · Freight Cost Model',
+    template: '%s · MARKSMAN Freight Cost Model',
   },
   description: DESCRIPTION,
-  applicationName: 'Freight Cost Model',
+  applicationName: 'MARKSMAN Freight Cost Model',
   openGraph: {
-    title: 'Freight Cost Model',
+    title: 'MARKSMAN · Freight Cost Model',
     description: DESCRIPTION,
     type: 'website',
-    siteName: 'Freight Cost Model',
+    siteName: 'MARKSMAN Freight Cost Model',
   },
   robots: { index: false, follow: false }, // private carrier app
 }

@@ -1,7 +1,7 @@
 # Entrega de RateBook a Rateware
 
 `POST /integration/rateware/ratebooks/:id/deliver` es una acción explícita de
-un administrador. Solo acepta RateBooks publicados y reenvía el bearer Kinde
+un administrador. Solo acepta RateBooks publicados y reenvía el bearer Supabase
 del usuario autenticado; no usa una credencial de Rateware en el navegador.
 
 La entrega calcula primero el paquete completo y su checksum SHA-256. La llave
@@ -25,8 +25,8 @@ Configurar únicamente en el entorno servidor de Freight Cost Model:
 RATEWARE_API_URL=https://<supabase-project>.supabase.co/functions/v1/fcm-ratebook-receiver
 ```
 
-Rateware debe verificar el mismo issuer y audiencia Kinde que Freight Cost
-Model para que el usuario administrador sea resuelto en ambos workspaces.
+Rateware debe verificar el mismo issuer, JWKS y audiencia Supabase que Freight
+Cost Model para que el usuario administrador sea resuelto en ambos workspaces.
 Antes de habilitar el endpoint deben aplicarse las migraciones FCM
 `20260820000100_rateware_approval_checksum` y
 `20260820000200_rateware_receiver_evidence`, y en Rateware

@@ -1,5 +1,5 @@
-import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
+import { verifiedAccessToken } from '@/lib/supabase/session'
 
 function configuredRatewareApiUrl() {
   const value = process.env.RATEWARE_GMAIL_API_URL
@@ -21,9 +21,7 @@ function configuredRatewareApiUrl() {
 }
 
 async function sessionToken() {
-  const { isAuthenticated, getAccessTokenRaw } = getKindeServerSession()
-  if (!(await isAuthenticated())) return null
-  return (await getAccessTokenRaw()) ?? null
+  return verifiedAccessToken()
 }
 
 async function ratewareRequest(token: string, body: Record<string, unknown>) {

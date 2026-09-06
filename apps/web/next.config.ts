@@ -1,14 +1,14 @@
 import path from 'node:path'
 import type { NextConfig } from 'next'
 
-// Report-only first: this lets staging surface violations from Kinde and the
+// Report-only first: this lets staging surface violations from Supabase Auth and the
 // Quote Desk's sandboxed srcDoc preview before CSP is enforced in production.
 const contentSecurityPolicyReportOnly = [
   "default-src 'self'",
   "base-uri 'self'",
   "object-src 'none'",
   "frame-ancestors 'none'",
-  "form-action 'self' https://*.kinde.com",
+  "form-action 'self' https://*.supabase.co",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
   "style-src 'self' 'unsafe-inline'",

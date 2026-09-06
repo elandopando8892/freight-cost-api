@@ -1,12 +1,12 @@
 /**
  * Generic BFF proxy — forwards /api/v1/* to the Fastify backend with the user's
- * Kinde access token attached as Bearer. Client code calls `/api/v1/...` without
+ * Supabase access token attached as Bearer. Client code calls `/api/v1/...` without
  * ever touching the token directly. Returns JSON 401 (not an HTML redirect) when
  * there's no session, so the client fetcher can react.
  */
 import { type NextRequest, NextResponse } from "next/server";
-import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { buildBffUpstreamUrl } from "@/lib/bff-upstream";
+import { verifiedAccessToken } from "@/lib/supabase/session";
 
 const API_URL = process.env.API_URL ?? "http://localhost:3000";
 
@@ -15,15 +15,7 @@ async function handle(
   ctx: { params: Promise<{ path: string[] }> },
 ) {
   const { path } = await ctx.params;
-  const { isAuthenticated, getAccessTokenRaw } = getKindeServerSession();
-
-  if (!(await isAuthenticated())) {
-    return NextResponse.json(
-      { error: "Not authenticated" },
-      { status: 401, headers: { "cache-control": "no-store" } },
-    );
-  }
-  const token = await getAccessTokenRaw();
+  const token = await verifiedAccessToken();
   if (!token) {
     return NextResponse.json(
       { error: "Not authenticated" },

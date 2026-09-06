@@ -391,7 +391,7 @@ export async function rateBooksRoutes(app: FastifyInstance) {
       const actorBearer = request.headers.authorization;
       if (!actorBearer?.startsWith("Bearer "))
         throw httpError(
-          "A Kinde bearer token is required for Rateware delivery.",
+          "A Supabase bearer token is required for Rateware delivery.",
           401,
         );
       const book = await prisma.rateBook.findFirstOrThrow({

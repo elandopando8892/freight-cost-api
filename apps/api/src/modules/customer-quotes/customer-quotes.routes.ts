@@ -379,7 +379,7 @@ export async function customerQuotesRoutes(app: FastifyInstance) {
       const actorBearer = request.headers.authorization;
       if (!actorBearer)
         throw Object.assign(
-          new Error("A Kinde bearer token is required for Gmail delivery."),
+          new Error("A Supabase bearer token is required for Gmail delivery."),
           { statusCode: 401 },
         );
       const actor = await prisma.user.findUnique({
@@ -455,7 +455,7 @@ export async function customerQuotesRoutes(app: FastifyInstance) {
       const actorBearer = request.headers.authorization;
       if (!actorBearer)
         throw Object.assign(
-          new Error("A Kinde bearer token is required for Gmail reconciliation."),
+          new Error("A Supabase bearer token is required for Gmail reconciliation."),
           { statusCode: 401 },
         );
       return reconcileCustomerQuoteEmailDelivery({

@@ -6,8 +6,10 @@ import {
 
 const validEnvironment = {
   DATABASE_URL: "postgresql://app:secret@db.example.com:5432/fcm",
-  KINDE_ISSUER_URL: "https://carrier.kinde.com",
-  KINDE_AUDIENCE: "https://api.example.com",
+  SUPABASE_URL: "https://alqjqzqagdmcywpjtnnr.supabase.co",
+  SUPABASE_PUBLISHABLE_KEY: "sb_publishable_test",
+  SUPABASE_EXPECTED_PROJECT_REF: "alqjqzqagdmcywpjtnnr",
+  SUPABASE_JWT_AUDIENCE: "authenticated",
   OPENAI_API_KEY: "stored-in-secret-manager",
   OPENAI_KEY_ROTATED_AT: "2026-08-12T00:00:00.000Z",
   OPENAI_MODEL: "gpt-4.1-mini",
@@ -17,14 +19,9 @@ const validEnvironment = {
 
 const validWebEnvironment = {
   API_URL: "https://api.example.com",
-  KINDE_CLIENT_ID: "client-id",
-  KINDE_CLIENT_SECRET: "stored-in-secret-manager",
-  KINDE_ISSUER_URL: "https://carrier.kinde.com",
-  KINDE_AUDIENCE: "https://api.example.com",
-  KINDE_SITE_URL: "https://freight-cost-web.example.com",
-  KINDE_POST_LOGIN_REDIRECT_URL: "https://freight-cost-web.example.com/",
-  KINDE_POST_LOGOUT_REDIRECT_URL: "https://freight-cost-web.example.com",
-  KINDE_SECRET_ROTATED_AT: "2026-08-12T00:00:00.000Z",
+  NEXT_PUBLIC_SUPABASE_URL: "https://alqjqzqagdmcywpjtnnr.supabase.co",
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_test",
+  NEXT_PUBLIC_SITE_URL: "https://freight-cost-web.example.com",
 };
 
 describe("release preflight", () => {
@@ -36,7 +33,7 @@ describe("release preflight", () => {
       gitDirtyFileCount: 0,
       gitHead: "a4fdc1e28c9e1000000000000000000000000000",
       requireRateware: false,
-      nodeVersion: "20.19.0",
+      nodeVersion: "22.13.0",
     });
 
     expect(result.ready).toBe(true);
@@ -53,7 +50,7 @@ describe("release preflight", () => {
       webEnvironment: {
         ...validWebEnvironment,
         API_URL: "http://localhost:3000",
-        KINDE_SECRET_ROTATED_AT: "not-a-date",
+        NEXT_PUBLIC_SUPABASE_URL: "https://other-auth.supabase.co",
       },
       migrationArtifacts: [],
       gitDirtyFileCount: 2,
@@ -74,7 +71,7 @@ describe("release preflight", () => {
       gitDirtyFileCount: 0,
       gitHead: "b4fdc1e28c9e1000000000000000000000000000",
       requireRateware: false,
-      nodeVersion: "20.19.0",
+      nodeVersion: "22.13.0",
     });
 
     expect(result.ready).toBe(false);
@@ -89,9 +86,43 @@ describe("release preflight", () => {
       gitDirtyFileCount: 0,
       gitHead: "a4fdc1e28c9e1000000000000000000000000000",
       requireRateware: false,
-      nodeVersion: "20.19.0",
+      nodeVersion: "22.13.0",
     });
 
     expect(result.checks.find((check) => check.key === "AI_KEY")?.status).toBe("BLOCK");
+  });
+
+  it("blocks Supabase linking without a configured publishable key", () => {
+    const result = buildReleasePreflight({
+      environment: { ...validEnvironment, SUPABASE_PUBLISHABLE_KEY: "" },
+      webEnvironment: validWebEnvironment,
+      migrationArtifacts: [...REQUIRED_RELEASE_MIGRATIONS],
+      gitDirtyFileCount: 0,
+      gitHead: "a4fdc1e28c9e1000000000000000000000000000",
+      requireRateware: false,
+      nodeVersion: "22.13.0",
+    });
+
+    expect(result.checks.find((check) => check.key === "SUPABASE_AUTH")?.status).toBe("BLOCK");
+  });
+
+  it("blocks a Supabase project other than rateware-prod", () => {
+    const result = buildReleasePreflight({
+      environment: {
+        ...validEnvironment,
+        SUPABASE_URL: "https://other-project.supabase.co",
+      },
+      webEnvironment: {
+        ...validWebEnvironment,
+        NEXT_PUBLIC_SUPABASE_URL: "https://other-project.supabase.co",
+      },
+      migrationArtifacts: [...REQUIRED_RELEASE_MIGRATIONS],
+      gitDirtyFileCount: 0,
+      gitHead: "a4fdc1e28c9e1000000000000000000000000000",
+      requireRateware: false,
+      nodeVersion: "22.13.0",
+    });
+
+    expect(result.checks.find((check) => check.key === "SUPABASE_AUTH")?.status).toBe("BLOCK");
   });
 });

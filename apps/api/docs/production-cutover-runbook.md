@@ -21,8 +21,8 @@ GO ni autoriza el envío de datos a Rateware o Gmail.
    build, auditoría y verificación de whitespace. `verify:release` añade el
    preflight local. El resultado local
    confirma solamente el artefacto; no confirma el estado de Vercel, Neon,
-   Kinde, Rateware ni Gmail.
-   El release requiere Node.js 20.19.0 o superior; configura el runtime de
+   Supabase Auth, Rateware ni Gmail.
+   El release requiere Node.js 22.0.0 o superior; configura el runtime de
    Vercel de forma consistente con esa precondición.
 
 4. Para adjuntar evidencia legible por sistemas de QA, sin variables ni
@@ -36,7 +36,7 @@ La compuerta además revisa que cada migración local tenga un nombre Prisma
 ordenable, SQL no vacío y lock PostgreSQL; tampoco aplica ni compara migraciones
 contra Neon.
 
-El workflow `.github/workflows/ci.yml` ejecuta `verify:ci` con Node.js 20.19.0
+El workflow `.github/workflows/ci.yml` ejecuta `verify:ci` con Node.js 22
 en cada push y pull request. No recibe secretos, no aplica migraciones ni
 despliega; una ejecución verde de CI no reemplaza el preflight ni QA remota.
 
@@ -52,8 +52,8 @@ remotos. Nunca copies secretos a archivos versionados ni a la evidencia de QA.
 
 | Servicio          | Variables requeridas                                                                                                                                                | Verificación humana                                                                               |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| API               | `DATABASE_URL`, `KINDE_ISSUER_URL`, `KINDE_AUDIENCE`, `CORS_ORIGINS`, `OPENAI_API_KEY`, `OPENAI_KEY_ROTATED_AT`, `OPENAI_MODEL`, `LOG_LEVEL`, `RATE_LIMIT_MAX`, `RATE_LIMIT_WINDOW` | La clave AI expuesta está revocada, el modelo es explícito, CORS contiene el origen HTTPS del Web y la fecha es ISO-8601. |
-| Web               | `API_URL`, `KINDE_CLIENT_ID`, `KINDE_CLIENT_SECRET`, `KINDE_ISSUER_URL`, `KINDE_AUDIENCE`, URLs de callback y logout                                                | Kinde permite el dominio productivo y emite access tokens para el audience de la API.             |
+| API               | `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_EXPECTED_PROJECT_REF=alqjqzqagdmcywpjtnnr`, `SUPABASE_JWT_AUDIENCE=authenticated`, `CORS_ORIGINS`, `OPENAI_API_KEY`, `OPENAI_KEY_ROTATED_AT`, `OPENAI_MODEL`, `LOG_LEVEL`, `RATE_LIMIT_MAX`, `RATE_LIMIT_WINDOW` | API y Web apuntan a `rateware-prod`, la clave AI está rotada, el modelo es explícito y CORS contiene el origen HTTPS del Web. |
+| Web               | `API_URL`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_SITE_URL` | Supabase permite el dominio productivo y sus callbacks; la clave es publicable, no secreta. |
 | Rateware opcional | `RATEWARE_API_URL` en API apuntando a `/functions/v1/fcm-ratebook-receiver`; `RATEWARE_GMAIL_API_URL` en Web si se usa el broker Gmail                               | El endpoint receptor, contrato, acción gobernada y cuenta de prueba fueron aprobados.             |
 
 `API_URL` del Web debe apuntar al dominio HTTPS de la API productiva. El BFF
@@ -69,15 +69,15 @@ el SHA completo o un prefijo de 7 a 40 caracteres), evitando liberar un commit
 distinto del que se validó.
 
 El preflight también revisa el archivo local del Web sin imprimir secretos:
-`API_URL` HTTPS, configuración Kinde, constancia `KINDE_SECRET_ROTATED_AT` y
-que el origen de sus callbacks coincida con `CORS_ORIGINS` del API. Esta revisión
+`API_URL` HTTPS, configuración Supabase, coincidencia de proyecto Web/API y
+que `NEXT_PUBLIC_SITE_URL` coincida con `CORS_ORIGINS` del API. Esta revisión
 no confirma que los valores remotos estén cargados; esa comprobación corresponde
 a QA autorizada.
 
 El Web aplica `X-Content-Type-Options`, `Referrer-Policy`,
 `Permissions-Policy`, `X-Frame-Options` y una CSP en modo `Report-Only` en
 todas sus respuestas. Durante QA, revisa las violaciones de CSP en el navegador
-para el flujo Kinde y el iframe sandbox del Quote Desk; registra sólo el
+para el flujo Supabase Auth y el iframe sandbox del Quote Desk; registra sólo el
 directivo afectado y el resultado en la evidencia de staging. La CSP no se
 aplica de forma bloqueante hasta que esos recorridos estén verificados sin
 violaciones relevantes y exista aprobación explícita para endurecerla.
@@ -118,7 +118,7 @@ configuración inválida bloquea la entrega antes de que salga una solicitud.
 ## 4. Desplegar y probar en QA controlado
 
 1. Despliega API y Web desde el mismo commit de release.
-2. Comprueba `/health` y `/ready` del API, login/callback/logout Kinde y la
+2. Comprueba `/health` y `/ready` del API, alta/confirmación/login/recuperación/logout Supabase y la
    carga inicial del panel con una cuenta de prueba. `/health` confirma que el
    proceso respondió; `/ready` confirma la consulta mínima a PostgreSQL y debe
    devolver `503` sin detalles si la base no está disponible. Conserva el

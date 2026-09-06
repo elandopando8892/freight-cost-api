@@ -82,7 +82,7 @@ if (jsonOutput) {
     `Resultado: ${result.ready ? "LISTO PARA QA REMOTA" : "BLOQUEADO"} · ${result.blockers} bloqueo(s) · ${result.warnings} advertencia(s)`,
   );
   console.log(
-    `Migraciones requeridas: ${REQUIRED_RELEASE_MIGRATIONS.length}. Este comando no accede a Neon, Vercel, Kinde ni Rateware.`,
+    `Migraciones requeridas: ${REQUIRED_RELEASE_MIGRATIONS.length}. Este comando no accede a Neon, Vercel, Supabase ni Rateware.`,
   );
 }
 

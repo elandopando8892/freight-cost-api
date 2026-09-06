@@ -4,6 +4,10 @@
 
 **Goal:** Move Freight Cost Model from 83.4% implemented to 100% production-ready with auditable evidence across UI, Kinde, Gmail, Rateware, database and release gates.
 
+> Nota 2026-08-30: las referencias a Kinde documentan el plan histórico. Para
+> el release actual, ADR-001 sustituye ese proveedor por Supabase Auth; ninguna
+> evidencia Kinde cuenta como validación del nuevo recorrido.
+
 **Architecture:** Keep Freight Cost Model as the system of record for cost bases, assumptions, quotes and delivery state. Rateware remains the external Gmail broker and receiving system; the BFF forwards the Kinde identity and immutable delivery package, while all irreversible actions remain explicitly confirmed by an ADMIN. The final release is accepted only when the code SHA, migrations, environment configuration and remote smoke evidence refer to the same artifact.
 
 **Tech Stack:** Fastify, Prisma/PostgreSQL, Next.js App Router, Kinde, Supabase Edge Functions/Rateware, Gmail OAuth, Vitest, TypeScript, Vercel.

@@ -35,20 +35,24 @@ API:
 - `STAGING_DATABASE_URL` de la base Neon aislada. Cuando `VERCEL_ENV=preview`,
   el runtime la exige y nunca cae a `DATABASE_URL`;
 - `NODE_ENV=production`;
-- `KINDE_ISSUER_URL` y `KINDE_AUDIENCE` de staging;
+- `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`,
+  `SUPABASE_EXPECTED_PROJECT_REF=alqjqzqagdmcywpjtnnr` y
+  `SUPABASE_JWT_AUDIENCE=authenticated` del proyecto compartido `rateware-prod`;
 - `CORS_ORIGINS` con el alias estable del web de staging;
 - `OPENAI_API_KEY`, `OPENAI_KEY_ROTATED_AT` y `OPENAI_MODEL` de staging.
 
 Web:
 
 - `API_URL` con el alias estable del API de staging;
-- `KINDE_CLIENT_ID`, `KINDE_CLIENT_SECRET`, `KINDE_ISSUER_URL`,
-  `KINDE_AUDIENCE`;
-- `KINDE_SITE_URL`, `KINDE_POST_LOGIN_REDIRECT_URL` y
-  `KINDE_POST_LOGOUT_REDIRECT_URL` usando el alias estable de la rama.
+- `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` del mismo
+  proyecto `rateware-prod`;
+- `NEXT_PUBLIC_SITE_URL` usando el alias estable de la rama.
 
-`STAGING_DATABASE_URL`, `API_URL` y `KINDE_CLIENT_SECRET` deben ser registros
+`STAGING_DATABASE_URL`, `API_URL` y las claves Supabase deben ser registros
 Preview separados; nunca registros que también tengan target Production.
+El scope separado de Vercel evita deriva de configuración, pero Auth sí comparte
+deliberadamente el proyecto productivo de Rateware. Ninguna prueba de Preview
+puede crear o modificar usuarios sin autorización explícita sobre ese Auth.
 
 ## Preflight automático
 
@@ -67,7 +71,7 @@ Production/Preview devuelve exit code 1.
 2. Crear Preview del API y verificar `/health` y `/ready` con el SHA esperado.
 3. Ejecutar `prisma migrate deploy` únicamente contra la base aislada.
 4. Crear Preview del web apuntando al API de staging.
-5. Completar login Kinde, registrar las cuatro identidades ADMIN y ejecutar el
+5. Completar login Supabase, registrar las cuatro identidades ADMIN y ejecutar el
    preflight de Sprint 71.
 6. Sólo con evidencia humana autorizada, ejecutar el GO dual. Ningún GO promueve
    automáticamente a Production.

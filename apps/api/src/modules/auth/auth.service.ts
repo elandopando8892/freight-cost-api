@@ -1,6 +1,6 @@
 import { prisma } from '../../config/prisma.js'
 
-/** Look up our internal user record (identity is owned by Kinde). */
+/** Look up our internal user record (identity is owned by Supabase Auth). */
 export async function getMe(userId: string) {
   return prisma.user.findUnique({
     where: { id: userId },

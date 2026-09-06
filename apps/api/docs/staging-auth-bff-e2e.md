@@ -1,4 +1,4 @@
-# E2E controlado de staging: Kinde, BFF y GO multiusuario
+# E2E controlado de staging: Supabase Auth, BFF y GO multiusuario
 
 Este protocolo se ejecuta únicamente sobre un tenant desechable o autorizado de
 staging, después de desplegar un `RELEASE_SHA` identificable. No utiliza cuentas
@@ -24,7 +24,7 @@ Dos usuarios ADMIN previamente aprovisionados en el mismo tenant realizan por
 separado:
 
 1. Smoke de staging y registro de sus controles.
-2. Login/callback Kinde, identidad en Settings, BFF autenticado, BFF sin sesión,
+2. Login/callback Supabase, identidad en Settings, recuperación, BFF autenticado, BFF sin sesión,
    logout y registro del recorrido humano.
 
 Sólo cuenta el registro más reciente de cada tipo para el release actual. PASS
@@ -38,7 +38,7 @@ identidad crea ambas evidencias y confirma el SHA al registrar GO. Si el roster
 incorpora más administradores, el backend activa la doble aprobación.
 
 Los endpoints `/pilot/staging-context` y `/pilot/staging-readiness` verifican
-tokens Kinde mediante lookup de usuarios existentes. No autoaprovisionan usuario,
+tokens Supabase verificados mediante lookup de usuarios existentes. No autoaprovisionan usuario,
 organización ni supuestos; una identidad desconocida recibe `403`.
 
 Usar tokens efímeros únicamente en las variables del proceso. No agregarlos a

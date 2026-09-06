@@ -28,5 +28,5 @@ export type OrganizationInvitationActor = {
   id: string;
   orgId: string;
   role: Role;
-  kindeId: string;
+  supabaseId: string;
 };

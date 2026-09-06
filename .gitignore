@@ -25,5 +25,8 @@ next-env.d.ts
 # Vercel
 .vercel
 
+# Local visual evidence and recoverable dependency backups
+tmp/
+
 # OS
 .DS_Store

@@ -1,10 +1,11 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { redirect } from 'next/navigation'
-import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
-import { LogoutLink } from '@kinde-oss/kinde-auth-nextjs/components'
-import { Menu, Waypoints } from 'lucide-react'
+import { Menu } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
 import { api } from '@/lib/api'
+import { createClient } from '@/lib/supabase/server'
+import { logout } from '../auth/actions'
 import { AppNavigation } from './app-navigation'
 import { ThemeToggle } from './theme-toggle'
 
@@ -18,16 +19,16 @@ interface OrgContext { name: string }
 interface UserContext { role: string }
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
-  const { getUser, isAuthenticated } = getKindeServerSession()
-  // proxy.ts already gates these routes; this is a belt-and-suspenders check.
-  if (!(await isAuthenticated())) redirect('/login')
-  const [user, org, me] = await Promise.all([
-    getUser(),
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+  const [org, me] = await Promise.all([
     api<OrgContext>('/org').catch(() => null),
     api<UserContext>('/auth/me').catch(() => null),
   ])
-  const email = user?.email ?? ''
-  const name = [user?.given_name, user?.family_name].filter(Boolean).join(' ') || email
+  const email = user.email ?? ''
+  const metadataName = typeof user.user_metadata?.full_name === 'string' ? user.user_metadata.full_name : ''
+  const name = metadataName || email
   const init = initials(name, email)
 
   return (
@@ -39,13 +40,19 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         Ir al contenido principal
       </a>
       <aside className="sticky top-0 hidden h-dvh overflow-y-auto border-r bg-sidebar px-2.5 py-3.5 print:hidden lg:flex lg:flex-col">
-        <Link href="/" className="mb-3 flex items-center gap-2 border-b px-2 pb-3 pt-2 hover:text-sidebar-accent-foreground">
-          <span className="grid size-[30px] place-items-center rounded-md border border-sidebar-primary bg-sidebar-accent text-sidebar-accent-foreground">
-            <Waypoints className="size-4" aria-hidden />
+        <Link href="/" className="mb-3 block border-b border-sidebar-border px-1 pb-3 pt-1">
+          <span className="block rounded-sm bg-[#efefef] px-2.5 py-2">
+            <Image
+              src="/brand/marksman-logo.png"
+              alt="MARKSMAN — Precision Freight Networks"
+              width={458}
+              height={54}
+              priority
+              className="h-auto w-full"
+            />
           </span>
-          <span className="grid leading-tight">
-            <span className="text-sm font-medium tracking-tight text-foreground">Freight Cost</span>
-            <span className="text-[10px] text-muted-foreground">Rateware family</span>
+          <span className="mt-2 block px-1 font-mono text-[9px] font-bold tracking-[0.14em] text-sidebar-foreground/65 uppercase">
+            Freight Cost Model
           </span>
         </Link>
         <div className="min-h-0 flex-1">
@@ -53,7 +60,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </div>
         <div className="mt-3 border-t px-2 pt-3">
           <Link href="/settings" className="flex items-center gap-2 rounded-md hover:text-sidebar-accent-foreground">
-            <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-sidebar-accent text-[11px] font-medium text-sidebar-accent-foreground">{init}</span>
+            <span className="flex size-7 shrink-0 items-center justify-center rounded-sm bg-sidebar-primary text-[11px] font-bold text-sidebar-primary-foreground">{init}</span>
             <span className="min-w-0">
               <span className="block truncate text-xs font-medium text-foreground">{name}</span>
               <span className="block truncate text-[10px] text-muted-foreground">{me?.role ?? email}</span>
@@ -75,27 +82,31 @@ export default async function AppLayout({ children }: { children: React.ReactNod
                   <AppNavigation compact closeOnNavigate />
                   <div className="mt-3 border-t pt-3">
                     <p className="mb-2 truncate px-2.5 text-xs text-muted-foreground">{email}</p>
-                    <LogoutLink className={buttonVariants({ variant: 'ghost', size: 'sm', className: 'w-full justify-start' })}>
-                      Cerrar sesión
-                    </LogoutLink>
+                    <form action={logout}>
+                      <button className={buttonVariants({ variant: 'ghost', size: 'sm', className: 'w-full justify-start' })}>
+                        Cerrar sesión
+                      </button>
+                    </form>
                   </div>
                 </div>
               </details>
               <div className="min-w-0 lg:flex lg:items-baseline lg:gap-2">
                 <p className="hidden text-xs text-muted-foreground lg:block">Organización</p>
-                <Link href="/" className="block truncate text-sm font-semibold tracking-tight lg:hidden">Freight Cost Model</Link>
+                <Link href="/" className="block truncate text-sm font-semibold tracking-tight lg:hidden">MARKSMAN · Freight Cost Model</Link>
                 <p className="hidden text-sm font-medium lg:block">{org?.name ?? 'Workspace operativo'}</p>
               </div>
             </div>
             <div className="flex items-center gap-2 text-sm">
               <ThemeToggle />
               <Link href="/settings" title="Configuración" aria-label="Abrir configuración de cuenta" className="flex items-center gap-2 rounded-md px-1 py-0.5 hover:bg-accent">
-                <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">{init}</span>
+                <span className="flex size-7 shrink-0 items-center justify-center rounded-sm bg-primary text-xs font-bold text-primary-foreground">{init}</span>
                 <span className="hidden max-w-[150px] truncate text-muted-foreground xl:inline">{name}</span>
               </Link>
-              <LogoutLink className={buttonVariants({ variant: 'outline', size: 'sm', className: 'hidden sm:inline-flex' })}>
-                Cerrar sesión
-              </LogoutLink>
+              <form action={logout} className="hidden sm:block">
+                <button className={buttonVariants({ variant: 'outline', size: 'sm' })}>
+                  Cerrar sesión
+                </button>
+              </form>
             </div>
           </div>
         </header>
