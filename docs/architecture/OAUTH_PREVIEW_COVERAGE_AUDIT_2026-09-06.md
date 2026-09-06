@@ -104,6 +104,12 @@ de `staging` para esto porque ese deployment continúa en Kinde.
 
 ### No-go de integración API
 
+Actualización posterior: la ventana aditiva autorizada resolvió el error de
+columna faltante; API y panel quedaron comprobados con la cuenta existente.
+Véase `SUPABASE_ADDITIVE_WINDOW_2026-09-06.md` para censo, respaldo, invariantes,
+rollback y límites de aceptación. El texto siguiente conserva el diagnóstico
+previo a esa ventana.
+
 El login Web, el intercambio de código y la persistencia de sesión sí están
 probados. La integración BFF/API no: los logs del API preview muestran que la
 consulta falla porque `User.supabaseId` todavía no existe en la base conectada,
