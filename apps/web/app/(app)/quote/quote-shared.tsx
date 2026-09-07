@@ -475,6 +475,11 @@ export function Result({ r, snapshot }: { r: QuoteResult; snapshot: FormSnapshot
               {c.notes.length > 0 ? <span className={requiresLineageReview ? 'ml-2' : ''}>{c.notes.join(' · ')}</span> : null}
             </div>
           ) : null}
+          {save.isError && (
+            <div className="rounded border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs text-destructive" role="alert">
+              No se pudo guardar la cotización. Conservamos el resultado; revisa tu sesión e inténtalo nuevamente.
+            </div>
+          )}
           <form className="flex flex-wrap items-center gap-2 border-t pt-3" onSubmit={(e) => { e.preventDefault(); save.mutate() }}>
             <Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Etiqueta opcional · Ej. Acme Q3" aria-label="Etiqueta de la cotización" className="h-9 flex-1 min-w-[200px]" disabled={save.isPending} />
             <Button type="submit" size="sm" disabled={save.isPending}>
