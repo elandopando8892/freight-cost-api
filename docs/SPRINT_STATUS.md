@@ -54,6 +54,8 @@ Iniciado:
   etiqueta `Reapertura · ...`; guardar crea un registro nuevo y conserva intacto el original.
 - El resultado concentra precio sugerido, margen, utilidad y decisión en “Resumen para propuesta”,
   sin publicar tarifas ni enviar comunicaciones.
+- La trazabilidad persistente `sourceQuoteId` quedó diseñada en `docs/architecture/ADR-002-quote-derivation-lineage.md`,
+  pero permanece propuesta: no se modificó Prisma/Neon ni se aplicó migración.
 - Se conserva el límite: guardar una cotización no publica tarifas ni envía comunicaciones.
 
 Siguiente incremento:
