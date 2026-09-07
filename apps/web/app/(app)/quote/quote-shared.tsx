@@ -562,6 +562,39 @@ export function Result({ r, snapshot }: { r: QuoteResult; snapshot: FormSnapshot
         </Card>
       )}
 
+      <Card className="border-primary/25 bg-primary/5">
+        <CardHeader className="flex-row items-start justify-between gap-3 border-b border-primary/15 px-4 py-3">
+          <div>
+            <CardTitle className="text-base">Resumen para propuesta</CardTitle>
+            <CardDescription>Referencia interna para revisión comercial. No publica ni envía una tarifa.</CardDescription>
+          </div>
+          <span className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-semibold ${decisionClass}`}>{decision}</span>
+        </CardHeader>
+        <CardContent className="grid gap-3 p-4">
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="rounded-md border border-primary/20 bg-background/70 p-3">
+              <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Precio sugerido</div>
+              <div className="mt-1 text-2xl font-semibold tracking-tight">{usd.format(c.recommendedSellUsd)}</div>
+            </div>
+            <div className="rounded-md border border-primary/20 bg-background/70 p-3">
+              <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Margen bruto</div>
+              <div className="mt-1 text-xl font-semibold">{pct(c.grossMarginPct)}</div>
+            </div>
+            <div className="rounded-md border border-primary/20 bg-background/70 p-3">
+              <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Utilidad bruta</div>
+              <div className="mt-1 text-xl font-semibold">{usd.format(c.grossProfitUsd)}</div>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {c.noGoFlag
+              ? 'No preparar para cliente: la venta recomendada queda por debajo del piso de costo.'
+              : requiresReview
+                ? 'Requiere revisión humana antes de convertirse en una propuesta comercial.'
+                : 'Puede pasar a revisión humana; el envío o compromiso comercial sigue siendo manual.'}
+          </p>
+        </CardContent>
+      </Card>
+
       <div className="grid gap-3 md:grid-cols-2">
         {r.mexLeg && <MexCard leg={r.mexLeg} />}
         {r.usaLeg && <UsaCard leg={r.usaLeg} />}

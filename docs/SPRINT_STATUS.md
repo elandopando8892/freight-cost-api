@@ -52,6 +52,8 @@ Iniciado:
   panel de versiones; ya no obliga a encontrar manualmente la base después del salto.
 - Al volver a cotizar, el nuevo resultado identifica la cotización de origen y propone una
   etiqueta `Reapertura · ...`; guardar crea un registro nuevo y conserva intacto el original.
+- El resultado concentra precio sugerido, margen, utilidad y decisión en “Resumen para propuesta”,
+  sin publicar tarifas ni enviar comunicaciones.
 - Se conserva el límite: guardar una cotización no publica tarifas ni envía comunicaciones.
 
 Siguiente incremento:
