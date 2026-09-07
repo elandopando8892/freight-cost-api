@@ -47,13 +47,13 @@ export default async function QuotePage() {
     <main className="mx-auto w-full max-w-[1440px] px-3 py-4 sm:px-4">
       <header className="mb-4 flex flex-col gap-2 border-b pb-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="mb-1 text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">Motor de cotización</p>
-          <h1 className="text-xl font-semibold tracking-tight">Construye una tarifa explicable</h1>
+          <p className="mb-1 font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">Nueva cotización · 3 pasos</p>
+          <h1 className="text-xl font-semibold tracking-tight">Cotiza una ruta</h1>
           <p className="mt-1 max-w-3xl text-xs text-muted-foreground">
-            Selecciona la base que gobierna la ruta. La resolución de ubicación, homologación MX y la regla de servicio se aplican en el motor.
+            Captura origen, destino y equipo. Revisa costo, margen y linaje antes de guardar.
           </p>
         </div>
-        <p className="rounded-md border bg-muted/40 px-3 py-2 text-[11px] text-muted-foreground">El cálculo propone · el transportista confirma</p>
+        <p className="border-l-2 border-primary px-3 py-1 text-[11px] text-muted-foreground">El cálculo propone · tú confirmas</p>
       </header>
       {user.role === 'VIEWER' ? (
         <section className="rounded-lg border bg-card p-5 text-center" aria-labelledby="quote-permission-title">

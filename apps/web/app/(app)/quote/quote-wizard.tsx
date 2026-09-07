@@ -143,7 +143,7 @@ export function QuoteWizard({ costBases = [] }: { costBases?: CostBaseOption[] }
           </CardContent>
         </Card>
 
-        <div className="flex items-center justify-between gap-3 border-t pt-3">
+        <div className="sticky bottom-0 z-10 -mx-4 flex items-center justify-between gap-3 border-t bg-card/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:backdrop-blur-none">
           <Button variant="ghost" onClick={back} disabled={step === 0}>← Anterior</Button>
           <div className="flex items-center gap-2">
             <button type="button" onClick={restart} className="text-xs text-muted-foreground hover:text-foreground">Reiniciar</button>
@@ -163,7 +163,7 @@ export function QuoteWizard({ costBases = [] }: { costBases?: CostBaseOption[] }
         operation={displayLabel(form.operation)}
         route={form.outboundLocation || form.inboundLocation ? `${form.outboundLocation || '—'} → ${form.inboundLocation || '—'}` : 'Pendiente'}
         equipment={`${displayLabel(form.truckType)} · ${displayLabel(form.trailer)}`}
-        className="xl:sticky xl:top-16"
+        className="order-first xl:order-none xl:sticky xl:top-16"
       />
 
       {step === STEPS.length - 1 && (

@@ -31,31 +31,29 @@ const navigation: { label: string; items: NavigationItem[] }[] = [
     items: [
       { href: '/', label: 'Inicio', icon: Gauge },
       { href: '/quote', label: 'Cotizar', icon: Calculator },
-      { href: '/quote-desk', label: 'Quote Desk', icon: NotebookTabs },
-      { href: '/quotes', label: 'Historial', icon: History },
+      { href: '/quotes', label: 'Mis cotizaciones', icon: History },
     ],
   },
   {
     label: 'Modelo',
     items: [
-      { href: '/cost-bases', label: 'Bases de costo', icon: Layers3 },
+      { href: '/cost-bases', label: 'Mis costos', icon: Layers3 },
+    ],
+  },
+]
+
+const secondaryNavigation: { label: string; items: NavigationItem[] }[] = [
+  {
+    label: 'Herramientas',
+    items: [
+      { href: '/quote-desk', label: 'Quote Desk', icon: NotebookTabs },
       { href: '/assumptions', label: 'Supuestos', icon: SlidersHorizontal },
       { href: '/catalog', label: 'Catálogo', icon: ClipboardList },
       { href: '/production', label: 'Rutas', icon: Route },
-    ],
-  },
-  {
-    label: 'Comercial',
-    items: [
       { href: '/ratebooks', label: 'RateBook', icon: LibraryBig },
       { href: '/market-intelligence', label: 'Mercado', icon: ChartNoAxesCombined },
       { href: '/fuel', label: 'Combustible', icon: Fuel },
       { href: '/scenarios', label: 'Escenarios', icon: Sparkles },
-    ],
-  },
-  {
-    label: 'Gobierno',
-    items: [
       { href: '/approvals', label: 'Aprobaciones', icon: ShieldCheck },
       { href: '/pilot-readiness', label: 'Piloto', icon: Landmark },
       { href: '/assistant', label: 'Asistente', icon: Bot },
@@ -123,6 +121,16 @@ export function AppNavigation({
           ))}
         </section>
       ))}
+      <details className="border-t pt-3">
+        <summary className="cursor-pointer list-none rounded-md px-2 py-1 font-mono text-[9px] font-bold tracking-[0.12em] text-sidebar-foreground/55 uppercase hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+          Más herramientas
+        </summary>
+        <div className="mt-1 grid gap-0.5">
+          {secondaryNavigation.flatMap((group) => group.items).map((item) => (
+            <NavigationLink key={item.href} {...item} closeOnNavigate={closeOnNavigate} />
+          ))}
+        </div>
+      </details>
       <section aria-label="Cuenta" className="grid gap-0.5 border-t pt-3">
         {!compact && <h2 className="px-2.5 pb-1 font-mono text-[9px] font-bold tracking-[0.12em] text-sidebar-foreground/55 uppercase">Cuenta</h2>}
         {accountLinks.map((item) => (
