@@ -50,6 +50,8 @@ Iniciado:
   permanece PENDIENTE hasta ejecutar con sesión Supabase real y evidencia redactada.
 - En Mis costos, “Revisar bases” selecciona la primera base activa del alcance y lleva al
   panel de versiones; ya no obliga a encontrar manualmente la base después del salto.
+- Al volver a cotizar, el nuevo resultado identifica la cotización de origen y propone una
+  etiqueta `Reapertura · ...`; guardar crea un registro nuevo y conserva intacto el original.
 - Se conserva el límite: guardar una cotización no publica tarifas ni envía comunicaciones.
 
 Siguiente incremento:

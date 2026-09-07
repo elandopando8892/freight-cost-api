@@ -299,6 +299,8 @@ export function QuoteForm({ recentLanes = [], costBases = [], initialQuote }: { 
               assumptionVersionLabel: selectedVersion ? `v${selectedVersion.version}` : 'Sin versión activa',
               costBaseReadiness: costBaseReadiness(selectedCostBase),
               costBaseReadinessDetail: costBaseReadinessDetail(selectedCostBase, form.operation),
+              sourceQuoteId: initialQuote?.id,
+              sourceQuoteLabel: initialQuote?.label,
             }}
           />
         ) : quote.isError ? (

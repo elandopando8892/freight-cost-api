@@ -183,6 +183,8 @@ export function QuoteWizard({ costBases = [], initialQuote }: { costBases?: Cost
                 assumptionVersionLabel: selectedVersion ? `v${selectedVersion.version}` : 'Sin versión activa',
                 costBaseReadiness: costBaseReadiness(selectedCostBase),
                 costBaseReadinessDetail: costBaseReadinessDetail(selectedCostBase, form.operation),
+                sourceQuoteId: initialQuote?.id,
+                sourceQuoteLabel: initialQuote?.label,
               }}
             />
           ) : quote.isError ? (

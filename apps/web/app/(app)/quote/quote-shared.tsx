@@ -69,6 +69,8 @@ export interface FormSnapshot {
   costBaseReadiness: CostBaseReadiness
   costBaseReadinessDetail: string
   equipment: { truckType: string; trailer: string; config: string; driver: string }
+  sourceQuoteId?: string
+  sourceQuoteLabel?: string | null
 }
 
 export interface LaneHint {
@@ -448,7 +450,8 @@ export function Result({ r, snapshot }: { r: QuoteResult; snapshot: FormSnapshot
   const requiresReview = c.reviewFlag || requiresLineageReview
   const decision = c.noGoFlag ? 'NO-GO' : requiresReview ? 'REVISAR' : 'LISTA PARA DECISION'
   const decisionClass = c.noGoFlag ? 'border-rose-200 bg-rose-50 text-rose-800' : requiresReview ? 'border-amber-200 bg-amber-50 text-amber-800' : 'border-emerald-200 bg-emerald-50 text-emerald-800'
-  const [label, setLabel] = useState('')
+  const sourceLabel = snapshot.sourceQuoteLabel?.trim() || snapshot.sourceQuoteId?.slice(0, 8)
+  const [label, setLabel] = useState(() => sourceLabel ? `Reapertura · ${sourceLabel}` : '')
   const [savedId, setSavedId] = useState<string | null>(null)
 
   const save = useMutation({
@@ -518,6 +521,11 @@ export function Result({ r, snapshot }: { r: QuoteResult; snapshot: FormSnapshot
             <div className={`rounded border px-3 py-2 text-xs ${decisionClass}`}>
               {requiresLineageReview ? <span>{snapshot.costBaseReadinessDetail}</span> : null}
               {c.notes.length > 0 ? <span className={requiresLineageReview ? 'ml-2' : ''}>{c.notes.join(' · ')}</span> : null}
+            </div>
+          ) : null}
+          {snapshot.sourceQuoteId ? (
+            <div className="rounded border border-primary/25 bg-primary/5 px-3 py-2 text-xs text-primary" role="status">
+              Propuesta derivada de la cotización <span className="font-mono">{sourceLabel}</span>. El registro original no se modifica.
             </div>
           ) : null}
           {save.isError && (
