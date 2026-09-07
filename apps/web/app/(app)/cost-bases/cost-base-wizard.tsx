@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type KeyboardEvent } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Bot, CheckCircle2, LockKeyhole, MessageCircle, ShieldCheck, Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
@@ -216,6 +216,29 @@ export function CostBaseWizard({ initialScope, existingCodes, pending, onSubmit 
   for (const preset of presets.data ?? []) {
     presetScopeCounts[preset.scope] += 1
   }
+  const enabledScopeValues: ('ALL' | CostBaseScope)[] = ['ALL', ...SCOPE.filter((item) => presetScopeCounts[item.value] > 0).map((item) => item.value)]
+  const scopeTabId = (value: 'ALL' | CostBaseScope) => `cost-base-scope-${value.toLowerCase()}`
+  const handleScopeTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    const current = event.currentTarget.dataset.scopeTab as 'ALL' | CostBaseScope | undefined
+    if (!current) return
+    const currentIndex = Math.max(0, enabledScopeValues.indexOf(current))
+    const key = event.key
+    const nextIndex = key === 'Home'
+      ? 0
+      : key === 'End'
+        ? enabledScopeValues.length - 1
+        : key === 'ArrowRight' || key === 'ArrowDown'
+          ? (currentIndex + 1) % enabledScopeValues.length
+          : key === 'ArrowLeft' || key === 'ArrowUp'
+            ? (currentIndex - 1 + enabledScopeValues.length) % enabledScopeValues.length
+            : -1
+    if (nextIndex < 0) return
+    event.preventDefault()
+    const next = enabledScopeValues[nextIndex]
+    setPresetScopeFilter(next)
+    setSelectedPresetId(null)
+    requestAnimationFrame(() => document.getElementById(scopeTabId(next))?.focus())
+  }
   const applicabilityPreview = useQuery({
     queryKey: ['cost-base-applicability-preview', draft.scope, JSON.stringify(profile)],
     queryFn: () => fetcher<ApplicabilitySummary>('/api/v1/cost-bases/applicability-preview', {
@@ -415,10 +438,13 @@ export function CostBaseWizard({ initialScope, existingCodes, pending, onSubmit 
                   <button
                     type="button"
                     role="tab"
+                    id={scopeTabId('ALL')}
+                    data-scope-tab="ALL"
                     onClick={() => {
                       setPresetScopeFilter('ALL')
                       setSelectedPresetId(null)
                     }}
+                    onKeyDown={handleScopeTabKeyDown}
                     aria-selected={presetScopeFilter === 'ALL'}
                     tabIndex={presetScopeFilter === 'ALL' ? 0 : -1}
                     className={`rounded-full border px-3 py-1.5 transition-colors ${presetScopeFilter === 'ALL' ? 'border-primary bg-primary/12 text-primary' : 'border-border hover:bg-muted/30 text-muted-foreground'}`}
@@ -430,12 +456,15 @@ export function CostBaseWizard({ initialScope, existingCodes, pending, onSubmit 
                       key={item.value}
                       type="button"
                       role="tab"
+                      id={scopeTabId(item.value)}
+                      data-scope-tab={item.value}
                     onClick={() => {
                       setPresetScopeFilter(item.value)
                       setSelectedPresetId(null)
                     }}
+                      onKeyDown={handleScopeTabKeyDown}
                       aria-selected={presetScopeFilter === item.value}
-                      tabIndex={presetScopeFilter === item.value ? 0 : -1}
+                      tabIndex={presetScopeFilter === item.value && presetScopeCounts[item.value] > 0 ? 0 : -1}
                       disabled={presetScopeCounts[item.value] === 0}
                       title={presetScopeCounts[item.value] === 0 ? 'No hay estándares para este alcance' : undefined}
                       className={`rounded-full border px-3 py-1.5 transition-colors ${presetScopeFilter === item.value ? 'border-primary bg-primary/12 text-primary' : 'border-border hover:bg-muted/30 text-muted-foreground'} ${presetScopeCounts[item.value] === 0 ? 'cursor-not-allowed opacity-50' : ''}`}

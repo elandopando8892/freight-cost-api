@@ -44,8 +44,8 @@ Iniciado:
   y revisión técnica) y expone un anuncio accesible mientras llegan los datos.
 - Sin base gobernada, el aviso aparece al entrar a Cotizar y dirige a Mis costos; `VIEWER`
   recibe una vista de solo lectura que separa claramente lo permitido de lo que requiere operador.
-- El filtro de alcance de estándares en Mis costos usa semántica de pestañas válida (`aria-selected`
-  y foco rotable) para teclado y lectores de pantalla.
+- El filtro de alcance de estándares en Mis costos usa semántica de pestañas válida (`aria-selected`),
+  foco único y navegación con flechas/Home/End para teclado y lectores de pantalla.
 - Se conserva el límite: guardar una cotización no publica tarifas ni envía comunicaciones.
 
 Siguiente incremento:
