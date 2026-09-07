@@ -448,6 +448,16 @@ export function Result({ r, snapshot }: { r: QuoteResult; snapshot: FormSnapshot
           <span className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-semibold ${decisionClass}`}>{decision}</span>
         </CardHeader>
         <CardContent className="grid gap-3 p-4">
+          <div className="grid gap-2 rounded-md border bg-muted/10 p-3 text-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+            <div className="min-w-0">
+              <div className="font-medium truncate">{snapshot.origin || 'Origen pendiente'} <span className="px-1 text-primary" aria-hidden="true">→</span> {snapshot.destination || 'Destino pendiente'}</div>
+              <div className="mt-1 text-xs text-muted-foreground">{snapshot.equipment.truckType} · {snapshot.equipment.trailer} · {snapshot.service || 'Servicio automático'}</div>
+            </div>
+            <div className="text-left text-xs text-muted-foreground sm:text-right">
+              <div>{snapshot.costBaseLabel}</div>
+              <div>{snapshot.assumptionVersionLabel}</div>
+            </div>
+          </div>
           <div className="grid grid-cols-2 gap-3 rounded-md border bg-muted/15 p-3 text-sm sm:grid-cols-4">
             <Stat label="MXN" value={mxn.format(r.freightBaselineUsd * r.fxRateUsed)} />
             <Stat label="FX" value={r.fxRateUsed.toFixed(2)} />
@@ -467,11 +477,14 @@ export function Result({ r, snapshot }: { r: QuoteResult; snapshot: FormSnapshot
           ) : null}
           <form className="flex flex-wrap items-center gap-2 border-t pt-3" onSubmit={(e) => { e.preventDefault(); save.mutate() }}>
             <Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Etiqueta opcional · Ej. Acme Q3" aria-label="Etiqueta de la cotización" className="h-9 flex-1 min-w-[200px]" disabled={save.isPending} />
-            <Button type="submit" size="sm" variant="outline" disabled={save.isPending}>
+            <Button type="submit" size="sm" disabled={save.isPending}>
               {save.isPending ? 'Guardando…' : savedId ? 'Guardar otra copia' : requiresLineageReview ? 'Guardar para revisión' : 'Guardar cotización'}
             </Button>
             {savedId && (
-              <Link href="/quotes" className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2">Ver historial →</Link>
+              <div className="flex items-center gap-3 text-xs">
+                <Link href={`/quotes/${savedId}`} className="font-medium text-primary hover:underline underline-offset-2">Abrir cotización →</Link>
+                <Link href="/quotes" className="text-muted-foreground hover:text-foreground underline underline-offset-2">Ver historial</Link>
+              </div>
             )}
           </form>
         </CardContent>
