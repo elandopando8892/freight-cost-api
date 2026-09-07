@@ -1,13 +1,14 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { QuoteForm, type LaneHint } from './quote-form'
 import { QuoteWizard } from './quote-wizard'
 import type { CostBaseOption, ReopenQuote } from './quote-shared'
 
 type Mode = 'guided' | 'fast'
 
-export function QuoteModes({ recentLanes = [], costBases = [], initialQuote }: { recentLanes?: LaneHint[]; costBases?: CostBaseOption[]; initialQuote?: ReopenQuote }) {
+export function QuoteModes({ recentLanes = [], costBases = [], initialQuote, reopenError }: { recentLanes?: LaneHint[]; costBases?: CostBaseOption[]; initialQuote?: ReopenQuote; reopenError?: string | null }) {
   const [mode, setMode] = useState<Mode>('guided')
   return (
     <>
@@ -15,6 +16,12 @@ export function QuoteModes({ recentLanes = [], costBases = [], initialQuote }: {
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-md border border-primary/25 bg-primary/5 px-3 py-2 text-xs" role="status">
           <span><strong>Reabriendo cotización</strong>{initialQuote.label ? ` · ${initialQuote.label}` : ` · ${initialQuote.id.slice(0, 8)}`}</span>
           <span className="text-muted-foreground">Puedes ajustar los datos antes de recalcular.</span>
+        </div>
+      )}
+      {reopenError && (
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs" role="alert">
+          <span><strong>No se pudo reabrir</strong> · {reopenError}</span>
+          <Link href="/quote" className="font-medium text-primary underline underline-offset-2">Iniciar cotización nueva</Link>
         </div>
       )}
       <div

@@ -16,6 +16,16 @@ interface RecentQuote {
   lane?: { origin?: string | null; destination?: string | null } | null
 }
 
+interface ReopenQuoteResponse {
+  id: string
+  label: string | null
+  operation: string
+  service: string
+  lane: { origin: string | null; destination: string | null } | null
+  costBase: { id: string } | null
+  explanation: { input: { equipment: { truckType: string; trailer: string; config: string; driver: string } } } | null
+}
+
 /** Most recent distinct lanes (by origin+dest+operation), up to 5, for re-quoting. */
 async function fetchRecentLanes(): Promise<LaneHint[]> {
   try {
@@ -37,6 +47,18 @@ async function fetchRecentLanes(): Promise<LaneHint[]> {
   }
 }
 
+async function fetchQuoteToReopen(quoteId?: string): Promise<{ quote: ReopenQuoteResponse | null; error: string | null }> {
+  if (!quoteId) return { quote: null, error: null }
+  try {
+    return { quote: await api<ReopenQuoteResponse>(`/quotes/${quoteId}`), error: null }
+  } catch {
+    return {
+      quote: null,
+      error: 'No pudimos cargar esa cotización. Puede que ya no exista o que no tengas acceso a ella.',
+    }
+  }
+}
+
 export default async function QuotePage({ searchParams }: { searchParams: Promise<{ quoteId?: string | string[] }> }) {
   const params = await searchParams
   const quoteId = Array.isArray(params.quoteId) ? params.quoteId[0] : params.quoteId
@@ -44,17 +66,17 @@ export default async function QuotePage({ searchParams }: { searchParams: Promis
     fetchRecentLanes(),
     api<CostBaseOption[]>('/cost-bases').catch(() => []),
     api<{ role: 'ADMIN' | 'OPERATOR' | 'VIEWER' }>('/auth/me'),
-    quoteId ? api<{ id: string; label: string | null; operation: string; service: string; lane: { origin: string | null; destination: string | null } | null; costBase: { id: string } | null; explanation: { input: { equipment: { truckType: string; trailer: string; config: string; driver: string } } } | null }>(`/quotes/${quoteId}`).catch(() => null) : Promise.resolve(null),
+    fetchQuoteToReopen(quoteId),
   ])
-  const initialQuote: ReopenQuote | undefined = reopened ? {
-    id: reopened.id,
-    label: reopened.label,
-    operation: reopened.operation,
-    service: reopened.service,
-    origin: reopened.lane?.origin ?? null,
-    destination: reopened.lane?.destination ?? null,
-    costBaseId: reopened.costBase?.id ?? null,
-    equipment: reopened.explanation?.input.equipment ?? null,
+  const initialQuote: ReopenQuote | undefined = reopened.quote ? {
+    id: reopened.quote.id,
+    label: reopened.quote.label,
+    operation: reopened.quote.operation,
+    service: reopened.quote.service,
+    origin: reopened.quote.lane?.origin ?? null,
+    destination: reopened.quote.lane?.destination ?? null,
+    costBaseId: reopened.quote.costBase?.id ?? null,
+    equipment: reopened.quote.explanation?.input.equipment ?? null,
   } : undefined
   return (
     <main className="mx-auto w-full max-w-[1440px] px-3 py-4 sm:px-4">
@@ -74,7 +96,7 @@ export default async function QuotePage({ searchParams }: { searchParams: Promis
           <p className="mt-1 text-sm text-muted-foreground">Tu rol puede revisar cotizaciones guardadas, pero no generar nuevos cálculos.</p>
           <Link href="/quotes" className="mt-3 inline-block text-sm font-medium text-primary underline underline-offset-2">Ir al historial</Link>
         </section>
-      ) : <QuoteModes recentLanes={recentLanes} costBases={costBases} initialQuote={initialQuote} />}
+      ) : <QuoteModes recentLanes={recentLanes} costBases={costBases} initialQuote={initialQuote} reopenError={reopened.error} />}
     </main>
   )
 }

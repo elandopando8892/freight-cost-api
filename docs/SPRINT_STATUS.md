@@ -8,8 +8,8 @@ HEAD: `e31c32d` antes de este incremento
 ## Lectura ejecutiva
 
 El plan vigente del MVP comercial tiene cuatro sprints quincenales. Estamos cerrando
-Sprint 1 y avanzando Sprint 2. El progreso ponderado es aproximadamente **26%**
-(se comunica como 25% redondeado); esto es avance local/preview, no aceptación de
+Sprint 1 y avanzando Sprint 2. El progreso ponderado es aproximadamente **28%**
+(se comunica como 30% redondeado); esto es avance local/preview, no aceptación de
 producción.
 
 El documento `apps/web/UI_UX_CONVERGENCE.md` conserva el historial de siete
@@ -30,7 +30,7 @@ Pendiente de cierre:
 - Capturas autenticadas en 1440 × 900, 1280 × 800 y 390 × 844.
 - Comparación contra wireframe y aprobación visual humana.
 
-## Sprint 2 · cotización end-to-end — 25%
+## Sprint 2 · cotización end-to-end — 30%
 
 Iniciado:
 
@@ -38,6 +38,8 @@ Iniciado:
 - Guardado mantiene el linaje y ofrece abrir directamente el detalle o volver al historial.
 - El detalle vuelve a `/quote?quoteId=...` y precarga ruta, operación, servicio, base y equipo;
   el original permanece intacto hasta que el usuario calcule y guarde una nueva cotización.
+- Una reapertura fallida ya no cae silenciosamente en un formulario vacío: muestra el motivo,
+  conserva el contexto de la acción y ofrece iniciar una cotización nueva.
 - Se conserva el límite: guardar una cotización no publica tarifas ni envía comunicaciones.
 
 Siguiente incremento:
