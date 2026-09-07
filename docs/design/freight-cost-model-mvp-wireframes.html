@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Freight Cost Model · MVP wireframes</title>
+    <style>
+      :root { --ink:#1e1e1e; --orange:#ea5e27; --grey:#484848; --cloud:#efefef; --line:#c8c8c8; --paper:#fff; --muted:#727272; }
+      * { box-sizing: border-box; }
+      body { margin:0; background:#d9d9d9; color:var(--ink); font:14px/1.4 Arial, sans-serif; }
+      header { padding:28px 32px 20px; background:var(--ink); color:var(--cloud); }
+      header img { width:190px; height:auto; display:block; margin-bottom:18px; }
+      header h1 { max-width:1100px; margin:0 0 6px; font-size:25px; letter-spacing:.01em; }
+      header p { max-width:880px; margin:0; color:#cfcfcf; }
+      main { max-width:1500px; margin:0 auto; padding:24px; }
+      .intro { display:flex; justify-content:space-between; gap:20px; align-items:end; margin-bottom:22px; }
+      .intro strong { display:block; font-size:12px; text-transform:uppercase; letter-spacing:.14em; color:var(--grey); }
+      .intro span { color:var(--muted); }
+      .direction { margin:0 0 28px; padding:18px; background:#e9e9e9; border:1px solid #b7b7b7; }
+      .direction h2 { margin:0 0 4px; font-size:18px; }
+      .direction > p { margin:0 0 14px; color:var(--grey); }
+      .boards { display:grid; grid-template-columns:minmax(0, 1fr) 390px; gap:18px; align-items:start; }
+      .frame { background:var(--paper); border:1px solid #a0a0a0; box-shadow:0 2px 0 #bdbdbd; overflow:hidden; }
+      .frame.desktop { min-height:560px; }
+      .frame.mobile { width:390px; max-width:100%; min-height:560px; justify-self:end; }
+      .frame-label { padding:7px 10px; background:#f7f7f7; color:var(--muted); border-bottom:1px solid var(--line); font:10px/1.2 monospace; letter-spacing:.08em; text-transform:uppercase; }
+      .shell { display:grid; grid-template-columns:196px 1fr; min-height:520px; }
+      .sidebar { padding:18px 12px; background:var(--ink); color:var(--cloud); }
+      .sidebar img { width:146px; margin:0 4px 28px; }
+      .side-label { margin:16px 6px 5px; color:#9f9f9f; font:9px monospace; text-transform:uppercase; letter-spacing:.12em; }
+      .nav { padding:8px 9px; margin:2px 0; color:#ddd; }
+      .nav.active { border-left:3px solid var(--orange); padding-left:6px; background:#333; color:#fff; }
+      .content { padding:22px 24px; background:#fbfbfb; }
+      .topline { display:flex; align-items:center; justify-content:space-between; gap:14px; border-bottom:1px solid var(--line); padding-bottom:14px; }
+      .eyebrow { color:var(--muted); font:10px monospace; text-transform:uppercase; letter-spacing:.13em; }
+      h3 { margin:3px 0; font-size:22px; }
+      .sub { color:var(--muted); }
+      .button { padding:9px 13px; border:1px solid var(--ink); background:var(--orange); color:var(--ink); font-weight:bold; }
+      .button.ghost { background:transparent; color:var(--ink); }
+      .button.disabled { opacity:.45; }
+      .body-grid { display:grid; grid-template-columns:1fr 250px; gap:16px; margin-top:17px; }
+      .form, .review, .table { border:1px solid var(--line); background:#fff; }
+      .section-head { display:flex; justify-content:space-between; padding:10px 12px; border-bottom:1px solid var(--line); font-weight:bold; }
+      .section-body { padding:12px; }
+      .field-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+      .field { display:grid; gap:4px; }
+      .field label { color:var(--muted); font:10px monospace; text-transform:uppercase; }
+      .input { min-height:34px; padding:8px 9px; border:1px solid #999; background:#fafafa; }
+      .input.focus { border:2px solid var(--orange); padding:7px 8px; }
+      .route-line { display:grid; grid-template-columns:1fr 24px 1fr; gap:8px; align-items:center; margin:14px 0; }
+      .route-line .arrow { text-align:center; color:var(--orange); font-weight:bold; }
+      .review { background:#f7f7f7; }
+      .review dl { display:grid; grid-template-columns:1fr auto; gap:8px 12px; margin:0; padding:12px; }
+      .review dt { color:var(--muted); }
+      .review dd { margin:0; font-weight:bold; text-align:right; }
+      .review .total { grid-column:1/-1; margin:4px -12px -12px; padding:12px; border-top:1px solid var(--ink); background:var(--ink); color:#fff; display:flex; justify-content:space-between; font-size:16px; }
+      .note { margin-top:12px; padding:9px 10px; border-left:3px solid var(--orange); background:#fff4ef; color:var(--grey); font-size:12px; }
+      .table { margin-top:17px; }
+      .rows { display:grid; }
+      .row { display:grid; grid-template-columns:1.2fr .9fr .7fr auto; gap:12px; padding:10px 12px; border-bottom:1px solid #e2e2e2; align-items:center; }
+      .row:last-child { border-bottom:0; }
+      .row.header { color:var(--muted); font:10px monospace; text-transform:uppercase; }
+      .status { padding:3px 6px; border:1px solid #999; font:10px monospace; white-space:nowrap; }
+      .mobile .frame-label { position:sticky; top:0; }
+      .mobile .shell { display:block; min-height:520px; }
+      .mobile .sidebar { display:none; }
+      .mobile .content { padding:16px; }
+      .mobile .topline { align-items:start; }
+      .mobile h3 { font-size:19px; }
+      .mobile .topline .button.ghost { display:none; }
+      .mobile .body-grid { display:flex; flex-direction:column; }
+      .mobile .review { order:-1; }
+      .mobile .field-grid { grid-template-columns:1fr; }
+      .mobile .route-line { grid-template-columns:1fr; }
+      .mobile .route-line .arrow { transform:rotate(90deg); }
+      .mobile .row { grid-template-columns:1fr auto; gap:4px 10px; }
+      .mobile .row > :nth-child(2), .mobile .row > :nth-child(3) { color:var(--muted); font-size:12px; }
+      .mobile .row > :nth-child(2) { grid-column:1; }
+      .mobile .row > :nth-child(3) { grid-column:1; }
+      .mobile .row > :last-child { grid-column:2; grid-row:1 / span 3; }
+      .bottom-action { position:sticky; bottom:0; margin:16px -16px -16px; padding:12px 16px; border-top:1px solid var(--line); background:#fff; }
+      .steps { display:flex; gap:5px; margin:14px 0; }
+      .step { flex:1; height:4px; background:#d0d0d0; }
+      .step.done, .step.current { background:var(--orange); }
+      .split { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+      .decision { padding:14px; border:2px solid var(--orange); background:#fffaf7; }
+      .decision strong { display:block; margin-bottom:7px; }
+      @media (max-width:900px) { main { padding:14px; } .boards { grid-template-columns:1fr; } .frame.mobile { justify-self:start; } .frame.desktop { overflow:auto; } }
+    </style>
+  </head>
+  <body>
+    <header>
+      <img src="../../apps/web/public/brand/marksman-logo.png" alt="MARKSMAN · Precision Freight Networks" />
+      <h1>Freight Cost Model · wireframes del MVP</h1>
+      <p>Flujo prioritario: configurar costos → cotizar una ruta → entender costo y margen → guardar/reabrir una cotización. Sprint 1 · 7 de septiembre de 2026.</p>
+    </header>
+    <main>
+      <div class="intro"><div><strong>Regla de decisión</strong><span>Elegir una dirección antes de convertirla en componentes.</span></div><div><strong>Estados cubiertos</strong><span>Entrada · cálculo · resultado · guardado</span></div></div>
+
+      <section class="direction">
+        <h2>Ruta directa</h2>
+        <p>Workspace horizontal: captura a la izquierda y revisión técnica persistente a la derecha. Reduce la navegación al trabajo inmediato.</p>
+        <div class="boards">
+          <div class="frame desktop"><div class="frame-label">Desktop · 1440 × 1024 · estado: captura + resultado</div><div class="shell"><aside class="sidebar"><img src="../../apps/web/public/brand/marksman-logo.png" alt=""/><div class="side-label">Operación</div><div class="nav">Inicio</div><div class="nav active">Cotizar</div><div class="nav">Mis cotizaciones</div><div class="side-label">Modelo</div><div class="nav">Mis costos</div><div class="side-label">Cuenta</div><div class="nav">Configuración</div></aside><div class="content"><div class="topline"><div><div class="eyebrow">Nueva cotización · paso 2 de 3</div><h3>Calcula tu ruta</h3><div class="sub">La base y la versión quedan visibles mientras revisas.</div></div><button class="button ghost">Guardar borrador</button></div><div class="body-grid"><div class="form"><div class="section-head"><span>Ruta y servicio</span><span class="status">EDITANDO</span></div><div class="section-body"><div class="route-line"><div class="field"><label>Origen</label><div class="input focus">Laredo, TX</div></div><div class="arrow">→</div><div class="field"><label>Destino</label><div class="input">Monterrey, NL</div></div></div><div class="field-grid"><div class="field"><label>Operación</label><div class="input">Cross-border</div></div><div class="field"><label>Equipo</label><div class="input">53' Dry Van</div></div></div><div class="note">La base sugerida se puede cambiar antes de calcular. No se publica ninguna tarifa.</div><div style="display:flex;justify-content:end;margin-top:14px"><button class="button">Calcular ruta</button></div></div></div><aside class="review"><div class="section-head"><span>Revisión técnica</span><span class="status">PREVIEW</span></div><dl><dt>Base</dt><dd>Cross-border v3</dd><dt>Distancia</dt><dd>181 mi</dd><dt>Costo estimado</dt><dd>$1,486</dd><dt>Margen objetivo</dt><dd>18%</dd><div class="total"><span>Precio sugerido</span><strong>$1,756</strong></div></dl></aside></div><div class="table"><div class="section-head"><span>Últimas cotizaciones</span><span class="sub">Ver historial →</span></div><div class="rows"><div class="row header"><span>Folio / ruta</span><span>Estado</span><span>Precio</span><span></span></div><div class="row"><span>FCM-1042 · Laredo → MTY</span><span><span class="status">BORRADOR</span></span><span>$1,756</span><span>›</span></div><div class="row"><span>FCM-1039 · Dallas → Saltillo</span><span><span class="status">GUARDADA</span></span><span>$2,140</span><span>›</span></div></div></div></div></div></div>
+          <div class="frame mobile"><div class="frame-label">Mobile · 390 × 844 · estado: revisión</div><div class="shell"><div class="content"><div class="topline"><div><div class="eyebrow">Cotizar · 2/3</div><h3>Calcula tu ruta</h3></div><button class="button ghost">×</button></div><div class="steps"><div class="step done"></div><div class="step current"></div><div class="step"></div></div><div class="body-grid"><aside class="review"><div class="section-head"><span>Resumen</span><span class="status">PREVIEW</span></div><dl><dt>Ruta</dt><dd>Laredo → MTY</dd><dt>Base</dt><dd>Cross-border v3</dd><dt>Costo</dt><dd>$1,486</dd><div class="total"><span>Precio sugerido</span><strong>$1,756</strong></div></dl></aside><div class="form"><div class="section-head"><span>Editar ruta</span></div><div class="section-body"><div class="field"><label>Origen</label><div class="input">Laredo, TX</div></div><div class="field" style="margin-top:10px"><label>Destino</label><div class="input focus">Monterrey, NL</div></div><div class="field" style="margin-top:10px"><label>Equipo</label><div class="input">53' Dry Van</div></div><div class="bottom-action"><button class="button" style="width:100%">Continuar a guardar</button></div></div></div></div></div></div></div>
+        </div>
+      </section>
+
+      <section class="direction">
+        <h2>Control de cotización</h2>
+        <p>La cotización es el objeto principal: el usuario vuelve a una lista operativa y abre un panel de revisión sin cambiar de contexto.</p>
+        <div class="boards">
+          <div class="frame desktop"><div class="frame-label">Desktop · 1440 × 1024 · estado: lista + panel</div><div class="shell"><aside class="sidebar"><img src="../../apps/web/public/brand/marksman-logo.png" alt=""/><div class="side-label">Operación</div><div class="nav">Inicio</div><div class="nav active">Mis cotizaciones</div><div class="nav">Cotizar</div><div class="side-label">Modelo</div><div class="nav">Mis costos</div></aside><div class="content"><div class="topline"><div><div class="eyebrow">Operación · historial gobernado</div><h3>Mis cotizaciones</h3><div class="sub">Reabre una cotización sin perder base, versión ni linaje.</div></div><button class="button">+ Nueva cotización</button></div><div class="table" style="margin-top:18px"><div class="section-head"><span>24 cotizaciones</span><span class="sub">Buscar · Estado · Fecha</span></div><div class="rows"><div class="row header"><span>Folio / cliente / ruta</span><span>Estado</span><span>Precio</span><span></span></div><div class="row" style="background:#fff4ef"><span><strong>FCM-1042</strong><br/><span class="sub">Laredo → Monterrey · 07 sep</span></span><span><span class="status">BORRADOR</span></span><span>$1,756</span><span>›</span></div><div class="row"><span><strong>FCM-1039</strong><br/><span class="sub">Dallas → Saltillo · 06 sep</span></span><span><span class="status">GUARDADA</span></span><span>$2,140</span><span>›</span></div><div class="row"><span><strong>FCM-1031</strong><br/><span class="sub">Houston → Apodaca · 05 sep</span></span><span><span class="status">COMPARTIDA</span></span><span>$1,932</span><span>›</span></div></div></div><div class="body-grid" style="grid-template-columns:1fr 290px"><div class="decision"><strong>La cotización seleccionada está lista para revisar</strong><span class="sub">Confirma el precio y prepara el documento; compartir sigue siendo una acción humana.</span><div style="margin-top:12px"><button class="button">Abrir cotización</button></div></div><aside class="review"><div class="section-head"><span>Linaje</span></div><dl><dt>Base</dt><dd>Cross-border v3</dd><dt>Ruta</dt><dd>181 mi</dd><dt>Costo</dt><dd>$1,486</dd><dt>Margen</dt><dd>18%</dd></dl></aside></div></div></div></div>
+          <div class="frame mobile"><div class="frame-label">Mobile · 390 × 844 · estado: lista</div><div class="shell"><div class="content"><div class="topline"><div><div class="eyebrow">Operación</div><h3>Mis cotizaciones</h3></div><button class="button">+</button></div><div class="field" style="margin-top:14px"><label>Buscar folio, cliente o ruta</label><div class="input">FCM-1042</div></div><div class="table" style="margin-top:14px"><div class="rows"><div class="row" style="background:#fff4ef"><span><strong>FCM-1042</strong><br/><span class="sub">Laredo → Monterrey</span></span><span><span class="status">BORRADOR</span></span><span>$1,756 · 07 sep</span><span>›</span></div><div class="row"><span><strong>FCM-1039</strong><br/><span class="sub">Dallas → Saltillo</span></span><span><span class="status">GUARDADA</span></span><span>$2,140 · 06 sep</span><span>›</span></div></div></div><div class="bottom-action"><button class="button" style="width:100%">+ Nueva cotización</button></div></div></div></div>
+        </div>
+      </section>
+
+      <section class="direction">
+        <h2>Asistente guiado</h2>
+        <p>Un paso por pantalla para usuarios nuevos; el resumen técnico permanece anclado y el lenguaje evita conceptos internos innecesarios.</p>
+        <div class="boards">
+          <div class="frame desktop"><div class="frame-label">Desktop · 1440 × 1024 · estado: paso 1 + resumen</div><div class="shell"><aside class="sidebar"><img src="../../apps/web/public/brand/marksman-logo.png" alt=""/><div class="side-label">Operación</div><div class="nav">Inicio</div><div class="nav active">Cotizar</div><div class="nav">Mis cotizaciones</div><div class="side-label">Modelo</div><div class="nav">Mis costos</div></aside><div class="content"><div class="topline"><div><div class="eyebrow">Nueva cotización · paso 1 de 3</div><h3>¿Qué quieres mover?</h3><div class="sub">Empezamos con lo mínimo; podrás revisar todo antes de guardar.</div></div><span class="status">BORRADOR</span></div><div class="body-grid"><div class="form"><div class="section-head"><span>Servicio</span></div><div class="section-body"><div class="split"><div class="decision"><strong>Ruta existente</strong><span class="sub">Usa una ruta guardada y acelera el cálculo.</span><div style="margin-top:12px"><button class="button">Elegir ruta</button></div></div><div class="form" style="padding:14px"><strong>Nueva ruta</strong><span class="sub">Captura origen y destino.</span><div style="margin-top:12px"><button class="button ghost">Crear ruta</button></div></div></div><div class="note">La base de costos se sugiere con tus reglas activas. Siempre podrás cambiarla.</div></div></div><aside class="review"><div class="section-head"><span>Tu progreso</span></div><div class="section-body"><div class="steps"><div class="step current"></div><div class="step"></div><div class="step"></div></div><p class="sub">1 · Servicio<br/>2 · Ruta y equipo<br/>3 · Revisar y guardar</p><div class="note">Ninguna acción publica tarifas ni envía información.</div></div></aside></div></div></div></div>
+          <div class="frame mobile"><div class="frame-label">Mobile · 390 × 844 · estado: paso 1</div><div class="shell"><div class="content"><div class="topline"><div><div class="eyebrow">Cotizar · 1/3</div><h3>¿Qué quieres mover?</h3></div><span class="status">BORRADOR</span></div><div class="steps"><div class="step current"></div><div class="step"></div><div class="step"></div></div><div class="decision" style="margin-top:16px"><strong>Ruta existente</strong><span class="sub">Usa una ruta guardada y acelera el cálculo.</span><button class="button" style="width:100%;margin-top:16px">Elegir ruta</button></div><div class="form" style="margin-top:12px"><div class="section-body"><strong>Nueva ruta</strong><p class="sub">Origen, destino y equipo en el siguiente paso.</p><button class="button ghost" style="width:100%">Crear ruta</button></div></div><div class="bottom-action"><button class="button disabled" style="width:100%">Continuar</button></div></div></div></div>
+        </div>
+      </section>
+
+      <footer style="padding:4px 0 18px;color:#666;font-size:12px">Wireframe de decisión · no reemplaza la validación visual autenticada en 1440 × 900, 1280 × 800 y 390 × 844.</footer>
+    </main>
+  </body>
+</html>
