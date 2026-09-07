@@ -42,6 +42,8 @@ Iniciado:
   conserva el contexto de la acción y ofrece iniciar una cotización nueva.
 - La carga de `/quote` conserva la composición final del flujo (encabezado, modos, formulario
   y revisión técnica) y expone un anuncio accesible mientras llegan los datos.
+- Sin base gobernada, el aviso aparece al entrar a Cotizar y dirige a Mis costos; `VIEWER`
+  recibe una vista de solo lectura que separa claramente lo permitido de lo que requiere operador.
 - Se conserva el límite: guardar una cotización no publica tarifas ni envía comunicaciones.
 
 Siguiente incremento:

@@ -4,12 +4,13 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { QuoteForm, type LaneHint } from './quote-form'
 import { QuoteWizard } from './quote-wizard'
-import type { CostBaseOption, ReopenQuote } from './quote-shared'
+import { preferredGovernedBase, type CostBaseOption, type ReopenQuote } from './quote-shared'
 
 type Mode = 'guided' | 'fast'
 
 export function QuoteModes({ recentLanes = [], costBases = [], initialQuote, reopenError }: { recentLanes?: LaneHint[]; costBases?: CostBaseOption[]; initialQuote?: ReopenQuote; reopenError?: string | null }) {
   const [mode, setMode] = useState<Mode>('guided')
+  const hasInitialGovernedBase = Boolean(preferredGovernedBase(costBases, 'D2D Import'))
   return (
     <>
       {initialQuote && (
@@ -22,6 +23,12 @@ export function QuoteModes({ recentLanes = [], costBases = [], initialQuote, reo
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs" role="alert">
           <span><strong>No se pudo reabrir</strong> · {reopenError}</span>
           <Link href="/quote" className="font-medium text-primary underline underline-offset-2">Iniciar cotización nueva</Link>
+        </div>
+      )}
+      {!hasInitialGovernedBase && (
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-md border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-xs text-amber-900 dark:text-amber-200" role="status">
+          <span><strong>Sin base gobernada disponible</strong> · El cálculo puede continuar como propuesta, pero cualquier guardado requerirá revisión.</span>
+          <Link href="/cost-bases" className="font-medium underline underline-offset-2">Revisar Mis costos →</Link>
         </div>
       )}
       <div

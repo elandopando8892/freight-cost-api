@@ -91,10 +91,17 @@ export default async function QuotePage({ searchParams }: { searchParams: Promis
         <p className="border-l-2 border-primary px-3 py-1 text-[11px] text-muted-foreground">El cálculo propone · tú confirmas</p>
       </header>
       {user.role === 'VIEWER' ? (
-        <section className="rounded-lg border bg-card p-5 text-center" aria-labelledby="quote-permission-title">
-          <h2 id="quote-permission-title" className="text-base font-semibold">Modo consulta</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Tu rol puede revisar cotizaciones guardadas, pero no generar nuevos cálculos.</p>
-          <Link href="/quotes" className="mt-3 inline-block text-sm font-medium text-primary underline underline-offset-2">Ir al historial</Link>
+        <section className="mx-auto max-w-2xl rounded-lg border bg-card p-5" aria-labelledby="quote-permission-title">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 id="quote-permission-title" className="text-base font-semibold">Consulta de cotizaciones</h2>
+            <span className="rounded-full border border-sky-500/30 bg-sky-500/5 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-sky-800 dark:text-sky-200">Solo lectura</span>
+          </div>
+          <p className="mt-2 text-sm text-muted-foreground">Tu rol puede revisar cotizaciones guardadas y su linaje, pero no generar, guardar ni confirmar nuevos cálculos.</p>
+          <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+            <div className="rounded-md border bg-muted/20 p-3"><dt className="text-xs font-medium text-foreground">Disponible</dt><dd className="mt-1 text-muted-foreground">Historial, detalle, base y versión usadas.</dd></div>
+            <div className="rounded-md border bg-muted/20 p-3"><dt className="text-xs font-medium text-foreground">Requiere operador</dt><dd className="mt-1 text-muted-foreground">Calcular, guardar, confirmar o compartir.</dd></div>
+          </dl>
+          <Link href="/quotes" className="mt-4 inline-flex text-sm font-medium text-primary underline underline-offset-2">Ir al historial →</Link>
         </section>
       ) : <QuoteModes recentLanes={recentLanes} costBases={costBases} initialQuote={initialQuote} reopenError={reopened.error} />}
     </main>
