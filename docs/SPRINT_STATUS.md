@@ -48,6 +48,8 @@ Iniciado:
   foco único y navegación con flechas/Home/End para teclado y lectores de pantalla.
 - La matriz de QA autenticada quedó preparada en `docs/QA_AUTHENTICATED_MVP_MATRIX.md`;
   permanece PENDIENTE hasta ejecutar con sesión Supabase real y evidencia redactada.
+- En Mis costos, “Revisar bases” selecciona la primera base activa del alcance y lleva al
+  panel de versiones; ya no obliga a encontrar manualmente la base después del salto.
 - Se conserva el límite: guardar una cotización no publica tarifas ni envía comunicaciones.
 
 Siguiente incremento:

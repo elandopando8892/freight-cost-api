@@ -175,6 +175,12 @@ export function CostBasesBoard({ initial, canEdit }: { initial: CostBase[]; canE
   const coverage = buildScopeCoverage(bases)
   const readyScopeCount = coverage.filter((item) => item.status === 'READY').length
   const selectedBase = bases.find((base) => base.id === selectedBaseId) ?? bases[0] ?? null
+  const reviewScope = (scope: Scope) => {
+    const firstBase = bases.find((base) => base.scope === scope && base.status !== 'ARCHIVED')
+    if (!firstBase) return
+    setSelectedBaseId(firstBase.id)
+    requestAnimationFrame(() => document.getElementById('base-list')?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
+  }
 
   const create = useMutation({
     mutationFn: (body: CostBaseCreateBody) =>
@@ -281,7 +287,7 @@ export function CostBasesBoard({ initial, canEdit }: { initial: CostBase[]; canE
         </div>
       </div>
 
-      <CoverageOverview coverage={coverage} onCreate={openCreate} canEdit={canEdit} />
+      <CoverageOverview coverage={coverage} onCreate={openCreate} onReview={reviewScope} canEdit={canEdit} />
 
       {showCreate && <CostBaseWizard key={createScope} initialScope={createScope} existingCodes={bases.map((base) => base.code)} pending={create.isPending} onSubmit={(body) => create.mutate(body)} />}
 
@@ -383,7 +389,7 @@ const COVERAGE_LABEL: Record<CoverageStatus, string> = {
   MISSING: 'Sin cobertura',
 }
 
-function CoverageOverview({ coverage, onCreate, canEdit }: { coverage: ScopeCoverage[]; onCreate: (scope: Scope) => void; canEdit: boolean }) {
+function CoverageOverview({ coverage, onCreate, onReview, canEdit }: { coverage: ScopeCoverage[]; onCreate: (scope: Scope) => void; onReview: (scope: Scope) => void; canEdit: boolean }) {
   const ready = coverage.filter((item) => item.status === 'READY').length
   return (
     <Card className="overflow-hidden">
@@ -419,7 +425,7 @@ function CoverageOverview({ coverage, onCreate, canEdit }: { coverage: ScopeCove
               {item.status === 'MISSING' && canEdit
                 ? <Button className="w-full" variant="outline" size="sm" onClick={() => onCreate(item.scope)}>Crear base {SCOPE_LABEL[item.scope]}</Button>
                 : item.baseCount > 0
-                  ? <Link href="#base-list" className="block text-center text-xs font-medium text-primary underline underline-offset-2">Revisar bases</Link>
+                  ? <button type="button" onClick={() => onReview(item.scope)} className="block w-full text-center text-xs font-medium text-primary underline underline-offset-2">Revisar bases de {SCOPE_LABEL[item.scope]} →</button>
                   : <span className="block text-center text-xs text-muted-foreground">Sin base disponible</span>}
             </div>
           </div>
