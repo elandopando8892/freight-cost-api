@@ -46,6 +46,8 @@ Iniciado:
   recibe una vista de solo lectura que separa claramente lo permitido de lo que requiere operador.
 - El filtro de alcance de estándares en Mis costos usa semántica de pestañas válida (`aria-selected`),
   foco único y navegación con flechas/Home/End para teclado y lectores de pantalla.
+- La matriz de QA autenticada quedó preparada en `docs/QA_AUTHENTICATED_MVP_MATRIX.md`;
+  permanece PENDIENTE hasta ejecutar con sesión Supabase real y evidencia redactada.
 - Se conserva el límite: guardar una cotización no publica tarifas ni envía comunicaciones.
 
 Siguiente incremento:
