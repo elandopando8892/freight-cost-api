@@ -419,7 +419,8 @@ export function CostBaseWizard({ initialScope, existingCodes, pending, onSubmit 
                       setPresetScopeFilter('ALL')
                       setSelectedPresetId(null)
                     }}
-                    aria-pressed={presetScopeFilter === 'ALL'}
+                    aria-selected={presetScopeFilter === 'ALL'}
+                    tabIndex={presetScopeFilter === 'ALL' ? 0 : -1}
                     className={`rounded-full border px-3 py-1.5 transition-colors ${presetScopeFilter === 'ALL' ? 'border-primary bg-primary/12 text-primary' : 'border-border hover:bg-muted/30 text-muted-foreground'}`}
                   >
                     Todos ({presetScopeCounts.ALL})
@@ -433,7 +434,8 @@ export function CostBaseWizard({ initialScope, existingCodes, pending, onSubmit 
                       setPresetScopeFilter(item.value)
                       setSelectedPresetId(null)
                     }}
-                      aria-pressed={presetScopeFilter === item.value}
+                      aria-selected={presetScopeFilter === item.value}
+                      tabIndex={presetScopeFilter === item.value ? 0 : -1}
                       disabled={presetScopeCounts[item.value] === 0}
                       title={presetScopeCounts[item.value] === 0 ? 'No hay estándares para este alcance' : undefined}
                       className={`rounded-full border px-3 py-1.5 transition-colors ${presetScopeFilter === item.value ? 'border-primary bg-primary/12 text-primary' : 'border-border hover:bg-muted/30 text-muted-foreground'} ${presetScopeCounts[item.value] === 0 ? 'cursor-not-allowed opacity-50' : ''}`}
