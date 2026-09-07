@@ -3,12 +3,12 @@
 Fecha de corte: 2026-09-07  
 Checkout: `D:\\andre\\worktrees\\freight-cost-model\\supabase-auth-migration-20260830`  
 Rama: `codex/supabase-auth-slice`  
-HEAD: `0250aa0`
+HEAD: `e31c32d` antes de este incremento
 
 ## Lectura ejecutiva
 
 El plan vigente del MVP comercial tiene cuatro sprints quincenales. Estamos cerrando
-Sprint 1 y ya iniciamos Sprint 2. El progreso ponderado es aproximadamente **23%**
+Sprint 1 y avanzando Sprint 2. El progreso ponderado es aproximadamente **26%**
 (se comunica como 25% redondeado); esto es avance local/preview, no aceptación de
 producción.
 
@@ -30,12 +30,14 @@ Pendiente de cierre:
 - Capturas autenticadas en 1440 × 900, 1280 × 800 y 390 × 844.
 - Comparación contra wireframe y aprobación visual humana.
 
-## Sprint 2 · cotización end-to-end — 15%
+## Sprint 2 · cotización end-to-end — 25%
 
 Iniciado:
 
 - Resultado de cotización muestra ruta, equipo, servicio, base y versión junto al precio.
 - Guardado mantiene el linaje y ofrece abrir directamente el detalle o volver al historial.
+- El detalle vuelve a `/quote?quoteId=...` y precarga ruta, operación, servicio, base y equipo;
+  el original permanece intacto hasta que el usuario calcule y guarde una nueva cotización.
 - Se conserva el límite: guardar una cotización no publica tarifas ni envía comunicaciones.
 
 Siguiente incremento:

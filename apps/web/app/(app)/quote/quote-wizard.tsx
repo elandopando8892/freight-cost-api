@@ -9,9 +9,9 @@ import { Input } from '@/components/ui/input'
 import { fetcher } from '@/lib/fetcher'
 import { LocationInput } from './location-input'
 import {
-  type QuoteResult, type FormFields, type FormErrors, type CostBaseOption,
+  type QuoteResult, type FormFields, type FormErrors, type CostBaseOption, type ReopenQuote,
   OPS, SVCS, TRUCKS, TRAILERS, CONFIGS, DRIVERS, ROUTES, selectCls,
-  initialFormFor, compatibleBases, preferredGovernedBase, activeVersionFor,
+  initialFormForQuote, compatibleBases, preferredGovernedBase, activeVersionFor,
   costBaseReadiness, costBaseReadinessDetail, quoteBody, Field, CostBaseSelector,
   CostBaseLineageNotice, CalculationContextPanel, ResultSkeleton, QuoteErrorState, Result,
 } from './quote-shared'
@@ -75,9 +75,9 @@ const DISPLAY_LABELS = {
 
 const displayLabel = (value: string) => DISPLAY_LABELS[value as DisplayValue] ?? value
 
-export function QuoteWizard({ costBases = [] }: { costBases?: CostBaseOption[] }) {
+export function QuoteWizard({ costBases = [], initialQuote }: { costBases?: CostBaseOption[]; initialQuote?: ReopenQuote }) {
   const [step, setStep] = useState(0)
-  const [form, setForm] = useState<FormFields>(() => initialFormFor(costBases))
+  const [form, setForm] = useState<FormFields>(() => initialFormForQuote(costBases, initialQuote))
   const [errors, setErrors] = useState<FormErrors>({})
   const [result, setResult] = useState<QuoteResult | null>(null)
 
@@ -122,7 +122,7 @@ export function QuoteWizard({ costBases = [] }: { costBases?: CostBaseOption[] }
 
   const next = () => { if (validateStep(step)) setStep((s) => Math.min(s + 1, STEPS.length - 1)) }
   const back = () => setStep((s) => Math.max(s - 1, 0))
-  const restart = () => { setForm(initialFormFor(costBases)); setErrors({}); setResult(null); quote.reset(); setStep(0) }
+  const restart = () => { setForm(initialFormForQuote(costBases, initialQuote)); setErrors({}); setResult(null); quote.reset(); setStep(0) }
   const selectedCostBase = costBases.find((base) => base.id === form.costBaseId)
   const selectedVersion = activeVersionFor(selectedCostBase)
 

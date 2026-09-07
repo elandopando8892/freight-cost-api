@@ -3,14 +3,20 @@
 import { useState } from 'react'
 import { QuoteForm, type LaneHint } from './quote-form'
 import { QuoteWizard } from './quote-wizard'
-import type { CostBaseOption } from './quote-shared'
+import type { CostBaseOption, ReopenQuote } from './quote-shared'
 
 type Mode = 'guided' | 'fast'
 
-export function QuoteModes({ recentLanes = [], costBases = [] }: { recentLanes?: LaneHint[]; costBases?: CostBaseOption[] }) {
+export function QuoteModes({ recentLanes = [], costBases = [], initialQuote }: { recentLanes?: LaneHint[]; costBases?: CostBaseOption[]; initialQuote?: ReopenQuote }) {
   const [mode, setMode] = useState<Mode>('guided')
   return (
     <>
+      {initialQuote && (
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-md border border-primary/25 bg-primary/5 px-3 py-2 text-xs" role="status">
+          <span><strong>Reabriendo cotización</strong>{initialQuote.label ? ` · ${initialQuote.label}` : ` · ${initialQuote.id.slice(0, 8)}`}</span>
+          <span className="text-muted-foreground">Puedes ajustar los datos antes de recalcular.</span>
+        </div>
+      )}
       <div
         role="group"
         aria-label="Modo de cotización"
@@ -19,7 +25,7 @@ export function QuoteModes({ recentLanes = [], costBases = [] }: { recentLanes?:
         <ModeTab active={mode === 'guided'} onClick={() => setMode('guided')} label="Guiado" description="Ruta, equipo y revisión" />
         <ModeTab active={mode === 'fast'} onClick={() => setMode('fast')} label="Rápido" description="Formulario para operación experta" />
       </div>
-      {mode === 'guided' ? <QuoteWizard costBases={costBases} /> : <QuoteForm recentLanes={recentLanes} costBases={costBases} />}
+      {mode === 'guided' ? <QuoteWizard costBases={costBases} initialQuote={initialQuote} /> : <QuoteForm recentLanes={recentLanes} costBases={costBases} initialQuote={initialQuote} />}
     </>
   )
 }

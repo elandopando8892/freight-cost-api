@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { api } from '@/lib/api'
 import type { LaneHint } from './quote-form'
 import { QuoteModes } from './quote-modes'
-import type { CostBaseOption } from './quote-shared'
+import type { CostBaseOption, ReopenQuote } from './quote-shared'
 
 export const dynamic = 'force-dynamic'
 export const metadata: Metadata = { title: 'Cotizar ruta' }
@@ -37,12 +37,25 @@ async function fetchRecentLanes(): Promise<LaneHint[]> {
   }
 }
 
-export default async function QuotePage() {
-  const [recentLanes, costBases, user] = await Promise.all([
+export default async function QuotePage({ searchParams }: { searchParams: Promise<{ quoteId?: string | string[] }> }) {
+  const params = await searchParams
+  const quoteId = Array.isArray(params.quoteId) ? params.quoteId[0] : params.quoteId
+  const [recentLanes, costBases, user, reopened] = await Promise.all([
     fetchRecentLanes(),
     api<CostBaseOption[]>('/cost-bases').catch(() => []),
     api<{ role: 'ADMIN' | 'OPERATOR' | 'VIEWER' }>('/auth/me'),
+    quoteId ? api<{ id: string; label: string | null; operation: string; service: string; lane: { origin: string | null; destination: string | null } | null; costBase: { id: string } | null; explanation: { input: { equipment: { truckType: string; trailer: string; config: string; driver: string } } } | null }>(`/quotes/${quoteId}`).catch(() => null) : Promise.resolve(null),
   ])
+  const initialQuote: ReopenQuote | undefined = reopened ? {
+    id: reopened.id,
+    label: reopened.label,
+    operation: reopened.operation,
+    service: reopened.service,
+    origin: reopened.lane?.origin ?? null,
+    destination: reopened.lane?.destination ?? null,
+    costBaseId: reopened.costBase?.id ?? null,
+    equipment: reopened.explanation?.input.equipment ?? null,
+  } : undefined
   return (
     <main className="mx-auto w-full max-w-[1440px] px-3 py-4 sm:px-4">
       <header className="mb-4 flex flex-col gap-2 border-b pb-3 sm:flex-row sm:items-end sm:justify-between">
@@ -61,7 +74,7 @@ export default async function QuotePage() {
           <p className="mt-1 text-sm text-muted-foreground">Tu rol puede revisar cotizaciones guardadas, pero no generar nuevos cálculos.</p>
           <Link href="/quotes" className="mt-3 inline-block text-sm font-medium text-primary underline underline-offset-2">Ir al historial</Link>
         </section>
-      ) : <QuoteModes recentLanes={recentLanes} costBases={costBases} />}
+      ) : <QuoteModes recentLanes={recentLanes} costBases={costBases} initialQuote={initialQuote} />}
     </main>
   )
 }

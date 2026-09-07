@@ -9,9 +9,9 @@ import { Input } from '@/components/ui/input'
 import { fetcher } from '@/lib/fetcher'
 import { LocationInput } from './location-input'
 import {
-  type QuoteResult, type FormFields, type FormErrors, type LaneHint, type CostBaseOption,
+  type QuoteResult, type FormFields, type FormErrors, type LaneHint, type CostBaseOption, type ReopenQuote,
   OPS, SVCS, TRUCKS, TRAILERS, CONFIGS, DRIVERS, ROUTES, selectCls,
-  initialFormFor, compatibleBases, preferredGovernedBase, activeVersionFor, costBaseReadiness, costBaseReadinessDetail,
+  initialFormForQuote, compatibleBases, preferredGovernedBase, activeVersionFor, costBaseReadiness, costBaseReadinessDetail,
   validate, quoteBody, Field, CostBaseSelector, CalculationContextPanel, ResultSkeleton, QuoteErrorState, Placeholder, Result,
 } from './quote-shared'
 
@@ -77,8 +77,8 @@ function validateInSpanish(form: FormFields): FormErrors {
   return errors
 }
 
-export function QuoteForm({ recentLanes = [], costBases = [] }: { recentLanes?: LaneHint[]; costBases?: CostBaseOption[] }) {
-  const [form, setForm] = useState<FormFields>(() => initialFormFor(costBases))
+export function QuoteForm({ recentLanes = [], costBases = [], initialQuote }: { recentLanes?: LaneHint[]; costBases?: CostBaseOption[]; initialQuote?: ReopenQuote }) {
+  const [form, setForm] = useState<FormFields>(() => initialFormForQuote(costBases, initialQuote))
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [result, setResult] = useState<QuoteResult | null>(null)
   const [errors, setErrors] = useState<FormErrors>({})
@@ -128,7 +128,7 @@ export function QuoteForm({ recentLanes = [], costBases = [] }: { recentLanes?: 
     quote.mutate()
   }
   const clear = () => {
-    setForm(initialFormFor(costBases))
+    setForm(initialFormForQuote(costBases, initialQuote))
     setResult(null)
     setErrors({})
     setShowAdvanced(false)

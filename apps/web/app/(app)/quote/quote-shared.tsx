@@ -80,6 +80,17 @@ export interface LaneHint {
   destination: string | null
 }
 
+export interface ReopenQuote {
+  id: string
+  label: string | null
+  origin: string | null
+  destination: string | null
+  operation: string
+  service: string
+  costBaseId: string | null
+  equipment: { truckType: string; trailer: string; config: string; driver: string } | null
+}
+
 export type CostBaseScope = 'CROSS_BORDER' | 'DRAYAGE' | 'LOCAL' | 'INTRA_MEX' | 'INTRA_US'
 export type CostBaseReadiness = 'GOVERNED' | 'IN_PREPARATION' | 'LEGACY'
 export interface CostBaseOption {
@@ -189,6 +200,40 @@ export function preferredGovernedBase(bases: CostBaseOption[], operation: string
 export function initialFormFor(bases: CostBaseOption[]): FormFields {
   const selected = preferredGovernedBase(bases, INITIAL_FORM.operation)
   return { ...INITIAL_FORM, costBaseId: selected?.id ?? '' }
+}
+
+export function initialFormForQuote(bases: CostBaseOption[], quote?: ReopenQuote): FormFields {
+  const base = initialFormFor(bases)
+  if (!quote) return base
+
+  const operation = OPS.includes(quote.operation as (typeof OPS)[number])
+    ? quote.operation as (typeof OPS)[number]
+    : base.operation
+  const service = SVCS.includes(quote.service as (typeof SVCS)[number])
+    ? quote.service as (typeof SVCS)[number]
+    : base.service
+  const compatible = compatibleBases(bases, operation)
+  const costBaseId = quote.costBaseId && compatible.some((candidate) => candidate.id === quote.costBaseId)
+    ? quote.costBaseId
+    : preferredGovernedBase(bases, operation)?.id ?? ''
+  const equipment = quote.equipment
+  const truckType = equipment && TRUCKS.includes(equipment.truckType as (typeof TRUCKS)[number]) ? equipment.truckType as (typeof TRUCKS)[number] : base.truckType
+  const trailer = equipment && TRAILERS.includes(equipment.trailer as (typeof TRAILERS)[number]) ? equipment.trailer as (typeof TRAILERS)[number] : base.trailer
+  const config = equipment && CONFIGS.includes(equipment.config as (typeof CONFIGS)[number]) ? equipment.config as (typeof CONFIGS)[number] : base.config
+  const driver = equipment && DRIVERS.includes(equipment.driver as (typeof DRIVERS)[number]) ? equipment.driver as (typeof DRIVERS)[number] : base.driver
+
+  return {
+    ...base,
+    outboundLocation: quote.origin ?? '',
+    inboundLocation: quote.destination ?? '',
+    operation,
+    service,
+    costBaseId,
+    truckType,
+    trailer,
+    config,
+    driver,
+  }
 }
 
 export function validate(f: FormFields): FormErrors {

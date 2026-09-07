@@ -185,10 +185,10 @@ export default async function QuoteDetailPage(
           <QuoteConfirmation quoteId={q.id} status={q.status} confirmedAt={q.confirmedAt} confirmedBy={q.confirmedBy} confirmationNote={q.confirmationNote} canEdit={canEdit} />
           {canEdit && q.status === 'CONFIRMED' && <RatewareHandoffDownload quoteId={q.id} />}
           {canEdit ? <Link
-            href="/quote"
+            href={`/quote?quoteId=${encodeURIComponent(q.id)}`}
             className="rounded-md border bg-background px-3 py-1.5 text-sm shadow-sm hover:bg-accent"
           >
-            Cotizar nuevamente
+            Volver a cotizar
           </Link> : null}
           {canEdit ? <DeleteQuoteButton id={q.id} label={q.label ?? `Cotización ${q.id.slice(0, 8)}`} /> : null}
         </div>
