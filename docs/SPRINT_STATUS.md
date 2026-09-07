@@ -40,6 +40,8 @@ Iniciado:
   el original permanece intacto hasta que el usuario calcule y guarde una nueva cotización.
 - Una reapertura fallida ya no cae silenciosamente en un formulario vacío: muestra el motivo,
   conserva el contexto de la acción y ofrece iniciar una cotización nueva.
+- La carga de `/quote` conserva la composición final del flujo (encabezado, modos, formulario
+  y revisión técnica) y expone un anuncio accesible mientras llegan los datos.
 - Se conserva el límite: guardar una cotización no publica tarifas ni envía comunicaciones.
 
 Siguiente incremento:
