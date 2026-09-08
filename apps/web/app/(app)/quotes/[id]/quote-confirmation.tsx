@@ -21,7 +21,7 @@ export function QuoteConfirmation({ quoteId, status, confirmedAt, confirmedBy, c
     onError: (error) => toast.error(error instanceof Error ? error.message : 'No se pudo confirmar la cotización'),
   })
 
-  if (status === 'CONFIRMED') return <div className="text-right text-xs text-emerald-700"><div className="font-medium">Confirmada por una persona</div><div>{confirmedBy?.email ?? 'Usuario eliminado'}{confirmedAt ? ` · ${new Date(confirmedAt).toLocaleString()}` : ''}</div>{confirmationNote && <div className="mt-1 max-w-64 text-muted-foreground">{confirmationNote}</div>}</div>
+  if (status === 'CONFIRMED') return <div className="min-w-0 max-w-full break-words text-right text-xs text-emerald-700"><div className="font-medium">Confirmada por una persona</div><div>{confirmedBy?.email ?? 'Usuario eliminado'}{confirmedAt ? ` · ${new Date(confirmedAt).toLocaleString()}` : ''}</div>{confirmationNote && <div className="mt-1 max-w-64 text-muted-foreground">{confirmationNote}</div>}</div>
   if (status === 'ARCHIVED') return <span className="text-xs text-muted-foreground">Cotización archivada</span>
   if (!canEdit) return <span className="rounded-md border px-2 py-1 text-xs text-muted-foreground">Modo consulta</span>
   return <>

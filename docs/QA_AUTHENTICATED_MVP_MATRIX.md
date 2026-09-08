@@ -6,6 +6,12 @@ Rama: `codex/supabase-auth-slice`
 
 ## Estado de evidencia
 
+Actualización posterior 2026-09-08: dos revisiones comerciales reales ADMIN con
+respuesta 200, edición y descarte al cerrar; fuente del piloto existente y cliente
+ficticio. AUTH-11 queda parcial, no PASS OPERATOR/sintético. La revisión móvil
+detectó desbordamiento del detalle: corregido localmente, aún no desplegado.
+Ver `COMMERCIAL_REVIEW_QA_2026-09-08.md`.
+
 Actualización 2026-09-08: el preview alineado `7a3d92d` ya tiene evidencia real
 de Google login, recarga, panel e historial con la cuenta existente ADMIN.
 Ver `PREVIEW_RELEASE_2026-09-08.md`. Esta comprobación de lectura no sustituye los

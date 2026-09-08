@@ -127,7 +127,7 @@ export default async function QuoteDetailPage(
     <main className="mx-auto w-full max-w-[1440px] px-3 py-4 sm:px-4">
       {/* Header */}
       <header className="mb-4 flex flex-wrap items-start justify-between gap-3 border-b pb-3">
-        <div className="min-w-0">
+        <div className="min-w-0 max-w-full">
           <div className="mb-1 text-xs text-muted-foreground print:hidden">
             <Link href="/quotes" className="hover:text-foreground">Historial</Link>
             <span className="mx-1">/</span>
@@ -155,7 +155,7 @@ export default async function QuoteDetailPage(
           )}
           {q.productionRoute && <p className="text-sm text-muted-foreground">Origen: ruta de producción <Link href="/production" className="font-medium text-foreground hover:underline">{q.productionRoute.code ?? `${q.productionRoute.origin} a ${q.productionRoute.destination}`}</Link></p>}
         </div>
-        <div className="flex shrink-0 flex-wrap items-center gap-2 print:hidden">
+        <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2 print:hidden">
           <ShareButtons
             quote={{
               id: q.id,

@@ -7,6 +7,12 @@ HEAD base del incremento de revisión comercial: `3b4f6a8`
 
 ## Lectura ejecutiva
 
+Incremento posterior 2026-09-08: revisión comercial real ADMIN con dos respuestas
+200, edición y descarte probados. Se detectó overflow del detalle móvil en preview
+y se corrigió localmente con wireframe y fixture de regresión. No está publicado
+ese ajuste; OPERATOR/VIEWER y renovación siguen pendientes. Evidencia en
+`COMMERCIAL_REVIEW_QA_2026-09-08.md`.
+
 Release preview autorizado 2026-09-08: web/API `7a3d92d` READY, login Google real
 y recarga comprobados con ADMIN existente, sin migraciones ni cambios de Auth.
 El desfase descrito abajo queda resuelto para esta pareja nueva. Recorrido comercial,
