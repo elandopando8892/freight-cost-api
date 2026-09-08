@@ -1,0 +1,19 @@
+{
+  "observedAt": "2026-09-08T18:03:00Z",
+  "teamId": "team_KUG1PtOwoJ16eUqxiOJ330Os",
+  "repository": "elandopando8892/freight-cost-api",
+  "web": {
+    "id": "dpl_9aHgvbD327BA6WE5hDnJ96jQskR4",
+    "projectId": "prj_yDKQHWchDSqxPSh1RF6SJnhiwzxV",
+    "state": "READY", "target": null,
+    "url": "https://freight-cost-o1urzjuyh-elandopando8892s-projects.vercel.app",
+    "sha": "f739e83a7911cb153f8dbb54a7c18eb49900a2b8", "gitDirty": "0"
+  },
+  "api": {
+    "id": "dpl_GLKN52WRGXgEzPBXqxgfVvjvPcos",
+    "projectId": "prj_mw1xLIqutlRSIG2F2BryfPqDvN2L",
+    "state": "READY", "target": null,
+    "url": "https://freight-cost-7qbldfn0v-elandopando8892s-projects.vercel.app",
+    "sha": "f739e83a7911cb153f8dbb54a7c18eb49900a2b8", "gitDirty": "0"
+  }
+}

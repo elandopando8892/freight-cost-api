@@ -7,6 +7,11 @@ HEAD base del incremento de revisión comercial: `3b4f6a8`
 
 ## Lectura ejecutiva
 
+Incremento posterior 2026-09-08: recuperación de carga del equipo publicada en
+preview web/API `f739e83`. Google login y listado ADMIN comprobados; sales ADMIN
+y jgonzalez VIEWER conservados. Wireframes desktop/móvil incluidos. Rama de error
+no ejercitada en cloud; QA VIEWER/renovación sigue pendiente. Ver `TEAM_LOADING_UX_2026-09-08.md`.
+
 Último incremento 2026-09-08: listado de equipo recuperado en preview `725646a` y
 rol de jgonzalez cambiado de OPERATOR a VIEWER con vista previa, confirmación,
 auditoría y persistencia. Sales permanece ADMIN. Falta login real de jgonzalez para
