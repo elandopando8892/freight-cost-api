@@ -17,6 +17,7 @@ import { buildQuoteCalculationSnapshot, isQuoteCalculationSnapshot, verifyQuoteC
 import { buildRatewareHandoff, confirmationEligibility, ratewareEconomicsDriftReasons } from './quote-governance.js'
 import { assessRatewareCandidate, assessRatewareReadiness } from './rateware-candidate.js'
 import { pricingInputIssues } from '../engine/engine-input-validation.js'
+import { CustomerProposalDraftRequestSchema, buildCustomerProposalDraftPreview } from './customer-proposal-draft.js'
 
 const MarketConditionEnum = z.enum([
   'Very Tight', 'Moderately Tight', 'Balanced', 'Slightly Loose', 'Very Loose',
@@ -301,6 +302,31 @@ export async function quotesRoutes(app: FastifyInstance) {
         confirmedBy: { select: { id: true, email: true } },
         auditEvents: { include: { actor: { select: { id: true, email: true } } }, orderBy: { createdAt: 'asc' } },
       },
+    })
+  })
+
+  app.post('/quotes/:id/customer-proposal-draft/preview', { preHandler: requireRole('ADMIN', 'OPERATOR') }, async (request) => {
+    const user = request.user as JwtPayload
+    const { id } = request.params as { id: string }
+    const idempotencyHeader = request.headers['idempotency-key']
+    const idempotencyKey = Array.isArray(idempotencyHeader) ? idempotencyHeader[0] : idempotencyHeader
+    const body = CustomerProposalDraftRequestSchema.parse(request.body)
+    const quote = await prisma.quote.findFirstOrThrow({
+      where: { id, orgId: user.orgId },
+      select: {
+        id: true,
+        status: true,
+        confirmedAt: true,
+        explanation: true,
+        lane: { select: { origin: true, destination: true } },
+      },
+    })
+    const eligibility = confirmationEligibility(quote.explanation)
+    return buildCustomerProposalDraftPreview({
+      quote,
+      request: body,
+      eligibility,
+      idempotencyKey: idempotencyKey ?? '',
     })
   })
 

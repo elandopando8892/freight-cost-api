@@ -63,10 +63,16 @@ Iniciado:
 - El contrato propuesto para esa futura conexión quedó documentado en
   `docs/architecture/ADR-003-quote-to-quote-desk-contract.md`: acción server-side,
   payload comercial mínimo, aislamiento por `orgId`, redacción de costo interno,
-  idempotencia y rollback. Sigue sin endpoint, migración, borrador o correo creados.
+  idempotencia y rollback. Sigue sin endpoint persistente, migración, borrador o correo creados.
 - El wireframe ahora cubre “Preparar propuesta” en desktop y mobile, con revisión
   previa, CTA fijo, exclusiones de datos internos y estados VIEWER/rechazo; todavía
   no existe botón funcional ni se crea un borrador.
+- El API ya tiene un preview reversible en
+  `POST /quotes/:id/customer-proposal-draft/preview`: exige `ADMIN/OPERATOR`,
+  limita la lectura por `orgId`, devuelve sólo el payload comercial redacted y
+  calcula una huella de reintento. Las pruebas focalizadas cubren 7 casos; no
+  persiste `CustomerQuote`, no ejecuta email y no reemplaza la futura idempotencia
+  persistente.
 - Se conserva el límite: guardar una cotización no publica tarifas ni envía comunicaciones.
 
 Siguiente incremento:
@@ -74,9 +80,8 @@ Siguiente incremento:
 - Validar el recorrido captura → cálculo → resultado → guardado → reapertura con datos sintéticos.
 - Cubrir estados loading, error, sin base gobernada y VIEWER.
 - Completar QA visual desktop/mobile del recorrido.
-- Diseñar wireframes de “Preparar propuesta” y autorizar por separado su implementación;
-- el wireframe quedó listo; falta autorizar por separado la implementación del
-  endpoint y la acción funcional. El ADR-003 no activa la integración.
+- El wireframe quedó listo; falta autorizar por separado la implementación del
+  endpoint de persistencia y la acción funcional. El ADR-003 no activa la integración.
 
 ## Sprints siguientes
 

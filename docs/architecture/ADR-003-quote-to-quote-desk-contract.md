@@ -1,6 +1,6 @@
 # ADR-003: contrato controlado entre cotización interna y Quote Desk
 
-- **Estado:** Propuesto; no implementado
+- **Estado:** Propuesto; preview técnico implementado, persistencia no implementada
 - **Fecha:** 2026-09-07
 - **Decisores:** producto MARKSMAN, ingeniería FCM y responsable humano de la propuesta
 - **Ámbito:** Freight Cost Model MVP, mismo `orgId`
@@ -39,6 +39,13 @@ POST /quotes/:quoteId/customer-proposal-draft
 Idempotency-Key: <uuid>
 Content-Type: application/json
 ```
+
+El incremento actual implementa únicamente el endpoint reversible
+`POST /quotes/:quoteId/customer-proposal-draft/preview`. Devuelve
+`mode: PREVIEW_ONLY`, un `idempotencyFingerprint` determinista y el payload
+redactado; no llama a `customerQuote.create`. El endpoint de persistencia de
+arriba sigue bloqueado hasta resolver el vínculo persistente de fuente y la
+idempotencia en el modelo comercial.
 
 Payload mínimo permitido (propuesta, no vigente):
 
@@ -107,7 +114,8 @@ permite apagar la capacidad sin alterar el cálculo.
 - **Aislamiento:** todas las lecturas/escrituras incluyen `orgId`; nunca confiar
   en un `orgId` del payload.
 - **Idempotencia:** `Idempotency-Key` y/o una huella de fuente + intención deben
-  impedir duplicados accidentales por doble clic o reintento de red.
+  impedir duplicados accidentales por doble clic o reintento de red. El preview
+  actual sólo calcula la huella; no afirma prevenir duplicados sin almacenamiento.
 - **Auditoría:** registrar actor, fuente, resultado, versión de contrato y
   motivo de rechazo; no registrar secretos ni texto sensible innecesario.
 - **Redacción:** pruebas que fallen si el payload de `CustomerQuote` contiene
@@ -140,15 +148,14 @@ de integración y mantener intacta la cotización fuente.
 ## No realizado en este incremento
 
 - No se modificó `schema.prisma`, Neon, Supabase Auth ni datos de negocio.
-- No se llamó a `/customer-quotes`, no se creó `CustomerQuote` y no se envió
-  ningún correo.
-- No se añadió botón ni se cambió el wireframe; la UI queda bloqueada hasta que
-  exista la especificación visual y una autorización de implementación.
+- No se llamó a `/customer-quotes`, no se creó `CustomerQuote`, no se ejecutó
+  persistencia desde el preview y no se envió ningún correo.
+- No se añadió botón funcional; el wireframe existe, pero la UI queda bloqueada
+  hasta que haya una autorización específica para activar persistencia.
 
 ## Próximo paso
 
-Tras aprobación puntual, crear el wireframe de la acción y sus estados, luego
-implementar el comando server-side con pruebas de autorización, aislamiento,
-redacción e idempotencia. La preparación de una propuesta seguirá siendo una
-acción humana confirmada.
-
+Tras aprobación puntual, añadir el vínculo persistente de fuente y la idempotencia
+al modelo comercial, implementar el comando server-side y conectar la UI contra
+el contrato probado. La preparación de una propuesta seguirá siendo una acción
+humana confirmada.
