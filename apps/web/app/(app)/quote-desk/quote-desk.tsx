@@ -383,6 +383,7 @@ export function QuoteDesk({
         <DeskMetric label="Aprobadas" value={approvedCount} />
         <DeskMetric label="Plantillas" value={templates.length} last />
       </div>
+      <ProposalFlow draftCount={draftCount} reviewCount={reviewCount} approvedCount={approvedCount} />
       {canEdit && open && (
         <Card className="border-primary/20">
           <CardHeader className="border-b bg-muted/25 pb-4">
@@ -973,6 +974,29 @@ function DeskMetric({
       <div className="text-[11px] text-muted-foreground">{label}</div>
     </div>
   );
+}
+
+function ProposalFlow({ draftCount, reviewCount, approvedCount }: { draftCount: number; reviewCount: number; approvedCount: number }) {
+  const stages = [
+    { label: "Capturar", detail: `${draftCount} borrador${draftCount === 1 ? "" : "es"}` },
+    { label: "Revisar", detail: `${reviewCount} en revisión` },
+    { label: "Aprobar", detail: `${approvedCount} aprobada${approvedCount === 1 ? "" : "s"}` },
+    { label: "Enviar manual", detail: "Confirmación humana" },
+  ]
+  return (
+    <ol className="grid gap-2 rounded-md border bg-muted/20 p-2 sm:grid-cols-4" aria-label="Flujo de propuesta comercial">
+      {stages.map((stage, index) => (
+        <li key={stage.label} className="relative rounded border bg-background/70 px-3 py-2">
+          <div className="flex items-center gap-2">
+            <span className="grid size-5 shrink-0 place-items-center rounded-full bg-primary/10 text-[10px] font-semibold text-primary" aria-hidden="true">{index + 1}</span>
+            <span className="text-xs font-medium">{stage.label}</span>
+          </div>
+          <span className="mt-1 block pl-7 text-[10px] text-muted-foreground">{stage.detail}</span>
+          {index < stages.length - 1 ? <span className="absolute -right-2 top-1/2 hidden h-px w-2 bg-border sm:block" aria-hidden="true" /> : null}
+        </li>
+      ))}
+    </ol>
+  )
 }
 
 function CaptureSummary({
