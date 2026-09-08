@@ -86,6 +86,32 @@ type SupabaseAuthUser = {
   email_confirmed_at?: unknown;
 };
 
+type UserLinkCandidate = {
+  id: string;
+  orgId: string;
+  role: Role;
+  identityLinked: boolean;
+};
+
+/**
+ * Transitional lookup for databases where legacy users can still have a null
+ * supabaseId while the generated Prisma client already models it as required.
+ * Selecting only a boolean avoids decoding that legacy null as a String.
+ */
+async function findUserLinkCandidate(email: string) {
+  const candidates = await prisma.$queryRaw<UserLinkCandidate[]>`
+    SELECT
+      "id",
+      "orgId",
+      "role",
+      ("supabaseId" IS NOT NULL) AS "identityLinked"
+    FROM "User"
+    WHERE LOWER("email") = LOWER(${email})
+    LIMIT 1
+  `;
+  return candidates[0] ?? null;
+}
+
 /** Confirm the email with the Auth server before it can link or select a tenant. */
 async function verifiedEmailForFirstLink(token: string, claims: SupabaseClaims) {
   const response = await fetch(`${configuredIssuer()}/user`, {
@@ -128,11 +154,9 @@ export async function resolveUser(
 
   const email = await verifiedEmailForFirstLink(token, claims);
 
-  const byEmail = await prisma.user.findFirst({
-    where: { email: { equals: email, mode: "insensitive" } },
-  });
+  const byEmail = await findUserLinkCandidate(email);
   if (byEmail) {
-    if (byEmail.supabaseId && byEmail.supabaseId !== supabaseId) {
+    if (byEmail.identityLinked) {
       throw new Error("Email is already linked to another Supabase identity");
     }
     const linked = await prisma.user.update({

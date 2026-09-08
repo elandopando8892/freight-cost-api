@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const prisma = {
+  $queryRaw: vi.fn(),
   user: {
     findUnique: vi.fn(),
     findFirst: vi.fn(),
@@ -35,6 +36,7 @@ function claims(sub = "new-supabase-subject") {
 describe("Supabase identity resolution", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    prisma.$queryRaw.mockResolvedValue([]);
     prisma.user.findUnique.mockResolvedValue(null);
     prisma.user.findFirst.mockResolvedValue(null);
     prisma.assumptionSet.findFirst.mockResolvedValue({ id: "set-1" });
@@ -57,13 +59,14 @@ describe("Supabase identity resolution", () => {
   });
 
   it("never reassigns an email already linked to another Supabase subject", async () => {
-    prisma.user.findFirst.mockResolvedValueOnce({
-      id: "existing-user",
-      orgId: "org-existing",
-      email: "pilot@example.com",
-      role: "ADMIN",
-      supabaseId: "different-supabase-subject",
-    });
+    prisma.$queryRaw.mockResolvedValueOnce([
+      {
+        id: "existing-user",
+        orgId: "org-existing",
+        role: "ADMIN",
+        identityLinked: true,
+      },
+    ]);
 
     await expect(resolveUser(claims(), "token-1")).rejects.toThrow(/already linked/i);
     expect(prisma.user.update).not.toHaveBeenCalled();
@@ -71,13 +74,14 @@ describe("Supabase identity resolution", () => {
   });
 
   it("links an existing unlinked user by verified Supabase email without changing tenant or role", async () => {
-    prisma.user.findFirst.mockResolvedValueOnce({
-      id: "existing-user",
-      orgId: "org-existing",
-      email: "pilot@example.com",
-      role: "OPERATOR",
-      supabaseId: null,
-    });
+    prisma.$queryRaw.mockResolvedValueOnce([
+      {
+        id: "existing-user",
+        orgId: "org-existing",
+        role: "OPERATOR",
+        identityLinked: false,
+      },
+    ]);
     prisma.user.update.mockResolvedValueOnce({
       id: "existing-user",
       orgId: "org-existing",
@@ -131,7 +135,7 @@ describe("Supabase identity resolution", () => {
     );
 
     await expect(resolveUser(claims(), "token-1")).rejects.toThrow(/confirmed matching email/i);
-    expect(prisma.user.findFirst).not.toHaveBeenCalled();
+    expect(prisma.$queryRaw).not.toHaveBeenCalled();
     expect(acceptPendingOrganizationInvitation).not.toHaveBeenCalled();
     expect(prisma.user.create).not.toHaveBeenCalled();
   });
