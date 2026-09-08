@@ -8,6 +8,7 @@ import { OrgNameForm } from './org-name-form'
 import { GmailIntegrationCard } from './gmail-integration-card'
 import { TeamInvitations } from './team-invitations'
 import { TeamMembers, type MemberRoleAudit, type TeamMember } from './team-members'
+import { TeamLoadError } from './team-load-error'
 import { logout } from '../../auth/actions'
 
 export const dynamic = 'force-dynamic'
@@ -28,7 +29,7 @@ export default async function SettingsPage() {
   const { data: { user } } = await supabase.auth.getUser()
   const [org, members, me, invitations, roleAudits] = await Promise.all([
     api<Org>('/org').catch(() => null),
-    api<TeamMember[]>('/org/members').catch(() => [] as TeamMember[]),
+    api<TeamMember[]>('/org/members').catch(() => null),
     api<Me>('/auth/me').catch(() => null),
     api<Invitation[]>('/org/invitations').catch(() => [] as Invitation[]),
     api<MemberRoleAudit[]>('/org/member-role-audits').catch(() => [] as MemberRoleAudit[]),
@@ -64,12 +65,12 @@ export default async function SettingsPage() {
             </div>
           ) : null}
 
-          <TeamMembers
+          {members === null ? <TeamLoadError /> : <TeamMembers
             members={members}
             currentUserId={me?.id ?? null}
             canManageRoles={me?.role === 'ADMIN'}
             audits={roleAudits}
-          />
+          />}
           {me?.role === 'ADMIN' ? <TeamInvitations invitations={invitations} /> : null}
         </CardContent>
       </Card>

@@ -136,6 +136,9 @@ export function TeamMembers({
             </tr>
           </thead>
           <tbody>
+            {members.length === 0 ? (
+              <tr><td colSpan={5} className="px-3 py-4 text-muted-foreground">No hay integrantes para mostrar.</td></tr>
+            ) : null}
             {members.map((member) => {
               const nextRole = draftRoles[member.id] ?? member.role
               const isCurrentUser = member.id === currentUserId
