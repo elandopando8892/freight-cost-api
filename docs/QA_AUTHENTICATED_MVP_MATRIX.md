@@ -6,6 +6,12 @@ Rama: `codex/supabase-auth-slice`
 
 ## Estado de evidencia
 
+Actualización 2026-09-08: roster preview reparado y cambio gobernado de
+jgonzalez@xbfreight.com OPERATOR → VIEWER aplicado, auditado y persistente tras
+recarga; sales@heymarksman.com permanece ADMIN. Falta iniciar sesión como jgonzalez
+y comprobar la experiencia sólo lectura, por lo que AUTH-07 continúa PENDIENTE.
+Ver `TEAM_ROSTER_COMPATIBILITY_2026-09-08.md`.
+
 Regresión local posterior 2026-09-08: 32/32 pruebas de revisión comercial y roles;
 incluye rechazo de claims de rol del cliente y equivalencia de errores para fuente
 ajena/inexistente con ADMIN/OPERATOR. Identidad/Prisma simulados: no cambia ningún

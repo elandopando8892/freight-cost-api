@@ -7,6 +7,11 @@ HEAD base del incremento de revisión comercial: `3b4f6a8`
 
 ## Lectura ejecutiva
 
+Último incremento 2026-09-08: listado de equipo recuperado en preview `725646a` y
+rol de jgonzalez cambiado de OPERATOR a VIEWER con vista previa, confirmación,
+auditoría y persistencia. Sales permanece ADMIN. Falta login real de jgonzalez para
+validar sólo lectura; no se cierra AUTH-07. Ver `TEAM_ROSTER_COMPATIBILITY_2026-09-08.md`.
+
 Último incremento 2026-09-08: arreglo responsive publicado en web/API preview
 alineados `00cfa51`. Detalle sin overflow a 390/1280/1440 px; Google login,
 revisión comercial ADMIN y recarga reales comprobados. El pendiente de despliegue
