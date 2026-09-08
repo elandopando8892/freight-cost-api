@@ -6,8 +6,13 @@ Rama: `codex/supabase-auth-slice`
 
 ## Estado de evidencia
 
-La matriz está preparada, pero permanece **PENDIENTE** hasta disponer de una sesión
-Supabase real en un preview/local autorizado. La cobertura de rutas sin sesión y la
+Actualización 2026-09-08: el preview alineado `7a3d92d` ya tiene evidencia real
+de Google login, recarga, panel e historial con la cuenta existente ADMIN.
+Ver `PREVIEW_RELEASE_2026-09-08.md`. Esta comprobación de lectura no sustituye los
+casos OPERATOR/VIEWER de la tabla, ni confirma renovación o recorrido comercial.
+
+La matriz completa permanece **PENDIENTE** hasta completar los casos con roles y
+datos de prueba autorizados en el preview. La cobertura de rutas sin sesión y la
 compilación no sustituyen el intercambio OAuth, la persistencia de sesión ni la
 renovación por expiración.
 

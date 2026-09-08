@@ -7,6 +7,11 @@ HEAD base del incremento de revisión comercial: `3b4f6a8`
 
 ## Lectura ejecutiva
 
+Release preview autorizado 2026-09-08: web/API `7a3d92d` READY, login Google real
+y recarga comprobados con ADMIN existente, sin migraciones ni cambios de Auth.
+El desfase descrito abajo queda resuelto para esta pareja nueva. Recorrido comercial,
+OPERATOR/VIEWER y renovación siguen pendientes. Ver `PREVIEW_RELEASE_2026-09-08.md`.
+
 Actualización 2026-09-08: se agregó `verify:preview-revisions`. La consulta viva de
 metadatos declara web `b4bdd4d` y API `f6e0d64` con `gitDirty=1`; la revisión
 comercial `06bc5ab` sigue validada localmente, no en esos previews. QA autenticada
