@@ -5,6 +5,7 @@ import { authenticate } from '../../middleware/authenticate.js'
 import { requireRole } from '../../middleware/authorize.js'
 import type { JwtPayload } from '../auth/auth.schema.js'
 import { prisma } from '../../config/prisma.js'
+import { listOrganizationMembers } from './organization-members.js'
 import {
   effectiveInvitationStatus,
   normalizeInvitationEmail,
@@ -87,15 +88,7 @@ export async function orgRoutes(app: FastifyInstance) {
   // Read-only roster of users in the caller's org.
   app.get('/org/members', async (request) => {
     const { orgId } = request.user as JwtPayload
-    const members = await prisma.user.findMany({
-      where: { orgId },
-      select: { id: true, email: true, role: true, supabaseId: true, createdAt: true },
-      orderBy: { createdAt: 'asc' },
-    })
-    return members.map(({ supabaseId, ...member }) => ({
-      ...member,
-      identityLinked: Boolean(supabaseId),
-    }))
+    return listOrganizationMembers(orgId)
   })
 
   app.get('/org/member-role-audits', { preHandler: requireRole('ADMIN') }, async (request) => {
