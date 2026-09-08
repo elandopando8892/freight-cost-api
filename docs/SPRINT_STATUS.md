@@ -7,6 +7,11 @@ HEAD base del incremento de revisión comercial: `3b4f6a8`
 
 ## Lectura ejecutiva
 
+Incremento posterior 2026-09-08: Configuración en español y distinción entre rol
+actual y rol histórico de invitación publicados en preview `f2870fe`. Sesión ADMIN
+y textos comprobados; wireframe desktop/móvil incluido. Ajuste responsive móvil
+implementado, aún no validado en navegador. Ver `SETTINGS_ROLE_COPY_2026-09-08.md`.
+
 Incremento posterior 2026-09-08: recuperación de carga del equipo publicada en
 preview web/API `f739e83`. Google login y listado ADMIN comprobados; sales ADMIN
 y jgonzalez VIEWER conservados. Wireframes desktop/móvil incluidos. Rama de error
