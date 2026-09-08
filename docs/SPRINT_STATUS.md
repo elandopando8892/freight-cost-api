@@ -60,6 +60,10 @@ Iniciado:
   (`Ruta`, `Tarifa base`, `Piso de costo`, `Recomendada`), sin enviar automáticamente.
 - Quote Desk ahora hace visible el flujo Capturar → Revisar → Aprobar → Enviar manual;
   los estados son informativos y no conectan todavía una cotización interna con una propuesta externa.
+- El contrato propuesto para esa futura conexión quedó documentado en
+  `docs/architecture/ADR-003-quote-to-quote-desk-contract.md`: acción server-side,
+  payload comercial mínimo, aislamiento por `orgId`, redacción de costo interno,
+  idempotencia y rollback. Sigue sin endpoint, migración, borrador o correo creados.
 - Se conserva el límite: guardar una cotización no publica tarifas ni envía comunicaciones.
 
 Siguiente incremento:
@@ -67,6 +71,8 @@ Siguiente incremento:
 - Validar el recorrido captura → cálculo → resultado → guardado → reapertura con datos sintéticos.
 - Cubrir estados loading, error, sin base gobernada y VIEWER.
 - Completar QA visual desktop/mobile del recorrido.
+- Diseñar wireframes de “Preparar propuesta” y autorizar por separado su implementación;
+  el ADR-003 no activa la integración.
 
 ## Sprints siguientes
 
