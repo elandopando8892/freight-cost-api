@@ -64,6 +64,9 @@ Iniciado:
   `docs/architecture/ADR-003-quote-to-quote-desk-contract.md`: acción server-side,
   payload comercial mínimo, aislamiento por `orgId`, redacción de costo interno,
   idempotencia y rollback. Sigue sin endpoint, migración, borrador o correo creados.
+- El wireframe ahora cubre “Preparar propuesta” en desktop y mobile, con revisión
+  previa, CTA fijo, exclusiones de datos internos y estados VIEWER/rechazo; todavía
+  no existe botón funcional ni se crea un borrador.
 - Se conserva el límite: guardar una cotización no publica tarifas ni envía comunicaciones.
 
 Siguiente incremento:
@@ -72,7 +75,8 @@ Siguiente incremento:
 - Cubrir estados loading, error, sin base gobernada y VIEWER.
 - Completar QA visual desktop/mobile del recorrido.
 - Diseñar wireframes de “Preparar propuesta” y autorizar por separado su implementación;
-  el ADR-003 no activa la integración.
+- el wireframe quedó listo; falta autorizar por separado la implementación del
+  endpoint y la acción funcional. El ADR-003 no activa la integración.
 
 ## Sprints siguientes
 
