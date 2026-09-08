@@ -91,6 +91,36 @@ describe('customer proposal preview HTTP contract (real authorization and snapsh
     expect(response.json()).not.toHaveProperty('draft')
     expect(prisma.quote.findFirst).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 'quote-1', orgId: 'org-2' } }))
   })
+  it.each(['ADMIN', 'OPERATOR'])('does not distinguish foreign and missing sources for %s', async (role) => {
+    Object.assign(auth, { role, orgId: 'org-2' })
+    const foreign = await send()
+    const missing = await app.inject({
+      method: 'POST', url: '/quotes/missing-quote/customer-proposal-draft/preview',
+      headers: { 'idempotency-key': 'preview-key-20260907' }, payload,
+    })
+    expect(foreign.statusCode).toBe(404)
+    expect(missing.statusCode).toBe(404)
+    // Correlation IDs identify requests, not whether a source exists.
+    const { requestId: foreignRequestId, ...foreignBody } = foreign.json()
+    const { requestId: missingRequestId, ...missingBody } = missing.json()
+    expect(foreignRequestId).toEqual(expect.any(String))
+    expect(missingRequestId).toEqual(expect.any(String))
+    expect(missingBody).toEqual(foreignBody)
+    expect(Object.keys(foreignBody)).toEqual(['error'])
+    expect(prisma.quote.findFirst).toHaveBeenLastCalledWith(expect.objectContaining({
+      where: { id: 'missing-quote', orgId: 'org-2' },
+    }))
+  })
+  it('does not elevate a VIEWER using client role or organization claims', async () => {
+    auth.role = 'VIEWER'
+    const response = await app.inject({
+      method: 'POST', url: '/quotes/quote-1/customer-proposal-draft/preview',
+      headers: { 'idempotency-key': 'preview-key-20260907', 'x-role': 'ADMIN', 'x-org-id': 'org-1' },
+      payload: { ...payload, role: 'ADMIN', orgId: 'org-1' },
+    })
+    expect(response.statusCode).toBe(403)
+    expect(prisma.quote.findFirst).not.toHaveBeenCalled()
+  })
   it.each(['DRAFT', 'ARCHIVED'])('blocks %s quotes', async (status) => {
     quote.status = status
     expect((await send()).statusCode).toBe(409)

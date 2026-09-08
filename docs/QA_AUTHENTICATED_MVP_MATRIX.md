@@ -6,6 +6,11 @@ Rama: `codex/supabase-auth-slice`
 
 ## Estado de evidencia
 
+Regresión local posterior 2026-09-08: 32/32 pruebas de revisión comercial y roles;
+incluye rechazo de claims de rol del cliente y equivalencia de errores para fuente
+ajena/inexistente con ADMIN/OPERATOR. Identidad/Prisma simulados: no cambia ningún
+caso autenticado a PASS. Ver `PERMISSION_REGRESSION_2026-09-08.md`.
+
 Última comprobación 2026-09-08: preview web/API `00cfa51` alineado. Arreglo móvil
 ya desplegado, detalle sin overflow a 390/1280/1440 px y revisión comercial a 390 px.
 Google login ADMIN y recarga reales aprobados en este origen; revisión comercial
