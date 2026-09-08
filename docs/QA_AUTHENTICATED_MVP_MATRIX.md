@@ -6,6 +6,13 @@ Rama: `codex/supabase-auth-slice`
 
 ## Estado de evidencia
 
+Última comprobación 2026-09-08: preview web/API `00cfa51` alineado. Arreglo móvil
+ya desplegado, detalle sin overflow a 390/1280/1440 px y revisión comercial a 390 px.
+Google login ADMIN y recarga reales aprobados en este origen; revisión comercial
+respondió con fuente existente y cliente ficticio. Esto resuelve el pendiente local
+de layout descrito abajo, no AUTH-09 completo ni casos OPERATOR/VIEWER/renovación.
+Evidencia: `PREVIEW_RESPONSIVE_RELEASE_2026-09-08.md`.
+
 Actualización posterior 2026-09-08: dos revisiones comerciales reales ADMIN con
 respuesta 200, edición y descarte al cerrar; fuente del piloto existente y cliente
 ficticio. AUTH-11 queda parcial, no PASS OPERATOR/sintético. La revisión móvil

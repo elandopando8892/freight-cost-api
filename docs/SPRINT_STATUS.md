@@ -7,6 +7,13 @@ HEAD base del incremento de revisión comercial: `3b4f6a8`
 
 ## Lectura ejecutiva
 
+Último incremento 2026-09-08: arreglo responsive publicado en web/API preview
+alineados `00cfa51`. Detalle sin overflow a 390/1280/1440 px; Google login,
+revisión comercial ADMIN y recarga reales comprobados. El pendiente de despliegue
+del ajuste descrito abajo queda resuelto. OPERATOR/VIEWER y renovación continúan
+pendientes; no se recalcula el porcentaje global ni se cierra sprint por este gate.
+Ver `PREVIEW_RESPONSIVE_RELEASE_2026-09-08.md`.
+
 Incremento posterior 2026-09-08: revisión comercial real ADMIN con dos respuestas
 200, edición y descarte probados. Se detectó overflow del detalle móvil en preview
 y se corrigió localmente con wireframe y fixture de regresión. No está publicado
