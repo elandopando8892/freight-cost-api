@@ -8,6 +8,7 @@ import { DeleteQuoteButton } from './delete-button'
 import { ShareButtons } from './share-buttons'
 import { SnapshotVerifier } from './snapshot-verifier'
 import { QuoteConfirmation, RatewareHandoffDownload } from './quote-confirmation'
+import { ProposalPreviewAction } from './proposal-preview'
 
 export const dynamic = 'force-dynamic'
 
@@ -183,6 +184,7 @@ export default async function QuoteDetailPage(
             }}
           />
           <QuoteConfirmation quoteId={q.id} status={q.status} confirmedAt={q.confirmedAt} confirmedBy={q.confirmedBy} confirmationNote={q.confirmationNote} canEdit={canEdit} />
+          <ProposalPreviewAction quoteId={q.id} status={q.status} canEdit={canEdit} />
           {canEdit && q.status === 'CONFIRMED' && <RatewareHandoffDownload quoteId={q.id} />}
           {canEdit ? <Link
             href={`/quote?quoteId=${encodeURIComponent(q.id)}`}

@@ -17,7 +17,7 @@ import { buildQuoteCalculationSnapshot, isQuoteCalculationSnapshot, verifyQuoteC
 import { buildRatewareHandoff, confirmationEligibility, ratewareEconomicsDriftReasons } from './quote-governance.js'
 import { assessRatewareCandidate, assessRatewareReadiness } from './rateware-candidate.js'
 import { pricingInputIssues } from '../engine/engine-input-validation.js'
-import { CustomerProposalDraftRequestSchema, buildCustomerProposalDraftPreview } from './customer-proposal-draft.js'
+import { CustomerProposalDraftRequestSchema, ProposalPreviewKeySchema, buildCustomerProposalDraftPreview } from './customer-proposal-draft.js'
 
 const MarketConditionEnum = z.enum([
   'Very Tight', 'Moderately Tight', 'Balanced', 'Slightly Loose', 'Very Loose',
@@ -305,13 +305,14 @@ export async function quotesRoutes(app: FastifyInstance) {
     })
   })
 
-  app.post('/quotes/:id/customer-proposal-draft/preview', { preHandler: requireRole('ADMIN', 'OPERATOR') }, async (request) => {
+  app.post('/quotes/:id/customer-proposal-draft/preview', { preHandler: requireRole('ADMIN', 'OPERATOR') }, async (request, reply) => {
+    reply.header('Cache-Control', 'no-store')
     const user = request.user as JwtPayload
     const { id } = request.params as { id: string }
     const idempotencyHeader = request.headers['idempotency-key']
-    const idempotencyKey = Array.isArray(idempotencyHeader) ? idempotencyHeader[0] : idempotencyHeader
+    const idempotencyKey = ProposalPreviewKeySchema.parse(idempotencyHeader)
     const body = CustomerProposalDraftRequestSchema.parse(request.body)
-    const quote = await prisma.quote.findFirstOrThrow({
+    const quote = await prisma.quote.findFirst({
       where: { id, orgId: user.orgId },
       select: {
         id: true,
@@ -321,12 +322,19 @@ export async function quotesRoutes(app: FastifyInstance) {
         lane: { select: { origin: true, destination: true } },
       },
     })
-    const eligibility = confirmationEligibility(quote.explanation)
+    if (!quote) throw httpError('La cotización no está disponible.', 404)
+    if (quote.status !== 'CONFIRMED') throw httpError('Confirma la cotización antes de revisar una propuesta.', 409)
+    let eligibility: ReturnType<typeof confirmationEligibility>
+    try {
+      eligibility = confirmationEligibility(quote.explanation)
+    } catch {
+      throw httpError('La evidencia guardada no permite revisar esta propuesta.', 409)
+    }
     return buildCustomerProposalDraftPreview({
       quote,
       request: body,
       eligibility,
-      idempotencyKey: idempotencyKey ?? '',
+      idempotencyKey,
     })
   })
 

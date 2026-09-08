@@ -39,6 +39,12 @@ sintéticos y la persona que ejecuta debe conservar capturas y timestamps.
 | AUTH-08 | Renovación | Esperar expiración controlada o usar ventana autorizada; recargar y repetir una lectura | Cookie/sesión se renueva por el flujo vigente; la app no pierde organización ni rol | Timestamps, status de red y captura; nunca token | PENDIENTE |
 | AUTH-09 | Visual responsive | Repetir AUTH-02/AUTH-04 en los tres viewports | Layout coincide con wireframe, no hay scroll horizontal ni CTA duplicado | Capturas con viewport visible | PENDIENTE |
 | AUTH-10 | Salida / rollback | Cerrar sesión y volver a `/quote` | Redirección a login; no quedan datos privados renderizados en la pantalla | Captura y status 307/route guard | PENDIENTE |
+| AUTH-11 | `OPERATOR` · revisión comercial | Detalle confirmado → Revisar propuesta → completar cliente/vigencia → Ver propuesta → Editar datos → cerrar | Preview 200 con mismo origen, tarifa verificada y cabecera de reintento; no se crean propuestas/correos | Capturas desktop/mobile y estados de red redactados | PENDIENTE |
+| AUTH-12 | Revisión · permisos / fuente | `VIEWER` consulta detalle; operador intenta ID inexistente/ajeno en datos de prueba | VIEWER sin acción; API 403/404 según caso, sin datos de otra organización | Capturas y respuestas sin identificadores reales | PENDIENTE |
+
+La prueba local de `apps/web/scripts/proposal-review-smoke.mjs` valida el componente
+con respuestas sintéticas y el contrato HTTP se prueba con Prisma simulado. Esa
+evidencia está en `docs/design/PROPOSAL_REVIEW_HANDOFF.md`; no cambia AUTH-11/12 a PASS.
 
 ## Criterios de salida
 

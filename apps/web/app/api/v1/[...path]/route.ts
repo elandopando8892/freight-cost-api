@@ -6,6 +6,7 @@
  */
 import { type NextRequest, NextResponse } from "next/server";
 import { buildBffUpstreamUrl } from "@/lib/bff-upstream";
+import { buildBffRequestHeaders } from "@/lib/bff-request-headers";
 import { verifiedAccessToken } from "@/lib/supabase/session";
 
 const API_URL = process.env.API_URL ?? "http://localhost:3000";
@@ -32,10 +33,7 @@ async function handle(
     );
   }
 
-  const headers = new Headers();
-  const ct = request.headers.get("content-type");
-  if (ct) headers.set("content-type", ct);
-  if (token) headers.set("authorization", `Bearer ${token}`);
+  const headers = buildBffRequestHeaders(request.headers, token);
 
   const init: RequestInit = {
     method: request.method,

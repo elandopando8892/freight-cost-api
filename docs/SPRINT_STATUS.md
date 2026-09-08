@@ -3,7 +3,7 @@
 Fecha de corte: 2026-09-07  
 Checkout: `D:\\andre\\worktrees\\freight-cost-model\\supabase-auth-migration-20260830`  
 Rama: `codex/supabase-auth-slice`  
-HEAD: `e31c32d` antes de este incremento
+HEAD base del incremento de revisión comercial: `3b4f6a8`
 
 ## Lectura ejecutiva
 
@@ -65,14 +65,25 @@ Iniciado:
   payload comercial mínimo, aislamiento por `orgId`, redacción de costo interno,
   idempotencia y rollback. Sigue sin endpoint persistente, migración, borrador o correo creados.
 - El wireframe ahora cubre “Preparar propuesta” en desktop y mobile, con revisión
-  previa, CTA fijo, exclusiones de datos internos y estados VIEWER/rechazo; todavía
-  no existe botón funcional ni se crea un borrador.
+  previa, CTA fijo, exclusiones de datos internos y estados VIEWER/rechazo.
+  Su corte funcional de revisión, sin guardado, está en
+  `docs/design/proposal-review-wireframe.html`.
 - El API ya tiene un preview reversible en
   `POST /quotes/:id/customer-proposal-draft/preview`: exige `ADMIN/OPERATOR`,
-  limita la lectura por `orgId`, devuelve sólo el payload comercial redacted y
-  calcula una huella de reintento. Las pruebas focalizadas cubren 7 casos; no
+  limita la lectura por `orgId`, devuelve sólo el payload comercial permitido y
+  calcula una huella de reintento. Las pruebas focalizadas cubren 25 casos; no
   persiste `CustomerQuote`, no ejecuta email y no reemplaza la futura idempotencia
   persistente.
+- Desde el detalle confirmado, “Revisar propuesta” permite capturar cliente,
+  contacto, vigencia y condiciones; consultar la tarifa comercial; volver a editar
+  o cerrar. Cancelar descarta los campos y aborta la petición en curso.
+- El BFF conserva `Idempotency-Key` y toma la identidad de la sesión verificada.
+  La ruta rechaza fuentes ajenas con 404 y evidencia alterada con 409. La vigencia
+  usa fecha civil de México; las distancias transfronterizas muestran ambos tramos.
+- QA local del componente y CSS reales: 1440×900, 1280×800 y 390×844; revisión,
+  edición, errores, reintentos, cancelación, permisos y teclado. Respuestas API
+  simuladas; la matriz de QA autenticada sigue pendiente. Ver
+  `docs/design/PROPOSAL_REVIEW_HANDOFF.md`.
 - Se conserva el límite: guardar una cotización no publica tarifas ni envía comunicaciones.
 
 Siguiente incremento:
@@ -80,8 +91,9 @@ Siguiente incremento:
 - Validar el recorrido captura → cálculo → resultado → guardado → reapertura con datos sintéticos.
 - Cubrir estados loading, error, sin base gobernada y VIEWER.
 - Completar QA visual desktop/mobile del recorrido.
-- El wireframe quedó listo; falta autorizar por separado la implementación del
-  endpoint de persistencia y la acción funcional. El ADR-003 no activa la integración.
+- Probar el recorrido de revisión comercial con una sesión real y el mismo SHA
+  en frontend/API de preview. La persistencia queda pendiente del contrato de
+  linaje/idempotencia y de autorización para cualquier cambio de base de datos.
 
 ## Sprints siguientes
 

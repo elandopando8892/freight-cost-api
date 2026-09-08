@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { QuoteCalculationSnapshot } from '../src/modules/quotes/quote-snapshot.js'
 import {
   buildCustomerProposalDraftPreview,
@@ -48,6 +48,8 @@ const quote = {
 const eligibility = { eligible: true, reasons: [], snapshot }
 
 describe('customer proposal draft preview', () => {
+  beforeEach(() => { vi.useFakeTimers(); vi.setSystemTime(new Date('2026-09-07T12:00:00Z')) })
+  afterEach(() => vi.useRealTimers())
   it('derives a commercial line without leaking internal economics', () => {
     const result = buildCustomerProposalDraftPreview({
       quote,
@@ -114,5 +116,17 @@ describe('customer proposal draft preview', () => {
     expect(retry.idempotencyFingerprint).toBe(first.idempotencyFingerprint)
     expect(next.idempotencyFingerprint).not.toBe(first.idempotencyFingerprint)
   })
-})
 
+  it('labels both cross-border legs instead of presenting only the MX distance', () => {
+    const crossBorder = { ...snapshot, input: { ...snapshot.input, usaLeg: { loadedMiles: 520 } } } as QuoteCalculationSnapshot
+    const result = buildCustomerProposalDraftPreview({ quote, request, eligibility: { ...eligibility, snapshot: crossBorder }, idempotencyKey: 'preview-key-20260907' })
+    expect(result.draft.lines[0].distance).toBe('250 km MX + 520 mi US')
+  })
+
+  it('accepts tomorrow in Mexico even after UTC has crossed midnight', () => {
+    const now = new Date('2026-09-08T02:00:00Z') // Sep 7, 20:00 in Mexico City
+    const result = buildCustomerProposalDraftPreview({ quote, request: { ...request, validUntil: new Date('2026-09-08T00:00:00Z') }, eligibility, idempotencyKey: 'preview-key-20260907', now })
+    expect(result.draft.validUntil).toBe('2026-09-08T00:00:00.000Z')
+    expect(() => buildCustomerProposalDraftPreview({ quote, request: { ...request, validUntil: new Date('2026-09-07T00:00:00Z') }, eligibility, idempotencyKey: 'preview-key-20260907', now })).toThrow(/future/i)
+  })
+})

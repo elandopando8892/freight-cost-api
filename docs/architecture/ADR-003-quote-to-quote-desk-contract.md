@@ -1,6 +1,6 @@
 # ADR-003: contrato controlado entre cotización interna y Quote Desk
 
-- **Estado:** Propuesto; preview técnico implementado, persistencia no implementada
+- **Estado:** UI y API de revisión implementados localmente; persistencia propuesta
 - **Fecha:** 2026-09-07
 - **Decisores:** producto MARKSMAN, ingeniería FCM y responsable humano de la propuesta
 - **Ámbito:** Freight Cost Model MVP, mismo `orgId`
@@ -40,12 +40,24 @@ Idempotency-Key: <uuid>
 Content-Type: application/json
 ```
 
-El incremento actual implementa únicamente el endpoint reversible
+El incremento actual implementa el endpoint reversible
 `POST /quotes/:quoteId/customer-proposal-draft/preview`. Devuelve
 `mode: PREVIEW_ONLY`, un `idempotencyFingerprint` determinista y el payload
 redactado; no llama a `customerQuote.create`. El endpoint de persistencia de
 arriba sigue bloqueado hasta resolver el vínculo persistente de fuente y la
 idempotencia en el modelo comercial.
+
+El detalle confirmado ofrece “Revisar propuesta” y consume ese preview a través
+del BFF de sesión existente. Los pasos son captura → revisión → edición/cierre.
+El BFF reenvía `Idempotency-Key` sin aceptar identidad del cliente. La pantalla
+valida versión, modo, fuente y campos comerciales de la respuesta antes de
+mostrarla; no representa la revisión como un borrador persistido.
+
+`validUntil` entra como fecha civil `YYYY-MM-DD`, posterior al día actual de
+`America/Mexico_City`, y sale como ISO a medianoche UTC para compatibilidad de
+representación. No se interpreta como vencimiento instantáneo a medianoche UTC.
+La UI formatea siempre el día civil. La tarifa proviene del snapshot reproducible;
+si hay tramos MX y US se muestran ambas distancias con unidades, sin inventar un total.
 
 Payload mínimo permitido (propuesta, no vigente):
 
@@ -150,12 +162,12 @@ de integración y mantener intacta la cotización fuente.
 - No se modificó `schema.prisma`, Neon, Supabase Auth ni datos de negocio.
 - No se llamó a `/customer-quotes`, no se creó `CustomerQuote`, no se ejecutó
   persistencia desde el preview y no se envió ningún correo.
-- No se añadió botón funcional; el wireframe existe, pero la UI queda bloqueada
-  hasta que haya una autorización específica para activar persistencia.
+- Se añadió un botón funcional sólo para revisión; no hay botón de guardado,
+  aprobación ni envío dentro de este flujo. La QA autenticada no se ejecutó.
 
 ## Próximo paso
 
 Tras aprobación puntual, añadir el vínculo persistente de fuente y la idempotencia
-al modelo comercial, implementar el comando server-side y conectar la UI contra
-el contrato probado. La preparación de una propuesta seguirá siendo una acción
+al modelo comercial e implementar el comando server-side de guardado. La revisión
+ya consume el contrato de preview. La preparación de una propuesta seguirá siendo una acción
 humana confirmada.

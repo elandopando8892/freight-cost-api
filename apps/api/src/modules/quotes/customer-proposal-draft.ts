@@ -8,11 +8,13 @@ export const CustomerProposalDraftRequestSchema = z.object({
   contactEmail: z.string().email().optional().nullable(),
   quoteType: z.string().trim().min(2).max(80).default('Spot'),
   goodsValue: z.string().trim().max(120).optional().nullable(),
-  validUntil: z.coerce.date(),
+  validUntil: z.string().date().transform((value) => new Date(`${value}T00:00:00.000Z`)),
   notes: z.string().trim().max(4000).optional().nullable(),
 }).strict()
 
 export type CustomerProposalDraftRequest = z.infer<typeof CustomerProposalDraftRequestSchema>
+
+export const ProposalPreviewKeySchema = z.string().regex(/^[-A-Za-z0-9._~]{16,128}$/)
 
 type Eligibility = {
   eligible: boolean
@@ -89,6 +91,9 @@ function equipmentLabel(snapshot: QuoteCalculationSnapshot) {
 }
 
 function distanceLabel(snapshot: QuoteCalculationSnapshot) {
+  if (snapshot.input.mexLeg?.baseKm != null && snapshot.input.usaLeg?.loadedMiles != null) {
+    return `${snapshot.input.mexLeg.baseKm} km MX + ${snapshot.input.usaLeg.loadedMiles} mi US`
+  }
   if (snapshot.input.mexLeg?.baseKm != null) return `${snapshot.input.mexLeg.baseKm} km`
   if (snapshot.input.usaLeg?.loadedMiles != null) return `${snapshot.input.usaLeg.loadedMiles} mi`
   return null
@@ -120,13 +125,18 @@ export function buildCustomerProposalDraftPreview(input: {
   if (!quote.confirmedAt) {
     throw proposalError('The quote has no human confirmation timestamp.', 409)
   }
-  if (request.validUntil.getTime() <= now.getTime()) {
+  // Validity is a civil business date, not an instant at midnight UTC.
+  const todayParts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Mexico_City', year: 'numeric', month: '2-digit', day: '2-digit',
+  }).formatToParts(now)
+  const today = ['year', 'month', 'day'].map((type) => todayParts.find((part) => part.type === type)?.value).join('-')
+  if (!Number.isFinite(request.validUntil.getTime()) || request.validUntil.toISOString().slice(0, 10) <= today) {
     throw proposalError('Proposal validity must be in the future.', 422)
   }
   if (!quote.lane?.origin || !quote.lane.destination) {
     throw proposalError('The confirmed quote has no governed origin and destination.', 409)
   }
-  if (!/^[-A-Za-z0-9._~]{16,128}$/.test(input.idempotencyKey)) {
+  if (!ProposalPreviewKeySchema.safeParse(input.idempotencyKey).success) {
     throw proposalError('A valid Idempotency-Key is required for the proposal preview.', 422)
   }
 
