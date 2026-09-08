@@ -7,6 +7,12 @@ HEAD base del incremento de revisión comercial: `3b4f6a8`
 
 ## Lectura ejecutiva
 
+Plan de cierre vigente desde 2026-09-08: un único sprint 9–22 septiembre, feature
+freeze y seis gates. Sustituye como plan operativo la progresión abierta de cuatro
+sprints descrita más abajo; esa sección queda como historial. Ya no se reportará
+el 28/30% estimado: el avance se comunica por gates verificables. Ver
+`MVP_CLOSURE_PLAN_2026-09-08.md`.
+
 Incremento posterior 2026-09-08: Configuración en español y distinción entre rol
 actual y rol histórico de invitación publicados en preview `f2870fe`. Sesión ADMIN
 y textos comprobados; wireframe desktop/móvil incluido. Ajuste responsive móvil
