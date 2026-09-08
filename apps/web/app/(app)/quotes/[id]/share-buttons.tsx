@@ -48,41 +48,41 @@ const pct1 = (n: number) => `${(n * 100).toFixed(1)}%`
 
 function buildSummary(q: QuoteSummaryProps, url: string): string {
   const lines: string[] = []
-  lines.push(q.label ?? `Quote ${q.id.slice(0, 8)}`)
+  lines.push(q.label ?? `Cotización ${q.id.slice(0, 8)}`)
   const meta: string[] = [q.operation]
   if (q.service) meta.push(q.service)
-  meta.push(`saved ${new Date(q.createdAt).toLocaleString()}`)
+  meta.push(`guardada ${new Date(q.createdAt).toLocaleString()}`)
   lines.push(meta.join(' · '))
   if (q.lane && (q.lane.origin || q.lane.destination)) {
-    lines.push(`Lane: ${q.lane.origin ?? '—'} → ${q.lane.destination ?? '—'}`)
+    lines.push(`Ruta: ${q.lane.origin ?? '—'} → ${q.lane.destination ?? '—'}`)
   }
-  if (q.set) lines.push(`Assumption set: ${q.set.name} (v${q.set.version})`)
+  if (q.set) lines.push(`Base de supuestos: ${q.set.name} (v${q.set.version})`)
   lines.push('')
-  lines.push(`Freight Baseline: ${usd0.format(q.freightBaselineUsd)}`)
-  lines.push(`Required (USD):   ${usd0.format(q.requiredTariffUsd)}`)
-  lines.push(`Required (MXN):   ${mxn0.format(q.requiredTariffMxn)}`)
-  lines.push(`FX:               ${q.fxRateUsed.toFixed(2)}`)
-  if (q.commercial) lines.push(`Margin:           ${pct1(q.commercial.grossMarginPct)}`)
+  lines.push(`Tarifa base:      ${usd0.format(q.freightBaselineUsd)}`)
+  lines.push(`Requerida (USD):  ${usd0.format(q.requiredTariffUsd)}`)
+  lines.push(`Requerida (MXN):  ${mxn0.format(q.requiredTariffMxn)}`)
+  lines.push(`Tipo de cambio:   ${q.fxRateUsed.toFixed(2)}`)
+  if (q.commercial) lines.push(`Margen:           ${pct1(q.commercial.grossMarginPct)}`)
   lines.push('')
   if (q.mexLeg) {
     lines.push(
-      `MEX leg: ${usd0.format(q.mexLeg.requiredTariffUsd)} · ${Math.round(q.mexLeg.totalKm)} km · ${q.mexLeg.cycleDays.toFixed(2)} days · RPM ${q.mexLeg.rpm.toFixed(2)}`,
+      `Tramo MEX: ${usd0.format(q.mexLeg.requiredTariffUsd)} · ${Math.round(q.mexLeg.totalKm)} km · ${q.mexLeg.cycleDays.toFixed(2)} días · RPM ${q.mexLeg.rpm.toFixed(2)}`,
     )
   }
   if (q.usaLeg) {
     lines.push(
-      `USA leg: ${usd0.format(q.usaLeg.flatUsd)} · ${Math.round(q.usaLeg.loadedMiles)} mi · RPM ${q.usaLeg.rpm.toFixed(2)}`,
+      `Tramo EE. UU.: ${usd0.format(q.usaLeg.flatUsd)} · ${Math.round(q.usaLeg.loadedMiles)} mi · RPM ${q.usaLeg.rpm.toFixed(2)}`,
     )
   }
   if (q.commercial) {
     lines.push('')
-    lines.push('Commercial:')
-    lines.push(`  Cost floor:    ${usd0.format(q.commercial.costFloorUsd)}`)
-    lines.push(`  Min (12%):     ${usd0.format(q.commercial.minSellUsd)}`)
-    lines.push(`  Target (18%):  ${usd0.format(q.commercial.targetSellUsd)}`)
-    lines.push(`  Premium (25%): ${usd0.format(q.commercial.premiumSellUsd)}`)
+    lines.push('Comercial:')
+    lines.push(`  Piso de costo:  ${usd0.format(q.commercial.costFloorUsd)}`)
+    lines.push(`  Mínimo (12%):   ${usd0.format(q.commercial.minSellUsd)}`)
+    lines.push(`  Objetivo (18%): ${usd0.format(q.commercial.targetSellUsd)}`)
+    lines.push(`  Premium (25%):  ${usd0.format(q.commercial.premiumSellUsd)}`)
     lines.push(
-      `  Recommended:   ${usd0.format(q.commercial.recommendedSellUsd)} (GP ${usd0.format(q.commercial.grossProfitUsd)}, ${pct1(q.commercial.grossMarginPct)})`,
+      `  Recomendada:    ${usd0.format(q.commercial.recommendedSellUsd)} (UB ${usd0.format(q.commercial.grossProfitUsd)}, ${pct1(q.commercial.grossMarginPct)})`,
     )
   }
   lines.push('')
@@ -123,13 +123,13 @@ export function ShareButtons({ quote }: { quote: QuoteSummaryProps }) {
   return (
     <>
       <Button variant="outline" size="sm" onClick={copyLink} disabled={busy !== null}>
-        {busy === 'link' ? 'Copying…' : 'Copy link'}
+      {busy === 'link' ? 'Copiando…' : 'Copiar enlace'}
       </Button>
       <Button variant="outline" size="sm" onClick={copySummary} disabled={busy !== null}>
-        {busy === 'summary' ? 'Copying…' : 'Copy summary'}
+      {busy === 'summary' ? 'Copiando…' : 'Copiar resumen'}
       </Button>
       <Button variant="outline" size="sm" onClick={() => window.print()} disabled={busy !== null}>
-        Print / PDF
+      Imprimir / PDF
       </Button>
     </>
   )

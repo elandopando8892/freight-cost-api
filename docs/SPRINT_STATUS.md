@@ -56,6 +56,8 @@ Iniciado:
   sin publicar tarifas ni enviar comunicaciones.
 - La trazabilidad persistente `sourceQuoteId` quedó diseñada en `docs/architecture/ADR-002-quote-derivation-lineage.md`,
   pero permanece propuesta: no se modificó Prisma/Neon ni se aplicó migración.
+- El resumen copiable del detalle ahora usa la misma terminología en español que la UI
+  (`Ruta`, `Tarifa base`, `Piso de costo`, `Recomendada`), sin enviar automáticamente.
 - Se conserva el límite: guardar una cotización no publica tarifas ni envía comunicaciones.
 
 Siguiente incremento:
