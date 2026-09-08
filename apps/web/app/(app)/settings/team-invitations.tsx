@@ -28,6 +28,13 @@ type InvitationPreview = {
   emailDelivery: 'NOT_SENT'
 }
 
+const roleLabel: Record<Invitation['role'], string> = {
+  ADMIN: 'Administrador', OPERATOR: 'Operador', VIEWER: 'Consulta',
+}
+const statusLabel: Record<Invitation['status'], string> = {
+  PENDING: 'Pendiente', ACCEPTED: 'Aceptada', REVOKED: 'Revocada', EXPIRED: 'Vencida',
+}
+
 export function TeamInvitations({ invitations }: { invitations: Invitation[] }) {
   const router = useRouter()
   const [email, setEmail] = useState('')
@@ -81,11 +88,11 @@ export function TeamInvitations({ invitations }: { invitations: Invitation[] }) 
   }
 
   return (
-    <section className="grid gap-4 border-t pt-5" aria-labelledby="team-invitations-heading">
+    <section className="grid min-w-0 gap-4 border-t pt-5" aria-labelledby="team-invitations-heading">
       <div>
         <h3 id="team-invitations-heading" className="text-sm font-medium">Invitaciones al equipo</h3>
         <p className="mt-1 text-xs text-muted-foreground">
-          Primero revisa la invitación. El correo se integra a esta organización en su primer acceso con Supabase y vence después de siete días.
+          Revisa y confirma la invitación. La persona se incorpora en su primer acceso; la invitación vence después de siete días.
         </p>
       </div>
 
@@ -104,7 +111,7 @@ export function TeamInvitations({ invitations }: { invitations: Invitation[] }) 
             autoComplete="email"
             value={email}
             onChange={(event) => changeEmail(event.target.value)}
-            placeholder="teammate@company.com"
+            placeholder="persona@empresa.com"
             required
           />
         </div>
@@ -131,7 +138,7 @@ export function TeamInvitations({ invitations }: { invitations: Invitation[] }) 
           {preview.eligible ? (
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p><span className="font-medium">{preview.email}</span> se integrará con el rol {preview.role}.</p>
+                <p><span className="font-medium">{preview.email}</span> se integrará con el rol {roleLabel[preview.role]}.</p>
                 <p className="mt-1 text-xs text-muted-foreground">Esta acción no envía ningún correo.</p>
               </div>
               <Button
@@ -150,17 +157,22 @@ export function TeamInvitations({ invitations }: { invitations: Invitation[] }) 
       ) : null}
 
       {invitations.length ? (
-        <div className="overflow-hidden rounded-md border">
-          <table className="w-full text-sm">
+        <div className="grid min-w-0 gap-2">
+          <p id="invitation-role-help" className="text-xs text-muted-foreground">
+            El rol de invitación es el registrado al invitar. Consulta los permisos actuales en Equipo.
+          </p>
+          <p className="text-xs text-muted-foreground sm:hidden">Desplaza la tabla para ver todos los datos.</p>
+          <div className="overflow-x-auto rounded-md border" role="region" aria-label="Historial de invitaciones" tabIndex={0}>
+          <table className="w-full min-w-[35rem] text-sm" aria-describedby="invitation-role-help">
             <thead className="bg-muted/40 text-left text-xs text-muted-foreground">
-              <tr><th className="px-3 py-2">Correo</th><th className="px-3 py-2">Rol</th><th className="px-3 py-2">Estado</th><th className="px-3 py-2"><span className="sr-only">Acciones</span></th></tr>
+              <tr><th className="px-3 py-2">Correo</th><th className="px-3 py-2">Rol de invitación</th><th className="px-3 py-2">Estado</th><th className="px-3 py-2"><span className="sr-only">Acciones</span></th></tr>
             </thead>
             <tbody>
               {invitations.map((invitation) => (
                 <tr key={invitation.id} className="border-t">
                   <td className="px-3 py-2">{invitation.email}</td>
-                  <td className="px-3 py-2">{invitation.role}</td>
-                  <td className="px-3 py-2">{invitation.status}</td>
+                  <td className="px-3 py-2">{roleLabel[invitation.role]}</td>
+                  <td className="px-3 py-2">{statusLabel[invitation.status]}</td>
                   <td className="px-3 py-2 text-right">
                     {invitation.status === 'PENDING' ? (
                       <Button
@@ -178,6 +190,7 @@ export function TeamInvitations({ invitations }: { invitations: Invitation[] }) 
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       ) : null}
     </section>

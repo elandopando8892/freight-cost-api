@@ -14,18 +14,18 @@ export function OrgNameForm({ initialName }: { initialName: string }) {
   const [name, setName] = useState(initialName)
   const save = useMutation({
     mutationFn: () => fetcher<{ name: string }>('/api/v1/org', { method: 'PUT', json: { name: name.trim() } }),
-    onSuccess: (o) => { toast.success(`Organization renamed to “${o.name}”`); router.refresh() },
+    onSuccess: (o) => { toast.success(`Nombre de la organización actualizado a “${o.name}”`); router.refresh() },
   })
   const dirty = name.trim() !== initialName && name.trim().length >= 2
 
   return (
-    <form className="flex items-end gap-2" onSubmit={(e) => { e.preventDefault(); if (dirty) save.mutate() }}>
-      <div className="grid flex-1 gap-1.5">
-        <Label htmlFor="org-name" className="text-xs text-muted-foreground">Organization name</Label>
+    <form className="flex flex-col gap-2 sm:flex-row sm:items-end" onSubmit={(e) => { e.preventDefault(); if (dirty) save.mutate() }}>
+      <div className="grid min-w-0 flex-1 gap-1.5">
+        <Label htmlFor="org-name" className="text-xs text-muted-foreground">Nombre de la organización</Label>
         <Input id="org-name" value={name} onChange={(e) => setName(e.target.value)} maxLength={120} />
       </div>
       <Button type="submit" size="sm" disabled={!dirty || save.isPending}>
-        {save.isPending ? 'Saving…' : 'Save'}
+        {save.isPending ? 'Guardando…' : 'Guardar'}
       </Button>
     </form>
   )
