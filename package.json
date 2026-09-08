@@ -23,6 +23,7 @@
     "migrations:member-role-contract": "tsx apps/api/scripts/verify-organization-member-role-migration.ts",
     "migrations:supabase-auth-contract": "tsx apps/api/scripts/verify-supabase-identity-cutover-migration.ts",
     "verify:oauth-preview": "tsx apps/api/scripts/verify-oauth-preview-coverage.ts",
+    "verify:preview-revisions": "tsx apps/api/scripts/verify-preview-revisions.ts",
     "security:headers": "tsx apps/api/scripts/verify-web-security-headers.ts",
     "smoke:staging:auth": "tsx apps/api/scripts/staging-auth-bff-smoke.ts",
     "e2e:staging:pilot": "tsx apps/api/scripts/staging-pilot-go-e2e.ts",

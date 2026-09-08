@@ -17,6 +17,9 @@ sintéticos y la persona que ejecuta debe conservar capturas y timestamps.
 
 ## Precondiciones
 
+- Comprobar primero las revisiones web/API con `verify:preview-revisions` y el
+  upstream efectivo del BFF. Ver `PREVIEW_REVISION_GATE.md`: el 2026-09-08 los
+  últimos previews consultados no acreditan el incremento local `06bc5ab`.
 - Preview/local del mismo origen con `/auth/callback` configurado.
 - Una cuenta de prueba con rol `OPERATOR` y otra con rol `VIEWER` en la organización
   autorizada; no reutilizar cuentas de producción.

@@ -7,6 +7,11 @@ HEAD base del incremento de revisión comercial: `3b4f6a8`
 
 ## Lectura ejecutiva
 
+Actualización 2026-09-08: se agregó `verify:preview-revisions`. La consulta viva de
+metadatos declara web `b4bdd4d` y API `f6e0d64` con `gitDirty=1`; la revisión
+comercial `06bc5ab` sigue validada localmente, no en esos previews. QA autenticada
+permanece pendiente. Evidencia y siguiente paso en `PREVIEW_REVISION_GATE.md`.
+
 El plan vigente del MVP comercial tiene cuatro sprints quincenales. Estamos cerrando
 Sprint 1 y avanzando Sprint 2. El progreso ponderado es aproximadamente **28%**
 (se comunica como 30% redondeado); esto es avance local/preview, no aceptación de
