@@ -107,8 +107,11 @@ async function findUserLinkCandidate(email: string) {
       ("supabaseId" IS NOT NULL) AS "identityLinked"
     FROM "User"
     WHERE LOWER("email") = LOWER(${email})
-    LIMIT 1
+    LIMIT 2
   `;
+  if (candidates.length > 1) {
+    throw new Error("Ambiguous email identity; manual reconciliation required");
+  }
   return candidates[0] ?? null;
 }
 
@@ -159,10 +162,16 @@ export async function resolveUser(
     if (byEmail.identityLinked) {
       throw new Error("Email is already linked to another Supabase identity");
     }
-    const linked = await prisma.user.update({
-      where: { id: byEmail.id },
-      data: { supabaseId },
-    });
+    // Compare-and-set prevents a concurrent first login from replacing a link.
+    const linkedRows = await prisma.$queryRaw<ResolvedUser[]>`
+      UPDATE "User" SET "supabaseId" = ${supabaseId}
+      WHERE "id" = ${byEmail.id}
+        AND LOWER("email") = LOWER(${email})
+        AND ("supabaseId" IS NULL OR "supabaseId" = ${supabaseId})
+      RETURNING "id", "orgId", "role", "supabaseId"
+    `;
+    const linked = linkedRows[0];
+    if (!linked) throw new Error("Identity link changed; retry sign-in");
     await ensureActiveSet(linked.orgId);
     return { id: linked.id, orgId: linked.orgId, role: linked.role, supabaseId };
   }

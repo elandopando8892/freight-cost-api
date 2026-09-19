@@ -82,12 +82,12 @@ describe("Supabase identity resolution", () => {
         identityLinked: false,
       },
     ]);
-    prisma.user.update.mockResolvedValueOnce({
+    prisma.$queryRaw.mockResolvedValueOnce([{
       id: "existing-user",
       orgId: "org-existing",
       role: "OPERATOR",
       supabaseId: "new-supabase-subject",
-    });
+    }]);
 
     await expect(resolveUser(claims(), "token-1")).resolves.toEqual({
       id: "existing-user",
@@ -95,10 +95,28 @@ describe("Supabase identity resolution", () => {
       role: "OPERATOR",
       supabaseId: "new-supabase-subject",
     });
-    expect(prisma.user.update).toHaveBeenCalledWith({
-      where: { id: "existing-user" },
-      data: { supabaseId: "new-supabase-subject" },
-    });
+    expect(prisma.user.update).not.toHaveBeenCalled();
+    expect(prisma.user.create).not.toHaveBeenCalled();
+  });
+
+  it("rejects ambiguous case-insensitive email matches without choosing a tenant", async () => {
+    prisma.$queryRaw.mockResolvedValueOnce([
+      { id: "a", orgId: "org-a", role: "ADMIN", identityLinked: false },
+      { id: "b", orgId: "org-b", role: "VIEWER", identityLinked: false },
+    ]);
+    await expect(resolveUser(claims(), "token")).rejects.toThrow(/ambiguous/i);
+    expect(prisma.$queryRaw).toHaveBeenCalledTimes(1);
+    expect(prisma.user.create).not.toHaveBeenCalled();
+  });
+
+  it("fails closed if another identity wins the first-link race", async () => {
+    prisma.$queryRaw.mockResolvedValueOnce([
+      { id: "a", orgId: "org-a", role: "OPERATOR", identityLinked: false },
+    ]).mockResolvedValueOnce([]);
+    await expect(resolveUser(claims(), "token")).rejects.toThrow(/link changed/i);
+    expect(prisma.user.update).not.toHaveBeenCalled();
+    expect(prisma.user.create).not.toHaveBeenCalled();
+    expect(acceptPendingOrganizationInvitation).not.toHaveBeenCalled();
   });
 
   it("accepts a pending invitation before considering a new organization", async () => {
