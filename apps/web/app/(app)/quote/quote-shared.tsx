@@ -12,6 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { fetcher } from '@/lib/fetcher'
+import { quoteErrorCopy } from '@/lib/quote-error'
 
 // ── Types (mirror the API engine output we consume) ─────────────────────────
 export interface MexLeg {
@@ -413,15 +414,20 @@ export function ResultSkeleton() {
   )
 }
 
-export function QuoteErrorState({ onRetry }: { onRetry: () => void }) {
+export function QuoteErrorState({ error, onRetry }: { error?: unknown; onRetry: () => void }) {
+  const copy = quoteErrorCopy(error)
   return (
-    <Card className="border-destructive/35 bg-destructive/5">
+    <Card role="alert" className="border-destructive/35 bg-destructive/5">
       <CardHeader className="px-4 py-3">
-        <CardTitle className="text-base text-destructive">No fue posible generar la tarifa</CardTitle>
-        <CardDescription>Conservamos la captura. Revisa el contexto de base y ruta, o intenta nuevamente.</CardDescription>
+        <CardTitle className="text-base text-destructive">{copy.title}</CardTitle>
+        <CardDescription>{copy.description}</CardDescription>
       </CardHeader>
       <CardContent className="px-4 pb-4 pt-0">
-        <Button type="button" size="sm" variant="outline" onClick={onRetry}>Intentar nuevamente</Button>
+        {copy.reviewBase ? (
+          <Link href="/cost-bases" className="font-medium underline underline-offset-2">Revisar cobertura de bases →</Link>
+        ) : (
+          <Button type="button" size="sm" variant="outline" onClick={onRetry}>Intentar nuevamente</Button>
+        )}
       </CardContent>
     </Card>
   )

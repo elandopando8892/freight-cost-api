@@ -188,7 +188,7 @@ export function QuoteWizard({ costBases = [], initialQuote }: { costBases?: Cost
               }}
             />
           ) : quote.isError ? (
-            <QuoteErrorState onRetry={() => quote.mutate()} />
+            <QuoteErrorState error={quote.error} onRetry={() => quote.mutate()} />
           ) : null}
         </div>
       )}

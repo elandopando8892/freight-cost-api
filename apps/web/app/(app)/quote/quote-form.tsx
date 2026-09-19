@@ -304,7 +304,7 @@ export function QuoteForm({ recentLanes = [], costBases = [], initialQuote }: { 
             }}
           />
         ) : quote.isError ? (
-          <QuoteErrorState onRetry={() => quote.mutate()} />
+          <QuoteErrorState error={quote.error} onRetry={() => quote.mutate()} />
         ) : (
           <Placeholder />
         )}
