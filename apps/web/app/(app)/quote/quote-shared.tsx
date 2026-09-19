@@ -107,6 +107,7 @@ export interface CostBaseOption {
     id: string
     version: number
     isActive: boolean
+    applicabilityContext?: unknown
     status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'
     _count: { params: number }
   }[]
@@ -175,7 +176,7 @@ export function activeVersionFor(base: CostBaseOption | undefined) {
 export function costBaseReadiness(base: CostBaseOption | undefined): CostBaseReadiness {
   if (!base) return 'LEGACY'
   const version = activeVersionFor(base)
-  return base.status === 'ACTIVE' && version?.status === 'PUBLISHED' && version._count.params === 210
+  return base.status === 'ACTIVE' && version?.status === 'PUBLISHED' && version._count.params === 210 && version.applicabilityContext != null
     ? 'GOVERNED'
     : 'IN_PREPARATION'
 }
@@ -185,13 +186,14 @@ export function costBaseReadinessDetail(base: CostBaseOption | undefined, operat
   if (!base) return `No hay una base gobernada seleccionada para ${scope ? SCOPE_LABEL[scope] : 'esta operación'}. El cálculo seguirá siendo una propuesta y cualquier cotización guardada requerirá revisión.`
   const version = activeVersionFor(base)
   if (costBaseReadiness(base) === 'GOVERNED') return `${base.code} v${version?.version} está activa, publicada y completa con 210 parámetros.`
+  if (version && version.applicabilityContext == null) return `${base.code} v${version.version} no tiene perfil de aplicabilidad. Sólo permite consultar cálculos históricos. Requiere una nueva versión con perfil aprobado para cotizar.`
   const reasons = [
     base.status !== 'ACTIVE' ? `la base está ${base.status === 'DRAFT' ? 'en borrador' : 'archivada'}` : null,
     !version ? 'sin versión activa' : null,
     version && version.status !== 'PUBLISHED' ? `v${version.version} está ${version.status === 'DRAFT' ? 'en borrador' : 'archivada'}` : null,
     version && version._count.params !== 210 ? `${version._count.params}/210 parámetros` : null,
   ].filter(Boolean)
-  return `${base.code} todavía está en preparación (${reasons.join(', ')}). El cálculo puede continuar como propuesta, pero cualquier cotización guardada requerirá revisión.`
+  return `${base.code} todavía está en preparación (${reasons.join(', ')}). Revisa la base antes de generar una nueva tarifa.`
 }
 
 export function preferredGovernedBase(bases: CostBaseOption[], operation: string) {
