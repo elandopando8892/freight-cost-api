@@ -30,6 +30,28 @@ const validInput = {
 };
 
 describe("staging auth/BFF smoke evaluation", () => {
+  it("keeps missing CORS blocked by default and in explicit direct mode", () => {
+    for (const transport of [undefined, "direct"] as const) {
+      const result = evaluateStagingAuthBffSmoke({ ...validInput, transport, apiCors: { status: 200, headers: {}, body: null } });
+      expect(result.ready).toBe(false);
+      expect(result.checks.find(check => check.key === "API_CORS")?.status).toBe("BLOCK");
+    }
+  });
+
+  it("marks direct CORS not applicable only with explicit BFF routing evidence", () => {
+    const result = evaluateStagingAuthBffSmoke({ ...validInput, transport: "bff", bffEvidence: "reviewed-routing.md", apiCors: { status: 200, headers: {}, body: null } });
+    expect(result.ready).toBe(true);
+    expect(result.scope).toBe("read-only-unauthenticated-smoke");
+    expect(result.checks.find(check => check.key === "API_CORS")?.status).toBe("NOT_APPLICABLE");
+    expect(() => evaluateStagingAuthBffSmoke({ ...validInput, transport: "bff" })).toThrow(/evidence/);
+  });
+
+  it("does not exempt BFF safety or API readiness in BFF mode", () => {
+    const result = evaluateStagingAuthBffSmoke({ ...validInput, transport: "bff", bffEvidence: "reviewed-routing.md", bffUnauthenticated: { status: 200, headers: {}, body: null }, apiReady: { status: 503, headers: {}, body: null } });
+    expect(result.ready).toBe(false);
+    expect(result.checks.filter(check => check.status === "BLOCK").map(check => check.key)).toEqual(["BFF_UNAUTHENTICATED", "API_READY"]);
+  });
+
   it("passes only the read-only staging contract", () => {
     expect(evaluateStagingAuthBffSmoke(validInput)).toMatchObject({ ready: true });
   });

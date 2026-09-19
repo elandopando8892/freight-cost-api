@@ -57,6 +57,10 @@ async function main() {
   const web = configuredHttpsUrl("STAGING_WEB_URL");
   const api = configuredHttpsUrl("STAGING_API_URL");
   const webOrigin = web.origin;
+  const transport = process.env.STAGING_API_TRANSPORT ?? "direct";
+  if (transport !== "direct" && transport !== "bff") throw new Error("Invalid transport.");
+  const bffEvidence = process.env.STAGING_BFF_EVIDENCE?.trim();
+  if (transport === "bff" && !bffEvidence) throw new Error("Missing BFF evidence.");
 
   const [webLogin, bffUnauthenticated, apiHealth, apiReady, apiCors] = await Promise.all([
     probe(endpoint(web, "/login")),
@@ -66,6 +70,8 @@ async function main() {
     probe(endpoint(api, "/health"), { origin: webOrigin }),
   ]);
   const result = evaluateStagingAuthBffSmoke({
+    transport,
+    bffEvidence,
     webOrigin,
     webLogin,
     bffUnauthenticated,
@@ -74,11 +80,11 @@ async function main() {
     apiCors,
   });
 
-  process.stdout.write(`${JSON.stringify({ schemaVersion: "fcm.staging-auth-bff-smoke.v1", ...result })}\n`);
+  process.stdout.write(`${JSON.stringify({ schemaVersion: "fcm.staging-auth-bff-smoke.v2", ...result })}\n`);
   process.exitCode = result.ready ? 0 : 1;
 }
 
 main().catch(() => {
-  process.stderr.write("Staging smoke could not start; verify HTTPS target configuration.\n");
+  process.stderr.write("Staging smoke could not start; verify HTTPS targets, transport (direct/bff), and BFF evidence reference.\n");
   process.exitCode = 1;
 });

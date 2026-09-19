@@ -30,3 +30,13 @@ Audit completo del lockfile volvió a reportar 13 hallazgos: 2 low, 4 moderate, 
 Ante regresión de login, permisos, BFF o UI, dejar de usar esta pareja y volver al preview alineado eee0fa8: web 8rsm0poap y API cauiyuc1e (URLs completas en PREVIEW_SECURITY_RELEASE_2026-09-19.md). Este procedimiento revierte selección del preview, no datos. No reemplazó alias productivos ni requiere promover despliegues a producción.
 
 No hubo cambios de Auth, bases, usuarios, migraciones, env compartidas ni operaciones comerciales. No se activó ningún perfil. La definición operativa y límites de recuperación de versiones se encuentran en C1_PROFILE_DECISION_2026-09-19.md.
+
+## Verificador v2: comprobación posterior, 15:10 UTC
+
+El verificador local ahora distingue `STAGING_API_TRANSPORT=direct` (valor predeterminado, conserva CORS obligatorio) de `bff` (requiere `STAGING_BFF_EVIDENCE` con referencia a la revisión del recorrido). En BFF se marca API_CORS NOT_APPLICABLE, nunca PASS; el resto de comprobaciones sigue siendo obligatorio. El resultado lleva scope `read-only-unauthenticated-smoke`, no aceptación del release completo.
+
+Revisión de fuente realizada: el wizard/form usa `/api/v1/engine/quote-by-route`; el proxy Next resuelve API_URL en servidor y añade token verificado. Esta evidencia delimita el recorrido, no prueba todos los clientes posibles ni la renovación. Antes de cada nuevo preview se debe confirmar que ese contrato sigue vigente y que API_URL apunta al SHA esperado. Si hay acceso de navegador directo a API, ejecutar modo direct y conservar su bloqueo hasta resolverlo con autorización.
+
+Ejecución local contra las URLs de este documento: bff = 5 PASS + 1 NOT_APPLICABLE, ready true sólo para ese alcance; direct = 5 PASS + 1 BLOCK, ready false. No se modificó configuración de CORS. Pruebas focalizadas: 6/6 PASS, typecheck API PASS. El código del verificador es posterior al SHA desplegado y se ejecutó localmente; no se redeplegó la aplicación por este cambio de herramienta.
+
+Uso del script con Node/tsx instalado: definir STAGING_WEB_URL y STAGING_API_URL con las URLs exactas; para BFF definir además STAGING_API_TRANSPORT=bff y STAGING_BFF_EVIDENCE con documento/revisión del candidato. Ejecutar `node --import tsx apps/api/scripts/staging-auth-bff-smoke.ts`. No usar ready=true para cerrar Google, sesión, permisos, UI autenticada o A3: esas pruebas permanecen independientes.

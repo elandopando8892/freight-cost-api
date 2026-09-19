@@ -14,6 +14,9 @@ export type StagingSmokeResponse = {
 };
 
 export type StagingAuthBffSmokeInput = {
+  transport?: "direct" | "bff";
+  /** Reference to separately reviewed routing evidence, not authentication proof. */
+  bffEvidence?: string;
   webOrigin: string;
   webLogin: StagingSmokeResponse;
   bffUnauthenticated: StagingSmokeResponse;
@@ -30,7 +33,7 @@ export type StagingSmokeCheck = {
     | "API_HEALTH"
     | "API_READY"
     | "API_CORS";
-  status: "PASS" | "BLOCK";
+  status: "PASS" | "BLOCK" | "NOT_APPLICABLE";
   detail: string;
 };
 
@@ -48,6 +51,9 @@ function hasCspReportOnlyPolicy(value: string | undefined) {
 }
 
 export function evaluateStagingAuthBffSmoke(input: StagingAuthBffSmokeInput) {
+  const transport = input.transport ?? "direct";
+  if (transport !== "direct" && transport !== "bff") throw new Error("Invalid smoke transport.");
+  if (transport === "bff" && !input.bffEvidence?.trim()) throw new Error("BFF routing evidence is required.");
   const healthRelease = input.apiHealth.body?.release;
   const checks: StagingSmokeCheck[] = [
     {
@@ -96,13 +102,21 @@ export function evaluateStagingAuthBffSmoke(input: StagingAuthBffSmokeInput) {
     {
       key: "API_CORS",
       status:
-        input.apiCors.status === 200 &&
+        transport === "bff" ? "NOT_APPLICABLE" : input.apiCors.status === 200 &&
         input.apiCors.headers.accessControlAllowOrigin === input.webOrigin
           ? "PASS"
           : "BLOCK",
-      detail: "La API debe devolver el origen Web de staging en Access-Control-Allow-Origin.",
+      detail: transport === "bff"
+        ? "CORS directo no aplica al recorrido BFF revisado; esto no verifica sesión ni tráfico autenticado."
+        : "La API debe devolver el origen Web de staging en Access-Control-Allow-Origin.",
     },
   ];
 
-  return { ready: checks.every((check) => check.status === "PASS"), checks };
+  return {
+    scope: "read-only-unauthenticated-smoke",
+    transport,
+    bffEvidence: transport === "bff" ? input.bffEvidence : undefined,
+    ready: checks.every((check) => check.status !== "BLOCK"),
+    checks,
+  };
 }
