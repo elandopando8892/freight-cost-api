@@ -40,3 +40,9 @@ Revisión de fuente realizada: el wizard/form usa `/api/v1/engine/quote-by-route
 Ejecución local contra las URLs de este documento: bff = 5 PASS + 1 NOT_APPLICABLE, ready true sólo para ese alcance; direct = 5 PASS + 1 BLOCK, ready false. No se modificó configuración de CORS. Pruebas focalizadas: 6/6 PASS, typecheck API PASS. El código del verificador es posterior al SHA desplegado y se ejecutó localmente; no se redeplegó la aplicación por este cambio de herramienta.
 
 Uso del script con Node/tsx instalado: definir STAGING_WEB_URL y STAGING_API_URL con las URLs exactas; para BFF definir además STAGING_API_TRANSPORT=bff y STAGING_BFF_EVIDENCE con documento/revisión del candidato. Ejecutar `node --import tsx apps/api/scripts/staging-auth-bff-smoke.ts`. No usar ready=true para cerrar Google, sesión, permisos, UI autenticada o A3: esas pruebas permanecen independientes.
+
+## Acceso ADMIN en este candidato
+
+19 septiembre 2026: navegación a /quote en web qu5sz8lxu presentó login; Continuar con Google mostró el proveedor alqjqzqagdmcywpjtnnr.supabase.co. Selección de la cuenta existente sales@heymarksman.com terminó en el panel de la misma URL de preview, organización HeyMarksman, rol ADMIN. Una recarga completa conservó organización/rol y acceso al panel. Evidencia observada por árbol accesible del navegador, sin extraer tokens ni cookies.
+
+El control de navegador presentó timeouts durante la selección; se reconciliaron leyendo el estado final autenticado, sin reiniciar OAuth. Después se abrió /quote, pero la inspección del formulario volvió a agotar tiempo y reinició la sesión de control. No se obtuvo comprobación visual concluyente del panel persistente. No se guardó ni envió nada. Renovación por expiración, otras identidades en este candidato, aislamiento API y cotización completa siguen pendientes. Login + recarga no equivale a A1 completo.
