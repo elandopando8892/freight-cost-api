@@ -184,7 +184,7 @@ export function costBaseReadiness(base: CostBaseOption | undefined): CostBaseRea
 
 export function costBaseReadinessDetail(base: CostBaseOption | undefined, operation: string) {
   const scope = scopeForOperation(operation)
-  if (!base) return `No hay una base gobernada seleccionada para ${scope ? SCOPE_LABEL[scope] : 'esta operación'}. El cálculo seguirá siendo una propuesta y cualquier cotización guardada requerirá revisión.`
+  if (!base) return `No hay una base gobernada seleccionada para ${scope ? SCOPE_LABEL[scope] : 'esta operación'}. Revisa la base y el perfil de su versión; los supuestos históricos pueden no admitir nuevas cotizaciones.`
   const version = activeVersionFor(base)
   if (costBaseReadiness(base) === 'GOVERNED') return `${base.code} v${version?.version} está activa, publicada y completa con 210 parámetros.`
   if (version && version.applicabilityContext == null) return `${base.code} v${version.version} no tiene perfil de aplicabilidad. Sólo permite consultar cálculos históricos. Requiere una nueva versión con perfil aprobado para cotizar.`
@@ -301,7 +301,7 @@ export function CostBaseSelector({ bases, operation, value, onChange }: {
   const selected = options.find((base) => base.id === value)
   return (
     <div className="grid gap-1.5">
-      <Field label="Base de costo" hint="Sólo una base activa con una versión publicada de 210 parámetros tiene gobierno de producción.">
+      <Field label="Base de costo" hint="Se requiere una base activa, una versión publicada con 210 parámetros y un perfil de operación compatible. El motor valida la compatibilidad al calcular.">
         <select className={selectCls} value={value} onChange={(event) => onChange(event.target.value)}>
           <option value="">Supuestos activos sin base · requieren revisión</option>
           {options.map((base) => {

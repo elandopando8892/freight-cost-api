@@ -27,7 +27,7 @@ export function QuoteModes({ recentLanes = [], costBases = [], initialQuote, reo
       )}
       {!hasInitialGovernedBase && (
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-md border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-xs text-amber-900 dark:text-amber-200" role="status">
-          <span><strong>Sin base gobernada disponible</strong> · El cálculo puede continuar como propuesta, pero cualquier guardado requerirá revisión.</span>
+          <span><strong>Revisa la base de costo</strong> · No se encontró una base gobernada para la operación inicial. Comprueba la versión y su perfil antes de calcular.</span>
           <Link href="/cost-bases" className="font-medium underline underline-offset-2">Revisar Mis costos →</Link>
         </div>
       )}
