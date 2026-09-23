@@ -7,6 +7,7 @@ import { ASSISTANT_WINDOW_MS, assistantQuota } from '../assistant/assistant-gove
 import { CostBaseConsultantRequestSchema } from './cost-base-consultant.schema.js'
 import { consultCostBase } from './cost-base-consultant.js'
 import { listRecommendedCostBasePresets } from './recommended-cost-base-presets.js'
+import { OPERATIONAL_SEGMENTS } from './operational-segments.js'
 import { applicabilitySummary } from './cost-base-applicability.js'
 import {
   ArchiveCostBaseSchema, ArchiveCostBaseVersionSchema, CostBaseApplicabilityPreviewSchema, CreateCostBaseSchema, CreateCostBaseVersionSchema,
@@ -24,6 +25,7 @@ export async function costBasesRoutes(app: FastifyInstance) {
   app.get('/cost-bases', async (request) => listCostBases((request.user as JwtPayload).orgId))
 
   app.get('/cost-bases/presets', async () => listRecommendedCostBasePresets())
+  app.get('/cost-bases/operational-segments', async () => OPERATIONAL_SEGMENTS)
 
   app.post('/cost-bases/applicability-preview', async (request) => {
     const input = CostBaseApplicabilityPreviewSchema.parse(request.body)

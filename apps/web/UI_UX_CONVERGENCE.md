@@ -382,3 +382,6 @@ Wireframe de estado (mismo contenedor de error existente; no se cambia la navega
 ```
 
 Sin campos estructurados conocidos, indicar origen/destino/base/servicio/FX sin mostrar texto arbitrario del servidor. Separar 401 sesión, 403 permisos, 429 límite y 5xx servicio. No modificar colores, fórmulas o controles de aprobación. Evidencia y límites: `tests/visual/README.md`.
+# Bases por segmento operativo — wireframe 2026-09-22
+
+En “Mis costos”, la creación presenta primero cinco segmentos configurables. Cada selección carga un estándar existente como borrador editable. Un panel plegable explica los cuatro casos pendientes (intercambio MX→US, US→MX, transbordo y MX Drayage), sin permitir fingir una tarifa V3. Después se ven alcance, perfil, supuestos y controles de gobierno ya existentes. La tarjeta y ficha de una base muestran el segmento guardado; las históricas indican “Sin clasificar”. Wireframe y matriz de soporte: `apps/api/docs/operational-segment-bases.md`.

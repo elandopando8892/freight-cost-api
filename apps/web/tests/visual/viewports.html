@@ -3,5 +3,5 @@
 <p>Dimensiones CSS del iframe, no del navegador anfitrión. No incluye el shell autenticado.</p>
 <button data-width="1440" data-height="900">1440 × 900</button><button data-width="1280" data-height="800">1280 × 800</button><button data-width="390" data-height="844">390 × 844</button>
 <output id="size">1440 × 900</output><iframe title="FCM local" width="1440" height="900" src="/tests/visual/index.html"></iframe>
-<script>document.querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>{const frame=document.querySelector('iframe');frame.width=button.dataset.width;frame.height=button.dataset.height;document.querySelector('#size').textContent=frame.width+' × '+frame.height}))</script>
+<script>const frame=document.querySelector('iframe');if(new URLSearchParams(location.search).get('page')==='segments')frame.src='/tests/visual/segments.html';document.querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>{frame.width=button.dataset.width;frame.height=button.dataset.height;document.querySelector('#size').textContent=frame.width+' × '+frame.height}))</script>
 </body></html>

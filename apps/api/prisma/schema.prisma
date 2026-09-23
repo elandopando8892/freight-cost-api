@@ -555,6 +555,7 @@ model CostBase {
   name          String
   description   String?
   scope         CostBaseScope
+  operationalSegment String?
   status        CostBaseStatus    @default(DRAFT)
   defaultPolicy CalculationPolicy @default(OPERATIONAL_V3)
   currency      String            @default("USD")
@@ -574,6 +575,7 @@ model CostBase {
   @@unique([orgId, code])
   @@index([orgId, scope, status])
   @@index([orgId, scope, isDefault])
+  @@index([orgId, operationalSegment, status])
 }
 
 model CostBaseAuditEvent {

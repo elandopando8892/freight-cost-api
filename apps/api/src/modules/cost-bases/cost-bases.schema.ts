@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { SectionEnum } from '../assumptions/assumptions.schema.js'
 import { CostBaseProfileSchema, profileConsistencyIssues } from './cost-base-profile.js'
+import { OperationalSegmentSchema, segmentFor } from './operational-segments.js'
 
 export const CostBaseScopeSchema = z.enum(['CROSS_BORDER', 'DRAYAGE', 'LOCAL', 'INTRA_MEX', 'INTRA_US'])
 export const CostBaseStatusSchema = z.enum(['DRAFT', 'ACTIVE', 'ARCHIVED'])
@@ -11,6 +12,7 @@ export const CreateCostBaseSchema = z.object({
   name: z.string().min(2).max(120),
   description: z.string().max(500).optional(),
   scope: CostBaseScopeSchema,
+  operationalSegment: OperationalSegmentSchema.optional(),
   // Defaults are resolved in the service so a recommended preset can supply
   // its own values when these fields are omitted.
   defaultPolicy: CostBasePolicySchema.optional(),
@@ -26,6 +28,12 @@ export const CreateCostBaseSchema = z.object({
     value: z.number().finite(),
   }).strict()).max(40).default([]),
 }).superRefine((value, context) => {
+  if (value.operationalSegment) {
+    const segment = segmentFor(value.operationalSegment)
+    if (segment.status !== 'CONFIGURABLE') context.addIssue({ code: 'custom', path: ['operationalSegment'], message: `${segment.label} todavía no tiene un modelo de costos V3 compatible.` })
+    if (segment.scope !== value.scope) context.addIssue({ code: 'custom', path: ['operationalSegment'], message: `${segment.label} requiere alcance ${segment.scope}.` })
+    if (value.presetId && value.presetId !== segment.presetId) context.addIssue({ code: 'custom', path: ['presetId'], message: 'El estándar no corresponde al segmento operativo seleccionado.' })
+  }
   const overrideKeys = new Set<string>()
   value.assumptionOverrides.forEach((override, index) => {
     const key = `${override.section}__${override.field}`

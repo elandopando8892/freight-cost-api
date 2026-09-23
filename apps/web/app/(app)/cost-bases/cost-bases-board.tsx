@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label'
 import { RelativeTime } from '@/components/relative-time'
 import { fetcher } from '@/lib/fetcher'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { CostBaseWizard, type CostBaseCreateBody, type CostBaseScope } from './cost-base-wizard'
+import { CostBaseWizard, type CostBaseCreateBody, type CostBaseScope, type OperationalSegmentOption } from './cost-base-wizard'
 import type { CostBaseProfile } from './cost-base-profile'
 
 type Scope = CostBaseScope
@@ -83,6 +83,7 @@ export interface CostBase {
   name: string
   description: string | null
   scope: Scope
+  operationalSegment: OperationalSegmentOption['id'] | null
   status: Status
   defaultPolicy: 'OPERATIONAL_V3' | 'WORKBOOK_V3'
   currency: string
@@ -158,7 +159,7 @@ function buildScopeCoverage(bases: CostBase[]): ScopeCoverage[] {
   })
 }
 
-export function CostBasesBoard({ initial, canEdit }: { initial: CostBase[]; canEdit: boolean }) {
+export function CostBasesBoard({ initial, segments, canEdit }: { initial: CostBase[]; segments: OperationalSegmentOption[]; canEdit: boolean }) {
   const [bases, setBases] = useState(initial)
   const [selectedBaseId, setSelectedBaseId] = useState(() => (
     initial.find((base) => base.isDefault && base.status === 'ACTIVE')?.id ??
@@ -289,7 +290,7 @@ export function CostBasesBoard({ initial, canEdit }: { initial: CostBase[]; canE
 
       <CoverageOverview coverage={coverage} onCreate={openCreate} onReview={reviewScope} canEdit={canEdit} />
 
-      {showCreate && <CostBaseWizard key={createScope} initialScope={createScope} existingCodes={bases.map((base) => base.code)} pending={create.isPending} onSubmit={(body) => create.mutate(body)} />}
+      {showCreate && <CostBaseWizard key={createScope} initialScope={createScope} existingCodes={bases.map((base) => base.code)} segments={segments} pending={create.isPending} onSubmit={(body) => create.mutate(body)} />}
 
       {bases.length === 0 && !showCreate && (
         <Card><CardHeader><CardTitle>No hay bases de costo</CardTitle><CardDescription>{canEdit ? 'Crea la primera base y selecciona el alcance de rutas que atenderá.' : 'No hay bases disponibles para consulta. Un administrador debe crear la primera.'}</CardDescription></CardHeader></Card>
@@ -298,6 +299,7 @@ export function CostBasesBoard({ initial, canEdit }: { initial: CostBase[]; canE
       {selectedBase && (
         <CostBaseWorkspace
           bases={bases}
+          segments={segments}
           base={selectedBase}
           selectedBaseId={selectedBase.id}
           onSelect={setSelectedBaseId}
@@ -437,6 +439,7 @@ function CoverageOverview({ coverage, onCreate, onReview, canEdit }: { coverage:
 
 function CostBaseWorkspace({
   bases,
+  segments,
   base,
   selectedBaseId,
   onSelect,
@@ -450,6 +453,7 @@ function CostBaseWorkspace({
   pending,
 }: {
   bases: CostBase[]
+  segments: OperationalSegmentOption[]
   base: CostBase
   selectedBaseId: string
   onSelect: (baseId: string) => void
@@ -504,7 +508,7 @@ function CostBaseWorkspace({
                   ) : null}
                 </span>
                 <span className="truncate text-[10px] text-muted-foreground">
-                  {SCOPE_LABEL[item.scope]} · {itemActive ? `v${itemActive.version}` : 'sin versión activa'} · {item._count.lanes} rutas
+                  {segments.find(segment => segment.id === item.operationalSegment)?.label ?? SCOPE_LABEL[item.scope]} · {itemActive ? `v${itemActive.version}` : 'sin versión activa'} · {item._count.lanes} rutas
                 </span>
               </button>
             )
@@ -603,6 +607,7 @@ function CostBaseWorkspace({
             </CardHeader>
             <CardContent className="grid gap-0 pt-1 text-xs">
               <GovernanceLine label="Ámbito" value={SCOPE_LABEL[base.scope]} />
+              <GovernanceLine label="Segmento" value={segments.find(segment => segment.id === base.operationalSegment)?.label ?? 'Sin clasificar · base histórica'} />
               <GovernanceLine label="Moneda" value={base.currency} />
               <GovernanceLine label="Modelo" value={base.defaultPolicy === 'WORKBOOK_V3' ? 'Workbook exacto' : 'Operacional V3'} />
               <GovernanceLine label="Versión de supuestos" value={active ? `v${active.version}` : 'Sin versión vigente'} />

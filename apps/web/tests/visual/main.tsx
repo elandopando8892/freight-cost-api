@@ -4,6 +4,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'sonner'
 import { QuoteModes } from '../../app/(app)/quote/quote-modes'
 import type { CostBaseOption, QuoteResult } from '../../app/(app)/quote/quote-shared'
+import { CostBaseWizard, type OperationalSegmentOption } from '../../app/(app)/cost-bases/cost-base-wizard'
+import { defaultProfile, type CostBaseScope } from '../../app/(app)/cost-bases/cost-base-profile'
 import '../../app/globals.css'
 
 const base: CostBaseOption = { id: 'fixture-base', code: 'QA-SINTETICA', name: 'Base ficticia — no comercial', scope: 'CROSS_BORDER', status: 'ACTIVE', defaultPolicy: 'OPERATIONAL_V3', isDefault: true,
@@ -13,10 +15,31 @@ let calls = 0
 let saves = 0
 const intents = new Map<string, string>()
 const reply = (data: unknown, status = 200) => new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json' } })
+const segmentFixtures: OperationalSegmentOption[] = [
+  { id: 'D2D_BINATIONAL_OWN', label: 'D2D · operación propia en MX y EE. UU.', scope: 'CROSS_BORDER', status: 'CONFIGURABLE', presetId: 'std-d2d-crossborder-v1', detail: 'Ambos tramos usan costos operativos propios y el cruce es through-tractor.' },
+  { id: 'D2D_MX_US_PARTNER', label: 'D2D · línea mexicana entrega a socio estadounidense', scope: 'CROSS_BORDER', status: 'MODEL_PENDING', presetId: null, detail: 'Falta la tarifa de la línea estadounidense y el punto de intercambio.' },
+  { id: 'D2D_US_MX_PARTNER', label: 'D2D · línea estadounidense entrega a socio mexicano', scope: 'CROSS_BORDER', status: 'MODEL_PENDING', presetId: null, detail: 'Falta la tarifa de la línea mexicana y el punto de intercambio.' },
+  { id: 'D2D_TRANSSHIPMENT', label: 'D2D · transbordo de carga', scope: 'CROSS_BORDER', status: 'MODEL_PENDING', presetId: null, detail: 'Faltan maniobras, almacén, tiempos y riesgos del transbordo.' },
+  { id: 'MX_DRAYAGE', label: 'Drayage México', scope: 'DRAYAGE', status: 'MODEL_PENDING', presetId: null, detail: 'El ciclo Drayage V3 actual es estadounidense.' },
+  { id: 'INTRA_MEX', label: 'FTL Intra-México', scope: 'INTRA_MEX', status: 'CONFIGURABLE', presetId: 'std-ftl-intra-mex-v1', detail: 'Rutas domésticas mexicanas con costos propios.' },
+  { id: 'MX_LOCAL', label: 'Locales México', scope: 'LOCAL', status: 'CONFIGURABLE', presetId: 'std-local-mx-v1', detail: 'Movimiento local mexicano con tractocamión.' },
+  { id: 'INTRA_US', label: 'FTL Intra-EE. UU.', scope: 'INTRA_US', status: 'CONFIGURABLE', presetId: 'std-ftl-intra-us-v1', detail: 'Rutas estadounidenses con costos propios.' },
+  { id: 'US_DRAYAGE', label: 'Drayage EE. UU.', scope: 'DRAYAGE', status: 'CONFIGURABLE', presetId: 'std-drayage-us-v1', detail: 'Ciclo portuario/intermodal estadounidense con chasis.' },
+]
+const presetFixtures = segmentFixtures.filter(segment => segment.presetId).map(segment => {
+  const scope = segment.scope as CostBaseScope
+  return { id: segment.presetId!, version: 'FCM_STANDARD_2026_1', label: segment.label, name: segment.label, code: `QA-${scope}`, description: segment.detail, scope, defaultPolicy: 'OPERATIONAL_V3', currency: scope === 'LOCAL' || scope === 'INTRA_MEX' ? 'MXN' : 'USD', isDefault: true,
+    applicabilityProfile: defaultProfile(scope), assumptionOverrides: [], rationale: [segment.detail], applicability: { scope, profile: defaultProfile(scope), counts: { REQUIRED: 20, OPTIONAL: 0, CONDITIONAL: 0, NOT_IMPLEMENTED: 0, NOT_APPLICABLE: 190 }, border: scope === 'CROSS_BORDER' ? 'REQUIRED' : 'NOT_APPLICABLE', catalogTotal: 210 } }
+})
 // Intentionally no fallback to native fetch. Unknown URLs fail closed.
 window.fetch = async (input, init) => {
   const path = typeof input === 'string' ? input : input instanceof URL ? input.pathname : input.url
   if (path === '/api/v1/catalog/locations') return reply({ locations: ['Monterrey, NL', 'Dallas, TX', 'Laredo, TX'] })
+  if (path === '/api/v1/cost-bases/presets') return reply(presetFixtures)
+  if (path === '/api/v1/cost-bases/applicability-preview') {
+    const body = JSON.parse(String(init?.body))
+    return reply({ scope: body.scope, profile: body.applicabilityProfile, counts: { REQUIRED: 20, OPTIONAL: 0, CONDITIONAL: 0, NOT_IMPLEMENTED: 0, NOT_APPLICABLE: 190 }, border: body.scope === 'CROSS_BORDER' ? 'REQUIRED' : 'NOT_APPLICABLE', catalogTotal: 210 })
+  }
   if (path === '/api/v1/engine/quote-by-route') {
     const capturedMode = mode
     const previewId = `fixture-preview-${++calls}`
@@ -44,6 +67,13 @@ const client = new QueryClient({ defaultOptions: { queries: { retry: false } } }
 function App() {
   const [scenario, setScenario] = useState('success')
   const [stats, setStats] = useState('')
+  const [created, setCreated] = useState('')
+  if (location.pathname.endsWith('/segments.html')) return <QueryClientProvider client={client}><main className="mx-auto max-w-7xl space-y-4 p-4 md:p-6">
+    <aside className="rounded border border-amber-500 bg-amber-50 p-3 text-sm text-black"><strong>QA LOCAL · SEGMENTOS SINTÉTICOS · SIN BASE REAL</strong></aside>
+    <h1 className="text-2xl font-semibold">Bases por segmento operativo</h1>
+    <CostBaseWizard initialScope="CROSS_BORDER" existingCodes={[]} segments={segmentFixtures} pending={false} onSubmit={body => setCreated(`Borrador local: ${body.operationalSegment ?? 'sin segmento'} · ${body.code}`)} />
+    <output role="status">{created}</output>
+  </main><Toaster /></QueryClientProvider>
   return <QueryClientProvider client={client}><main className="mx-auto max-w-7xl space-y-4 p-4 md:p-6">
     <aside className="rounded border border-amber-500 bg-amber-50 p-3 text-sm text-black">
       <strong>QA LOCAL · DATOS SINTÉTICOS · SIN AUTH NI BACKEND REAL</strong>

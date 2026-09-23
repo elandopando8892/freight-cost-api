@@ -38,6 +38,7 @@ export type CostBaseCreateBody = {
   name: string
   description?: string
   scope: CostBaseScope
+  operationalSegment?: OperationalSegmentOption['id']
   defaultPolicy: Policy
   currency: string
   isDefault: boolean
@@ -91,6 +92,15 @@ type RecommendedPreset = {
   assumptionOverrides: AssumptionOverride[]
   rationale: string[]
   applicability: NonNullable<ConsultantResult['applicability']>
+}
+
+export type OperationalSegmentOption = {
+  id: 'D2D_BINATIONAL_OWN' | 'D2D_MX_US_PARTNER' | 'D2D_US_MX_PARTNER' | 'D2D_TRANSSHIPMENT' | 'MX_DRAYAGE' | 'INTRA_MEX' | 'MX_LOCAL' | 'INTRA_US' | 'US_DRAYAGE'
+  label: string
+  scope: CostBaseScope
+  status: 'CONFIGURABLE' | 'MODEL_PENDING'
+  presetId: string | null
+  detail: string
 }
 
 const SCOPE: { value: CostBaseScope; label: string; description: string }[] = [
@@ -163,9 +173,10 @@ function nextAvailableCode(preferred: string, existingCodes: readonly string[]) 
   return `${normalized.slice(0, 23)}-${Date.now().toString().slice(-8)}`
 }
 
-export function CostBaseWizard({ initialScope, existingCodes, pending, onSubmit }: {
+export function CostBaseWizard({ initialScope, existingCodes, segments, pending, onSubmit }: {
   initialScope: CostBaseScope
   existingCodes: string[]
+  segments: OperationalSegmentOption[]
   pending: boolean
   onSubmit: (body: CostBaseCreateBody) => void
 }) {
@@ -180,6 +191,7 @@ export function CostBaseWizard({ initialScope, existingCodes, pending, onSubmit 
   const [issues, setIssues] = useState<Issue[]>([])
   const [applicability, setApplicability] = useState<ConsultantResult['applicability']>(null)
   const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null)
+  const [selectedSegmentId, setSelectedSegmentId] = useState<OperationalSegmentOption['id'] | null>(null)
   const [presetScopeFilter, setPresetScopeFilter] = useState<'ALL' | CostBaseScope>(initialScope)
   const [touchedFields, setTouchedFields] = useState({ code: false, name: false })
   const presets = useQuery({
@@ -281,6 +293,7 @@ export function CostBaseWizard({ initialScope, existingCodes, pending, onSubmit 
 
   const updateScope = (scope: CostBaseScope) => {
     if (selectedPreset?.scope !== scope) setSelectedPresetId(null)
+    if (segments.find(segment => segment.id === selectedSegmentId)?.scope !== scope) setSelectedSegmentId(null)
     if (draft.scope !== scope && draft.assumptionOverrides.length > 0) {
       toast.info('Se retiraron los valores propios del alcance anterior para evitar combinaciones incompatibles.')
     }
@@ -358,6 +371,7 @@ export function CostBaseWizard({ initialScope, existingCodes, pending, onSubmit 
 
   const applyPreset = (preset: RecommendedPreset) => {
     setSelectedPresetId(preset.id)
+    setSelectedSegmentId(segments.find(segment => segment.presetId === preset.id)?.id ?? null)
     setPresetScopeFilter(preset.scope)
     setDraft({
       scope: preset.scope,
@@ -393,6 +407,7 @@ export function CostBaseWizard({ initialScope, existingCodes, pending, onSubmit 
       name: draft.name.trim(),
       description: draft.description?.trim() || undefined,
       scope: draft.scope,
+      operationalSegment: selectedSegmentId ?? undefined,
       defaultPolicy: draft.defaultPolicy,
       currency: draft.currency,
       isDefault: draft.isDefault,
@@ -426,7 +441,33 @@ export function CostBaseWizard({ initialScope, existingCodes, pending, onSubmit 
         </div>
       </CardHeader>
       <CardContent className="p-0">
-        <section className="border-b p-4" aria-labelledby="cost-base-presets-title">
+        <section className="border-b p-4" aria-labelledby="operational-segments-title">
+          <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">Primero elige cómo opera la ruta</p>
+          <h3 id="operational-segments-title" className="mt-1 text-sm font-medium">Bases por segmento operativo</h3>
+          <p className="mt-1 text-xs text-muted-foreground">Cada base es independiente. Sólo los segmentos con modelo V3 se pueden configurar para cálculo; se crean en borrador y requieren calibración y aprobación.</p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+            {segments.filter(segment => segment.status === 'CONFIGURABLE').map(segment => {
+              const preset = presets.data?.find(item => item.id === segment.presetId)
+              const selected = selectedSegmentId === segment.id
+              return <button key={segment.id} type="button" disabled={!preset} aria-pressed={selected} onClick={() => { if (preset) applyPreset(preset) }} className={`rounded-lg border p-3 text-left transition-colors ${selected ? 'border-primary bg-primary/8 shadow-[inset_3px_0_0_var(--primary)]' : 'hover:bg-muted/40'} disabled:opacity-60`}>
+                <span className="block text-sm font-medium">{segment.label}</span>
+                <span className="mt-1 block text-xs text-muted-foreground">{segment.detail}</span>
+                <span className="mt-2 block text-[10px] font-medium text-emerald-700 dark:text-emerald-400">{preset ? 'Configurar borrador →' : 'Cargando estándar…'}</span>
+              </button>
+            })}
+          </div>
+          <details className="mt-3 rounded-lg border bg-muted/15 p-3 text-xs">
+            <summary className="cursor-pointer font-medium">Modalidades que requieren modelo adicional ({segments.filter(segment => segment.status === 'MODEL_PENDING').length})</summary>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              {segments.filter(segment => segment.status === 'MODEL_PENDING').map(segment => <div key={segment.id} className="rounded border bg-background p-3">
+                <div className="font-medium">{segment.label}</div><p className="mt-1 text-muted-foreground">{segment.detail}</p><span className="mt-2 block text-[10px] font-medium text-amber-700 dark:text-amber-400">Aún no calculable con V3</span>
+              </div>)}
+            </div>
+          </details>
+        </section>
+        <details className="border-b">
+        <summary className="cursor-pointer px-4 py-3 text-sm font-medium">Opciones avanzadas · estándares técnicos</summary>
+        <section className="p-4" aria-labelledby="cost-base-presets-title">
           <div>
             <div className="mb-2 flex items-end justify-between gap-3">
               <div><p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">Inicio rápido</p><p id="cost-base-presets-title" className="text-sm font-medium">Estándares recomendados</p></div>
@@ -497,6 +538,7 @@ export function CostBaseWizard({ initialScope, existingCodes, pending, onSubmit 
             )}
           </div>
         </section>
+        </details>
 
         <div className="grid min-w-0 gap-0 lg:grid-cols-[minmax(0,1.08fr)_minmax(22rem,0.92fr)]">
         <div className="grid min-w-0 content-start gap-4 border-b p-4 lg:border-b-0 lg:border-r">
