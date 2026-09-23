@@ -4,6 +4,46 @@ Estado: Sprints 1–7 implementados localmente; cierre visual autenticado pendie
 Referencia visual: `freight-cost-model-wireframes.html`
 Alcance: aplicación Web de Freight Cost Model; no altera contratos API ni datos.
 
+## Anexo — sprint de integridad del flujo (22-09-2026)
+
+Este anexo incorpora la UI del nuevo contrato de vista previa y guardado; no modifica el alcance visual de los sprints anteriores. La captura y el resultado viven en un borrador compartido por Guiado/Rápido. La respuesta sólo se muestra si corresponde a la revisión enviada. Guardar utiliza `previewId`, nunca importes reconstruidos en el navegador. En cambio real de entradas se invalida resultado y asociación del guardado; un cambio de modo no recalcula.
+
+Wireframe de escritorio, aplicable a 1440 × 900 y 1280 × 800:
+
+```text
+┌─ Guiado | Rápido ────────────────────────────────────────────────┐
+│ Captura: ruta · operación · servicio · equipo · base · FX        │
+├───────────────────────────────────┬──────────────────────────────┤
+│ Formulario / pasos                │ Contexto: base y versión    │
+│ [Generar tarifa]                  │ Política · revisión         │
+├───────────────────────────────────┴──────────────────────────────┤
+│ Resultado vinculado a captura enviada                            │
+│ Precio · tramos · margen efectivo · procedencia de referencia    │
+│ Etiqueta [Guardar para revisión] → Abrir cotización · Historial  │
+│ Tras guardar: [Guardar otra copia] con intención nueva            │
+└───────────────────────────────────────────────────────────────────┘
+```
+
+Wireframe móvil, 390 × 844:
+
+```text
+┌─ Guiado | Rápido ──────────────┐
+│ Ruta / operación / base        │
+│ Servicio / equipo / FX         │
+│ [Generar tarifa]              │
+├───────────────────────────────┤
+│ Base y versión · política      │
+│ Resultado / procedencia       │
+│ Tramos apilados               │
+│ [Guardar]                     │
+│ Abrir cotización · Historial  │
+└───────────────────────────────┘
+```
+
+Estados a inspeccionar: vacío legítimo, cálculo pendiente, error de cálculo, resultado vigente, versión desactualizada (`409`), guardado pendiente, guardado con enlace al objeto, sin permiso (`403`), dashboard parcialmente fallido. En error de lectura el panel nunca muestra cero registros ni un CTA de primera base. No hay scroll horizontal de página; el historial puede desplazar su tabla internamente. Foco y etiquetas deben comprobarse con teclado.
+
+QA visual autenticado de 1440 × 900, 1280 × 800 y 390 × 844 **pendiente**: este sprint no recibió una sesión local/staging autorizada ni desplegó código. Los wireframes son criterio de revisión, no capturas de la aplicación real.
+
 ## 1. Objetivo
 
 La aplicación debe implementar el lenguaje visual y los flujos del wireframe de Freight Cost Model inspirado en Rateware CMS. No basta con que una función exista: en escritorio debe conservar el contexto de trabajo en una composición horizontal, compacta, tabular y orientada a decisiones.

@@ -1,20 +1,20 @@
 'use client'
 
 import { useState } from 'react'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { toast } from 'sonner'
+import { useQuery } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { fetcher } from '@/lib/fetcher'
 import { LocationInput } from './location-input'
 import {
-  type QuoteResult, type FormFields, type FormErrors, type CostBaseOption, type ReopenQuote,
+  type FormFields, type FormErrors, type CostBaseOption, type ReopenQuote,
   OPS, SVCS, TRUCKS, TRAILERS, CONFIGS, DRIVERS, ROUTES, selectCls,
-  initialFormForQuote, compatibleBases, preferredGovernedBase, activeVersionFor,
-  costBaseReadiness, costBaseReadinessDetail, quoteBody, Field, CostBaseSelector,
+  compatibleBases, preferredGovernedBase, activeVersionFor,
+  costBaseReadiness, costBaseReadinessDetail, Field, CostBaseSelector,
   CostBaseLineageNotice, CalculationContextPanel, ResultSkeleton, QuoteErrorState, Result,
 } from './quote-shared'
+import type { QuoteDraft } from './use-quote-draft'
 
 // Progressive-disclosure steps: one decision at a time, with microcopy.
 const STEPS = [
@@ -75,11 +75,11 @@ const DISPLAY_LABELS = {
 
 const displayLabel = (value: string) => DISPLAY_LABELS[value as DisplayValue] ?? value
 
-export function QuoteWizard({ costBases = [], initialQuote }: { costBases?: CostBaseOption[]; initialQuote?: ReopenQuote }) {
-  const [step, setStep] = useState(0)
-  const [form, setForm] = useState<FormFields>(() => initialFormForQuote(costBases, initialQuote))
+export function QuoteWizard({ draft, costBases = [], initialQuote }: { draft: QuoteDraft; costBases?: CostBaseOption[]; initialQuote?: ReopenQuote }) {
+  const [step, setStep] = useState(() => draft.reviewed ? STEPS.length - 1 : 0)
+  const { form, update: setForm, reviewed, quote } = draft
   const [errors, setErrors] = useState<FormErrors>({})
-  const [result, setResult] = useState<QuoteResult | null>(null)
+  const result = reviewed?.result ?? null
 
   const { data: locData } = useQuery({
     queryKey: ['catalog-locations'],
@@ -88,22 +88,9 @@ export function QuoteWizard({ costBases = [], initialQuote }: { costBases?: Cost
   })
   const locations = locData?.locations ?? []
 
-  const quote = useMutation({
-    mutationFn: () => fetcher<QuoteResult>('/api/v1/engine/quote-by-route', { method: 'POST', json: quoteBody(form) }),
-    onSuccess: (r) => {
-      setResult(r)
-      toast.success(`Base estimada ${usdFmt(r.freightBaselineUsd)}`, {
-        description: `${displayLabel(r.operation)} · ${r.mexLeg ? 'MEX' : ''}${r.mexLeg && r.usaLeg ? ' + ' : ''}${r.usaLeg ? 'EE. UU.' : ''}`,
-      })
-    },
-    onError: () => setResult(null),
-  })
-
   const set = <K extends keyof FormFields>(k: K, v: FormFields[K]) => {
     setForm((f) => ({ ...f, [k]: v }))
     if (errors[k]) setErrors((e) => ({ ...e, [k]: undefined }))
-    if (result) setResult(null) // changing inputs invalidates the shown price
-    if (quote.isError) quote.reset()
   }
 
   // Only the lane step has required fields.
@@ -122,7 +109,7 @@ export function QuoteWizard({ costBases = [], initialQuote }: { costBases?: Cost
 
   const next = () => { if (validateStep(step)) setStep((s) => Math.min(s + 1, STEPS.length - 1)) }
   const back = () => setStep((s) => Math.max(s - 1, 0))
-  const restart = () => { setForm(initialFormForQuote(costBases, initialQuote)); setErrors({}); setResult(null); quote.reset(); setStep(0) }
+  const restart = () => { draft.reset(); setErrors({}); setStep(0) }
   const selectedCostBase = costBases.find((base) => base.id === form.costBaseId)
   const selectedVersion = activeVersionFor(selectedCostBase)
 
@@ -172,16 +159,17 @@ export function QuoteWizard({ costBases = [], initialQuote }: { costBases?: Cost
             <ResultSkeleton />
           ) : result ? (
             <Result
+              draft={draft}
               r={result}
               snapshot={{
-                service: form.service,
-                fxRate: form.fxRate,
-                origin: form.outboundLocation.trim(),
-                destination: form.inboundLocation.trim(),
-                equipment: { truckType: form.truckType, trailer: form.trailer, config: form.config, driver: form.driver },
-                costBaseLabel: selectedCostBase?.code ?? 'Supuestos activos sin base',
-                assumptionVersionLabel: selectedVersion ? `v${selectedVersion.version}` : 'Sin versión activa',
-                costBaseReadiness: costBaseReadiness(selectedCostBase),
+                service: reviewed!.form.service,
+                fxRate: reviewed!.form.fxRate,
+                origin: reviewed!.form.outboundLocation.trim(),
+                destination: reviewed!.form.inboundLocation.trim(),
+                equipment: { truckType: reviewed!.form.truckType, trailer: reviewed!.form.trailer, config: reviewed!.form.config, driver: reviewed!.form.driver },
+                costBaseLabel: result.lineage?.costBase?.code ?? selectedCostBase?.code ?? 'Supuestos activos sin base',
+                assumptionVersionLabel: result.lineage?.set ? `v${result.lineage.set.version}` : selectedVersion ? `v${selectedVersion.version}` : 'Sin versión activa',
+                costBaseReadiness: result.lineage?.readiness ?? costBaseReadiness(selectedCostBase),
                 costBaseReadinessDetail: costBaseReadinessDetail(selectedCostBase, form.operation),
                 sourceQuoteId: initialQuote?.id,
                 sourceQuoteLabel: initialQuote?.label,
@@ -195,8 +183,6 @@ export function QuoteWizard({ costBases = [], initialQuote }: { costBases?: Cost
     </div>
   )
 }
-
-const usdFmt = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n)
 
 function Stepper({ step, onJump }: { step: number; onJump: (s: number) => void }) {
   return (

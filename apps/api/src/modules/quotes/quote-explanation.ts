@@ -1,4 +1,4 @@
-import type { EngineOutput, EquipmentSpec } from '../engine/engine.types.js'
+import type { DrayageLegInput, EngineOutput, EquipmentSpec, MexLegInput, UsaLegInput } from '../engine/engine.types.js'
 import type { QuoteCalculationSnapshot } from './quote-snapshot.js'
 
 type QuoteExplanationInput = {
@@ -7,8 +7,9 @@ type QuoteExplanationInput = {
   equipment: EquipmentSpec
   fxRate?: number
   overrides?: Record<string, number>
-  mex?: { baseKm: number; routeExpensesMxn: number; baseHours: number; route: string } | undefined
-  usa?: { loadedMiles: number; transitDaysRaw: number; driverExpenses: number; outState: string; dieselUsdGal: number; fscUsdMile: number; originCondition: string; destCondition: string } | undefined
+  mex?: Pick<MexLegInput, 'baseKm'> & Partial<MexLegInput>
+  usa?: Pick<UsaLegInput, 'loadedMiles'> & Partial<UsaLegInput>
+  drayage?: DrayageLegInput
 }
 
 type Lineage = {
@@ -25,7 +26,7 @@ export type QuoteExplanation = {
     equipment: EquipmentSpec
     fxRateRequested: number | null
     overrideCount: number
-    legs: { mex: QuoteExplanationInput['mex'] | null; usa: QuoteExplanationInput['usa'] | null }
+    legs: { mex: QuoteExplanationInput['mex'] | null; usa: QuoteExplanationInput['usa'] | null; drayage?: QuoteExplanationInput['drayage'] | null }
   }
   lineage: Lineage
   calculation: {
@@ -63,7 +64,7 @@ export function buildQuoteExplanation(input: QuoteExplanationInput, result: Engi
       equipment: input.equipment,
       fxRateRequested: input.fxRate ?? null,
       overrideCount: Object.keys(input.overrides ?? {}).length,
-      legs: { mex: input.mex ?? null, usa: input.usa ?? null },
+      legs: { mex: input.mex ?? null, usa: input.usa ?? null, ...(input.drayage ? { drayage: input.drayage } : {}) },
     },
     lineage,
     calculation: {

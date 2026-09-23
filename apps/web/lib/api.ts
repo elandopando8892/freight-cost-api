@@ -29,7 +29,7 @@ export async function api<T = unknown>(
     headers.set('content-type', 'application/json')
     init.body = JSON.stringify(init.json)
   }
-  const res = await fetch(`${API_URL}${path}`, { ...init, headers, cache: 'no-store' })
+  const res = await fetch(`${API_URL}${path}`, { ...init, headers, cache: 'no-store', signal: init.signal ?? AbortSignal.timeout(12_000) })
   const text = await res.text()
   const data = text ? safeJson(text) : null
   if (!res.ok) throw new ApiError(res.status, data, `API ${res.status} ${path}`)

@@ -24,7 +24,7 @@ export async function fetcher<T = unknown>(
     headers.set('content-type', 'application/json')
     rest.body = JSON.stringify(json)
   }
-  const res = await fetch(path, { ...rest, headers })
+  const res = await fetch(path, { ...rest, headers, signal: rest.signal ?? AbortSignal.timeout(20_000) })
   if (res.status === 401) {
     if (typeof window !== 'undefined') window.dispatchEvent(new Event(sessionExpiredEvent))
     throw new ClientApiError(401, null, 'Session expired')

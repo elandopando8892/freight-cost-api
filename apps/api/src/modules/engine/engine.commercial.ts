@@ -13,7 +13,8 @@ export interface CommercialInput {
   productionCostUsd: number   // Σ leg CVU+CFU
   riskAdjUsd: number          // Σ leg risk
   recommendedSellUsd: number  // cost-plus required tariff (freight baseline)
-  marketReferenceUsd: number  // Σ leg market rate (0 until DAT seeded)
+  marketReferenceUsd: number  // engine composite; provenance distinguishes observed vs cost-derived
+  marketReferenceProvenance?: 'observed' | 'mixed' | 'cost_proxy' | 'absent'
   loadedMiles: number
   cycleDays: number
   fuelMixOk: boolean
@@ -25,12 +26,16 @@ export interface CommercialOutput {
   minSellUsd: number
   targetSellUsd: number
   premiumSellUsd: number
+  minMarginPct: number
+  targetMarginPct: number
+  premiumMarginPct: number
   recommendedSellUsd: number
   grossProfitUsd: number
   grossMarginPct: number
   gpPerLoadedMileUsd: number
   gpPerDayUsd: number
   marketReferenceUsd: number
+  marketReferenceProvenance?: 'observed' | 'mixed' | 'cost_proxy' | 'absent'
   marketVsCostSpreadUsd: number
   marketVsCostSpreadPct: number
   noGoFlag: boolean
@@ -73,9 +78,12 @@ export function calculateCommercial(input: CommercialInput): CommercialOutput {
   if (!input.fuelMixOk) { reviewFlag = true; notes.push('REVIEW: fuel purchase mix MX+US ≠ 1.00') }
 
   return {
-    costFloorUsd, minSellUsd, targetSellUsd, premiumSellUsd, recommendedSellUsd,
+    costFloorUsd, minSellUsd, targetSellUsd, premiumSellUsd,
+    minMarginPct: minMargin, targetMarginPct: targetMargin, premiumMarginPct: premiumMargin,
+    recommendedSellUsd,
     grossProfitUsd, grossMarginPct, gpPerLoadedMileUsd, gpPerDayUsd,
-    marketReferenceUsd, marketVsCostSpreadUsd, marketVsCostSpreadPct,
+    marketReferenceUsd, marketReferenceProvenance: input.marketReferenceProvenance,
+    marketVsCostSpreadUsd, marketVsCostSpreadPct,
     noGoFlag, reviewFlag, notes,
   }
 }

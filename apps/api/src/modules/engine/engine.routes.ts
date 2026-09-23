@@ -1,6 +1,8 @@
 import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
+import { Prisma } from '@prisma/client'
 import { authenticate } from '../../middleware/authenticate.js'
+import { prisma } from '../../config/prisma.js'
 import type { JwtPayload } from '../auth/auth.schema.js'
 import { buildParamMap, type ParamMap } from '../assumptions/assumptions.service.js'
 import { calculate } from './engine.calculator.js'
@@ -9,6 +11,7 @@ import { defaultService } from './engine.factors.js'
 import type { EngineInput, EquipmentSpec, MarketCondition } from './engine.types.js'
 import { assertCalculationOverrides, resolveCalculationContext, scopeForOperation } from '../cost-bases/cost-bases.service.js'
 import { pricingInputIssues } from './engine-input-validation.js'
+import { buildQuoteCalculationSnapshot } from '../quotes/quote-snapshot.js'
 
 const MarketConditionEnum = z.enum([
   'Very Tight', 'Moderately Tight', 'Balanced', 'Slightly Loose', 'Very Loose',
@@ -166,6 +169,7 @@ export async function engineRoutes(app: FastifyInstance) {
   })
 
   app.post('/engine/quote-by-route', async (request, reply) => {
+    reply.header('Cache-Control', 'no-store')
     const { orgId } = request.user as JwtPayload
     const body = ByRouteSchema.parse(request.body)
     const service = body.service ?? defaultService(body.operation)
@@ -202,7 +206,7 @@ export async function engineRoutes(app: FastifyInstance) {
     assertCalculationOverrides(costBase?.scope ?? scopeForOperation(body.operation), body.overrides, applicabilityProfile)
     if (set) params = buildParamMap(set.params)
 
-    const result = calculate({
+    const input: EngineInput = {
       policy: body.policy ?? defaultPolicy,
       applicabilityProfile: applicabilityProfile ?? undefined,
       operation: body.operation,
@@ -213,6 +217,30 @@ export async function engineRoutes(app: FastifyInstance) {
       overrides: body.overrides,
       mexLeg: resolved.mexLeg,
       usaLeg: resolved.usaLeg,
+    }
+    const result = calculate(input)
+    const snapshot = buildQuoteCalculationSnapshot({ ...input, params: { ...params, ...(body.overrides ?? {}) }, overrides: undefined }, result)
+    const lineage = {
+      costBase: costBase ? { id: costBase.id, code: costBase.code, name: costBase.name, scope: costBase.scope, status: costBase.status } : null,
+      set: set ? { id: set.id, name: set.name, version: set.version, status: set.status, isActive: set.isActive } : null,
+      policy: result.policy,
+      readiness: !costBase ? 'LEGACY' : costBase.status === 'ACTIVE' && set?.status === 'PUBLISHED'
+        && set.isActive && set.applicabilityContext != null && set.params.length === 210 ? 'GOVERNED' : 'IN_PREPARATION',
+    }
+    const capture = {
+      origin: body.outboundLocation.trim(), destination: body.inboundLocation.trim(),
+      mexBorder: body.mexBorder, usBorder: body.usBorder, route: body.route,
+      operation: body.operation, service, equipment: body.equipment, fxRate: body.fxRate ?? null,
+    }
+    const preview = await prisma.quoteCalculationPreview.create({
+      data: {
+        orgId, capture: capture as Prisma.InputJsonValue,
+        lineage: lineage as Prisma.InputJsonValue,
+        snapshot: snapshot as unknown as Prisma.InputJsonValue,
+        result: { ...result, resolved: { mexLeg: resolved.mexLeg ?? null, usaLeg: resolved.usaLeg ?? null }, warnings: resolved.warnings } as unknown as Prisma.InputJsonValue,
+        expiresAt: new Date(Date.now() + 20 * 60_000),
+      },
+      select: { id: true },
     })
 
     return reply.send({
@@ -222,6 +250,8 @@ export async function engineRoutes(app: FastifyInstance) {
       costBaseId: costBase?.id ?? null,
       assumptionSetId: set?.id ?? null,
       applicabilityProfile,
+      lineage,
+      previewId: preview.id,
     })
   })
 }

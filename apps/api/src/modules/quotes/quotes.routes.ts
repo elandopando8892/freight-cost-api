@@ -18,6 +18,7 @@ import { buildRatewareHandoff, confirmationEligibility, ratewareEconomicsDriftRe
 import { assessRatewareCandidate, assessRatewareReadiness } from './rateware-candidate.js'
 import { pricingInputIssues } from '../engine/engine-input-validation.js'
 import { CustomerProposalDraftRequestSchema, ProposalPreviewKeySchema, buildCustomerProposalDraftPreview } from './customer-proposal-draft.js'
+import { previewSaveIntentHash, verifiedPreviewData } from './quote-preview.js'
 
 const MarketConditionEnum = z.enum([
   'Very Tight', 'Moderately Tight', 'Balanced', 'Slightly Loose', 'Very Loose',
@@ -67,6 +68,8 @@ const CreateQuoteSchema = z.object({
   mex: MexSchema.optional(),
   usa: UsaSchema.optional(),
 })
+const SavePreviewSchema = z.object({ previewId: z.string().min(1), label: z.string().trim().max(160).nullable().optional() }).strict()
+const SavePreviewKeySchema = z.string().uuid()
 const ConfirmQuoteSchema = z.object({ note: z.string().trim().min(3).max(2000) })
 const RatewareEnrichmentSchema = z.object({ carrier: z.string().trim().min(2).max(160), effectiveDate: z.string().date(), rateOwner: z.string().trim().min(2).max(160), capacityPerWeek: z.number().int().positive().max(1_000_000).optional(), notes: z.string().trim().max(1000).optional() })
 const RATEWARE_REQUIRED_ENRICHMENT_FIELDS = ['carrier', 'effectiveDate', 'rateOwner'] as const
@@ -147,6 +150,95 @@ export function assertQuoteLaneCompatible(
 
 export async function quotesRoutes(app: FastifyInstance) {
   app.addHook('preHandler', authenticate)
+
+  app.post('/quotes/from-preview', { preHandler: requireRole('ADMIN', 'OPERATOR') }, async (request, reply) => {
+    reply.header('Cache-Control', 'no-store')
+    const user = request.user as JwtPayload
+    const body = SavePreviewSchema.parse(request.body)
+    const key = SavePreviewKeySchema.parse(request.headers['idempotency-key'])
+    const label = body.label?.trim() || null
+    const intentHash = previewSaveIntentHash(body.previewId, label)
+    const prior = await prisma.quoteSaveIntent.findUnique({ where: { orgId_key: { orgId: user.orgId, key } }, include: { quote: true } })
+    if (prior) {
+      if (prior.intentHash !== intentHash) throw httpError('La clave de guardado ya se utilizó con otro contenido.', 409)
+      return reply.status(200).send(prior.quote)
+    }
+
+    const preview = await prisma.quoteCalculationPreview.findFirst({ where: { id: body.previewId, orgId: user.orgId } })
+    if (!preview) throw httpError('La vista previa no está disponible para esta organización.', 404)
+    if (preview.expiresAt.getTime() <= Date.now()) throw httpError('El cálculo está desactualizado. Calcula de nuevo antes de guardar.', 409)
+    const { capture, lineage, snapshot, result } = verifiedPreviewData(preview)
+
+    if (lineage.set) {
+      const version = await prisma.assumptionSet.findFirst({
+        where: { id: lineage.set.id, orgId: user.orgId },
+        select: { id: true, isActive: true, status: true, costBaseId: true },
+      })
+      if (!version || version.isActive !== lineage.set.isActive || version.status !== lineage.set.status || version.costBaseId !== (lineage.costBase?.id ?? null)) {
+        throw httpError('La versión de supuestos cambió desde el cálculo. Calcula de nuevo.', 409)
+      }
+    }
+    if (lineage.costBase) {
+      const base = await prisma.costBase.findFirst({
+        where: { id: lineage.costBase.id, orgId: user.orgId }, select: { id: true, status: true },
+      })
+      if (!base || base.status !== lineage.costBase.status) {
+        throw httpError('La base de costos cambió desde el cálculo. Calcula de nuevo.', 409)
+      }
+    }
+
+    const explanation = buildQuoteExplanation({
+      operation: capture.operation, service: capture.service, equipment: capture.equipment,
+      fxRate: capture.fxRate ?? undefined, mex: snapshot.input.mexLeg, usa: snapshot.input.usaLeg,
+      drayage: snapshot.input.drayageLeg,
+    }, result, lineage, snapshot)
+    const create = () => prisma.$transaction(async (tx) => {
+      const laneKey = buildLaneKey(user.orgId, capture.origin, capture.destination, undefined,
+        capture.operation, capture.service, capture.equipment.config, lineage.costBase?.id ?? null)
+      const lane = await tx.lane.upsert({
+        where: { orgId_laneKey: { orgId: user.orgId, laneKey } },
+        create: {
+          orgId: user.orgId, laneKey, costBaseId: lineage.costBase?.id ?? null,
+          origin: capture.origin, destination: capture.destination,
+          operationType: capture.operation, serviceType: capture.service, config: capture.equipment.config,
+        },
+        update: { costBaseId: lineage.costBase?.id ?? null },
+        select: { id: true },
+      })
+      const quote = await tx.quote.create({
+        data: {
+          orgId: user.orgId, laneId: lane.id,
+          assumptionSetId: lineage.set?.id ?? undefined, costBaseId: lineage.costBase?.id ?? undefined,
+          label, previewId: preview.id,
+          calculationPolicy: result.policy, operation: result.operation, service: capture.service,
+          freightBaselineUsd: result.freightBaselineUsd, requiredTariffUsd: result.requiredTariffUsd,
+          requiredTariffMxn: round2(usdToMxn(result.requiredTariffUsd, result.fxRateUsed)), fxRateUsed: result.fxRateUsed,
+          mexLeg: (result.mexLeg ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
+          usaLeg: (result.usaLeg ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
+          commercial: result.commercial as unknown as Prisma.InputJsonValue,
+          explanation: explanation as unknown as Prisma.InputJsonValue,
+          auditEvents: { create: {
+            orgId: user.orgId, actorId: user.sub, action: 'CREATED',
+            note: 'Quote saved from a reviewed server calculation.',
+            payload: { source: 'REVIEWED_PREVIEW', previewId: preview.id, snapshotChecksum: snapshot.checksum,
+              costBaseId: lineage.costBase?.id ?? null, assumptionSetId: lineage.set?.id ?? null } as Prisma.InputJsonValue,
+          } },
+        },
+      })
+      await tx.quoteSaveIntent.create({ data: { orgId: user.orgId, key, intentHash, quoteId: quote.id } })
+      return quote
+    })
+    try {
+      return reply.status(201).send(await create())
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        const winner = await prisma.quoteSaveIntent.findUnique({ where: { orgId_key: { orgId: user.orgId, key } }, include: { quote: true } })
+        if (winner && winner.intentHash === intentHash) return reply.status(200).send(winner.quote)
+        if (winner) throw httpError('La clave de guardado ya se utilizó con otro contenido.', 409)
+      }
+      throw error
+    }
+  })
 
   app.post('/quotes', { preHandler: requireRole('ADMIN', 'OPERATOR') }, async (request, reply) => {
     const user = request.user as JwtPayload

@@ -1,19 +1,19 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { toast } from 'sonner'
+import { useQuery } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { fetcher } from '@/lib/fetcher'
 import { LocationInput } from './location-input'
 import {
-  type QuoteResult, type FormFields, type FormErrors, type LaneHint, type CostBaseOption, type ReopenQuote,
+  type FormFields, type FormErrors, type LaneHint, type CostBaseOption, type ReopenQuote,
   OPS, SVCS, TRUCKS, TRAILERS, CONFIGS, DRIVERS, ROUTES, selectCls,
-  initialFormForQuote, compatibleBases, preferredGovernedBase, activeVersionFor, costBaseReadiness, costBaseReadinessDetail,
-  validate, quoteBody, Field, CostBaseSelector, CalculationContextPanel, ResultSkeleton, QuoteErrorState, Placeholder, Result,
+  compatibleBases, preferredGovernedBase, activeVersionFor, costBaseReadiness, costBaseReadinessDetail,
+  validate, Field, CostBaseSelector, CalculationContextPanel, ResultSkeleton, QuoteErrorState, Placeholder, Result,
 } from './quote-shared'
+import type { QuoteDraft } from './use-quote-draft'
 
 export type { LaneHint }
 
@@ -77,10 +77,10 @@ function validateInSpanish(form: FormFields): FormErrors {
   return errors
 }
 
-export function QuoteForm({ recentLanes = [], costBases = [], initialQuote }: { recentLanes?: LaneHint[]; costBases?: CostBaseOption[]; initialQuote?: ReopenQuote }) {
-  const [form, setForm] = useState<FormFields>(() => initialFormForQuote(costBases, initialQuote))
+export function QuoteForm({ draft, recentLanes = [], costBases = [], initialQuote }: { draft: QuoteDraft; recentLanes?: LaneHint[]; costBases?: CostBaseOption[]; initialQuote?: ReopenQuote }) {
+  const { form, update: setForm, reviewed, quote } = draft
   const [showAdvanced, setShowAdvanced] = useState(false)
-  const [result, setResult] = useState<QuoteResult | null>(null)
+  const result = reviewed?.result ?? null
   const [errors, setErrors] = useState<FormErrors>({})
   const recentRef = useRef<HTMLDetailsElement>(null)
 
@@ -93,22 +93,9 @@ export function QuoteForm({ recentLanes = [], costBases = [], initialQuote }: { 
   })
   const locations = locData?.locations ?? []
 
-  const quote = useMutation({
-    mutationFn: () => fetcher<QuoteResult>('/api/v1/engine/quote-by-route', { method: 'POST', json: quoteBody(form) }),
-    onSuccess: (r) => {
-      setResult(r)
-      toast.success(`Base estimada ${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(r.freightBaselineUsd)}`, {
-        description: `${displayLabel(r.operation)} · ${r.mexLeg ? 'MEX' : ''}${r.mexLeg && r.usaLeg ? ' + ' : ''}${r.usaLeg ? 'EE. UU.' : ''}`,
-      })
-    },
-    onError: () => { setResult(null) }, // fetcher already toasted the error
-  })
-
   const set = <K extends keyof FormFields>(k: K, v: FormFields[K]) => {
     setForm((f) => ({ ...f, [k]: v }))
     if (errors[k]) setErrors((e) => ({ ...e, [k]: undefined }))
-    if (result) setResult(null)
-    if (quote.isError) quote.reset()
   }
   const setOperation = (operation: (typeof OPS)[number]) => {
     const options = compatibleBases(costBases, operation)
@@ -117,8 +104,6 @@ export function QuoteForm({ recentLanes = [], costBases = [], initialQuote }: { 
       const fallback = preferredGovernedBase(costBases, operation)
       return { ...current, operation, costBaseId: currentStillValid ? current.costBaseId : fallback?.id ?? '' }
     })
-    if (result) setResult(null)
-    if (quote.isError) quote.reset()
   }
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -128,11 +113,9 @@ export function QuoteForm({ recentLanes = [], costBases = [], initialQuote }: { 
     quote.mutate()
   }
   const clear = () => {
-    setForm(initialFormForQuote(costBases, initialQuote))
-    setResult(null)
+    draft.reset()
     setErrors({})
     setShowAdvanced(false)
-    quote.reset()
   }
   const applyLane = (lane: LaneHint) => {
     setForm((f) => ({
@@ -149,8 +132,6 @@ export function QuoteForm({ recentLanes = [], costBases = [], initialQuote }: { 
       service: (SVCS as readonly string[]).includes(lane.service) ? (lane.service as (typeof SVCS)[number]) : f.service,
     }))
     setErrors({})
-    if (result) setResult(null)
-    if (quote.isError) quote.reset()
     if (recentRef.current) recentRef.current.open = false
   }
   const onFormKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
@@ -288,16 +269,17 @@ export function QuoteForm({ recentLanes = [], costBases = [], initialQuote }: { 
           <ResultSkeleton />
         ) : result ? (
           <Result
+            draft={draft}
             r={result}
             snapshot={{
-              service: form.service,
-              fxRate: form.fxRate,
-              origin: form.outboundLocation.trim(),
-              destination: form.inboundLocation.trim(),
-              equipment: { truckType: form.truckType, trailer: form.trailer, config: form.config, driver: form.driver },
-              costBaseLabel: selectedCostBase?.code ?? 'Supuestos activos sin base',
-              assumptionVersionLabel: selectedVersion ? `v${selectedVersion.version}` : 'Sin versión activa',
-              costBaseReadiness: costBaseReadiness(selectedCostBase),
+              service: reviewed!.form.service,
+              fxRate: reviewed!.form.fxRate,
+              origin: reviewed!.form.outboundLocation.trim(),
+              destination: reviewed!.form.inboundLocation.trim(),
+              equipment: { truckType: reviewed!.form.truckType, trailer: reviewed!.form.trailer, config: reviewed!.form.config, driver: reviewed!.form.driver },
+              costBaseLabel: result.lineage?.costBase?.code ?? selectedCostBase?.code ?? 'Supuestos activos sin base',
+              assumptionVersionLabel: result.lineage?.set ? `v${result.lineage.set.version}` : selectedVersion ? `v${selectedVersion.version}` : 'Sin versión activa',
+              costBaseReadiness: result.lineage?.readiness ?? costBaseReadiness(selectedCostBase),
               costBaseReadinessDetail: costBaseReadinessDetail(selectedCostBase, form.operation),
               sourceQuoteId: initialQuote?.id,
               sourceQuoteLabel: initialQuote?.label,

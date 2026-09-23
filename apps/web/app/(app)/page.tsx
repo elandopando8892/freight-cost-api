@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { RelativeTime } from '@/components/relative-time'
 import { dateKeyInTimeZone } from '@/lib/civil-date'
 import { QuotesChart } from './quotes-chart'
+import { dashboardErrorCopy, section } from '@/lib/dashboard-state'
 
 export const metadata: Metadata = { title: 'Panel de control' }
 export const dynamic = 'force-dynamic'
@@ -64,23 +65,31 @@ interface SavedQuote {
 interface CarrierOnboarding { completed: number; total: number; ready: boolean }
 
 const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
+const usdPerGallon = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 3 })
 
-async function safe<T>(p: Promise<T>, fallback: T): Promise<T> {
-  try { return await p } catch (err) {
-    if (err instanceof ApiError) return fallback
-    throw err
-  }
+function SectionError({ name, error }: { name: string; error: unknown }) {
+  const status = error instanceof ApiError ? error.status : null
+  const copy = dashboardErrorCopy(status)
+  return <div role="alert" className="rounded-md border border-destructive/30 bg-destructive/5 p-4 text-sm">
+    <p className="font-medium">{name} no disponible</p>
+    <p className="mt-1 text-muted-foreground">{copy.detail}</p>
+    <Link href={copy.href} className="mt-2 inline-block font-medium text-primary underline underline-offset-2">
+      {copy.action}
+    </Link>
+  </div>
 }
 
 export default async function DashboardPage() {
-  // Fetch everything in parallel; tolerate per-endpoint 404/empty so a missing
-  // section doesn't blow up the whole page.
-  const [bases, fuel, quotes, onboarding] = await Promise.all([
-    safe(api<CostBaseSummary[]>('/cost-bases'), [] as CostBaseSummary[]),
-    safe(api<FuelStatus>('/market/fuel'), null as FuelStatus | null),
-    safe(api<SavedQuote[]>('/quotes'), [] as SavedQuote[]),
-    safe(api<CarrierOnboarding>('/onboarding/carrier'), { completed: 0, total: 5, ready: false }),
+  const [basesSection, fuelSection, quotesSection, onboardingSection] = await Promise.all([
+    section(api<CostBaseSummary[]>('/cost-bases')),
+    section(api<FuelStatus>('/market/fuel')),
+    section(api<SavedQuote[]>('/quotes')),
+    section(api<CarrierOnboarding>('/onboarding/carrier')),
   ])
+  const bases = basesSection.data ?? []
+  const fuel = fuelSection.data
+  const quotes = quotesSection.data ?? []
+  const onboarding = onboardingSection.data
   const activeBases = bases.filter((base) =>
     base.status === 'ACTIVE' && base.versions.some((version) => version.status === 'PUBLISHED' && version.isActive),
   )
@@ -113,10 +122,11 @@ export default async function DashboardPage() {
         </div>
       </header>
 
-      {!onboarding.ready && <Card className="mb-6 overflow-hidden border-primary/20 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent"><CardContent className="flex flex-col gap-4 py-5 sm:flex-row sm:items-center sm:justify-between"><div className="flex items-start gap-3"><span className="grid size-9 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground shadow-sm"><Sparkles className="size-4" /></span><div><p className="text-sm font-semibold">Activación operativa pendiente</p><p className="mt-0.5 text-sm text-muted-foreground">{onboarding.completed} de {onboarding.total} pasos con evidencia operativa.</p></div></div><Link href="/onboarding" className="text-sm font-medium text-primary hover:underline">Continuar onboarding →</Link></CardContent></Card>}
+      {onboardingSection.error != null && <div className="mb-6"><SectionError name="Activación operativa" error={onboardingSection.error} /></div>}
+      {onboarding && !onboarding.ready && <Card className="mb-6 overflow-hidden border-primary/20 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent"><CardContent className="flex flex-col gap-4 py-5 sm:flex-row sm:items-center sm:justify-between"><div className="flex items-start gap-3"><span className="grid size-9 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground shadow-sm"><Sparkles className="size-4" /></span><div><p className="text-sm font-semibold">Activación operativa pendiente</p><p className="mt-0.5 text-sm text-muted-foreground">{onboarding.completed} de {onboarding.total} pasos con evidencia operativa.</p></div></div><Link href="/onboarding" className="text-sm font-medium text-primary hover:underline">Continuar onboarding →</Link></CardContent></Card>}
 
       {/* First-run onboarding — only until the first quote is saved */}
-      {quotes.length === 0 && (
+      {quotesSection.data && basesSection.data && quotes.length === 0 && (
         <Card className="mb-6 overflow-hidden border-primary/20">
           <CardHeader className="border-b bg-muted/30 pb-4">
             <CardTitle className="text-base">De datos a tarifa en tres pasos</CardTitle>
@@ -151,13 +161,13 @@ export default async function DashboardPage() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">Bases operativas</p>
-                <p className="mt-2 max-w-56 truncate text-lg font-semibold tracking-tight">{activeBases.length ? `${activeBases.length} ${activeBases.length === 1 ? 'activa' : 'activas'}` : 'Sin bases activas'}</p>
+                <p className="mt-2 max-w-56 truncate text-lg font-semibold tracking-tight">{basesSection.error ? 'Consulta no disponible' : activeBases.length ? `${activeBases.length} ${activeBases.length === 1 ? 'activa' : 'activas'}` : 'Sin bases activas'}</p>
               </div>
               <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary"><Layers3 className="size-4" /></span>
             </div>
             <div className="mt-5 flex items-end justify-between gap-3">
-              <p className="text-sm text-muted-foreground">{defaultBase ? <>{defaultBase.code}{defaultVersion ? ` · v${defaultVersion.version}` : ''} · <RelativeTime iso={defaultBase.updatedAt} /></> : bases.length === 0 ? 'Crea tu primera base para cotizar.' : `${bases.length} bases disponibles; falta activar una versión.`}</p>
-              <Link href="/cost-bases" className="shrink-0 text-sm font-medium text-primary hover:underline">{bases.length ? 'Administrar' : 'Crear base'}</Link>
+              {basesSection.error ? <SectionError name="Bases de costo" error={basesSection.error} /> : <p className="text-sm text-muted-foreground">{defaultBase ? <>{defaultBase.code}{defaultVersion ? ` · v${defaultVersion.version}` : ''} · <RelativeTime iso={defaultBase.updatedAt} /></> : bases.length === 0 ? 'Crea tu primera base para cotizar.' : `${bases.length} bases disponibles; falta activar una versión.`}</p>}
+              {!basesSection.error && <Link href="/cost-bases" className="shrink-0 text-sm font-medium text-primary hover:underline">{bases.length ? 'Administrar' : 'Crear base'}</Link>}
             </div>
           </CardContent>
         </Card>
@@ -167,13 +177,13 @@ export default async function DashboardPage() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">Diesel · EE. UU.</p>
-                <p className="mt-2 text-lg font-semibold tracking-tight">{usRegion ? `${usd.format(usRegion.dieselUsdGal)} / gal` : 'Sin lectura'}</p>
+                <p className="mt-2 text-lg font-semibold tracking-tight">{fuelSection.error ? 'Consulta no disponible' : usRegion ? `${usdPerGallon.format(usRegion.dieselUsdGal)} / gal` : 'Sin lectura'}</p>
               </div>
               <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-cyan-500/10 text-cyan-700 dark:text-cyan-300"><Droplets className="size-4" /></span>
             </div>
             <div className="mt-5 flex items-end justify-between gap-3">
-              <p className="text-sm text-muted-foreground">{newestFuel ? <>Actualizado <RelativeTime iso={newestFuel} /> · {fuel?.fscBrackets ?? 0} brackets FSC</> : 'Aún no hay regiones cargadas.'}</p>
-              <Link href="/fuel" className="shrink-0 text-sm font-medium text-primary hover:underline">Ver mercado</Link>
+              {fuelSection.error ? <SectionError name="Combustible" error={fuelSection.error} /> : <p className="text-sm text-muted-foreground">{newestFuel ? <>Actualizado <RelativeTime iso={newestFuel} /> · {fuel?.fscBrackets ?? 0} brackets FSC</> : 'Aún no hay regiones cargadas.'}</p>}
+              {!fuelSection.error && <Link href="/fuel" className="shrink-0 text-sm font-medium text-primary hover:underline">Ver mercado</Link>}
             </div>
           </CardContent>
         </Card>
@@ -183,20 +193,20 @@ export default async function DashboardPage() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">Cotizaciones</p>
-                <p className="mt-2 text-lg font-semibold tracking-tight">{quotes.length} <span className="text-sm font-normal text-muted-foreground">guardadas</span></p>
+                <p className="mt-2 text-lg font-semibold tracking-tight">{quotesSection.error ? 'Consulta no disponible' : <>{quotes.length} <span className="text-sm font-normal text-muted-foreground">guardadas</span></>}</p>
               </div>
               <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"><CircleDollarSign className="size-4" /></span>
             </div>
             <div className="mt-5 flex items-end justify-between gap-3">
-              <p className="text-sm text-muted-foreground">{recent[0] ? <>Última <RelativeTime iso={recent[0].createdAt} /> · {usd.format(recent[0].freightBaselineUsd)}</> : 'Empieza con una nueva cotización.'}</p>
-              <Link href="/quotes" className="shrink-0 text-sm font-medium text-primary hover:underline">Historial</Link>
+              {quotesSection.error ? <SectionError name="Cotizaciones" error={quotesSection.error} /> : <p className="text-sm text-muted-foreground">{recent[0] ? <>Última <RelativeTime iso={recent[0].createdAt} /> · {usd.format(recent[0].freightBaselineUsd)}</> : 'Empieza con una nueva cotización.'}</p>}
+              {!quotesSection.error && <Link href="/quotes" className="shrink-0 text-sm font-medium text-primary hover:underline">Historial</Link>}
             </div>
           </CardContent>
         </Card>
       </section>
 
       {/* Quote volume */}
-      {quotes.length > 0 && (
+      {!quotesSection.error && quotes.length > 0 && (
         <Card className="mb-6">
           <CardHeader className="flex flex-row items-start justify-between gap-4 border-b pb-4">
             <div>
@@ -225,7 +235,7 @@ export default async function DashboardPage() {
           )}
         </CardHeader>
         <CardContent className="p-0">
-          {recent.length === 0 ? (
+          {quotesSection.error ? <div className="p-5"><SectionError name="Actividad reciente" error={quotesSection.error} /></div> : recent.length === 0 ? (
             <div className="px-6 py-10 text-center text-sm text-muted-foreground">
               Aún no hay cotizaciones guardadas. <Link href="/quote" className="font-medium text-primary underline underline-offset-2">Crear la primera →</Link>
             </div>

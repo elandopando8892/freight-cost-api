@@ -3,7 +3,7 @@
 // Shared quote types, field constants, validation, and the Result renderer — used
 // by both the Rápido form (quote-form) and the Guiado wizard (quote-wizard).
 
-import { cloneElement, useId, useState, type ReactElement, type ReactNode } from 'react'
+import { cloneElement, useId, useRef, type ReactElement, type ReactNode } from 'react'
 import Link from 'next/link'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -12,7 +12,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { fetcher } from '@/lib/fetcher'
-import { quoteErrorCopy } from '@/lib/quote-error'
+import { quoteErrorCopy, quoteSaveErrorCopy } from '@/lib/quote-error'
+import { fxFormat, marginLabel, provenanceLabel, usdPerMile } from '@/lib/quote-format'
+import type { QuoteDraft } from './use-quote-draft'
 
 // ── Types (mirror the API engine output we consume) ─────────────────────────
 export interface MexLeg {
@@ -29,8 +31,10 @@ export interface UsaLeg {
 }
 export interface Commercial {
   costFloorUsd: number; minSellUsd: number; targetSellUsd: number; premiumSellUsd: number
+  minMarginPct?: number; targetMarginPct?: number; premiumMarginPct?: number
   recommendedSellUsd: number; grossProfitUsd: number; grossMarginPct: number; gpPerLoadedMileUsd: number
-  marketReferenceUsd: number; noGoFlag: boolean; reviewFlag: boolean; notes: string[]
+  marketReferenceUsd: number; marketReferenceProvenance?: 'observed' | 'mixed' | 'cost_proxy' | 'absent'
+  noGoFlag: boolean; reviewFlag: boolean; notes: string[]
 }
 export interface ResolvedMexLeg {
   baseKm: number; routeExpensesMxn?: number; baseHours?: number
@@ -47,6 +51,8 @@ export interface ResolvedUsaLeg {
   origin?: string; dest?: string
 }
 export interface QuoteResult {
+  previewId: string
+  lineage?: { costBase: { id: string; code: string; status: string } | null; set: { id: string; version: number; status: string } | null; readiness: CostBaseReadiness }
   policy: 'OPERATIONAL_V3' | 'WORKBOOK_V3'
   operation: string
   mexLeg: MexLeg | null
@@ -452,46 +458,41 @@ export function Placeholder() {
   )
 }
 
-export function Result({ r, snapshot }: { r: QuoteResult; snapshot: FormSnapshot }) {
+export function Result({ draft, r, snapshot }: { draft: QuoteDraft; r: QuoteResult; snapshot: FormSnapshot }) {
   const c = r.commercial
   const requiresLineageReview = snapshot.costBaseReadiness !== 'GOVERNED'
   const requiresReview = c.reviewFlag || requiresLineageReview
   const decision = c.noGoFlag ? 'NO-GO' : requiresReview ? 'REVISAR' : 'LISTA PARA DECISION'
   const decisionClass = c.noGoFlag ? 'border-rose-200 bg-rose-50 text-rose-800' : requiresReview ? 'border-amber-200 bg-amber-50 text-amber-800' : 'border-emerald-200 bg-emerald-50 text-emerald-800'
   const sourceLabel = snapshot.sourceQuoteLabel?.trim() || snapshot.sourceQuoteId?.slice(0, 8)
-  const [label, setLabel] = useState(() => sourceLabel ? `Reapertura · ${sourceLabel}` : '')
-  const [savedId, setSavedId] = useState<string | null>(null)
+  const saveState = draft.saveState
+  const savedId = saveState?.savedId ?? null
+  const pendingSave = useRef(false)
 
   const save = useMutation({
-    mutationFn: () => {
-      const body: Record<string, unknown> = { operation: r.operation, equipment: snapshot.equipment }
-      if (label.trim()) body.label = label.trim()
-      if (snapshot.service) body.service = snapshot.service
-      if (snapshot.fxRate) body.fxRate = Number(snapshot.fxRate)
-      if (snapshot.origin) body.origin = snapshot.origin
-      if (snapshot.destination) body.destination = snapshot.destination
-      if (r.costBaseId) body.costBaseId = r.costBaseId
-      if (r.assumptionSetId) body.assumptionSetId = r.assumptionSetId
-      body.policy = r.policy
-      if (r.resolved.mexLeg) {
-        const m = r.resolved.mexLeg
-        body.mex = { baseKm: m.baseKm, routeExpensesMxn: m.routeExpensesMxn ?? 0, baseHours: m.baseHours ?? 0, route: m.route }
-      }
-      if (r.resolved.usaLeg) {
-        const u = r.resolved.usaLeg
-        body.usa = {
-          loadedMiles: u.loadedMiles, transitDaysRaw: u.transitDaysRaw ?? 0, driverExpenses: u.driverExpenses ?? 0,
-          outState: u.outState, dieselUsdGal: u.dieselUsdGal, fscUsdMile: u.fscUsdMile,
-          originCondition: u.originCondition, destCondition: u.destCondition,
-        }
-      }
-      return fetcher<{ id: string; createdAt: string; label: string | null }>('/api/v1/quotes', { method: 'POST', json: body })
+    mutationFn: (intent: { previewId: string; key: string; label: string | null }) => {
+      return fetcher<{ id: string; createdAt: string; label: string | null }>('/api/v1/quotes/from-preview', {
+        method: 'POST', headers: { 'Idempotency-Key': intent.key },
+        json: { previewId: intent.previewId, label: intent.label }, silent: true,
+      })
     },
-    onSuccess: (q) => {
-      setSavedId(q.id)
-      toast.success(requiresLineageReview ? 'Cotización guardada para revisión' : 'Cotización guardada', { description: q.label ?? q.id.slice(0, 8) })
+    onSuccess: (q, intent) => {
+      if (draft.recordSaved(intent.previewId, q.id)) {
+        toast.success(requiresLineageReview ? 'Cotización guardada para revisión' : 'Cotización guardada', { description: q.label ?? q.id.slice(0, 8) })
+      } else {
+        toast.info('Se guardó un cálculo anterior. Consulta el historial; el borrador actual no cambió.')
+      }
     },
+    onSettled: () => { pendingSave.current = false },
   })
+
+  const submitSave = () => {
+    if (pendingSave.current) return
+    const intent = draft.beginSave()
+    if (!intent?.previewId) return
+    pendingSave.current = true
+    save.mutate({ previewId: intent.previewId, key: intent.key, label: intent.label })
+  }
 
   return (
     <div className="grid gap-3">
@@ -516,7 +517,7 @@ export function Result({ r, snapshot }: { r: QuoteResult; snapshot: FormSnapshot
           </div>
           <div className="grid grid-cols-2 gap-3 rounded-md border bg-muted/15 p-3 text-sm sm:grid-cols-4">
             <Stat label="MXN" value={mxn.format(r.freightBaselineUsd * r.fxRateUsed)} />
-            <Stat label="FX" value={r.fxRateUsed.toFixed(2)} />
+            <Stat label="FX · MXN/USD" value={fxFormat.format(r.fxRateUsed)} />
             <Stat label="Operación" value={r.operation} />
             <Stat label="Margen" value={pct(c.grossMarginPct)} />
           </div>
@@ -538,13 +539,13 @@ export function Result({ r, snapshot }: { r: QuoteResult; snapshot: FormSnapshot
           ) : null}
           {save.isError && (
             <div className="rounded border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs text-destructive" role="alert">
-              No se pudo guardar la cotización. Conservamos el resultado; revisa tu sesión e inténtalo nuevamente.
+              {quoteSaveErrorCopy(save.error)}
             </div>
           )}
-          <form className="flex flex-wrap items-center gap-2 border-t pt-3" onSubmit={(e) => { e.preventDefault(); save.mutate() }}>
-            <Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Etiqueta opcional · Ej. Acme Q3" aria-label="Etiqueta de la cotización" className="h-9 flex-1 min-w-[200px]" disabled={save.isPending} />
+          <form className="flex flex-wrap items-center gap-2 border-t pt-3" onSubmit={(e) => { e.preventDefault(); submitSave() }}>
+            <Input value={saveState?.label ?? ''} onChange={(e) => draft.setSaveLabel(e.target.value)} placeholder="Etiqueta opcional · Ej. Acme Q3" aria-label="Etiqueta de la cotización" className="h-9 flex-1 min-w-[200px]" disabled={save.isPending || Boolean(saveState?.attempted && (!savedId || saveState.copyRequested))} />
             <Button type="submit" size="sm" disabled={save.isPending}>
-              {save.isPending ? 'Guardando…' : savedId ? 'Guardar otra copia' : requiresLineageReview ? 'Guardar para revisión' : 'Guardar cotización'}
+              {save.isPending ? 'Guardando…' : saveState?.copyRequested ? 'Reintentar copia' : savedId ? 'Guardar otra copia' : requiresLineageReview ? 'Guardar para revisión' : 'Guardar cotización'}
             </Button>
             {savedId && (
               <div className="flex items-center gap-3 text-xs">
@@ -616,15 +617,15 @@ export function Result({ r, snapshot }: { r: QuoteResult; snapshot: FormSnapshot
         <CardContent className="grid gap-3 p-4">
           <div className="grid grid-cols-2 gap-3 rounded-md border bg-muted/15 p-3 sm:grid-cols-4">
             <Stat label="Piso de costo" value={usd.format(c.costFloorUsd)} />
-            <Stat label="Mínimo (12%)" value={usd.format(c.minSellUsd)} />
-            <Stat label="Objetivo (18%)" value={usd.format(c.targetSellUsd)} />
-            <Stat label="Premium (25%)" value={usd.format(c.premiumSellUsd)} />
+            <Stat label={marginLabel('Mínimo', c.minMarginPct)} value={usd.format(c.minSellUsd)} />
+            <Stat label={marginLabel('Objetivo', c.targetMarginPct)} value={usd.format(c.targetSellUsd)} />
+            <Stat label={marginLabel('Premium', c.premiumMarginPct)} value={usd.format(c.premiumSellUsd)} />
           </div>
           <div className="grid grid-cols-2 gap-3 rounded-md border bg-muted/15 p-3 sm:grid-cols-4">
             <Stat label="Venta recomendada" value={usd.format(c.recommendedSellUsd)} />
             <Stat label="Utilidad bruta" value={usd.format(c.grossProfitUsd)} />
-            <Stat label="UB / milla cargada" value={usd.format(c.gpPerLoadedMileUsd)} />
-            <Stat label="Referencia de mercado" value={c.marketReferenceUsd > 0 ? usd.format(c.marketReferenceUsd) : '—'} />
+            <Stat label="UB · USD/milla cargada" value={usdPerMile.format(c.gpPerLoadedMileUsd)} />
+            <Stat label={`Referencia · ${provenanceLabel(c.marketReferenceProvenance)}`} value={c.marketReferenceUsd > 0 ? usd.format(c.marketReferenceUsd) : '—'} />
           </div>
           {(c.noGoFlag || c.reviewFlag || c.notes.length > 0) && (
             <div className="grid gap-1.5 rounded-md border bg-muted/30 p-3 text-sm">
@@ -651,8 +652,8 @@ function MexCard({ leg }: { leg: MexLeg }) {
       </CardHeader>
       <CardContent className="grid gap-3 p-4">
         <div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
-          <Stat label="RPM" value={leg.rpm.toFixed(2)} />
-          <Stat label="FSC" value={leg.fsc.toFixed(2)} />
+          <Stat label="RPM · USD/milla" value={usdPerMile.format(leg.rpm)} />
+          <Stat label="FSC · USD/milla" value={usdPerMile.format(leg.fsc)} />
           <Stat label="Margen UT" value={pct(leg.utMargin)} />
           <Stat label="CFU" value={usd.format(leg.cfuUsd)} />
         </div>
@@ -683,8 +684,8 @@ function UsaCard({ leg }: { leg: UsaLeg }) {
       </CardHeader>
       <CardContent className="grid gap-3 p-4">
         <div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
-          <Stat label="RPM" value={leg.rpm.toFixed(2)} />
-          <Stat label="FSC" value={leg.fsc.toFixed(2)} />
+          <Stat label="RPM · USD/milla" value={usdPerMile.format(leg.rpm)} />
+          <Stat label="FSC · USD/milla" value={usdPerMile.format(leg.fsc)} />
           <Stat label="Tarifa UT" value={pct(leg.utRate)} />
           <Stat label="CFU" value={usd.format(leg.cfuUsd)} />
         </div>
@@ -692,7 +693,7 @@ function UsaCard({ leg }: { leg: UsaLeg }) {
           <Stat label="Combustible" value={usd.format(leg.fuelCostUsd)} />
           <Stat label="Mantto. + llantas" value={usd.format(leg.maintTiresUsd)} />
           <Stat label="Operador" value={usd.format(leg.driverCostUsd)} />
-          <Stat label="Mercado DAT" value={leg.marketRpm > 0 ? `${leg.marketRpm.toFixed(2)} RPM` : '—'} />
+          <Stat label="Mercado DAT · USD/milla" value={leg.marketRpm > 0 ? usdPerMile.format(leg.marketRpm) : '—'} />
         </div>
         <div className="text-xs">
           <div className="text-muted-foreground">ReferenceKey</div>

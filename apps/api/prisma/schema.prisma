@@ -222,6 +222,8 @@ model Organization {
   assumptionSets           AssumptionSet[]
   lanes                    Lane[]
   quotes                   Quote[]
+  quoteCalculationPreviews QuoteCalculationPreview[]
+  quoteSaveIntents         QuoteSaveIntent[]
   customerQuotes           CustomerQuote[]
   customerQuoteEmailDrafts CustomerQuoteEmailDraft[]
   customerQuoteTemplates   CustomerQuoteTemplate[]
@@ -918,6 +920,7 @@ model Quote {
   costBaseId        String?
   productionRouteId String?
   label             String?
+  previewId         String?
   version           Int               @default(1)
   status            QuoteStatus       @default(DRAFT)
   confirmedAt       DateTime?
@@ -946,6 +949,7 @@ model Quote {
   // calculation components and commercial decision at save time.
   explanation     Json?
   auditEvents     QuoteAuditEvent[]
+  saveIntents     QuoteSaveIntent[]
   scenarioReviews ScenarioReview[]
 
   org             Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
@@ -959,6 +963,38 @@ model Quote {
   @@index([productionRouteId])
   @@index([confirmedById])
   @@index([orgId, status])
+}
+
+// The retry key is deliberately kept outside Quote responses and quote history.
+model QuoteSaveIntent {
+  orgId      String
+  key        String
+  intentHash String
+  quoteId    String
+  createdAt  DateTime @default(now())
+
+  org   Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  quote Quote        @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+
+  @@id([orgId, key])
+  @@index([quoteId])
+}
+
+// Short-lived, organization-scoped server evidence for an exact reviewed calculation.
+// Saving never accepts economic values from the browser.
+model QuoteCalculationPreview {
+  id        String   @id @default(cuid())
+  orgId     String
+  capture   Json
+  lineage   Json
+  snapshot  Json
+  result    Json
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId, expiresAt])
 }
 
 // Immutable review packet generated from a reproducible quote snapshot. The

@@ -123,11 +123,16 @@ export function calculate(input: EngineInput): EngineOutput {
   const marketReferenceUsd =
     (usaLeg && usaLeg.marketRateUsd > 0 ? usaLeg.marketRateUsd : usaLeg ? usaFlat : 0) +
     (mexLeg ? mexLeg.requiredTariffUsd : 0)
+  const hasObservedMarket = Boolean(usaLeg && usaLeg.marketRpm > 0 && usaLeg.marketRateUsd > 0)
+  const marketReferenceProvenance = marketReferenceUsd <= 0 ? 'absent'
+    : hasObservedMarket && mexLeg ? 'mixed'
+      : hasObservedMarket ? 'observed' : 'cost_proxy'
   const commercial = calculateCommercial({
     productionCostUsd,
     riskAdjUsd,
     recommendedSellUsd: freightBaselineUsd,
     marketReferenceUsd,
+    marketReferenceProvenance,
     loadedMiles,
     cycleDays,
     fuelMixOk: !legacyOperational && operation !== 'D2D Export' && operation !== 'D2D Import'

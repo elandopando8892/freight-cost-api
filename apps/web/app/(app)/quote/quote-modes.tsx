@@ -5,11 +5,13 @@ import Link from 'next/link'
 import { QuoteForm, type LaneHint } from './quote-form'
 import { QuoteWizard } from './quote-wizard'
 import { preferredGovernedBase, type CostBaseOption, type ReopenQuote } from './quote-shared'
+import { useQuoteDraft } from './use-quote-draft'
 
 type Mode = 'guided' | 'fast'
 
 export function QuoteModes({ recentLanes = [], costBases = [], initialQuote, reopenError }: { recentLanes?: LaneHint[]; costBases?: CostBaseOption[]; initialQuote?: ReopenQuote; reopenError?: string | null }) {
   const [mode, setMode] = useState<Mode>('guided')
+  const draft = useQuoteDraft(costBases, initialQuote)
   const hasInitialGovernedBase = Boolean(preferredGovernedBase(costBases, 'D2D Import'))
   return (
     <>
@@ -39,7 +41,7 @@ export function QuoteModes({ recentLanes = [], costBases = [], initialQuote, reo
         <ModeTab active={mode === 'guided'} onClick={() => setMode('guided')} label="Guiado" description="Ruta, equipo y revisión" />
         <ModeTab active={mode === 'fast'} onClick={() => setMode('fast')} label="Rápido" description="Formulario para operación experta" />
       </div>
-      {mode === 'guided' ? <QuoteWizard costBases={costBases} initialQuote={initialQuote} /> : <QuoteForm recentLanes={recentLanes} costBases={costBases} initialQuote={initialQuote} />}
+      {mode === 'guided' ? <QuoteWizard draft={draft} costBases={costBases} initialQuote={initialQuote} /> : <QuoteForm draft={draft} recentLanes={recentLanes} costBases={costBases} initialQuote={initialQuote} />}
     </>
   )
 }
