@@ -11,7 +11,10 @@ import { defaultService } from './engine.factors.js'
 import type { EngineInput, EquipmentSpec, MarketCondition } from './engine.types.js'
 import { assertCalculationOverrides, resolveCalculationContext, scopeForOperation } from '../cost-bases/cost-bases.service.js'
 import { pricingInputIssues } from './engine-input-validation.js'
-import { buildQuoteCalculationSnapshot } from '../quotes/quote-snapshot.js'
+import { buildQuoteCalculationSnapshot, calculateForQuoteSnapshot } from '../quotes/quote-snapshot.js'
+import { verifiedPreviewData } from '../quotes/quote-preview.js'
+import { compareObservedTripCosts } from './engine-economic-validation.js'
+import { OperationalSegmentSchema, segmentFor } from '../cost-bases/operational-segments.js'
 
 const MarketConditionEnum = z.enum([
   'Very Tight', 'Moderately Tight', 'Balanced', 'Slightly Loose', 'Very Loose',
@@ -85,6 +88,43 @@ const CalculateSchema = z.object({
 
 export async function engineRoutes(app: FastifyInstance) {
   app.addHook('preHandler', authenticate)
+
+  const EconomicComparisonSchema = z.object({
+    previewId: z.string().min(1),
+    observed: z.object({
+      sourceReference: z.string().trim().min(4).max(240),
+      asOf: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(value => {
+        const date = new Date(`${value}T00:00:00Z`)
+        return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value
+          && date.getTime() <= Date.now()
+      }, 'Invalid observation date'),
+      allocationMethod: z.string().trim().min(10).max(500),
+      mexProductionCostUsd: z.number().finite().positive().optional(),
+      usaProductionCostUsd: z.number().finite().positive().optional(),
+    }).strict(),
+  }).strict()
+
+  app.post('/engine/compare-observed-cost', async (request, reply) => {
+    reply.header('Cache-Control', 'no-store')
+    const { orgId } = request.user as JwtPayload
+    const body = EconomicComparisonSchema.parse(request.body)
+    const preview = await prisma.quoteCalculationPreview.findFirst({ where: { id: body.previewId, orgId } })
+    if (!preview) return reply.status(404).send({ error: 'Calculation preview not found for this organization.' })
+    if (preview.expiresAt.getTime() <= Date.now()) return reply.status(409).send({ error: 'Calculation preview expired; calculate again.' })
+    const { lineage, snapshot } = verifiedPreviewData(preview)
+    if (lineage.readiness !== 'GOVERNED' || !lineage.costBase) {
+      return reply.status(422).send({ error: 'A governed cost base is required for observed-cost comparison.' })
+    }
+    const base = await prisma.costBase.findFirst({
+      where: { id: lineage.costBase.id, orgId },
+      select: { operationalSegment: true },
+    })
+    const parsedSegment = OperationalSegmentSchema.safeParse(base?.operationalSegment)
+    if (!parsedSegment.success || segmentFor(parsedSegment.data).status !== 'CONFIGURABLE') {
+      return reply.status(422).send({ error: 'This segment has no supported own-cost comparison model.' })
+    }
+    return reply.send(compareObservedTripCosts(parsedSegment.data, calculateForQuoteSnapshot(snapshot), body.observed))
+  })
 
   app.post('/engine/calculate', async (request, reply) => {
     const { orgId } = request.user as JwtPayload
