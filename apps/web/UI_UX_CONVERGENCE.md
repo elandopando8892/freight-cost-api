@@ -366,3 +366,19 @@ Pendiente para cierre humano al 100%:
 - El transporte crea una clave de idempotencia estable, toma un claim exclusivo y conserva recibo, identificadores Gmail, actor y timestamps.
 - Una respuesta ambigua queda `DELIVERY_UNKNOWN` y bloquea reintentos ciegos para evitar duplicados.
 - El receptor `send_fcm_customer_quote_email` todavía debe implementarse y desplegarse en Rateware antes de habilitar producción.
+# Incremento QA de errores de cálculo — 2026-09-22
+
+Wireframe de estado (mismo contenedor de error existente; no se cambia la navegación):
+
+```text
+┌ Captura conservada ──────────────────────────┐
+│ Origen · Destino · Base · Equipo · FX        │
+└─────────────────────────────────────────────┘
+┌ Revisa los datos del cálculo ────────────────┐
+│ Corrige: [nombres de campos conocidos]      │
+│ Conservamos la captura.                     │
+│ [Intentar nuevamente]                       │
+└─────────────────────────────────────────────┘
+```
+
+Sin campos estructurados conocidos, indicar origen/destino/base/servicio/FX sin mostrar texto arbitrario del servidor. Separar 401 sesión, 403 permisos, 429 límite y 5xx servicio. No modificar colores, fórmulas o controles de aprobación. Evidencia y límites: `tests/visual/README.md`.

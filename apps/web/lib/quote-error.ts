@@ -1,8 +1,21 @@
 /** Allowlisted UI copy: never display arbitrary server diagnostics persistently. */
 export function quoteErrorCopy(error: unknown) {
   const failure = error && typeof error === 'object'
-    ? error as { status?: unknown; message?: unknown }
+    ? error as { status?: unknown; message?: unknown; body?: { issues?: unknown } }
     : null
+  const fields: Record<string, string> = { outboundLocation: 'origen', inboundLocation: 'destino', mexBorder: 'frontera de México', usBorder: 'frontera de EE. UU.', operation: 'operación', service: 'servicio', route: 'tipo de ruta', costBaseId: 'base de costo', fxRate: 'tipo de cambio', 'equipment.truckType': 'camión', 'equipment.trailer': 'remolque', 'equipment.config': 'configuración', 'equipment.driver': 'operador' }
+  if (failure?.status === 400 || failure?.status === 422) {
+    const issues = Array.isArray(failure.body?.issues) ? failure.body.issues : []
+    const labels = [...new Set(issues.flatMap(issue => {
+      const field = issue && typeof issue === 'object' ? (issue as { field?: unknown }).field : null
+      return typeof field === 'string' && Object.hasOwn(fields, field) ? [fields[field]] : []
+    }))]
+    return { title: 'Revisa los datos del cálculo', description: labels.length ? `Corrige: ${labels.join(', ')}. Conservamos la captura; vuelve a calcular después de corregirla.` : 'El servidor rechazó los datos. Revisa origen, destino, base, servicio y tipo de cambio. Conservamos la captura.', reviewBase: false }
+  }
+  if (failure?.status === 401) return { title: 'La sesión expiró', description: 'Inicia sesión nuevamente antes de calcular. Conservamos la captura mientras permanezcas en esta pantalla.', reviewBase: false }
+  if (failure?.status === 403) return { title: 'Sin permiso para calcular', description: 'Solicita a un administrador revisar tus permisos. La captura no se ha eliminado.', reviewBase: false }
+  if (failure?.status === 429) return { title: 'Límite temporal de consultas', description: 'Espera un momento y vuelve a calcular. No enviamos reintentos automáticos.', reviewBase: false }
+  if (typeof failure?.status === 'number' && failure.status >= 500) return { title: 'Servicio de cálculo no disponible', description: 'Conservamos la captura. Intenta nuevamente cuando el servicio se recupere; no equivale a una ruta sin datos.', reviewBase: false }
   const missingProfile = failure?.status === 409 && failure.message ===
     'Legacy cost-base versions without an applicability profile are restricted to historical snapshot replay.'
   return missingProfile ? {
