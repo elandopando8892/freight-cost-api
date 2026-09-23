@@ -225,6 +225,7 @@ model Organization {
   quotes                   Quote[]
   quoteCalculationPreviews QuoteCalculationPreview[]
   quoteSaveIntents         QuoteSaveIntent[]
+  partnerCostEstimates     PartnerCostEstimate[]
   customerQuotes           CustomerQuote[]
   customerQuoteEmailDrafts CustomerQuoteEmailDraft[]
   customerQuoteTemplates   CustomerQuoteTemplate[]
@@ -967,6 +968,28 @@ model Quote {
   @@index([productionRouteId])
   @@index([confirmedById])
   @@index([orgId, status])
+}
+
+// Purchase-only evidence; never treated as a commercial Quote.
+model PartnerCostEstimate {
+  id         String   @id @default(uuid())
+  orgId      String
+  previousId String?
+  version    Int
+  actorId    String
+  saveKey    String
+  intentHash String
+  snapshot   Json
+  createdAt  DateTime @default(now())
+
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  previous PartnerCostEstimate? @relation("PartnerCostVersions", fields: [orgId, previousId], references: [orgId, id], onDelete: NoAction, onUpdate: NoAction)
+  next PartnerCostEstimate[] @relation("PartnerCostVersions")
+
+  @@unique([orgId, id])
+  @@unique([orgId, saveKey])
+  @@unique([orgId, previousId])
+  @@index([orgId, createdAt, id])
 }
 
 // The retry key is deliberately kept outside Quote responses and quote history.

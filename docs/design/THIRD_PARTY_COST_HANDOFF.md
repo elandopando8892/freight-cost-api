@@ -1,5 +1,31 @@
 # Costos de socios · wireframes y contrato visual
 
+## Incremento: economía congelada y persistencia
+
+```text
+DESKTOP 1280 / MÓVIL 390 (misma secuencia, una columna)
+Costos de socios                 [Estimaciones guardadas]
+[Captura existente → Calcular]
+[Desglose + costo conocido USD]
+[Guardar estimación / Guardar nueva versión]
+Guardado: versión N · [Abrir versión guardada]
+
+Estimaciones guardadas          [Nueva estimación]
+Origen → Destino · Fecha viaje · vN · [Abrir]
+[Siguientes 20]
+
+Versión guardada N — evidencia histórica, no tarifa vigente
+[Costo congelado + desglose]
+[Ver tarifas, referencias, vigencias y supuestos ▾] (FX y captura congelada)
+[Versión anterior] [Versión siguiente, si existe]
+[Preparar nueva versión ▾]
+  Captura precargada → editar → recalcular → guardar vN+1
+```
+
+Reutiliza ancho, tokens y espaciado existentes. Guardar sólo aparece tras un cálculo completo y revisable; no implica cotización de venta ni verificación de fuentes. Una edición invalida el cálculo visible. En guardado se bloquea la captura; si la respuesta se pierde, el reintento conserva clave y contenido y la captura sigue bloqueada para reconciliar el intento. Éxito muestra enlace persistente. Conflicto de versión pide abrir la sucesora; no sobrescribe. VIEWER consulta historial/detalle, sin controles de escritura. Historial vacío lo indica, un fallo no se representa como lista vacía. Tarjetas y texto largo se ajustan al ancho; botones de 44 px, foco visible, orden de lectura natural, errores con alert y confirmación con status. Detalle muestra la versión congelada sin recálculo implícito ni FX actualizado.
+
+La base de datos guarda versiones append-only separadas de Quote: sólo compra, sin margen comercial inventado. La migración se valida en PostgreSQL desechable antes de proponer su aplicación remota. Los wireframes inferiores describen la captura original; la indicación de no persistencia corresponde únicamente a esa primera entrega.
+
 Alcance: estimar la compra D2D de un viaje sencillo con intercambio entre línea MX y US. Entrada desde Cotizar → Costos de socios. No se reutiliza el perfil de activos propios. Se conservan las bases y fórmulas V3 existentes.
 
 ## Wireframe desktop · 1280 px

@@ -13,6 +13,7 @@ import { catalogRoutes } from "./modules/catalog/catalog.routes.js";
 import { marketRoutes } from "./modules/market/market.routes.js";
 import { lanesRoutes } from "./modules/lanes/lanes.routes.js";
 import { engineRoutes } from "./modules/engine/engine.routes.js";
+import { partnerCostRoutes } from "./modules/engine/partner-cost.routes.js";
 import { quotesRoutes } from "./modules/quotes/quotes.routes.js";
 import { productionRoutes } from "./modules/production/production.routes.js";
 import { cronRoutes } from "./modules/cron/cron.routes.js";
@@ -122,6 +123,7 @@ export function buildApp() {
   app.register(marketRoutes);
   app.register(lanesRoutes);
   app.register(engineRoutes);
+  app.register(partnerCostRoutes);
   app.register(quotesRoutes);
   app.register(productionRoutes);
   app.register(cronRoutes);

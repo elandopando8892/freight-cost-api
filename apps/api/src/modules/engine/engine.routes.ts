@@ -16,7 +16,7 @@ import { verifiedPreviewData } from '../quotes/quote-preview.js'
 import { compareObservedTripCosts } from './engine-economic-validation.js'
 import { OperationalSegmentSchema, segmentFor } from '../cost-bases/operational-segments.js'
 import { requireRole } from '../../middleware/authorize.js'
-import { calculateThirdPartyCost } from './third-party-cost.js'
+import { reviewedPartnerCost } from './partner-cost-snapshot.js'
 
 const MarketConditionEnum = z.enum([
   'Very Tight', 'Moderately Tight', 'Balanced', 'Slightly Loose', 'Very Loose',
@@ -93,7 +93,7 @@ export async function engineRoutes(app: FastifyInstance) {
 
   app.post('/engine/third-party-cost', { preHandler: requireRole('ADMIN', 'OPERATOR') }, async (request, reply) => {
     reply.header('Cache-Control', 'no-store')
-    return reply.send(calculateThirdPartyCost(request.body))
+    return reply.send(reviewedPartnerCost(request.body))
   })
 
   const EconomicComparisonSchema = z.object({

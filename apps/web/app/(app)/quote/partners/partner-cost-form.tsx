@@ -1,10 +1,13 @@
 'use client'
 
-import { useRef, useState, type FormEvent, type ReactNode } from 'react'
+import { createContext, useContext, useId, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { fetcher, ClientApiError } from '@/lib/fetcher'
 
 const control = 'min-h-11 w-full min-w-0 rounded border border-input bg-background px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-ring'
-type Report = {
+export type Report = {
+  reviewChecksum: string
+  modelVersion: string
+  input: Record<string, unknown>
   status: 'INCOMPLETE' | 'ESTIMATE'
   purchaseCostUsd: number | null
   issues: { field: string; message: string }[]
@@ -13,6 +16,12 @@ type Report = {
   exclusions: string[]
 }
 const usd = (value: number) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'USD', currencyDisplay: 'narrowSymbol' }).format(value)
+const InitialInput = createContext<Record<string, unknown>>({})
+function useInitial(name: string) {
+  const input = useContext(InitialInput)
+  const value = name.split('.').reduce<unknown>((obj, key) => obj && typeof obj === 'object' ? (obj as Record<string, unknown>)[key] : undefined, input)
+  return value === undefined ? '' : String(value)
+}
 
 function invalidFieldCopy(body: unknown) {
   const labels: Record<string, string> = { mex: 'tarifa y condiciones MX', usa: 'tarifa y condiciones US',
@@ -32,7 +41,7 @@ function Field({ name, label, type = 'text', required = true, minLength, step = 
   name: string; label: string; type?: string; required?: boolean; minLength?: number; step?: string
 }) {
   return <label className="grid min-w-0 gap-1 text-sm"><span>{label}</span>
-    <input className={control} name={name} type={type} required={required} minLength={minLength}
+    <input className={control} name={name} type={type} required={required} minLength={minLength} defaultValue={useInitial(name)}
       maxLength={240} min={type === 'number' ? 0 : undefined} max={type === 'number' ? 100000000 : undefined}
       step={type === 'number' ? step : undefined} />
   </label>
@@ -40,8 +49,9 @@ function Field({ name, label, type = 'text', required = true, minLength, step = 
 function Select({ name, label, children, onChange, value }: {
   name: string; label: string; children: ReactNode; onChange?: (value: string) => void; value?: string
 }) {
+  const initial = useInitial(name)
   return <label className="grid min-w-0 gap-1 text-sm"><span>{label}</span>
-    <select className={control} name={name} required value={value} defaultValue={value === undefined ? '' : undefined}
+    <select className={control} name={name} required value={value} defaultValue={value === undefined ? initial : undefined}
       onChange={event => onChange?.(event.target.value)}>{children}</select>
   </label>
 }
@@ -50,11 +60,12 @@ function Currency({ name }: { name: string }) {
 }
 function Notes({ name, label }: { name: string; label: string }) {
   return <label className="grid gap-1 text-sm"><span>{label}</span>
-    <textarea className={control} name={name} required minLength={10} maxLength={1500} rows={3} />
+    <textarea className={control} name={name} required minLength={10} maxLength={1500} rows={3} defaultValue={useInitial(name)} />
   </label>
 }
 function Term({ name, label, border = false }: { name: string; label: string; border?: boolean }) {
-  const [mode, setMode] = useState('UNKNOWN')
+  const initial = useInitial(`${name}.mode`)
+  const [mode, setMode] = useState(initial || 'UNKNOWN')
   return <div className="space-y-3 rounded border p-3">
     <Select name={`${name}.mode`} label={label} value={mode} onChange={setMode}>
       <option value="UNKNOWN">Por confirmar</option>
@@ -119,14 +130,39 @@ export function partnerCostPayload(data: FormData) {
   }
 }
 
-export function PartnerCostForm() {
+export function PartnerCostForm({ initialInput = {}, previousId, readOnly = false }: { initialInput?: Record<string, unknown>; previousId?: string; readOnly?: boolean }) {
+  const formId = useId()
   const [report, setReport] = useState<Report | null>(null)
   const [error, setError] = useState('')
   const [pending, setPending] = useState(false)
   const busy = useRef(false)
+  const [saving, setSaving] = useState(false)
+  const [saveLocked, setSaveLocked] = useState(false)
+  const [saved, setSaved] = useState<{ id: string; version: number } | null>(null)
+  const intent = useRef<{ key: string; body: unknown } | null>(null)
+  async function save() {
+    if (busy.current || !report || saved || readOnly) return
+    busy.current = true
+    setSaving(true); setSaveLocked(true); setError('')
+    intent.current ??= { key: crypto.randomUUID(), body: { input: report.input, reviewChecksum: report.reviewChecksum, ...(previousId ? { previousId } : {}) } }
+    try {
+      setSaved(await fetcher<{ id: string; version: number }>('/api/v1/partner-cost-estimates', {
+        method: 'POST', headers: { 'Idempotency-Key': intent.current.key }, json: intent.current.body, silent: true,
+      }))
+    } catch (caught) {
+      // A timeout may hide a successful commit. Keep the exact key/body and lock
+      // the capture until retry reconciles it; never issue a second save intent.
+      if (caught instanceof ClientApiError && [400, 403, 409, 422].includes(caught.status)) {
+        intent.current = null; setSaveLocked(false)
+        if (caught.status === 409) setReport(null)
+        setError(caught.status === 409 ? 'No se guardó esta solicitud: el cálculo cambió o ya existe otra versión. Abre el historial antes de recalcular.'
+          : caught.status === 403 ? 'Tu rol no permite guardar estimaciones.' : 'Revisa los conceptos antes de guardar.')
+      } else setError('No pudimos confirmar el guardado. Reintenta con el mismo botón para recuperar el resultado sin duplicarlo. También puedes consultar el historial.')
+    } finally { busy.current = false; setSaving(false) }
+  }
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (busy.current) return
+    if (busy.current || saveLocked || readOnly) return
     const payload = partnerCostPayload(new FormData(event.currentTarget))
     busy.current = true
     setPending(true); setReport(null); setError('')
@@ -139,9 +175,9 @@ export function PartnerCostForm() {
             : 'No se pudo calcular. Conservamos tu captura para que puedas reintentar.')
     } finally { busy.current = false; setPending(false) }
   }
-  return <div className="space-y-6">
+  return <InitialInput.Provider value={initialInput}><div className="space-y-6">
     <form onSubmit={submit} onChange={() => { setReport(null); setError('') }}>
-      <fieldset disabled={pending} className="min-w-0 space-y-6 disabled:opacity-70">
+      <fieldset disabled={pending || saveLocked || readOnly} className={`min-w-0 space-y-6 ${readOnly ? '' : 'disabled:opacity-70'}`}>
         <legend className="sr-only">Datos del costo de socios</legend>
         <fieldset className="space-y-4 rounded border bg-card p-5">
           <legend className="px-1 font-semibold">1. Movimiento</legend>
@@ -156,8 +192,8 @@ export function PartnerCostForm() {
           </div>
           <Notes name="assumptions" label="Supuestos: carga, tiempos y responsabilidades por tramo" />
         </fieldset>
-        <section aria-labelledby="carriers-title" className="space-y-3">
-          <h2 id="carriers-title" className="font-semibold">2. Tarifas de las líneas</h2>
+        <section aria-labelledby={`${formId}-carriers`} className="space-y-3">
+          <h2 id={`${formId}-carriers`} className="font-semibold">2. Tarifas de las líneas</h2>
           <div className="grid gap-5 md:grid-cols-2"><Carrier name="mex" label="Línea mexicana" /><Carrier name="usa" label="Línea estadounidense" /></div>
         </section>
         <fieldset className="space-y-4 rounded border bg-card p-5">
@@ -171,14 +207,15 @@ export function PartnerCostForm() {
             <Field name="fx.asOf" label="Fecha del tipo de cambio" type="date" required={false} />
           </div>
         </fieldset>
-        <p className="text-sm text-muted-foreground">Estimación en esta sesión. Incluye los cargos capturados; no se guarda como cotización.</p>
+        {!readOnly && <><p className="text-sm text-muted-foreground">Calcula y revisa antes de guardar. Sólo costo de compra: no genera una cotización de venta ni envía tarifas.</p>
         <button type="submit" className="min-h-11 w-full rounded bg-primary px-5 py-3 font-semibold text-primary-foreground hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:w-auto">{pending ? 'Calculando…' : 'Calcular costo de compra'}</button>
+        </>}
       </fieldset>
     </form>
     {error && <p role="alert" className="rounded border border-destructive p-4 text-sm">{error}</p>}
     <div aria-live="polite" aria-busy={pending}>
-      {report && <section className="space-y-4 rounded border bg-card p-5" aria-labelledby="partner-result-title">
-        <h2 id="partner-result-title" className="text-lg font-semibold">{report.status === 'INCOMPLETE' ? 'Completa los conceptos pendientes' : 'Costo conocido de compra'}</h2>
+      {report && <section className="space-y-4 rounded border bg-card p-5" aria-labelledby={`${formId}-result`}>
+        <h2 id={`${formId}-result`} className="text-lg font-semibold">{report.status === 'INCOMPLETE' ? 'Completa los conceptos pendientes' : 'Costo conocido de compra'}</h2>
         {report.issues.length > 0 && <ul className="list-disc space-y-2 pl-5 text-sm">{report.issues.map(issue => <li key={issue.field}>{issue.message}</li>)}</ul>}
         <dl className="space-y-3">{report.lines.map(line => <div key={line.id} className="flex flex-wrap justify-between gap-2 border-b pb-2 text-sm">
           <dt className="min-w-0 break-words">{line.label}<span className="block text-xs text-muted-foreground">{line.provider} · {line.amount.toLocaleString('es-MX')} {line.currency}</span></dt>
@@ -189,5 +226,10 @@ export function PartnerCostForm() {
         <p className="text-xs text-muted-foreground">Fuentes declaradas por el usuario. Excluye: {report.exclusions.join('; ')}.</p>
       </section>}
     </div>
-  </div>
+    {report?.status === 'ESTIMATE' && report.purchaseCostUsd !== null && !saved && <button type="button" onClick={save} disabled={saving}
+      className="min-h-11 rounded bg-primary px-5 py-3 font-semibold text-primary-foreground disabled:opacity-70 focus-visible:outline-2 focus-visible:outline-ring">
+      {saving ? 'Guardando…' : saveLocked ? 'Reintentar guardado sin duplicar' : previousId ? 'Guardar nueva versión' : 'Guardar estimación'}
+    </button>}
+    {saved && <p role="status" className="rounded border bg-card p-4">Versión {saved.version} guardada. <a className="underline underline-offset-4" href={`/quote/partners/saved/${saved.id}`}>Abrir versión guardada</a></p>}
+  </div></InitialInput.Provider>
 }

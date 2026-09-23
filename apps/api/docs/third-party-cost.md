@@ -1,5 +1,7 @@
 # Estimación de compra por socios · FCM_THIRD_PARTY_FLAT_V1
 
+> Actualización: el incremento de persistencia sobre `10739ca` está implementado localmente. Ver [evidencia, límites y rollout](partner-cost-persistence.md). Las secciones inferiores conservan la evidencia de la primera entrega, que calculaba sólo en sesión; ya no describen por sí solas el alcance del código actual.
+
 Fecha: 2026-09-23. Implementación local sobre `a2bfe23` en `codex/quote-integrity-sprint`, worktree en D:. El objetivo es que XBF componga costos de terceros por modalidad a partir de tarifas documentadas. Este primer incremento cubre D2D de un viaje sencillo, con línea MX y línea US e intercambio de equipo. La nacionalidad de la empresa principal es independiente de la dirección del viaje.
 
 ## Flujo disponible
