@@ -15,6 +15,8 @@ import { buildQuoteCalculationSnapshot, calculateForQuoteSnapshot } from '../quo
 import { verifiedPreviewData } from '../quotes/quote-preview.js'
 import { compareObservedTripCosts } from './engine-economic-validation.js'
 import { OperationalSegmentSchema, segmentFor } from '../cost-bases/operational-segments.js'
+import { requireRole } from '../../middleware/authorize.js'
+import { calculateThirdPartyCost } from './third-party-cost.js'
 
 const MarketConditionEnum = z.enum([
   'Very Tight', 'Moderately Tight', 'Balanced', 'Slightly Loose', 'Very Loose',
@@ -88,6 +90,11 @@ const CalculateSchema = z.object({
 
 export async function engineRoutes(app: FastifyInstance) {
   app.addHook('preHandler', authenticate)
+
+  app.post('/engine/third-party-cost', { preHandler: requireRole('ADMIN', 'OPERATOR') }, async (request, reply) => {
+    reply.header('Cache-Control', 'no-store')
+    return reply.send(calculateThirdPartyCost(request.body))
+  })
 
   const EconomicComparisonSchema = z.object({
     previewId: z.string().min(1),

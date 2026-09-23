@@ -4,6 +4,8 @@ Estado: implementación local en `codex/quote-integrity-sprint`; migración adit
 
 ## Objetivo y frontera de cálculo
 
+Actualización 2026-09-23: los dos segmentos D2D con socio ya disponen de una [calculadora independiente de compra por viaje](third-party-cost.md), accesible desde Cotizar. Su estado `MODEL_PENDING` en este catálogo sigue describiendo la base V3 versionada: la calculadora de sesión no habilita la publicación de una base de terceros.
+
 Una base tiene `scope` amplio, segmento opcional y versiones de supuestos. El segmento se asigna al crear una base y no se puede editar para reinterpretar cotizaciones históricas. Las bases anteriores mantienen `operationalSegment = null` y aparecen como “Sin clasificar · base histórica”. Varias bases pueden compartir alcance; sigue existiendo una sola predeterminada por alcance al activar. En la cotización, el usuario elige la base concreta.
 
 | Segmento | Estado V3 | Base inicial | Motivo |

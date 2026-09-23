@@ -172,7 +172,7 @@ export function profileConsistencyIssues(
     issues.push('El modelo Tandem actual sólo está soportado en operaciones con tramo México.')
   }
   if (profile.ownershipModels.some((ownership) => ownership !== 'OWNED_FINANCED')) {
-    issues.push('LEASED y BROKERED aún no tienen un modelo matemático compatible; usa OWNED_FINANCED.')
+    issues.push('LEASED y BROKERED requieren modelos distintos al costeo de activos propios V3. Las tarifas por viaje de socios D2D se estiman en Costos de socios.')
   }
   if (profile.truckTypes.some((truck) => truck !== 'Truck Trailer')) {
     issues.push('Las bases gobernadas V3 sólo soportan Truck Trailer hasta incorporar costos de capital específicos por vehículo.')

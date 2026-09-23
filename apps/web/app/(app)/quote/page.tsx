@@ -90,6 +90,9 @@ export default async function QuotePage({ searchParams }: { searchParams: Promis
         </div>
         <p className="border-l-2 border-primary px-3 py-1 text-[11px] text-muted-foreground">El cálculo propone · tú confirmas</p>
       </header>
+      {user.role !== 'VIEWER' && <div className="mb-4 rounded border bg-card p-3 text-sm">
+        ¿Trabajas con tarifas de líneas asociadas? <Link href="/quote/partners" className="font-semibold underline underline-offset-4">Calcular costos de socios →</Link>
+      </div>}
       {user.role === 'VIEWER' ? (
         <section className="mx-auto max-w-2xl rounded-lg border bg-card p-5" aria-labelledby="quote-permission-title">
           <div className="flex flex-wrap items-center justify-between gap-2">
