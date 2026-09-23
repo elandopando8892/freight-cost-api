@@ -11,6 +11,9 @@ vi.mock('../src/middleware/authenticate.js', () => ({
 }))
 
 const localUrl = process.env.FCM_TEST_DATABASE_URL
+if (localUrl && !['localhost', '127.0.0.1', '[::1]'].includes(new URL(localUrl).hostname)) {
+  throw new Error('FCM_TEST_DATABASE_URL must target disposable loopback PostgreSQL, never a remote database')
+}
 
 describe.skipIf(!localUrl)('reviewed quote persistence on disposable local PostgreSQL', () => {
   let app: FastifyInstance
