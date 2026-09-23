@@ -8,6 +8,7 @@ import { CostBaseConsultantRequestSchema } from './cost-base-consultant.schema.j
 import { consultCostBase } from './cost-base-consultant.js'
 import { listRecommendedCostBasePresets } from './recommended-cost-base-presets.js'
 import { OPERATIONAL_SEGMENTS } from './operational-segments.js'
+import { SaveCostBaseCalibrationSchema } from './cost-base-calibration.js'
 import { applicabilitySummary } from './cost-base-applicability.js'
 import {
   ArchiveCostBaseSchema, ArchiveCostBaseVersionSchema, CostBaseApplicabilityPreviewSchema, CreateCostBaseSchema, CreateCostBaseVersionSchema,
@@ -15,7 +16,7 @@ import {
 } from './cost-bases.schema.js'
 import {
   activateCostBaseVersion, archiveCostBase, archiveCostBaseVersion, createCostBase, createCostBaseVersion,
-  getCostBase, getCostBaseVersionImpact, listCostBases, publishCostBaseVersion, updateCostBase,
+  getCostBase, getCostBaseCalibration, getCostBaseVersionImpact, listCostBases, publishCostBaseVersion, saveCostBaseCalibration, updateCostBase,
   updateCostBaseVersionProfile,
 } from './cost-bases.service.js'
 
@@ -120,6 +121,17 @@ export async function costBasesRoutes(app: FastifyInstance) {
       UpdateCostBaseVersionProfileSchema.parse(request.body),
       user.sub,
     )
+  })
+
+  app.get('/cost-bases/:id/versions/:versionId/calibration', async (request) => {
+    const { id, versionId } = request.params as { id: string; versionId: string }
+    return getCostBaseCalibration((request.user as JwtPayload).orgId, id, versionId)
+  })
+
+  app.post('/cost-bases/:id/versions/:versionId/calibration', { preHandler: requireRole('ADMIN') }, async (request) => {
+    const { id, versionId } = request.params as { id: string; versionId: string }
+    const user = request.user as JwtPayload
+    return saveCostBaseCalibration(user.orgId, id, versionId, SaveCostBaseCalibrationSchema.parse(request.body), user.sub)
   })
 
   app.post('/cost-bases/:id/versions/:versionId/activate', { preHandler: requireRole('ADMIN') }, async (request) => {

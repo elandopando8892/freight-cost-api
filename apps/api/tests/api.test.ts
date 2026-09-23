@@ -2554,6 +2554,61 @@ describe("Cost bases and versions", () => {
     });
   });
 
+  it("blocks publication of a segmented base until its own assumptions have dated calibration evidence", async () => {
+    const { DEFAULT_ASSUMPTIONS } = await import("../src/data/default-assumptions.js");
+    const { defaultCostBaseProfile } = await import("../src/modules/cost-bases/cost-base-profile.js");
+    vi.mocked(prisma.assumptionSet.updateMany).mockClear();
+    vi.mocked(prisma.assumptionSet.findFirstOrThrow).mockResolvedValueOnce({
+      id: "set-1", orgId: "org-1", status: "DRAFT", costBaseId: "base-1",
+      applicabilityContext: defaultCostBaseProfile("INTRA_MEX"), calibrationEvidence: null,
+      costBase: { scope: "INTRA_MEX", status: "DRAFT", operationalSegment: "INTRA_MEX" },
+      params: DEFAULT_ASSUMPTIONS.map(({ section, field, value }) => ({ section, field, value })),
+      _count: { params: 210 }, scenarioReviewSource: null,
+    } as never);
+    const res = await app.inject({
+      method: "POST", url: "/cost-bases/base-1/versions/set-1/publish",
+      headers: { authorization: `Bearer ${token}` }, payload: { note: "Approved after Q3 cost review" },
+    });
+    expect(res.statusCode).toBe(422);
+    expect(res.json().error).toMatch(/review and confirm the segment assumptions/i);
+    expect(vi.mocked(prisma.assumptionSet.updateMany).mock.calls.some(call => call[0].data.status === "PUBLISHED")).toBe(false);
+  });
+
+  it("records per-group calibration for the exact draft snapshot and reads it back as current", async () => {
+    const { DEFAULT_ASSUMPTIONS } = await import("../src/data/default-assumptions.js");
+    const { defaultCostBaseProfile } = await import("../src/modules/cost-bases/cost-base-profile.js");
+    const { calibrationChecklist } = await import("../src/modules/cost-bases/cost-base-calibration.js");
+    const profile = defaultCostBaseProfile("LOCAL");
+    const params = DEFAULT_ASSUMPTIONS.map(({ section, field, value }) => ({ section, field, value }));
+    const version = {
+      id: "set-1", orgId: "org-1", status: "DRAFT", costBaseId: "base-1", applicabilityContext: profile,
+      calibrationEvidence: null, params,
+      costBase: { scope: "LOCAL", status: "DRAFT", operationalSegment: "MX_LOCAL" },
+    };
+    const sources = calibrationChecklist("LOCAL", profile, params).groups.map(group => ({
+      groupId: group.id, source: `Reviewed cost report ${group.id}`, asOf: "2026-09-01",
+    }));
+    vi.mocked(prisma.assumptionSet.update).mockClear();
+    vi.mocked(prisma.assumptionVersionAudit.create).mockClear();
+    vi.mocked(prisma.assumptionSet.findFirstOrThrow)
+      .mockResolvedValueOnce(version as never)
+      .mockImplementationOnce(async () => ({
+        ...version,
+        calibrationEvidence: vi.mocked(prisma.assumptionSet.update).mock.calls[0][0].data.calibrationEvidence,
+      }) as never);
+    const res = await app.inject({
+      method: "POST", url: "/cost-bases/base-1/versions/set-1/calibration",
+      headers: { authorization: `Bearer ${token}` }, payload: { sources },
+    });
+    expect(res.statusCode).toBe(200);
+    expect(res.json().status).toBe("CURRENT");
+    expect(res.json().groups).toHaveLength(sources.length);
+    expect(vi.mocked(prisma.assumptionSet.update).mock.calls[0][0].data.calibrationEvidence).toMatchObject({
+      segment: "MX_LOCAL", reviewedBy: "user-1", sources,
+    });
+    expect(vi.mocked(prisma.assumptionVersionAudit.create).mock.calls[0][0].data.action).toBe("CALIBRATION_REVIEWED");
+  });
+
   it("requires an explicit applicability profile before publishing a legacy draft", async () => {
     vi.mocked(prisma.assumptionSet.findFirstOrThrow).mockResolvedValueOnce({
       id: "set-1",

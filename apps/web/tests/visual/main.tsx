@@ -5,6 +5,7 @@ import { Toaster } from 'sonner'
 import { QuoteModes } from '../../app/(app)/quote/quote-modes'
 import type { CostBaseOption, QuoteResult } from '../../app/(app)/quote/quote-shared'
 import { CostBaseWizard, type OperationalSegmentOption } from '../../app/(app)/cost-bases/cost-base-wizard'
+import { CostBaseCalibrationDialog } from '../../app/(app)/cost-bases/cost-base-calibration-dialog'
 import { defaultProfile, type CostBaseScope } from '../../app/(app)/cost-bases/cost-base-profile'
 import '../../app/globals.css'
 
@@ -36,6 +37,13 @@ window.fetch = async (input, init) => {
   const path = typeof input === 'string' ? input : input instanceof URL ? input.pathname : input.url
   if (path === '/api/v1/catalog/locations') return reply({ locations: ['Monterrey, NL', 'Dallas, TX', 'Laredo, TX'] })
   if (path === '/api/v1/cost-bases/presets') return reply(presetFixtures)
+  if (path === '/api/v1/cost-bases/fixture-base/versions/fixture-version/calibration') return reply({
+    versionId: 'fixture-version', versionStatus: 'DRAFT', segment: 'MX_LOCAL', status: 'NOT_REVIEWED', evidence: null,
+    groups: [
+      { id: 'FLEET_ASSETS', label: 'Flota, activos y seguros', fields: [{ section: 'GENERAL_BASE', field: 'Tamaño de Flota', value: 32, unit: 'tractors', recommended: 50, applicability: 'REQUIRED' }] },
+      { id: 'ROUTE_CYCLE', label: 'Ciclo, reposicionamiento y equipo', fields: [{ section: 'UTILIZATION', field: 'Billable Day Floor Local', value: 1, unit: 'days', recommended: 1, applicability: 'CONDITIONAL' }] },
+    ], withoutMath: [{ section: 'UTILIZATION', field: 'Detention Rate' }],
+  })
   if (path === '/api/v1/cost-bases/applicability-preview') {
     const body = JSON.parse(String(init?.body))
     return reply({ scope: body.scope, profile: body.applicabilityProfile, counts: { REQUIRED: 20, OPTIONAL: 0, CONDITIONAL: 0, NOT_IMPLEMENTED: 0, NOT_APPLICABLE: 190 }, border: body.scope === 'CROSS_BORDER' ? 'REQUIRED' : 'NOT_APPLICABLE', catalogTotal: 210 })
@@ -68,6 +76,14 @@ function App() {
   const [scenario, setScenario] = useState('success')
   const [stats, setStats] = useState('')
   const [created, setCreated] = useState('')
+  const [showCalibration, setShowCalibration] = useState(true)
+  if (location.pathname.endsWith('/calibration.html')) return <QueryClientProvider client={client}><main className="mx-auto max-w-7xl space-y-4 p-4 md:p-6">
+    <aside className="rounded border border-amber-500 bg-amber-50 p-3 text-sm text-black"><strong>QA LOCAL · CALIBRACIÓN SINTÉTICA · SIN AUTH NI BASE REAL</strong></aside>
+    <h1 className="text-2xl font-semibold">Calibración de supuestos</h1>
+    <button className="rounded border p-2" onClick={() => setShowCalibration(true)}>Abrir calibración</button>
+    {showCalibration ? <CostBaseCalibrationDialog baseId="fixture-base" versionId="fixture-version" onClose={() => setShowCalibration(false)} onSaved={() => setCreated('Calibración local simulada')} /> : null}
+    <output>{created}</output>
+  </main><Toaster /></QueryClientProvider>
   if (location.pathname.endsWith('/segments.html')) return <QueryClientProvider client={client}><main className="mx-auto max-w-7xl space-y-4 p-4 md:p-6">
     <aside className="rounded border border-amber-500 bg-amber-50 p-3 text-sm text-black"><strong>QA LOCAL · SEGMENTOS SINTÉTICOS · SIN BASE REAL</strong></aside>
     <h1 className="text-2xl font-semibold">Bases por segmento operativo</h1>

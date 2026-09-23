@@ -385,3 +385,5 @@ Sin campos estructurados conocidos, indicar origen/destino/base/servicio/FX sin 
 # Bases por segmento operativo — wireframe 2026-09-22
 
 En “Mis costos”, la creación presenta primero cinco segmentos configurables. Cada selección carga un estándar existente como borrador editable. Un panel plegable explica los cuatro casos pendientes (intercambio MX→US, US→MX, transbordo y MX Drayage), sin permitir fingir una tarifa V3. Después se ven alcance, perfil, supuestos y controles de gobierno ya existentes. La tarjeta y ficha de una base muestran el segmento guardado; las históricas indican “Sin clasificar”. Wireframe y matriz de soporte: `apps/api/docs/operational-segment-bases.md`.
+
+La versión de cada base segmentada añade “Calibrar”: una hoja de grupos aplicables con valores actuales frente a referencias V3, fuente y fecha por grupo, advertencia de parámetros sin efecto matemático y un enlace a edición de supuestos. Tras una edición, la revisión se marca obsoleta y la publicación queda bloqueada hasta renovarla. Wireframe del flujo en `apps/api/docs/operational-segment-bases.md`.

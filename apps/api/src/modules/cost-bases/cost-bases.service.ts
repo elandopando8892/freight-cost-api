@@ -12,6 +12,8 @@ import { buildVersionImpact } from './version-impact.js'
 import { isParameterApplicable, parameterApplicability } from './cost-base-applicability.js'
 import { listRecommendedCostBasePresets } from './recommended-cost-base-presets.js'
 import { defaultCostBaseProfile, parseCostBaseProfile, profileConsistencyIssues, type CostBaseProfile } from './cost-base-profile.js'
+import { CALIBRATION_CHECKLIST_VERSION, calibrationStatus, calibrationFingerprint, type SaveCostBaseCalibrationInput } from './cost-base-calibration.js'
+import { OperationalSegmentSchema, segmentFor } from './operational-segments.js'
 import {
   assertAssumptionSetDomain,
   assertAssumptionValueDomain,
@@ -540,6 +542,75 @@ export async function createCostBaseVersion(orgId: string, costBaseId: string, i
   })
 }
 
+export async function getCostBaseCalibration(orgId: string, costBaseId: string, versionId: string) {
+  const version = await prisma.assumptionSet.findFirstOrThrow({
+    where: { id: versionId, orgId, costBaseId },
+    include: { params: true, costBase: { select: { scope: true, defaultPolicy: true, operationalSegment: true } } },
+  })
+  if (!version.costBase) throw httpError('The assumption version is not linked to this cost base.', 422)
+  const parsed = OperationalSegmentSchema.safeParse(version.costBase.operationalSegment)
+  if (!parsed.success) throw httpError('This historical cost base has no governed operational segment.', 422)
+  if (segmentFor(parsed.data).status !== 'CONFIGURABLE') throw httpError('This operational segment has no supported V3 cost model.', 422)
+  if (version.applicabilityContext == null) throw httpError('Define the applicability profile before calibration.', 422)
+  const profile = parseCostBaseProfile(version.costBase.scope, version.applicabilityContext)
+  return {
+    versionId: version.id,
+    versionStatus: version.status,
+    segment: parsed.data,
+    ...calibrationStatus(version.calibrationEvidence, parsed.data, profile, version.params, version.costBase.scope),
+  }
+}
+
+export async function saveCostBaseCalibration(
+  orgId: string, costBaseId: string, versionId: string, input: SaveCostBaseCalibrationInput, actorId: string,
+) {
+  await prisma.$transaction(async tx => {
+    await lockOrganizationLifecycle(tx, orgId)
+    await lockAssumptionVersion(tx, orgId, versionId)
+    const version = await tx.assumptionSet.findFirstOrThrow({
+      where: { id: versionId, orgId, costBaseId },
+      include: { params: true, costBase: { select: { scope: true, operationalSegment: true, status: true } } },
+    })
+    if (!version.costBase || version.costBase.status === 'ARCHIVED') throw httpError('The cost base is not editable.', 409)
+    if (version.status !== AssumptionVersionStatus.DRAFT) throw httpError('Only draft versions can be calibrated.', 409)
+    const parsed = OperationalSegmentSchema.safeParse(version.costBase.operationalSegment)
+    if (!parsed.success) throw httpError('Select a governed operational segment before calibration.', 422)
+    if (segmentFor(parsed.data).status !== 'CONFIGURABLE') throw httpError('This operational segment has no supported V3 cost model.', 422)
+    if (version.applicabilityContext == null) throw httpError('Define the applicability profile before calibration.', 422)
+    const profile = parseCostBaseProfile(version.costBase.scope, version.applicabilityContext)
+    assertCanonicalAssumptionIdentity(version.params)
+    assertAssumptionSetDomain(version.params, version.costBase.scope)
+    const checklist = calibrationStatus(null, parsed.data, profile, version.params, version.costBase.scope)
+    const expectedIds = new Set<string>(checklist.groups.map(group => group.id))
+    const submittedIds = new Set(input.sources.map(source => source.groupId))
+    if (input.sources.length !== expectedIds.size || submittedIds.size !== expectedIds.size
+      || [...submittedIds].some(id => !expectedIds.has(id))) {
+      throw httpError('Provide one dated source for every applicable calibration group.', 422)
+    }
+    const missing = checklist.groups.flatMap(group => group.fields.filter(field => field.value == null))
+    if (missing.length > 0) throw httpError('The calibration checklist contains missing canonical values.', 422)
+    await tx.assumptionSet.update({
+      where: { id: version.id },
+      data: { calibrationEvidence: {
+        checklistVersion: CALIBRATION_CHECKLIST_VERSION,
+        segment: parsed.data,
+        fingerprint: calibrationFingerprint(parsed.data, profile, version.params),
+        reviewedAt: new Date().toISOString(),
+        reviewedBy: actorId,
+        sources: input.sources,
+      } },
+    })
+    await tx.assumptionVersionAudit.create({
+      data: {
+        orgId, setId: version.id, actorId, action: 'CALIBRATION_REVIEWED',
+        fromStatus: AssumptionVersionStatus.DRAFT, toStatus: AssumptionVersionStatus.DRAFT,
+        note: `${input.sources.length} applicable assumption groups reviewed against dated sources.`,
+      },
+    })
+  })
+  return getCostBaseCalibration(orgId, costBaseId, versionId)
+}
+
 export async function updateCostBaseVersionProfile(
   orgId: string,
   costBaseId: string,
@@ -695,7 +766,7 @@ export async function publishCostBaseVersion(
     const version = await tx.assumptionSet.findFirstOrThrow({
       where: { id: versionId, orgId, costBaseId },
       include: {
-        costBase: { select: { scope: true, status: true } },
+        costBase: { select: { scope: true, status: true, operationalSegment: true } },
         params: { select: { section: true, field: true, value: true } },
         _count: { select: { params: true } },
         scenarioReviewSource: { select: { id: true, status: true } },
@@ -720,6 +791,16 @@ export async function publishCostBaseVersion(
     }
     assertCanonicalAssumptionIdentity(version.params)
     assertAssumptionSetDomain(version.params, version.costBase?.scope)
+    if (version.costBase?.operationalSegment) {
+      const parsed = OperationalSegmentSchema.safeParse(version.costBase.operationalSegment)
+      if (!parsed.success || version.applicabilityContext == null) throw httpError('Invalid operational segment or profile.', 422)
+      if (segmentFor(parsed.data).status !== 'CONFIGURABLE') throw httpError('This operational segment has no supported V3 cost model.', 422)
+      const profile = parseCostBaseProfile(version.costBase.scope, version.applicabilityContext)
+      const calibration = calibrationStatus(version.calibrationEvidence, parsed.data, profile, version.params, version.costBase.scope)
+      if (calibration.status !== 'CURRENT') {
+        throw httpError('Review and confirm the segment assumptions against dated sources after the last parameter/profile edit before publishing.', 422)
+      }
+    }
     const reviewBlocker = scenarioReviewPublishBlocker(version.scenarioReviewSource?.status, input.impactAcknowledged)
     if (reviewBlocker) throw httpError(reviewBlocker, version.scenarioReviewSource?.status === 'APPROVED' ? 422 : 409)
     const releaseImpact = version.scenarioReviewSource ? await getCostBaseVersionImpact(orgId, costBaseId, versionId) : null

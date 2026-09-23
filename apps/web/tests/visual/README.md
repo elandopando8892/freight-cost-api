@@ -7,6 +7,7 @@ Fecha: 2026-09-22 (sesión America/Mexico_City). Base: `2a0d6ca`, rama `codex/qu
 Desde `apps/web`, con Node >=22: `node tests/visual/server.mjs`.
 Abrir `http://127.0.0.1:4317/tests/visual/viewports.html`.
 Para el selector de bases por segmento: `http://127.0.0.1:4317/tests/visual/viewports.html?page=segments`. Los catálogos y borradores de esa pantalla son igualmente sintéticos; la acción Crear sólo registra el cuerpo en el visor local.
+Para el diálogo de calibración: `http://127.0.0.1:4317/tests/visual/viewports.html?page=calibration`. Dos grupos y sus valores son sintéticos; no representan el catálogo completo ni guardan evidencia real.
 Servidor limitado a loopback, puerto fijo 4317, sin cargar archivos de entorno. El fixture reemplaza fetch sin fallback: sólo responde a tres rutas sintéticas; las demás fallan. CSP limita conexiones al mismo origen. No es una ruta Next, no desactiva autenticación, no simula una sesión y no se integra al build del producto.
 
 Se montan QuoteModes, ambos formularios, resultado y estilos reales. Next Link se sustituye por un anchor sólo en este visor. Base/versión, importes y respuestas son ficticios: no acreditan motor, BD, permisos reales ni aprobación. Las piernas MEX/US son null; esas tablas no quedan cubiertas visualmente. Tipografía usa Arial como fallback explícito; no acredita fuentes de marca licenciadas.

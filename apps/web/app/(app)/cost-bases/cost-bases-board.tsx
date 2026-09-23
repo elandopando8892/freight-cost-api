@@ -14,6 +14,7 @@ import { fetcher } from '@/lib/fetcher'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { CostBaseWizard, type CostBaseCreateBody, type CostBaseScope, type OperationalSegmentOption } from './cost-base-wizard'
 import type { CostBaseProfile } from './cost-base-profile'
+import { CostBaseCalibrationDialog } from './cost-base-calibration-dialog'
 
 type Scope = CostBaseScope
 type Status = 'DRAFT' | 'ACTIVE' | 'ARCHIVED'
@@ -38,7 +39,7 @@ export interface CostBaseVersion {
 
 interface VersionAudit {
   id: string
-  action: 'DRAFT_CREATED' | 'PROFILE_UPDATED' | 'PUBLISHED' | 'ARCHIVED'
+  action: 'DRAFT_CREATED' | 'PROFILE_UPDATED' | 'CALIBRATION_REVIEWED' | 'PUBLISHED' | 'ARCHIVED'
   note: string | null
   createdAt: string
   actor?: { email: string } | null
@@ -115,7 +116,7 @@ const VERSION_STATUS_LABEL: Record<CostBaseVersion['status'], string> = {
 }
 
 const AUDIT_ACTION_LABEL: Record<VersionAudit['action'], string> = {
-  DRAFT_CREATED: 'Borrador creado', PROFILE_UPDATED: 'Perfil operativo actualizado', PUBLISHED: 'Publicada', ARCHIVED: 'Archivada',
+  DRAFT_CREATED: 'Borrador creado', PROFILE_UPDATED: 'Perfil operativo actualizado', CALIBRATION_REVIEWED: 'Supuestos calibrados', PUBLISHED: 'Publicada', ARCHIVED: 'Archivada',
 }
 
 const BASE_AUDIT_ACTION_LABEL: Record<BaseAudit['action'], string> = {
@@ -170,6 +171,7 @@ export function CostBasesBoard({ initial, segments, canEdit }: { initial: CostBa
   const [showCreate, setShowCreate] = useState(canEdit && initial.length === 0)
   const [createScope, setCreateScope] = useState<Scope>('CROSS_BORDER')
   const [versionAction, setVersionAction] = useState<{ kind: 'publish' | 'archive'; baseId: string; version: CostBaseVersion } | null>(null)
+  const [calibrationTarget, setCalibrationTarget] = useState<{ baseId: string; versionId: string } | null>(null)
   const [impactTarget, setImpactTarget] = useState<{ base: CostBase; version: CostBaseVersion } | null>(null)
   const [baseEditTarget, setBaseEditTarget] = useState<CostBase | null>(null)
   const [baseArchiveTarget, setBaseArchiveTarget] = useState<CostBase | null>(null)
@@ -306,6 +308,7 @@ export function CostBasesBoard({ initial, segments, canEdit }: { initial: CostBa
           onNewVersion={(baseId) => newVersion.mutate(baseId)}
           onOpenImpact={openImpact}
           onVersionAction={(kind, baseId, version) => setVersionAction({ kind, baseId, version })}
+          onOpenCalibration={(baseId, versionId) => setCalibrationTarget({ baseId, versionId })}
           onActivate={(baseId, versionId) => activate.mutate({ baseId, versionId })}
           onEditBase={setBaseEditTarget}
           onArchiveBase={setBaseArchiveTarget}
@@ -320,13 +323,22 @@ export function CostBasesBoard({ initial, segments, canEdit }: { initial: CostBa
           }}
         />
       )}
+      {calibrationTarget ? <CostBaseCalibrationDialog
+        key={`${calibrationTarget.baseId}:${calibrationTarget.versionId}`}
+        baseId={calibrationTarget.baseId}
+        versionId={calibrationTarget.versionId}
+        onClose={() => setCalibrationTarget(null)}
+        onSaved={() => { void fetcher<CostBase>(`/api/v1/cost-bases/${calibrationTarget.baseId}`).then(base => setBases(items => items.map(item => item.id === base.id ? base : item))).catch(() => undefined) }}
+      /> : null}
       <Dialog open={versionAction !== null} onOpenChange={(open) => { if (!open) setVersionAction(null) }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{versionAction?.kind === 'publish' ? 'Publicar versión' : 'Archivar versión'}</DialogTitle>
             <DialogDescription>
               {versionAction?.kind === 'publish'
-                ? 'Al publicar se bloquean los 210 parámetros. Los cambios posteriores requieren una nueva versión en borrador.'
+                ? bases.find(base => base.id === versionAction.baseId)?.operationalSegment
+                  ? 'La publicación exige una calibración vigente con fuentes fechadas para los supuestos aplicables. Después se bloquean los 210 parámetros.'
+                  : 'Al publicar se bloquean los 210 parámetros. Los cambios posteriores requieren una nueva versión en borrador.'
                 : 'Las versiones archivadas permanecen visibles en el historial y no pueden volver a utilizarse.'}
             </DialogDescription>
           </DialogHeader>
@@ -446,6 +458,7 @@ function CostBaseWorkspace({
   onNewVersion,
   onOpenImpact,
   onVersionAction,
+  onOpenCalibration,
   onActivate,
   onEditBase,
   onArchiveBase,
@@ -460,6 +473,7 @@ function CostBaseWorkspace({
   onNewVersion: (baseId: string) => void
   onOpenImpact: (base: CostBase, version: CostBaseVersion) => void
   onVersionAction: (kind: 'publish' | 'archive', baseId: string, version: CostBaseVersion) => void
+  onOpenCalibration: (baseId: string, versionId: string) => void
   onActivate: (baseId: string, versionId: string) => void
   onEditBase: (base: CostBase) => void
   onArchiveBase: (base: CostBase) => void
@@ -585,6 +599,7 @@ function CostBaseWorkspace({
                   <div className="flex flex-wrap items-center justify-end gap-1">
                     <Button variant="ghost" size="xs" onClick={() => onOpenImpact(base, version)} disabled={pending.impact}>Impacto</Button>
                     <Button variant="ghost" size="xs" render={<Link href={`/assumptions/${version.id}`} />}>{canEdit && version.status === 'DRAFT' ? 'Editar' : 'Ver'}</Button>
+                    {base.operationalSegment ? <Button variant="ghost" size="xs" onClick={() => onOpenCalibration(base.id, version.id)}>{canEdit && version.status === 'DRAFT' ? 'Calibrar' : 'Ver calibración'}</Button> : null}
                     {canEdit && version.status === 'DRAFT' && base.status !== 'ARCHIVED' ? (
                       <Button variant="ghost" size="xs" disabled={pending.transition} onClick={() => onVersionAction('publish', base.id, version)}>Publicar</Button>
                     ) : null}

@@ -181,6 +181,7 @@ enum AssumptionVersionStatus {
 enum AssumptionVersionAuditAction {
   DRAFT_CREATED
   PROFILE_UPDATED
+  CALIBRATION_REVIEWED
   PUBLISHED
   ARCHIVED
 }
@@ -449,6 +450,7 @@ model AssumptionSet {
   status          AssumptionVersionStatus @default(DRAFT)
   notes           String?
   applicabilityContext Json?
+  calibrationEvidence Json?
   sourceVersionId String?
   publishedAt     DateTime?
   publishedById   String?
