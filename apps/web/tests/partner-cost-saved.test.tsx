@@ -39,6 +39,15 @@ it('links successors instead of offering an edit of an old version', async () =>
   expect(host.querySelector('a[href="/quote/partners/saved/new"]')).not.toBeNull()
   expect(host.textContent).not.toContain('Preparar nueva versión')
 })
+it('shows base lineage and routes a new calculation through the base rather than stripping provenance', async () => {
+  http.api.mockResolvedValueOnce({ id: 'saved', version: 1, snapshot: { ...report,
+    baseLineage: { costBaseId: 'base-a', versionId: 'version-a', version: 3, termsChecksum: 'c'.repeat(64) } },
+    createdAt: '2026-09-23T00:00:00Z', actorId: 'actor', nextId: null }).mockResolvedValueOnce({ role: 'OPERATOR' })
+  await act(async () => root.render(await SavedPartnerCost({ params: Promise.resolve({ id: 'saved' }) })))
+  expect(host.textContent).toContain('base publicada · v3')
+  expect(host.textContent).not.toContain('Preparar nueva versión')
+  expect(host.querySelector('a[href="/cost-bases/partners?base=base-a"]')).not.toBeNull()
+})
 it('renders paginated links and does not turn failed reads into an empty history', async () => {
   http.api.mockResolvedValueOnce({ items: [{ id: 'saved', version: 1, origin: 'Monterrey', destination: 'Dallas', serviceDate: '2026-10-10', purchaseCostUsd: 2530 }], nextCursor: 'next-page' })
   const page = await SavedPartnerCosts({ searchParams: Promise.resolve({}) })

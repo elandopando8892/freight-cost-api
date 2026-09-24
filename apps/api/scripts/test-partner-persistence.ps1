@@ -30,7 +30,7 @@ try {
   $env:FCM_TEST_DATABASE_URL = $env:DATABASE_URL
   $ready = $false
   for ($i = 0; $i -lt 30; $i++) {
-    docker exec $container pg_isready -U postgres -d fcm_partner_disposable
+    docker exec $container pg_isready -h 127.0.0.1 -U postgres -d fcm_partner_disposable
     if ($LASTEXITCODE -eq 0) { $ready = $true; break }
     Start-Sleep -Seconds 1
   }
@@ -43,7 +43,7 @@ try {
   & node node_modules/prisma/build/index.js migrate deploy --schema apps/api/prisma/schema.prisma
   if ($LASTEXITCODE -ne 0) { throw 'Migration replay failed' }
   Push-Location apps/api
-  try { & node ../../node_modules/vitest/vitest.mjs run tests/partner-cost-postgres.test.ts; if ($LASTEXITCODE -ne 0) { throw 'PostgreSQL checks failed' } }
+  try { & node ../../node_modules/vitest/vitest.mjs run tests/partner-cost-postgres.test.ts tests/partner-base-postgres.test.ts; if ($LASTEXITCODE -ne 0) { throw 'PostgreSQL checks failed' } }
   finally { Pop-Location }
 } finally {
   $env:DATABASE_URL = $previousUrl

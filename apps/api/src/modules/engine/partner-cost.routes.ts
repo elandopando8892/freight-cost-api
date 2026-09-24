@@ -34,8 +34,11 @@ export async function partnerCostRoutes(app: FastifyInstance) {
     const snapshot = reviewedPartnerCost(body.input)
     if (snapshot.reviewChecksum !== body.reviewChecksum) throw failure(409, 'El cálculo revisado cambió. Vuelve a calcular antes de guardar.')
     if (snapshot.status !== 'ESTIMATE' || snapshot.purchaseCostUsd === null) throw failure(422, 'Completa los conceptos pendientes antes de guardar.')
-    const parent = body.previousId ? await prisma.partnerCostEstimate.findFirst({ where: { id: body.previousId, orgId }, select: { version: true } }) : null
+    const parent = body.previousId ? await prisma.partnerCostEstimate.findFirst({ where: { id: body.previousId, orgId }, select: { version: true, snapshot: true } }) : null
     if (body.previousId && !parent) throw failure(404, 'Estimación no disponible.')
+    if (parent && 'baseLineage' in frozenPartnerCost(parent.snapshot)) {
+      throw failure(409, 'Este cálculo procede de una base publicada. Recalcula desde la base para conservar su procedencia.')
+    }
     try {
       // One atomic insert; DB unique constraints arbitrate retries and competing revisions.
       const row = await prisma.partnerCostEstimate.create({ data: {

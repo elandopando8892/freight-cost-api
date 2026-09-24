@@ -226,6 +226,7 @@ model Organization {
   quoteCalculationPreviews QuoteCalculationPreview[]
   quoteSaveIntents         QuoteSaveIntent[]
   partnerCostEstimates     PartnerCostEstimate[]
+  partnerTariffBases       PartnerTariffBase[]
   customerQuotes           CustomerQuote[]
   customerQuoteEmailDrafts CustomerQuoteEmailDraft[]
   customerQuoteTemplates   CustomerQuoteTemplate[]
@@ -968,6 +969,66 @@ model Quote {
   @@index([productionRouteId])
   @@index([confirmedById])
   @@index([orgId, status])
+}
+
+// Third-party economics are isolated from the own-fleet V3 assumption catalog.
+model PartnerTariffBase {
+  id String @id @default(uuid())
+  orgId String
+  code String
+  name String
+  actorId String
+  saveKey String
+  intentHash String
+  activeVersionId String?
+  archived Boolean @default(false)
+  lifecycleRevision Int @default(0)
+  lifecycleEvents PartnerTariffLifecycle[]
+  createdAt DateTime @default(now())
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  versions PartnerTariffVersion[] @relation("PartnerTariffVersions")
+  activeVersion PartnerTariffVersion? @relation("ActivePartnerTariff", fields: [orgId, id, activeVersionId], references: [orgId, baseId, id], onDelete: NoAction, onUpdate: NoAction)
+  @@unique([orgId, id])
+  @@unique([orgId, code])
+  @@unique([orgId, saveKey])
+}
+
+model PartnerTariffLifecycle {
+  id String @id @default(uuid())
+  orgId String
+  baseId String
+  revision Int
+  archived Boolean
+  actorId String
+  note String
+  saveKey String
+  intentHash String
+  createdAt DateTime @default(now())
+  base PartnerTariffBase @relation(fields: [orgId, baseId], references: [orgId, id], onDelete: Cascade)
+  @@unique([orgId, baseId, revision])
+  @@unique([orgId, saveKey])
+}
+
+model PartnerTariffVersion {
+  id String @id @default(uuid())
+  orgId String
+  baseId String
+  version Int
+  terms Json
+  termsChecksum String
+  actorId String
+  saveKey String
+  intentHash String
+  status String @default("DRAFT")
+  publishedById String?
+  publishedAt DateTime?
+  publicationNote String?
+  createdAt DateTime @default(now())
+  base PartnerTariffBase @relation("PartnerTariffVersions", fields: [orgId, baseId], references: [orgId, id], onDelete: Cascade)
+  activeFor PartnerTariffBase[] @relation("ActivePartnerTariff")
+  @@unique([orgId, baseId, id])
+  @@unique([orgId, baseId, version])
+  @@unique([orgId, saveKey])
 }
 
 // Purchase-only evidence; never treated as a commercial Quote.

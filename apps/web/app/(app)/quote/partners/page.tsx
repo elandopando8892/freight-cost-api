@@ -13,6 +13,7 @@ export default async function PartnerCostPage() {
       <Link href="/quote" className="text-sm underline underline-offset-4">← Cotizar</Link>
       <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">D2D · viaje sencillo · intercambio</p>
       <h1 className="text-2xl font-semibold">Costos de socios</h1>
+      <Link href="/cost-bases/partners" className="inline-block min-h-11 rounded border px-4 py-2 text-sm font-semibold">Calcular desde una base publicada →</Link>
       <Link href="/quote/partners/saved" className="inline-block min-h-11 py-2 text-sm underline underline-offset-4">Estimaciones guardadas →</Link>
       <p className="max-w-3xl text-sm text-muted-foreground">Suma las tarifas de tus líneas MX y US, combustible, peajes y cargos del intercambio. Captura los importes antes de impuestos.</p>
     </header>

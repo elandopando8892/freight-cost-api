@@ -19,6 +19,13 @@ export default async function SavedPartnerCost({ params }: { params: Promise<{ i
     <h1 className="text-2xl font-semibold">Costo de socios · versión {saved.version}</h1>
     <p className="break-words font-semibold">{String(report.input.origin)} → {String(report.input.destination)} · Viaje {String(report.input.serviceDate)}</p>
     <p className="text-sm text-muted-foreground">Evidencia histórica congelada; no confirma vigencia actual ni verifica las fuentes. Guardada {saved.createdAt.slice(0, 10)} · modelo {report.modelVersion}.</p>
+    {report.baseLineage && <section className="space-y-2 rounded border bg-card p-4" aria-label="Procedencia de la base">
+      <h2 className="font-semibold">Calculada desde una base publicada · v{report.baseLineage.version}</h2>
+      <p className="break-all text-xs">Base: {report.baseLineage.costBaseId} · Versión: {report.baseLineage.versionId}</p>
+      <p className="break-all font-mono text-xs">Huella de términos: {report.baseLineage.termsChecksum}</p>
+      <Link className="inline-block min-h-11 py-2 underline" href={`/cost-bases/partners?base=${encodeURIComponent(report.baseLineage.costBaseId)}`}>Consultar base actual y preparar otro cálculo</Link>
+      <p className="text-sm text-muted-foreground">La base actual puede tener otra versión. Este resultado conserva las tarifas y supuestos utilizados originalmente.</p>
+    </section>}
     <section className="space-y-4 rounded border bg-card p-5" aria-label="Economía guardada">
       <h2 className="font-semibold">Costo conocido de compra</h2>
       <p className="font-mono text-2xl">{report.purchaseCostUsd?.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</p>
@@ -30,7 +37,7 @@ export default async function SavedPartnerCost({ params }: { params: Promise<{ i
     </section>
     <details className="space-y-4 rounded border bg-card p-5">
       <summary className="min-h-11 cursor-pointer py-2 font-semibold">Ver tarifas, referencias, vigencias y supuestos</summary>
-      <p className="text-sm text-muted-foreground">Estos campos son de consulta. Para cambiar datos crea una nueva versión debajo.</p>
+      <p className="text-sm text-muted-foreground">Estos campos son de consulta. {report.baseLineage ? 'Para otro cálculo utiliza la versión activa de la base.' : 'Para cambiar datos crea una nueva versión debajo.'}</p>
       <PartnerCostForm initialInput={report.input} readOnly />
       <p className="break-all font-mono text-xs">Huella: {report.reviewChecksum} · Autor: {saved.actorId}</p>
     </details>
@@ -38,7 +45,7 @@ export default async function SavedPartnerCost({ params }: { params: Promise<{ i
       {saved.previousId && <Link className="min-h-11 py-2 underline" href={`/quote/partners/saved/${saved.previousId}`}>← Versión anterior</Link>}
       {saved.nextId && <Link className="min-h-11 py-2 underline" href={`/quote/partners/saved/${saved.nextId}`}>Versión siguiente →</Link>}
     </nav>
-    {user.role !== 'VIEWER' && !saved.nextId && <details className="rounded border bg-card p-5">
+    {user.role !== 'VIEWER' && !saved.nextId && !report.baseLineage && <details className="rounded border bg-card p-5">
       <summary className="min-h-11 cursor-pointer py-2 font-semibold">Preparar nueva versión</summary>
       <p className="mb-4 text-sm text-muted-foreground">Actualiza las tarifas y sus fuentes, vuelve a calcular y revisa antes de guardar. La versión anterior se conserva.</p>
       <PartnerCostForm key={saved.id} initialInput={report.input} previousId={saved.id} />

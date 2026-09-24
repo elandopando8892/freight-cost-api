@@ -5,6 +5,7 @@ import { fetcher, ClientApiError } from '@/lib/fetcher'
 
 const control = 'min-h-11 w-full min-w-0 rounded border border-input bg-background px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-ring'
 export type Report = {
+  baseLineage?: { costBaseId: string; versionId: string; version: number; termsChecksum: string; model: string }
   reviewChecksum: string
   modelVersion: string
   input: Record<string, unknown>
@@ -16,7 +17,7 @@ export type Report = {
   exclusions: string[]
 }
 const usd = (value: number) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'USD', currencyDisplay: 'narrowSymbol' }).format(value)
-const InitialInput = createContext<Record<string, unknown>>({})
+export const InitialInput = createContext<Record<string, unknown>>({})
 function useInitial(name: string) {
   const input = useContext(InitialInput)
   const value = name.split('.').reduce<unknown>((obj, key) => obj && typeof obj === 'object' ? (obj as Record<string, unknown>)[key] : undefined, input)
@@ -37,16 +38,16 @@ function invalidFieldCopy(body: unknown) {
     : 'Revisa importes, fechas y referencias. Los importes admiten hasta dos decimales.'
 }
 
-function Field({ name, label, type = 'text', required = true, minLength, step = '0.01' }: {
-  name: string; label: string; type?: string; required?: boolean; minLength?: number; step?: string
+export function Field({ name, label, type = 'text', required = true, minLength, maxLength = 240, step = '0.01' }: {
+  name: string; label: string; type?: string; required?: boolean; minLength?: number; maxLength?: number; step?: string
 }) {
   return <label className="grid min-w-0 gap-1 text-sm"><span>{label}</span>
     <input className={control} name={name} type={type} required={required} minLength={minLength} defaultValue={useInitial(name)}
-      maxLength={240} min={type === 'number' ? 0 : undefined} max={type === 'number' ? 100000000 : undefined}
+      maxLength={maxLength} min={type === 'number' ? 0 : undefined} max={type === 'number' ? 100000000 : undefined}
       step={type === 'number' ? step : undefined} />
   </label>
 }
-function Select({ name, label, children, onChange, value }: {
+export function Select({ name, label, children, onChange, value }: {
   name: string; label: string; children: ReactNode; onChange?: (value: string) => void; value?: string
 }) {
   const initial = useInitial(name)
@@ -58,12 +59,12 @@ function Select({ name, label, children, onChange, value }: {
 function Currency({ name }: { name: string }) {
   return <Select name={name} label="Moneda"><option value="" disabled>Elegir</option><option>MXN</option><option>USD</option></Select>
 }
-function Notes({ name, label }: { name: string; label: string }) {
+export function Notes({ name, label }: { name: string; label: string }) {
   return <label className="grid gap-1 text-sm"><span>{label}</span>
     <textarea className={control} name={name} required minLength={10} maxLength={1500} rows={3} defaultValue={useInitial(name)} />
   </label>
 }
-function Term({ name, label, border = false }: { name: string; label: string; border?: boolean }) {
+export function Term({ name, label, border = false }: { name: string; label: string; border?: boolean }) {
   const initial = useInitial(`${name}.mode`)
   const [mode, setMode] = useState(initial || 'UNKNOWN')
   return <div className="space-y-3 rounded border p-3">
@@ -85,7 +86,7 @@ function Term({ name, label, border = false }: { name: string; label: string; bo
     </div>}
   </div>
 }
-function Carrier({ name, label }: { name: string; label: string }) {
+export function Carrier({ name, label }: { name: string; label: string }) {
   return <fieldset className="min-w-0 space-y-4 rounded border bg-card p-5">
     <legend className="px-1 font-semibold">{label}</legend>
     <div className="grid gap-3 sm:grid-cols-2">
@@ -130,7 +131,7 @@ export function partnerCostPayload(data: FormData) {
   }
 }
 
-export function PartnerCostForm({ initialInput = {}, previousId, readOnly = false }: { initialInput?: Record<string, unknown>; previousId?: string; readOnly?: boolean }) {
+export function PartnerCostForm({ initialInput = {}, previousId, readOnly = false, termsOnly = false }: { initialInput?: Record<string, unknown>; previousId?: string; readOnly?: boolean; termsOnly?: boolean }) {
   const formId = useId()
   const [report, setReport] = useState<Report | null>(null)
   const [error, setError] = useState('')
@@ -186,7 +187,7 @@ export function PartnerCostForm({ initialInput = {}, previousId, readOnly = fals
               <option value="D2D_MX_US_PARTNER">Línea mexicana + socio US</option><option value="D2D_US_MX_PARTNER">Línea US + socio mexicano</option>
             </Select>
             <Select name="direction" label="Dirección"><option value="" disabled>Elegir</option><option value="MX_TO_US">México → EE. UU.</option><option value="US_TO_MX">EE. UU. → México</option></Select>
-            <Field name="serviceDate" label="Fecha del viaje" type="date" />
+            {!termsOnly && <Field name="serviceDate" label="Fecha del viaje" type="date" />}
             <Field name="origin" label="Origen" minLength={2} /><Field name="destination" label="Destino" minLength={2} /><Field name="equipment" label="Equipo y configuración" minLength={2} />
             <Field name="mxInterchange" label="Punto de intercambio en MX" minLength={2} /><Field name="usInterchange" label="Punto de intercambio en US" minLength={2} />
           </div>
@@ -200,12 +201,12 @@ export function PartnerCostForm({ initialInput = {}, previousId, readOnly = fals
           <legend className="px-1 font-semibold">3. Cruce e intercambio</legend>
           <p className="text-sm text-muted-foreground">Asigna cada concepto una sola vez. Si ya está dentro de una tarifa, elige la línea que lo incluye.</p>
           <div className="grid gap-4 md:grid-cols-2"><Term name="crossing" label="Cruce fronterizo" border /><Term name="interchange" label="Intercambio de equipo" border /></div>
-          <p className="text-sm text-muted-foreground">Si hay importes en MXN, captura su conversión a USD.</p>
+          {!termsOnly && <><p className="text-sm text-muted-foreground">Si hay importes en MXN, captura su conversión a USD.</p>
           <div className="grid gap-4 md:grid-cols-3">
             <Field name="fx.mxnPerUsd" label="MXN por 1 USD" type="number" step="0.000001" required={false} />
             <Field name="fx.source" label="Fuente del tipo de cambio" required={false} />
             <Field name="fx.asOf" label="Fecha del tipo de cambio" type="date" required={false} />
-          </div>
+          </div></>}
         </fieldset>
         {!readOnly && <><p className="text-sm text-muted-foreground">Calcula y revisa antes de guardar. Sólo costo de compra: no genera una cotización de venta ni envía tarifas.</p>
         <button type="submit" className="min-h-11 w-full rounded bg-primary px-5 py-3 font-semibold text-primary-foreground hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:w-auto">{pending ? 'Calculando…' : 'Calcular costo de compra'}</button>
