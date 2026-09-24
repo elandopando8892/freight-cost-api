@@ -4,7 +4,7 @@ import { authenticate } from '../../middleware/authenticate.js'
 import type { JwtPayload } from '../auth/auth.schema.js'
 import { buildParamMap, type ParamMap } from '../assumptions/assumptions.service.js'
 import { calculate } from './engine.calculator.js'
-import { resolveRoute } from './lane-resolver.service.js'
+import { mexLegForPolicy, resolveRoute } from './lane-resolver.service.js'
 import { defaultService } from './engine.factors.js'
 import type { EngineInput, EquipmentSpec, MarketCondition } from './engine.types.js'
 import { assertCalculationOverrides, resolveCalculationContext, scopeForOperation } from '../cost-bases/cost-bases.service.js'
@@ -202,8 +202,10 @@ export async function engineRoutes(app: FastifyInstance) {
     assertCalculationOverrides(costBase?.scope ?? scopeForOperation(body.operation), body.overrides, applicabilityProfile)
     if (set) params = buildParamMap(set.params)
 
+    const policy = body.policy ?? defaultPolicy
+    const mexLeg = mexLegForPolicy(resolved.mexLeg, policy)
     const result = calculate({
-      policy: body.policy ?? defaultPolicy,
+      policy,
       applicabilityProfile: applicabilityProfile ?? undefined,
       operation: body.operation,
       service,
@@ -211,13 +213,13 @@ export async function engineRoutes(app: FastifyInstance) {
       params,
       fxRate: body.fxRate,
       overrides: body.overrides,
-      mexLeg: resolved.mexLeg,
+      mexLeg,
       usaLeg: resolved.usaLeg,
     })
 
     return reply.send({
       ...result,
-      resolved: { mexLeg: resolved.mexLeg ?? null, usaLeg: resolved.usaLeg ?? null },
+      resolved: { mexLeg: mexLeg ?? null, usaLeg: resolved.usaLeg ?? null },
       warnings: resolved.warnings,
       costBaseId: costBase?.id ?? null,
       assumptionSetId: set?.id ?? null,
