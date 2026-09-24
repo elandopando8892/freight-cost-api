@@ -13,7 +13,7 @@
  *   MX-only   :  MEX = origin→dest
  */
 import { prisma } from '../../config/prisma.js'
-import type { EquipmentSpec, MexLegInput, UsaLegInput, MarketCondition } from './engine.types.js'
+import type { EnginePolicy, EquipmentSpec, MexLegInput, UsaLegInput, MarketCondition } from './engine.types.js'
 
 export interface ResolveInput {
   orgId: string
@@ -43,6 +43,29 @@ export function normalizeLaneLookup(value: string): string {
     .trim()
     .replace(/\s+/g, ' ')
     .toUpperCase()
+}
+
+type MexLegContext = Omit<MexLegInput, 'baseKm' | 'routeExpensesMxn' | 'baseHours'>
+
+/**
+ * A MEX leg from a lane row (the reference table or the carrier's own matrix):
+ * its km plus the casetas (MXN) and route hours the row carries.
+ */
+export function mexLegFromLane(
+  lane: { km: number; tolls?: number | null; horasRuta?: number | null },
+  context: MexLegContext,
+): MexLegInput {
+  return { ...context, baseKm: lane.km, routeExpensesMxn: lane.tolls ?? 0, baseHours: lane.horasRuta ?? 0 }
+}
+
+/**
+ * WORKBOOK_V3 reproduces the V3.0 sheet, whose mexLaneProd route-expense and
+ * hours references are #REF (km only), so it prices the MEX leg without
+ * casetas or route hours. The operational policy prices both.
+ */
+export function mexLegForPolicy(leg: MexLegInput | undefined, policy: EnginePolicy): MexLegInput | undefined {
+  if (!leg || policy !== 'WORKBOOK_V3') return leg
+  return { ...leg, routeExpensesMxn: 0, baseHours: 0 }
 }
 
 /** Return every pricing leg that an operation requires but the resolver did not find. */
@@ -136,12 +159,10 @@ async function resolveMexLeg(
   const carrier = await findCarrierMexLane(orgId, origin, dest)
   if (carrier) {
     warnings.push(`MEX lane from your production matrix: "${carrier.origin} - ${carrier.destination}" (${carrier.km} km)`)
-    return {
-      baseKm: carrier.km,
-      routeExpensesMxn: 0, baseHours: 0,
+    return mexLegFromLane(carrier, {
       operation, service, route, equipment: eq,
       origin: carrier.origin, dest: carrier.destination,
-    }
+    })
   }
 
   // 2) Global reference table (truck-specific), with homologation → production retry.
@@ -157,13 +178,11 @@ async function resolveMexLeg(
     }
   }
   if (!row) { warnings.push(`MEX lane not found: "${key}" (add it to your production matrix to quote it)`); return undefined }
-  return {
-    baseKm: row.km,
-    routeExpensesMxn: 0,   // V3.0 mexLaneProd uses km only (route-expense refs are #REF→0)
-    baseHours: 0,
+  // Casetas and route hours as seeded; WORKBOOK_V3 drops them (see mexLegForPolicy).
+  return mexLegFromLane(row, {
     operation, service, route, equipment: eq,
     origin: o, dest: d,    // full MX names (engine homologates for the ReferenceKey)
-  }
+  })
 }
 
 /** Look up an org's custom MEX lane by origin→dest, trying raw + homologation-normalized keys. */

@@ -12,7 +12,7 @@ import { prisma } from '../../config/prisma.js'
 import { calculationApplicabilityProfile, resolveCalculationContext, scopeForOperation } from '../cost-bases/cost-bases.service.js'
 import { buildParamMap } from '../assumptions/assumptions.service.js'
 import { calculate } from '../engine/engine.calculator.js'
-import { missingRequiredPricingLegs, normalizeLaneLookup, resolveRoute } from '../engine/lane-resolver.service.js'
+import { mexLegForPolicy, missingRequiredPricingLegs, normalizeLaneLookup, resolveRoute } from '../engine/lane-resolver.service.js'
 import { buildLaneKey } from '../lanes/lanes.schema.js'
 import { buildQuoteExplanation } from '../quotes/quote-explanation.js'
 import { buildQuoteCalculationSnapshot } from '../quotes/quote-snapshot.js'
@@ -465,18 +465,19 @@ export async function productionRoutes(app: FastifyInstance) {
     assertCompleteResolution(route.operation, resolved)
 
     const params = buildParamMap(route.confirmedAssumptionSet.params)
+    const mexLeg = mexLegForPolicy(resolved.mexLeg, applicabilityProfile.calculationPolicy)
     const input: EngineInput = {
       policy: applicabilityProfile.calculationPolicy,
       applicabilityProfile,
       operation: route.operation, service: route.service, equipment, params,
-      mexLeg: resolved.mexLeg, usaLeg: resolved.usaLeg,
+      mexLeg, usaLeg: resolved.usaLeg,
     }
     const result = calculate(input)
     const snapshot = buildQuoteCalculationSnapshot(input, result)
     const explanation = buildQuoteExplanation(
       {
         operation: route.operation, service: route.service, equipment,
-        mex: resolved.mexLeg ? { baseKm: resolved.mexLeg.baseKm, routeExpensesMxn: resolved.mexLeg.routeExpensesMxn ?? 0, baseHours: resolved.mexLeg.baseHours ?? 0, route: resolved.mexLeg.route } : undefined,
+        mex: mexLeg ? { baseKm: mexLeg.baseKm, routeExpensesMxn: mexLeg.routeExpensesMxn ?? 0, baseHours: mexLeg.baseHours ?? 0, route: mexLeg.route } : undefined,
         usa: resolved.usaLeg ? { loadedMiles: resolved.usaLeg.loadedMiles, transitDaysRaw: resolved.usaLeg.transitDaysRaw ?? 0, driverExpenses: resolved.usaLeg.driverExpenses ?? 0, outState: resolved.usaLeg.outState, dieselUsdGal: resolved.usaLeg.dieselUsdGal, fscUsdMile: resolved.usaLeg.fscUsdMile, originCondition: resolved.usaLeg.originCondition, destCondition: resolved.usaLeg.destCondition } : undefined,
       }, result,
       {

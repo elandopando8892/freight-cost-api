@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { missingRequiredPricingLegs, normalizeLaneLookup, usZipPrefix } from '../src/modules/engine/lane-resolver.service.js'
+import { mexLegForPolicy, mexLegFromLane, missingRequiredPricingLegs, normalizeLaneLookup, usZipPrefix } from '../src/modules/engine/lane-resolver.service.js'
+import { calculate } from '../src/modules/engine/engine.calculator.js'
 import { homologateMx, buildReferenceKey } from '../src/modules/engine/reference-key.js'
 import { defaultService } from '../src/modules/engine/engine.factors.js'
 import { pricingInputIssues } from '../src/modules/engine/engine-input-validation.js'
@@ -47,6 +48,32 @@ describe('lane-resolver — canonical lane lookup and required legs', () => {
       expect.stringContaining('mayor que cero'),
     ])
     expect(pricingInputIssues('Drayage', { drayage: { loadedMiles: 25 } })).toEqual([])
+  })
+})
+
+describe('lane-resolver — MEX legs carry casetas and route hours', () => {
+  const equipment = { truckType: 'Truck Trailer', trailer: 'Dry Van', config: 'Single', driver: 'B1' }
+  const context = { operation: 'Intra-Mex', service: 'One Way', route: 'Straight & Danger', equipment }
+
+  it('takes km, casetas (MXN) and route hours from the lane row', () => {
+    const leg = mexLegFromLane({ km: 850, tolls: 2006.4, horasRuta: 23 }, context)
+    expect(leg).toMatchObject({ baseKm: 850, routeExpensesMxn: 2006.4, baseHours: 23 })
+    expect(mexLegFromLane({ km: 120, tolls: null, horasRuta: null }, context))
+      .toMatchObject({ baseKm: 120, routeExpensesMxn: 0, baseHours: 0 })
+  })
+
+  it('keeps them under OPERATIONAL_V3 and drops them under WORKBOOK_V3 (V3.0 sheet parity)', () => {
+    const leg = mexLegFromLane({ km: 850, tolls: 2006.4, horasRuta: 23 }, context)
+    expect(mexLegForPolicy(leg, 'OPERATIONAL_V3')).toMatchObject({ routeExpensesMxn: 2006.4, baseHours: 23 })
+    expect(mexLegForPolicy(leg, 'WORKBOOK_V3')).toMatchObject({ baseKm: 850, routeExpensesMxn: 0, baseHours: 0 })
+    expect(mexLegForPolicy(undefined, 'WORKBOOK_V3')).toBeUndefined()
+  })
+
+  it('prices the casetas: Monterrey → Guadalajara costs more with them than km only', () => {
+    const leg = mexLegFromLane({ km: 850, tolls: 2006.4, horasRuta: 23 }, context)
+    const kmOnly = { ...leg, routeExpensesMxn: 0, baseHours: 0 }
+    const run = (mexLeg: typeof leg) => calculate({ operation: 'Intra-Mex', service: 'One Way', equipment, params: {}, mexLeg })
+    expect(run(leg).mexLeg!.requiredTariffUsd).toBeGreaterThan(run(kmOnly).mexLeg!.requiredTariffUsd)
   })
 })
 
