@@ -6,6 +6,7 @@ import {
   type TireCalibrationSummary,
 } from './tire-calibration-workbench'
 import type { TireReviewer } from './tire-review-actions'
+import { TirePublicResearch } from './tire-public-research'
 
 export const dynamic = 'force-dynamic'
 export const metadata: Metadata = { title: 'Calibración de llantas' }
@@ -26,7 +27,7 @@ export default async function TireCalibrationPage() {
           Calibración de llantas
         </Link>
       </nav>
-      <TireCalibrationWorkbench initialDossiers={dossiers} role={user.role} currentUserId={user.id} reviewers={reviewers} />
+      <TireCalibrationWorkbench initialDossiers={dossiers} role={user.role} currentUserId={user.id} reviewers={reviewers} researchPanel={<TirePublicResearch />} />
     </main>
   )
 }

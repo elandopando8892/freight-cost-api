@@ -1,5 +1,6 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import { useMemo, useState } from 'react'
 import {
   CheckCircle2,
@@ -125,11 +126,13 @@ export function TireCalibrationWorkbench({
   role,
   currentUserId,
   reviewers = [],
+  researchPanel,
 }: {
   initialDossiers: TireCalibrationSummary[]
   role: 'ADMIN' | 'OPERATOR' | 'VIEWER'
   currentUserId?: string
   reviewers?: TireReviewer[]
+  researchPanel?: ReactNode
 }) {
   const [dossiers, setDossiers] = useState(initialDossiers)
   const [filter, setFilter] = useState('')
@@ -214,6 +217,8 @@ export function TireCalibrationWorkbench({
           <p className="text-[11px] text-muted-foreground">listos para publicar</p>
         </div>
       </section>
+
+      {researchPanel}
 
       <div className="grid items-start gap-5 xl:grid-cols-[22rem_minmax(0,1fr)]">
         <aside className="rounded-lg border bg-card" aria-label="Expedientes de calibración">
