@@ -21,4 +21,12 @@ Para convertir investigación en contraste económico hacen falta una cifra abso
 
 ## Verificación y rollback
 
-La nueva prueba comprueba que los cinco segmentos excluidos tienen una brecha, que todas las fuentes referenciadas existen y que el bloque sigue sin parámetros adoptados ni elegibilidad de cotización. El registro y panel son de sólo lectura; se pueden revertir sin migrar datos. Resultados de build, pruebas y preview se añaden al ejecutarlos.
+La nueva prueba comprueba que los cinco segmentos excluidos tienen una brecha, que todas las fuentes referenciadas existen y que el bloque sigue sin parámetros adoptados ni elegibilidad de cotización. Los cuatro enlaces oficiales respondieron HTTP 200 a `HEAD` el 28 de septiembre de 2026. Pasaron 10 pruebas focalizadas y `npm run build -w freight-cost-web`; el build remoto también terminó. El registro y panel son de sólo lectura; se pueden revertir sin migrar datos.
+
+## Preview y límites de aceptación
+
+- Frontend: https://freight-cost-gm6h3a1hd-elandopando8892s-projects.vercel.app/cost-bases/tires, deployment `dpl_BRpL88UUU1AWZS3cqwuFC2QgtZQm`, `READY`, SHA funcional `b3df5e60d505db7f008a784e5619ec2ac1833f6f`, sólo preview.
+- API exclusiva existente y sin cambios: `/health` HTTP 200 y release `192f8577a8442d407c61b907e37c4decd40a0a01`. El par web/API no tiene el mismo SHA porque no hubo cambio de API ni redepliegue de sus credenciales. No se modificaron Auth, datos, motor, bases ni producción.
+- Con OPERATOR existente, Google OAuth regresó al preview; se observaron las cuatro fuentes y cinco brechas, cero parámetros adoptados y cero expedientes. Las tarjetas se revisaron en escritorio y a 390 px; el viewport volvió a su tamaño normal. La recarga conservó la sesión. Esto no prueba renovación del token a largo plazo, integración de cálculo ni aceptación productiva.
+- Capturas: `D:\andre\apps\codex-home\visualizations\2026\08\26\01a03cbb-7378-7dc0-9dd0-24077f169b51\tire-excluded-sources-preview.png` y `tire-excluded-sources-mobile.png` en la misma carpeta.
+- El build de Vercel reportó 13 avisos npm (2 low, 4 moderate, 6 high, 1 critical) en el árbol completo. No se actualizaron dependencias ni lockfile; necesitan triage separado.
