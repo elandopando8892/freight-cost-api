@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "fcm.tire-preview-readiness.v1",
+  "release": {
+    "expectedSha": "8b2cc00b003a9e809c1119ceaeeaf15be5fc7616",
+    "apiSha": "8b2cc00b003a9e809c1119ceaeeaf15be5fc7616",
+    "webSha": "8b2cc00b003a9e809c1119ceaeeaf15be5fc7616",
+    "apiDirty": true,
+    "webDirty": true
+  },
+  "database": {
+    "migrationId": "20260927000100_tire_calibration_multitenant",
+    "migrationApplied": false,
+    "prismaRoleBypassRls": null,
+    "backupVerified": false,
+    "restoreVerified": false
+  },
+  "identities": [
+    {
+      "identityKey": "sales-admin",
+      "orgKey": "tenant-rateware",
+      "role": "ADMIN",
+      "loginVerified": false,
+      "reloadVerified": false,
+      "renewalVerified": false
+    },
+    {
+      "identityKey": "primary-operator",
+      "orgKey": "tenant-rateware",
+      "role": "OPERATOR",
+      "loginVerified": false,
+      "reloadVerified": false,
+      "renewalVerified": false
+    },
+    {
+      "identityKey": "xbf-viewer",
+      "orgKey": "tenant-rateware",
+      "role": "VIEWER",
+      "loginVerified": false,
+      "reloadVerified": false,
+      "renewalVerified": false
+    }
+  ],
+  "workflow": {
+    "sourceCaptured": false,
+    "staleSourceRejected": false,
+    "dossierOpened": false,
+    "reviewersAssigned": false,
+    "economicDecisionRecorded": false,
+    "independentDecisionRecorded": false,
+    "approvalPackageReadAfterReload": false,
+    "crossTenantDenied": false
+  },
+  "productionEnabled": false
+}

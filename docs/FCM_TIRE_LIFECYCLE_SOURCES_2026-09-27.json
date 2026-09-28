@@ -1,0 +1,107 @@
+{
+  "schemaVersion": "fcm.tire-lifecycle-sources.v1",
+  "capturedOn": "2026-09-27",
+  "governance": {
+    "purpose": "Public research pack for COST_TIRES; it is not a production calibration.",
+    "adoptedParameterCount": 0,
+    "quoteEligible": false,
+    "databaseWriteAllowed": false
+  },
+  "newTirePriceObservations": [
+    {
+      "id": "eurotyres-rm185-11r225-20260927",
+      "seller": "Eurotyres",
+      "model": "Roadmaster RM185",
+      "size": "11R22.5",
+      "listedPriceMxn": 5727.92,
+      "sellerTerms": "Price excludes IVA unless expressly indicated; freight and other expenses may be additional.",
+      "generalIvaScenarioGrossMxn": 6644.39,
+      "sourceUrl": "https://eurotyres.mx/products/roadmaster-11r22-5-16-rm185-tp",
+      "termsUrl": "https://eurotyres.mx/policies/legal-notice",
+      "technicalIdentityCompleteness": "PARTIAL",
+      "installedCostCompleteness": "INCOMPLETE",
+      "adoptionStatus": "BLOCKED"
+    },
+    {
+      "id": "eurotyres-rm275-11r225-20260927",
+      "seller": "Eurotyres",
+      "model": "Roadmaster RM275",
+      "size": "11R22.5",
+      "listedPriceMxn": 6088.56,
+      "sellerTerms": "Price excludes IVA unless expressly indicated; freight and other expenses may be additional.",
+      "generalIvaScenarioGrossMxn": 7062.73,
+      "sourceUrl": "https://eurotyres.mx/products/roadmaster-11r22-5-rm275-16c-sc-tr-reg",
+      "termsUrl": "https://eurotyres.mx/policies/legal-notice",
+      "technicalIdentityCompleteness": "PARTIAL",
+      "installedCostCompleteness": "INCOMPLETE",
+      "adoptionStatus": "BLOCKED"
+    }
+  ],
+  "identityDiscrepancies": [
+    {
+      "model": "Roadmaster RM185",
+      "size": "11R22.5",
+      "vendorDescription": "146/143M 16PR",
+      "manufacturerSpecification": "146/143L, Load Range H",
+      "manufacturerApplication": "Regional/urban steer and all-position",
+      "manufacturerSourceUrl": "https://www.roadmastertires.com/on/demandware.static/-/Sites-goodyear-master-catalog/default/dwe2635e8e/pdf/product-specifications/roadmaster/RM185.pdf",
+      "status": "UNRESOLVED"
+    },
+    {
+      "model": "Roadmaster RM275",
+      "size": "11R22.5",
+      "vendorDescription": "146/143M 16PR",
+      "manufacturerSpecification": "146/143L, Load Range H",
+      "manufacturerApplication": "Long-haul drive",
+      "manufacturerSourceUrl": "https://www.roadmastertires.com/on/demandware.static/-/Sites-goodyear-master-catalog/default/dw96e5471e/pdf/product-specifications/roadmaster/RM275.pdf",
+      "status": "UNRESOLVED"
+    }
+  ],
+  "retreadPriceObservations": [
+    {
+      "id": "renovadora-pachuca-routeway-11r225-20260927",
+      "seller": "Renovadora de Pachuca",
+      "size": "11R22.5",
+      "patterns": ["RW201", "RW601"],
+      "listedPriceRangeMxn": { "min": 3606, "max": 3886 },
+      "sourceUrl": "https://www.renovadoradepachuca.com/routeway",
+      "taxBasis": "UNSTATED",
+      "casingIncluded": "UNSTATED",
+      "installationIncluded": "UNSTATED",
+      "targetFitment": "UNVERIFIED",
+      "adoptionStatus": "BLOCKED"
+    }
+  ],
+  "lifecycleClaims": [
+    {
+      "id": "michelin-mx-retread-cost-claim",
+      "claim": "Average retread cost is stated as 40 percent lower than a comparable new tire.",
+      "sourceUrl": "https://pro.michelin.com.mx/renovado-de-llanta",
+      "scope": "Michelin internal European 2022 study; not a Roadmaster or XBF observation.",
+      "adoptionStatus": "BLOCKED"
+    },
+    {
+      "id": "bandag-mx-retread-cost-range",
+      "claim": "A retread is stated to cost about 30 to 50 percent of a comparable new tire.",
+      "sourceUrl": "https://commercial.bridgestone.com.mx/es-mx/recursos/llantas-renovadas-101/ahorrando-con-renovados",
+      "scope": "General educational claim; no exact product, installed basis, life or target-fleet cohort.",
+      "adoptionStatus": "BLOCKED"
+    },
+    {
+      "id": "michelin-million-mile-casing",
+      "claim": "Selected Michelin products are designed for up to four retreads when the casing remains eligible.",
+      "sourceUrl": "https://business.michelinman.com/million-mile-casing",
+      "scope": "Selected Michelin casing program; not transferable to Roadmaster or XBF.",
+      "adoptionStatus": "BLOCKED"
+    }
+  ],
+  "missingTargetEvidence": [
+    "Exact approved product and fitment by STEER, DRIVE and TRAILER position",
+    "Delivered installed cost including IVA, freight, mounting, balancing and disposal",
+    "Observed first-life kilometers by position and operating segment",
+    "Casing inspection and acceptance rate for each sequential retread stage",
+    "Installed retread price and observed retread life by stage",
+    "Terminal casing credit or disposal cost",
+    "Documented quantity by actual tractor and trailer configuration"
+  ]
+}

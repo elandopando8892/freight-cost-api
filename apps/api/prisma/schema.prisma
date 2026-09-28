@@ -247,6 +247,11 @@ model Organization {
   costBaseAuditEvents      CostBaseAuditEvent[]
   carrierProfile           CarrierProfile?
   memberRoleAudits         OrganizationMemberRoleAudit[]
+  tireCalibrationDossiers   TireCalibrationDossier[]
+  tireCalibrationEvents     TireCalibrationReviewEvent[]
+  tireCalibrationPackages   TireCalibrationApprovalPackage[]
+  tireCohortSourceSnapshots TireCohortSourceSnapshot[]
+  tireCohortSourceHeads     TireCohortSourceHead[]
 }
 
 model User {
@@ -283,6 +288,15 @@ model User {
   invitationsAccepted         OrganizationInvitation[]    @relation("OrganizationInvitationAcceptor")
   memberRoleChangesMade       OrganizationMemberRoleAudit[] @relation("OrganizationMemberRoleAuditActor")
   memberRoleChangesReceived   OrganizationMemberRoleAudit[] @relation("OrganizationMemberRoleAuditMember")
+  tireCalibrationDossiersAuthored  TireCalibrationDossier[]         @relation("TireCalibrationDossierAuthor")
+  tireCalibrationDossiersOwned     TireCalibrationDossier[]         @relation("TireCalibrationDossierEconomicOwner")
+  tireCalibrationDossiersReviewed  TireCalibrationDossier[]         @relation("TireCalibrationDossierIndependentReviewer")
+  tireCalibrationReviewEvents      TireCalibrationReviewEvent[]     @relation("TireCalibrationReviewEventActor")
+  tireCalibrationPackagesCreated   TireCalibrationApprovalPackage[] @relation("TireCalibrationApprovalPackageCreator")
+  tireCohortSourceSnapshotsCreated TireCohortSourceSnapshot[]       @relation("TireCohortSourceSnapshotCreator")
+  tireCohortSourceHeadsUpdated     TireCohortSourceHead[]           @relation("TireCohortSourceHeadUpdater")
+
+  @@unique([orgId, id])
 }
 
 model OrganizationInvitation {
@@ -601,6 +615,133 @@ model CostBaseAuditEvent {
   @@index([costBaseId, createdAt])
   @@index([orgId, createdAt])
   @@index([actorId])
+}
+
+model TireCohortSourceSnapshot {
+  id                     String   @id @default(cuid())
+  orgId                  String
+  cohortKey              String
+  version                Int
+  requestId              String
+  commandFingerprint     String
+  aggregationFingerprint String
+  recordsSnapshot        Json
+  statisticsPolicy       Json
+  createdById            String
+  createdAt              DateTime @default(now())
+
+  org        Organization             @relation(fields: [orgId], references: [id], onDelete: Restrict)
+  createdBy  User                     @relation("TireCohortSourceSnapshotCreator", fields: [orgId, createdById], references: [orgId, id], onDelete: Restrict)
+  currentFor TireCohortSourceHead[]   @relation("TireCohortSourceCurrentSnapshot")
+  dossiers   TireCalibrationDossier[]
+
+  @@unique([orgId, cohortKey, version])
+  @@unique([orgId, requestId])
+  @@unique([orgId, id])
+  @@index([orgId, cohortKey, createdAt])
+  @@index([createdById])
+}
+
+model TireCohortSourceHead {
+  id                String   @id @default(cuid())
+  orgId             String
+  cohortKey         String
+  currentSnapshotId String
+  revision          Int      @default(1)
+  updatedById       String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  org             Organization             @relation(fields: [orgId], references: [id], onDelete: Restrict)
+  currentSnapshot TireCohortSourceSnapshot @relation("TireCohortSourceCurrentSnapshot", fields: [orgId, currentSnapshotId], references: [orgId, id], onDelete: Restrict)
+  updatedBy       User                     @relation("TireCohortSourceHeadUpdater", fields: [orgId, updatedById], references: [orgId, id], onDelete: Restrict)
+
+  @@unique([orgId, cohortKey])
+  @@unique([orgId, id])
+  @@index([currentSnapshotId])
+  @@index([updatedById])
+}
+
+model TireCalibrationDossier {
+  id                           String   @id @default(cuid())
+  orgId                        String
+  proposalId                   String
+  version                      Int
+  status                       String   @default("DRAFT")
+  revision                     Int      @default(0)
+  proposalFingerprint          String
+  sourceAggregationFingerprint String
+  sourceSnapshotId             String
+  authorId                     String
+  economicOwnerId              String?
+  independentReviewerId        String?
+  proposalSnapshot             Json
+  createdAt                    DateTime @default(now())
+  updatedAt                    DateTime @updatedAt
+
+  org                 Organization                    @relation(fields: [orgId], references: [id], onDelete: Restrict)
+  sourceSnapshot      TireCohortSourceSnapshot        @relation(fields: [orgId, sourceSnapshotId], references: [orgId, id], onDelete: Restrict)
+  author              User                            @relation("TireCalibrationDossierAuthor", fields: [orgId, authorId], references: [orgId, id], onDelete: Restrict)
+  economicOwner       User?                           @relation("TireCalibrationDossierEconomicOwner", fields: [orgId, economicOwnerId], references: [orgId, id], onDelete: Restrict)
+  independentReviewer User?                           @relation("TireCalibrationDossierIndependentReviewer", fields: [orgId, independentReviewerId], references: [orgId, id], onDelete: Restrict)
+  events              TireCalibrationReviewEvent[]
+  approvalPackage     TireCalibrationApprovalPackage?
+
+  @@unique([orgId, proposalId])
+  @@unique([orgId, id])
+  @@index([orgId, status, updatedAt])
+  @@index([sourceSnapshotId])
+  @@index([economicOwnerId])
+  @@index([independentReviewerId])
+}
+
+model TireCalibrationReviewEvent {
+  id                String   @id @default(cuid())
+  orgId             String
+  dossierId         String
+  requestId         String
+  sequence          Int
+  action            String
+  actorId           String
+  fromStatus        String?
+  toStatus          String?
+  payload           Json?
+  previousEventHash String?
+  eventHash         String
+  createdAt         DateTime @default(now())
+
+  org     Organization           @relation(fields: [orgId], references: [id], onDelete: Restrict)
+  dossier TireCalibrationDossier @relation(fields: [orgId, dossierId], references: [orgId, id], onDelete: Restrict)
+  actor   User                   @relation("TireCalibrationReviewEventActor", fields: [orgId, actorId], references: [orgId, id], onDelete: Restrict)
+
+  @@unique([orgId, requestId])
+  @@unique([dossierId, sequence])
+  @@unique([dossierId, eventHash])
+  @@index([orgId, createdAt])
+  @@index([actorId])
+}
+
+model TireCalibrationApprovalPackage {
+  id                           String   @id @default(cuid())
+  orgId                        String
+  dossierId                    String
+  createdById                  String
+  proposalFingerprint          String
+  sourceAggregationFingerprint String
+  ledgerHeadHash               String
+  packageFingerprint           String
+  snapshot                     Json
+  quoteEligible                Boolean  @default(false)
+  createdAt                    DateTime @default(now())
+
+  org       Organization           @relation(fields: [orgId], references: [id], onDelete: Restrict)
+  dossier   TireCalibrationDossier @relation(fields: [orgId, dossierId], references: [orgId, id], onDelete: Restrict)
+  createdBy User                   @relation("TireCalibrationApprovalPackageCreator", fields: [orgId, createdById], references: [orgId, id], onDelete: Restrict)
+
+  @@unique([orgId, dossierId])
+  @@unique([orgId, packageFingerprint])
+  @@index([orgId, createdAt])
+  @@index([createdById])
 }
 
 model EquipmentConfig {

@@ -21,6 +21,7 @@ export default async function PartnerBasesPage({ searchParams }: {
     <nav aria-label="Modelo de bases" className="flex flex-wrap gap-3 border-b pb-3">
       <Link className="min-h-11 rounded border px-4 py-2" href="/cost-bases">Flota propia</Link>
       <Link aria-current="page" className="min-h-11 rounded bg-primary px-4 py-2 text-primary-foreground" href="/cost-bases/partners">Tarifas de socios</Link>
+      <Link className="min-h-11 rounded border px-4 py-2" href="/cost-bases/tires">Calibración de llantas</Link>
     </nav>
     <header className="flex flex-wrap items-center justify-between gap-4"><div><h1 className="text-2xl font-semibold">Bases de costo · Tarifas de socios</h1>
       <p className="mt-2 text-sm text-muted-foreground">D2D por ruta y equipo. Conserva tarifas, vigencias y supuestos para reutilizarlos al calcular.</p></div>
