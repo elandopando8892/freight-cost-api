@@ -23,3 +23,12 @@ La salida utilizable exige identidad y posición aprobadas, costo instalado comp
 ## Verificación y rollback
 
 Typecheck web, siete pruebas existentes de workbench y build Next pasaron. El cambio sólo agrega una sección de lectura a la página; quitar el componente y el prop `researchPanel` revierte la UI sin migración ni cambio de datos. La validación visual y, si se despliega, la identidad exacta del preview se registran a continuación.
+
+## Preview final y aceptación observada
+
+- Commit funcional `192f8577a8442d407c61b907e37c4decd40a0a01` en D:. API `dpl_Be3NqRMP53nR8DNG31J84hdytBPR` y web `dpl_FstdWftSTFSKwzzQSDPyszRidzXL`: ambos READY, target preview, metadata con el mismo SHA.
+- API: https://freight-cost-p6i5zd05x-elandopando8892s-projects.vercel.app. `/health` y `/ready` devolvieron `ok` y `ready`, base conectada y release `192f8577a8442d407c61b907e37c4decd40a0a01`.
+- Web: https://freight-cost-ioxlkqbye-elandopando8892s-projects.vercel.app/cost-bases/tires. Login Google real del OPERATOR existente; el callback retornó a la raíz del mismo origen y se abrió el módulo. La sección mostró los tres registros históricos, enlaces y siete faltantes en español. La base aislada siguió con tres usuarios, una organización, cero supuestos y cero expedientes.
+- Las URL de vendedor de Eurotyres no se reconfirmaron. Ninguno de los tres importes se considera costo instalado, parámetro adoptado ni dato vigente. No se ejecutó una decisión económica real al no existir una cohorte válida.
+- Los dos archivos temporales privados de credenciales usados para despliegue se eliminaron por ruta exacta después de la verificación. Las credenciales del runtime permanecen sólo en la configuración del deployment.
+- La autenticación no conserva el destino profundo después de OAuth; el usuario llega a la raíz y navega al módulo. Es una mejora de navegación separada.
