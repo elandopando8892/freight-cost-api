@@ -10,6 +10,7 @@ import { readVerifiedPartnerPreviewTarget } from './inspect-partner-preview.js'
 const backupDirectory = 'D:\\andre\\backups\\freight-cost-model'
 const image = 'postgres:17-alpine'
 const localDatabase = 'fcm_tire_restore'
+const rehearsalDatabase = 'fcm_tire_s8'
 const localPassword = 'local-fixture-only'
 let stage = 'initialization'
 
@@ -113,15 +114,16 @@ async function createEncryptedBackup(client: string, pgEnv: string[], destinatio
   return plaintextBytes
 }
 
-function startRestoreContainer(name: string) {
+function startRestoreContainer(name: string, database = localDatabase, loopback = false) {
+  const networking = loopback ? ['-p', '127.0.0.1::5432'] : ['--network', 'none']
   run('docker', ['run', '--detach', '--rm', '--name', name,
     '--label', 'fcm.disposable=staging-restore', '--tmpfs', '/var/lib/postgresql/data:rw,nosuid,nodev,size=2g',
-    '--network', 'none', '-e', `POSTGRES_PASSWORD=${localPassword}`, '-e', `POSTGRES_DB=${localDatabase}`, image])
+    ...networking, '-e', `POSTGRES_PASSWORD=${localPassword}`, '-e', `POSTGRES_DB=${database}`, image])
 }
 
-async function waitReady(name: string) {
+async function waitReady(name: string, database = localDatabase) {
   for (let attempt = 0; attempt < 40; attempt++) {
-    const result = spawnSync('docker', ['exec', name, 'pg_isready', '-U', 'postgres', '-d', localDatabase],
+    const result = spawnSync('docker', ['exec', name, 'pg_isready', '-U', 'postgres', '-d', database],
       { windowsHide: true, stdio: 'ignore', timeout: 5000 })
     if (result.status === 0) return
     await new Promise(resolve => setTimeout(resolve, 500))
@@ -129,7 +131,7 @@ async function waitReady(name: string) {
   throw new Error('Disposable restore server did not become ready')
 }
 
-async function restoreEncryptedBackup(name: string, source: string, key: Buffer) {
+async function restoreEncryptedBackup(name: string, source: string, key: Buffer, database = localDatabase) {
   const size = statSync(source).size
   if (size < 29) throw new Error('Encrypted archive is incomplete')
   const header = Buffer.alloc(12)
@@ -143,7 +145,7 @@ async function restoreEncryptedBackup(name: string, source: string, key: Buffer)
   const decipher = createDecipheriv('aes-256-gcm', key, header)
   decipher.setAuthTag(tag)
   const restore = spawn('docker', ['exec', '-i', name, 'pg_restore', '--exit-on-error', '--no-owner', '--no-acl',
-    '-U', 'postgres', '-d', localDatabase], { windowsHide: true, stdio: ['pipe', 'ignore', 'pipe'] })
+    '-U', 'postgres', '-d', database], { windowsHide: true, stdio: ['pipe', 'ignore', 'pipe'] })
   restore.stderr.resume() // No source data or SQL details in logs.
   const ended = waitForExit(restore, 'pg_restore')
   await Promise.all([
@@ -152,13 +154,13 @@ async function restoreEncryptedBackup(name: string, source: string, key: Buffer)
   ])
 }
 
-function restoredCounts(name: string) {
+function restoredCounts(name: string, database = localDatabase) {
   const sql = `SELECT (SELECT count(*) FROM "User") || '|' ||
     (SELECT count(*) FROM "_prisma_migrations") || '|' ||
     (SELECT count(*) FROM information_schema.tables WHERE table_schema='public' AND table_type='BASE TABLE') || '|' ||
     (SELECT count(*) FROM "User" WHERE "kindeId" IS NOT NULL AND btrim("kindeId") <> '');`
   const output = run('docker', ['exec', name, 'psql', '-X', '-At', '-v', 'ON_ERROR_STOP=1', '-U', 'postgres',
-    '-d', localDatabase, '-c', sql])
+    '-d', database, '-c', sql])
   const parts = output.split('|').map(Number)
   if (parts.length !== 4 || parts.some(value => !Number.isSafeInteger(value))) throw new Error('Invalid restore counts')
   return { users: parts[0], migrations: parts[1], tables: parts[2], legacyIds: parts[3] }
@@ -208,7 +210,120 @@ async function verifyExistingBackup(manifestPath: string) {
   }
 }
 
+function migratedCloneCounts(name: string) {
+  const sql = `SELECT (SELECT count(*) FROM "User") || '|' ||
+    (SELECT count(*) FROM "_prisma_migrations" WHERE finished_at IS NOT NULL AND rolled_back_at IS NULL) || '|' ||
+    (SELECT count(*) FROM information_schema.tables WHERE table_schema='public' AND table_type='BASE TABLE') || '|' ||
+    (SELECT count(*) FROM "User" WHERE "supabaseId" IS NULL OR btrim("supabaseId")='') || '|' ||
+    (SELECT count(*) FROM information_schema.columns WHERE table_schema='public' AND table_name='User' AND column_name='kindeId') || '|' ||
+    (SELECT count(*) FROM information_schema.columns WHERE table_schema='public' AND table_name='User' AND column_name='supabaseId' AND is_nullable='NO') || '|' ||
+    (SELECT count(*) FROM pg_class WHERE relname IN ('TireCohortSourceSnapshot','TireCohortSourceHead','TireCalibrationDossier','TireCalibrationReviewEvent','TireCalibrationApprovalPackage','TireCohortV2ResearchSnapshot','TireCohortV2ResearchHead') AND relrowsecurity AND relforcerowsecurity) || '|' ||
+    (SELECT count(*) FROM pg_constraint WHERE connamespace='public'::regnamespace AND NOT convalidated);`
+  const output = run('docker', ['exec', name, 'psql', '-X', '-At', '-v', 'ON_ERROR_STOP=1', '-U', 'postgres',
+    '-d', rehearsalDatabase, '-c', sql])
+  const parts = output.split('|').map(Number)
+  if (parts.length !== 8 || parts.some(value => !Number.isSafeInteger(value))) throw new Error('Invalid clone metrics')
+  return { users: parts[0], appliedMigrations: parts[1], tables: parts[2], unlinkedSupabaseUsers: parts[3],
+    kindeColumns: parts[4], supabaseIdNotNullColumns: parts[5], forcedRlsTables: parts[6], invalidConstraints: parts[7] }
+}
+
+function grantCloneTestRole(name: string) {
+  const sql = `CREATE ROLE fcm_tire_app LOGIN PASSWORD 'local-app-only' NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOBYPASSRLS;
+    GRANT CONNECT ON DATABASE fcm_tire_s8 TO fcm_tire_app;
+    GRANT USAGE ON SCHEMA public TO fcm_tire_app;
+    GRANT SELECT, UPDATE ON TABLE "Organization" TO fcm_tire_app;
+    GRANT SELECT ON TABLE "User" TO fcm_tire_app;
+    GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE "TireCohortSourceSnapshot", "TireCohortSourceHead", "TireCalibrationDossier", "TireCalibrationReviewEvent", "TireCalibrationApprovalPackage", "TireCohortV2ResearchSnapshot", "TireCohortV2ResearchHead" TO fcm_tire_app;`
+  run('docker', ['exec', '-i', name, 'psql', '-X', '-v', 'ON_ERROR_STOP=1', '-U', 'postgres', '-d', rehearsalDatabase], sql)
+  const flags = run('docker', ['exec', name, 'psql', '-X', '-At', '-v', 'ON_ERROR_STOP=1', '-U', 'postgres',
+    '-d', rehearsalDatabase, '-c', "SELECT rolsuper::text || '|' || rolbypassrls::text FROM pg_roles WHERE rolname='fcm_tire_app'"])
+  if (flags !== 'false|false') throw new Error('Application test role can bypass RLS')
+}
+
+async function rehearseExistingBackup(manifestPath: string) {
+  stage = 'rehearsal manifest verification'
+  const fullManifest = resolve(manifestPath)
+  if (resolve(backupDirectory, basename(fullManifest)) !== fullManifest) throw new Error('Manifest must be in the approved backup directory')
+  const evidence = JSON.parse(readFileSync(fullManifest, 'utf8')) as {
+    schemaVersion: string; archive: string; wrappedKey: string; encryptedSha256: string;
+    sourceCounts: ReturnType<typeof restoredCounts>; restore: string
+  }
+  if (evidence.schemaVersion !== 'fcm.staging-backup-restore.v1' || evidence.restore !== 'PASS') throw new Error('Completed backup required')
+  for (const path of [evidence.archive, evidence.wrappedKey]) {
+    if (resolve(backupDirectory, basename(path)) !== resolve(path)) throw new Error('Backup file path is outside the approved directory')
+  }
+  if (await encryptedHash(evidence.archive) !== evidence.encryptedSha256) throw new Error('Encrypted archive checksum changed')
+  if (!process.cwd().replace(/\\/g, '/').endsWith('/apps/api')) throw new Error('Run rehearsal from apps/api')
+  const key = unprotectForCurrentUser(readFileSync(evidence.wrappedKey, 'utf8').trim())
+  const clone = `fcm-pg-clone-${randomBytes(6).toString('hex')}`
+  let started = false
+  try {
+    stage = 'isolated clone startup'
+    startRestoreContainer(clone, rehearsalDatabase, true)
+    started = true
+    await waitReady(clone, rehearsalDatabase)
+    const mapping = run('docker', ['port', clone, '5432/tcp'])
+    if (!/^127\.0\.0\.1:\d+$/.test(mapping)) throw new Error('Only loopback PostgreSQL port is permitted')
+    const port = mapping.split(':')[1]
+    const adminUrl = `postgresql://postgres:${localPassword}@127.0.0.1:${port}/${rehearsalDatabase}`
+    const appUrl = `postgresql://fcm_tire_app:local-app-only@127.0.0.1:${port}/${rehearsalDatabase}`
+    stage = 'restoring staging data into clone'
+    await restoreEncryptedBackup(clone, evidence.archive, key, rehearsalDatabase)
+    const before = restoredCounts(clone, rehearsalDatabase)
+    if (JSON.stringify(before) !== JSON.stringify(evidence.sourceCounts)) throw new Error('Clone differs from backup before migration')
+    stage = 'Prisma migrate deploy on loopback clone'
+    const cli = resolve('../../node_modules/prisma/build/index.js')
+    const schema = resolve('prisma/schema.prisma')
+    const migration = spawnSync(process.execPath, [cli, 'migrate', 'deploy', '--schema', schema], {
+      cwd: process.cwd(), env: { ...process.env, DATABASE_URL: adminUrl }, windowsHide: true,
+      stdio: ['ignore', 'pipe', 'pipe'], timeout: 180_000, encoding: 'utf8',
+    })
+    if (migration.status !== 0 || migration.error) throw new Error('Prisma migration rehearsal failed')
+    stage = 'Prisma migrate status on loopback clone'
+    const status = spawnSync(process.execPath, [cli, 'migrate', 'status', '--schema', schema], {
+      cwd: process.cwd(), env: { ...process.env, DATABASE_URL: adminUrl }, windowsHide: true,
+      stdio: ['ignore', 'pipe', 'pipe'], timeout: 60_000, encoding: 'utf8',
+    })
+    if (status.status !== 0 || status.error) throw new Error('Migrated clone is not current')
+    stage = 'post-migration clone invariants'
+    const after = migratedCloneCounts(clone)
+    if (after.users !== before.users || after.appliedMigrations !== before.migrations + 4 ||
+      after.tables !== before.tables + 7 || after.unlinkedSupabaseUsers !== 0 || after.kindeColumns !== 0 ||
+      after.supabaseIdNotNullColumns !== 1 || after.forcedRlsTables !== 7 || after.invalidConstraints !== 0) {
+      throw new Error('Migrated clone failed identity, schema or RLS invariants')
+    }
+    stage = 'tenant RLS integration tests on clone'
+    grantCloneTestRole(clone)
+    const tests = spawnSync(process.execPath, [resolve('../../node_modules/vitest/vitest.mjs'), 'run',
+      'tests/tire-calibration-rls-postgres.test.ts', 'tests/tire-calibration-multitenant-contract.test.ts',
+      'tests/tire-cohort-v2-rls-postgres.test.ts'], {
+      cwd: process.cwd(), env: { ...process.env, DATABASE_URL: adminUrl,
+        FCM_TEST_ADMIN_DATABASE_URL: adminUrl, FCM_TEST_DATABASE_URL: appUrl },
+      windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'], timeout: 180_000, encoding: 'utf8',
+    })
+    if (tests.status !== 0 || tests.error) throw new Error('Tenant RLS integration tests failed on clone')
+    run('docker', ['stop', clone])
+    started = false
+    console.log(JSON.stringify({ mode: 'REHEARSE_MANIFEST_ON_DISPOSABLE_CLONE', manifest: fullManifest,
+      source: 'encrypted staging backup; no staging connection', before, after,
+      prismaMigrateDeploy: 'PASS', prismaMigrateStatus: 'PASS', tenantRlsTests: 'PASS',
+      testsSummary: tests.stdout.match(/Tests\s+\d+ passed[^\r\n]*/)?.[0] ?? 'passed',
+      cloneDisposed: true, stagingWritesAttempted: false, productionTouched: false,
+      authenticatedSupabaseLoginTested: false }, null, 2))
+  } finally {
+    key.fill(0)
+    if (started) run('docker', ['stop', clone])
+  }
+}
+
 async function main() {
+  const rehearseIndex = process.argv.indexOf('--rehearse-manifest')
+  if (rehearseIndex >= 0) {
+    if (!process.argv[rehearseIndex + 1]) throw new Error('Missing manifest path')
+    checkLocalDocker()
+    await rehearseExistingBackup(process.argv[rehearseIndex + 1])
+    return
+  }
   const verifyIndex = process.argv.indexOf('--verify-manifest')
   if (verifyIndex >= 0) {
     if (!process.argv[verifyIndex + 1]) throw new Error('Missing manifest path')
@@ -227,7 +342,7 @@ async function main() {
     return
   }
   if (process.argv.includes('--help')) {
-    console.log('Back up verified freight-cost-api preview Neon to DPAPI-protected AES-GCM on D:, then restore in disposable, non-network-exposed local PostgreSQL. --verify-manifest PATH replays an isolated restore without contacting staging. No staging migrations or writes.')
+    console.log('Back up verified freight-cost-api preview Neon to DPAPI-protected AES-GCM on D:, then restore in disposable PostgreSQL. --verify-manifest PATH repeats restore. --rehearse-manifest PATH migrates only a disposable loopback clone and runs tenant tests. No staging migrations or writes.')
     return
   }
   if (process.platform !== 'win32') throw new Error('Windows DPAPI is required')
