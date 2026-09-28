@@ -1,8 +1,12 @@
 import { ExternalLink } from 'lucide-react'
 import research from '../../../../../../docs/FCM_TIRE_LIFECYCLE_SOURCES_2026-09-27.json'
+import imtReference from '../../../../../../docs/FCM_TIRE_IMT_PT881_2025.json'
 
 const formatMxn = (value: number) => new Intl.NumberFormat('es-MX', {
   style: 'currency', currency: 'MXN', maximumFractionDigits: 2,
+}).format(value)
+const formatMxnPerKm = (value: number) => new Intl.NumberFormat('es-MX', {
+  style: 'currency', currency: 'MXN', minimumFractionDigits: 5, maximumFractionDigits: 5,
 }).format(value)
 
 function SourceLink({ href, children }: { href: string; children: React.ReactNode }) {
@@ -47,6 +51,40 @@ export function TirePublicResearch() {
           <p className="mt-2 text-xs text-amber-200">No está claro si incluye carcasa, impuestos e instalación. No consta inspección ni vida por etapa.</p>
           <SourceLink href={retread.sourceUrl}>Renovadora</SourceLink>
         </article>
+      </div>
+
+      <div className="mt-5 rounded border border-sky-800/50 bg-sky-950/10 p-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-sky-300">Referencia oficial · México interurbano</p>
+            <h3 className="mt-1 font-semibold">IMT · costos base 2025</h3>
+            <p className="mt-1 max-w-3xl text-sm text-muted-foreground">Resultados del modelo VOC para vehículos cargados a capacidad límite. Son costos de llantas del vehículo completo; sirven para contrastar magnitudes en un tramo mexicano interurbano comparable.</p>
+          </div>
+          <SourceLink href={`${imtReference.source.url}#page=60`}>Publicación Técnica 881</SourceLink>
+        </div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          {imtReference.vehicleReferences.map(item => (
+            <article key={item.configuration} className="rounded border bg-background/70 p-3">
+              <div className="flex flex-wrap items-baseline justify-between gap-1">
+                <h4 className="font-semibold">{item.configuration}</h4>
+                <span className="text-xs text-muted-foreground">{item.tireCountModel} llantas del modelo</span>
+              </div>
+              <p className="mt-2 text-lg font-semibold tabular-nums">{formatMxn(item.tireCostMxnPer1000VehicleKm)}</p>
+              <p className="text-xs text-muted-foreground">por 1,000 veh-km · tabla {item.table}</p>
+              <p className="mt-2 text-xs tabular-nums">Equivale a {formatMxnPerKm(item.tireCostMxnPer1000VehicleKm / 1000)} por veh-km.</p>
+            </article>
+          ))}
+        </div>
+        <p className="mt-3 text-xs text-amber-200">Modelo con llanta 1100-20 y precios 2025. No mide vida por posición, costo instalado XBF, drayage, reparto local ni el tramo estadounidense. Ninguna cifra se adopta en el motor.</p>
+        <p className="mt-2 text-xs text-muted-foreground">{imtReference.governance.possibleComparison}</p>
+        <details className="mt-2 text-sm">
+          <summary className="min-h-11 cursor-pointer text-primary">Ver supuestos y trazabilidad IMT</summary>
+          <div className="grid gap-2 rounded border p-3 text-xs text-muted-foreground sm:grid-cols-2">
+            <p>Entrada: llanta nueva {formatMxn(imtReference.scope.newTirePriceMxn2025)} y razón renovado/nueva {imtReference.scope.retreadToNewPriceRatioModel} en la tabla {imtReference.scope.inputTable}, página PDF {imtReference.scope.inputPagePdf}.</p>
+            <p>El coeficiente {imtReference.scope.maximumRetreadsModelCoefficient} de renovados pertenece a VOC; no cuenta renovados físicos observados. Salidas: páginas PDF {imtReference.vehicleReferences.map(item => item.pdfPage).join(', ')}.</p>
+            <p className="break-all sm:col-span-2">SHA-256 del PDF verificado: {imtReference.source.pdfSha256}</p>
+          </div>
+        </details>
       </div>
 
       <div className="mt-5 rounded border border-dashed p-4">

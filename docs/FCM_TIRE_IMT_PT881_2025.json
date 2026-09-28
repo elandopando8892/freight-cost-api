@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "fcm.tire-model-reference.v1",
+  "source": {
+    "publisher": "Instituto Mexicano del Transporte",
+    "title": "Costos de operación base de los vehículos representativos del transporte interurbano 2025",
+    "publicationNumber": 881,
+    "priceYear": 2025,
+    "url": "https://imt.mx/archivos/Publicaciones/PublicacionTecnica/pt881.pdf",
+    "pdfSha256": "816728964103158f0a99f44c41bbe5d2bb7240c33e35651fcbd90c0b391412f4",
+    "verifiedOn": "2026-09-28"
+  },
+  "scope": {
+    "vehicleOperation": "Modelo de operación interurbana mexicana, vehículo cargado a su capacidad límite y costo de operación base",
+    "tireSpecification": "1100-20.00 normal; no equivale a Roadmaster 11R22.5 ni a la selección de XBF",
+    "inputPagePdf": 39,
+    "inputTable": "3.22",
+    "newTirePriceMxn2025": 2926.73,
+    "retreadToNewPriceRatioModel": 0.33,
+    "maximumRetreadsModelCoefficient": 3.57,
+    "maximumRetreadsInterpretation": "Coeficiente del modelo VOC; no es un número entero observado de renovados por carcasa"
+  },
+  "vehicleReferences": [
+    {
+      "configuration": "T3-S3",
+      "tireCountModel": 22,
+      "equivalentNewTiresPer1000VehicleKmRounded": 0.39,
+      "tireCostMxnPer1000VehicleKm": 1141.73,
+      "pdfPage": 60,
+      "table": "4.1"
+    },
+    {
+      "configuration": "T3-S2",
+      "tireCountModel": 18,
+      "equivalentNewTiresPer1000VehicleKmRounded": 0.33,
+      "tireCostMxnPer1000VehicleKm": 969.96,
+      "pdfPage": 61,
+      "table": "4.2"
+    },
+    {
+      "configuration": "T3-S2-R4",
+      "tireCountModel": 34,
+      "equivalentNewTiresPer1000VehicleKmRounded": 0.56,
+      "tireCostMxnPer1000VehicleKm": 1637.71,
+      "pdfPage": 62,
+      "table": "4.3"
+    }
+  ],
+  "governance": {
+    "classification": "EXTERNAL_MODEL_SANITY_CHECK",
+    "possibleComparison": "Sólo tramo mexicano interurbano con configuración y condiciones comparables verificadas; por ejemplo Intra-Mex o componente MX de D2D",
+    "excludedDirectApplication": ["MX_DRAYAGE", "MX_LOCAL", "US_LEG", "POSITION_SPECIFIC_LIFE", "XBF_INSTALLED_COST"],
+    "adoptedParameterCount": 0,
+    "parameterWriteAllowed": false,
+    "quoteEligible": false
+  }
+}
