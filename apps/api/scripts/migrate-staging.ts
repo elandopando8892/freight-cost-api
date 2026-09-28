@@ -3,6 +3,11 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { parse } from "dotenv";
 import { assertIsolatedNeonStagingTarget } from "../src/config/database-url.js";
+import {
+  isTireV2ResearchMigrationConfirmed,
+  pendingTireV2ResearchMigration,
+  tireV2ResearchMigrationConfirmation,
+} from "../src/config/tire-v2-migration-confirmation.js";
 
 const envFile = process.env.STAGING_ENV_FILE?.trim();
 if (!envFile) {
@@ -55,10 +60,19 @@ function prismaMigration(
   if (result.status !== 0 && !pending) {
     throw new Error(`Prisma migrate ${command} failed.`);
   }
+  return `${result.stdout ?? ""}\n${result.stderr ?? ""}`;
 }
 
 process.stdout.write("Validated isolated Neon staging migration target.\n");
-prismaMigration("status", { allowPending: true });
+const statusOutput = prismaMigration("status", { allowPending: true });
+if (pendingTireV2ResearchMigration(statusOutput) && !isTireV2ResearchMigrationConfirmed({
+  confirmation: process.env.FCM_TIRE_V2_RESEARCH_MIGRATION_CONFIRMATION,
+  releaseSha: process.env.FCM_MIGRATION_RELEASE_SHA,
+})) {
+  throw new Error(
+    `Pending tire v2 research migration requires FCM_TIRE_V2_RESEARCH_MIGRATION_CONFIRMATION=${tireV2ResearchMigrationConfirmation(process.env.FCM_MIGRATION_RELEASE_SHA?.trim() || '<release-sha>')} with FCM_MIGRATION_RELEASE_SHA set to the intended commit.`,
+  );
+}
 prismaMigration("deploy");
 prismaMigration("status");
 process.stdout.write("Staging migrations are current.\n");

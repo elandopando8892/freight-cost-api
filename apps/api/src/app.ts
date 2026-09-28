@@ -19,6 +19,7 @@ import { productionRoutes } from "./modules/production/production.routes.js";
 import { cronRoutes } from "./modules/cron/cron.routes.js";
 import { costBasesRoutes } from "./modules/cost-bases/cost-bases.routes.js";
 import { tireCalibrationRoutes } from "./modules/cost-bases/tire-calibration.routes.js";
+import { tireCohortV2ResearchRoutes } from "./modules/cost-bases/tire-cohort-v2.routes.js";
 import { partnerBaseRoutes } from "./modules/cost-bases/partner-base.routes.js";
 import { customerQuotesRoutes } from "./modules/customer-quotes/customer-quotes.routes.js";
 import { rateBooksRoutes } from "./modules/ratebooks/ratebooks.routes.js";
@@ -112,6 +113,7 @@ export function buildApp() {
   app.register(orgRoutes);
   app.register(assumptionsRoutes);
   app.register(tireCalibrationRoutes);
+  app.register(tireCohortV2ResearchRoutes);
 
   app.register(costBasesRoutes);
   app.register(partnerBaseRoutes);

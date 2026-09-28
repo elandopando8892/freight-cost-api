@@ -4,6 +4,7 @@ import {
   verifyTireCohortV2ResearchSnapshot,
 } from '../src/modules/cost-bases/tire-cohort-v2-statistics.js'
 import { aggregateTireCohorts } from '../src/modules/cost-bases/tire-cohort-statistics.js'
+import { reviewTireCohortRecordV2 } from '../src/modules/cost-bases/tire-cohort-v2.js'
 
 const policy = {
   minimumClosedCycles: 2, outlierFenceMultiplier: 1.5,
@@ -87,7 +88,9 @@ describe('tire cohort v2 research aggregation and snapshot contract', () => {
     const snapshot = createTireCohortV2ResearchSnapshot({
       snapshotId: '33333333-3333-4333-8333-333333333333', orgId: 'tenant-a',
       createdById: 'operator-a', requestId: '44444444-4444-4444-8444-444444444444',
-      version: 1, createdAt: '2026-09-28T12:00:00.000Z', records: [fixture('a')], policy,
+      version: 1, createdAt: '2026-09-28T12:00:00.000Z',
+      comparisonKey: reviewTireCohortRecordV2(fixture('a')).comparisonKey,
+      records: [fixture('a')], policy,
     })
     expect(verifyTireCohortV2ResearchSnapshot(snapshot, 'tenant-a').aggregation.fingerprint)
       .toBe(snapshot.aggregationFingerprint)

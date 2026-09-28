@@ -7,6 +7,11 @@ import {
   productionMigrationConfirmation,
 } from "../src/config/production-migration-confirmation.js";
 import { resolveVercelStagingMigrationTarget } from "../src/config/database-url.js";
+import {
+  isTireV2ResearchMigrationConfirmed,
+  pendingTireV2ResearchMigration,
+  tireV2ResearchMigrationConfirmation,
+} from "../src/config/tire-v2-migration-confirmation.js";
 
 const schema = "prisma/schema.prisma";
 const baselineSchema = "prisma/baseline.prisma";
@@ -37,6 +42,19 @@ function requireSuccess(label: string, result: ReturnType<typeof prisma>) {
   if (result.status !== 0) throw new Error(`${label} failed.`);
 }
 
+function requireTireV2ResearchMigrationApproval(statusOutput: string) {
+  if (!pendingTireV2ResearchMigration(statusOutput)) return;
+  const releaseSha = process.env.VERCEL_GIT_COMMIT_SHA?.trim();
+  if (!isTireV2ResearchMigrationConfirmed({
+    confirmation: process.env.FCM_TIRE_V2_RESEARCH_MIGRATION_CONFIRMATION,
+    releaseSha,
+  })) {
+    throw new Error(
+      `Pending tire v2 research migration requires FCM_TIRE_V2_RESEARCH_MIGRATION_CONFIRMATION=${tireV2ResearchMigrationConfirmation(releaseSha || '<release-sha>')}.`,
+    );
+  }
+}
+
 requireSuccess("Prisma generate", prisma(["generate", "--schema", schema]));
 
 const stagingMigrationTarget =
@@ -50,6 +68,7 @@ if (stagingMigrationTarget) {
   ) {
     throw new Error("Staging migration status could not be verified.");
   }
+  requireTireV2ResearchMigrationApproval(stagingStatus.output);
   requireSuccess(
     "Staging migration deploy",
     prisma(["migrate", "deploy", "--schema", schema]),
@@ -82,6 +101,7 @@ const pending = status.output.includes("have not yet been applied");
 if (!pending) {
   throw new Error("Production migration status could not be verified.");
 }
+requireTireV2ResearchMigrationApproval(status.output);
 
 if (
   !isProductionMigrationConfirmed({

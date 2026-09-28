@@ -46,6 +46,7 @@ GRANT USAGE ON SCHEMA public TO fcm_tire_app;
 GRANT SELECT, UPDATE ON TABLE "Organization" TO fcm_tire_app;
 GRANT SELECT ON TABLE "User" TO fcm_tire_app;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE "TireCohortSourceSnapshot", "TireCohortSourceHead", "TireCalibrationDossier", "TireCalibrationReviewEvent", "TireCalibrationApprovalPackage" TO fcm_tire_app;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE "TireCohortV2ResearchSnapshot", "TireCohortV2ResearchHead" TO fcm_tire_app;
 '@ | Out-Null
   $role = Invoke-Sql fcm_tire_s8 "SELECT rolsuper::text || '|' || rolbypassrls::text FROM pg_roles WHERE rolname='fcm_tire_app'"
   if ($role -ne 'false|false') { throw 'Application role can bypass RLS' }
@@ -53,7 +54,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE "TireCohortSourceSnapshot", "TireC
   $env:FCM_TEST_DATABASE_URL = $appUrl
   Push-Location apps/api
   try {
-    & $nodeExe ../../node_modules/vitest/vitest.mjs run tests/tire-calibration-rls-postgres.test.ts tests/tire-calibration-multitenant-contract.test.ts
+    & $nodeExe ../../node_modules/vitest/vitest.mjs run tests/tire-calibration-rls-postgres.test.ts tests/tire-calibration-multitenant-contract.test.ts tests/tire-cohort-v2-rls-postgres.test.ts
     if ($LASTEXITCODE -ne 0) { throw 'PostgreSQL RLS/persistence tests failed' }
   } finally { Pop-Location }
   docker exec $container pg_dump -U postgres -d fcm_tire_s8 -Fc -f /tmp/tire-s15.dump
@@ -66,12 +67,14 @@ SELECT 'dossiers|' || count(*) FROM "TireCalibrationDossier"
 UNION ALL SELECT 'events|' || count(*) FROM "TireCalibrationReviewEvent"
 UNION ALL SELECT 'packages|' || count(*) FROM "TireCalibrationApprovalPackage"
 UNION ALL SELECT 'package-hashes|' || string_agg("packageFingerprint", ',' ORDER BY id) FROM "TireCalibrationApprovalPackage"
-UNION ALL SELECT 'forced-rls|' || count(*) FROM pg_class WHERE relname IN ('TireCohortSourceSnapshot','TireCohortSourceHead','TireCalibrationDossier','TireCalibrationReviewEvent','TireCalibrationApprovalPackage') AND relrowsecurity AND relforcerowsecurity;
+UNION ALL SELECT 'v2-snapshots|' || count(*) FROM "TireCohortV2ResearchSnapshot"
+UNION ALL SELECT 'v2-heads|' || count(*) FROM "TireCohortV2ResearchHead"
+UNION ALL SELECT 'forced-rls|' || count(*) FROM pg_class WHERE relname IN ('TireCohortSourceSnapshot','TireCohortSourceHead','TireCalibrationDossier','TireCalibrationReviewEvent','TireCalibrationApprovalPackage','TireCohortV2ResearchSnapshot','TireCohortV2ResearchHead') AND relrowsecurity AND relforcerowsecurity;
 '@
   $original = @(Invoke-Sql fcm_tire_s8 $evidenceSql)
   $restored = @(Invoke-Sql fcm_tire_restore $evidenceSql)
   if (Compare-Object $original $restored) { throw 'Restore evidence mismatch' }
-  if ($original -notcontains 'forced-rls|5') { throw 'Missing forced RLS' }
+  if ($original -notcontains 'forced-rls|7') { throw 'Missing forced RLS' }
   [ordered]@{ schemaVersion='fcm.tire-isolated-validation.v1'; commit=(& git rev-parse HEAD); localOnly=$true; syntheticIdentities=$true; postgresRls='PASS'; backup='PASS'; restore='PASS'; applicationSuperuser=$false; applicationBypassRls=$false; evidence=$restored; cloudPreviewValidated=$false; authenticatedBrowserValidated=$false } | ConvertTo-Json -Depth 5
 } finally {
   foreach ($key in $saved.Keys) { [Environment]::SetEnvironmentVariable($key, $saved[$key], 'Process') }

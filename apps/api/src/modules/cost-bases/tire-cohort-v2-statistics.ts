@@ -125,6 +125,7 @@ export const TireCohortV2ResearchSnapshotSchema = z.object({
   requestId: z.string().uuid(),
   version: z.number().int().positive(),
   createdAt: z.string().datetime({ offset: true }),
+  comparisonKey: z.string().trim().min(1),
   records: z.array(TireCohortRecordV2Schema).min(1),
   policy: TireCohortV2ResearchPolicySchema,
   aggregationFingerprint: z.string().regex(/^[a-f0-9]{64}$/),
@@ -135,6 +136,9 @@ export function createTireCohortV2ResearchSnapshot(input: Omit<z.input<typeof Ti
   const draft = TireCohortV2ResearchSnapshotSchema.omit({ aggregationFingerprint: true, snapshotFingerprint: true }).parse({
     ...input, schemaVersion: 2, researchOnly: true,
   })
+  if (draft.records.some(record => reviewTireCohortRecordV2(record).comparisonKey !== draft.comparisonKey)) {
+    throw new Error('SOURCE_COMPARISON_KEY_MISMATCH')
+  }
   const aggregation = aggregateTireCohortsV2(draft.records, draft.policy)
   const content = { ...draft, aggregationFingerprint: aggregation.fingerprint }
   return TireCohortV2ResearchSnapshotSchema.parse({ ...content, snapshotFingerprint: fingerprint(content) })
@@ -145,6 +149,9 @@ export function verifyTireCohortV2ResearchSnapshot(input: unknown, expectedOrgId
   if (snapshot.orgId !== expectedOrgId) throw new Error('TENANT_RESOURCE_NOT_FOUND')
   const { snapshotFingerprint, ...content } = snapshot
   if (fingerprint(content) !== snapshotFingerprint) throw new Error('SOURCE_SNAPSHOT_INTEGRITY_FAILURE')
+  if (snapshot.records.some(record => reviewTireCohortRecordV2(record).comparisonKey !== snapshot.comparisonKey)) {
+    throw new Error('SOURCE_COMPARISON_KEY_MISMATCH')
+  }
   const aggregation = aggregateTireCohortsV2(snapshot.records, snapshot.policy)
   if (aggregation.fingerprint !== snapshot.aggregationFingerprint) throw new Error('SOURCE_SNAPSHOT_INTEGRITY_FAILURE')
   return { snapshot, aggregation }
