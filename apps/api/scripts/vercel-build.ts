@@ -8,6 +8,7 @@ import {
 } from "../src/config/production-migration-confirmation.js";
 import { resolveVercelStagingMigrationTarget } from "../src/config/database-url.js";
 import {
+  assertTireV2ResearchIsSolePending,
   isTireV2ResearchMigrationConfirmed,
   pendingTireV2ResearchMigration,
   tireV2ResearchMigrationConfirmation,
@@ -44,6 +45,7 @@ function requireSuccess(label: string, result: ReturnType<typeof prisma>) {
 
 function requireTireV2ResearchMigrationApproval(statusOutput: string) {
   if (!pendingTireV2ResearchMigration(statusOutput)) return;
+  assertTireV2ResearchIsSolePending(statusOutput);
   const releaseSha = process.env.VERCEL_GIT_COMMIT_SHA?.trim();
   if (!isTireV2ResearchMigrationConfirmed({
     confirmation: process.env.FCM_TIRE_V2_RESEARCH_MIGRATION_CONFIRMATION,

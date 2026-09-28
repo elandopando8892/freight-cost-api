@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 import { parse } from "dotenv";
 import { assertIsolatedNeonStagingTarget } from "../src/config/database-url.js";
 import {
+  assertTireV2ResearchIsSolePending,
   isTireV2ResearchMigrationConfirmed,
   pendingTireV2ResearchMigration,
   tireV2ResearchMigrationConfirmation,
@@ -65,6 +66,7 @@ function prismaMigration(
 
 process.stdout.write("Validated isolated Neon staging migration target.\n");
 const statusOutput = prismaMigration("status", { allowPending: true });
+assertTireV2ResearchIsSolePending(statusOutput);
 if (pendingTireV2ResearchMigration(statusOutput) && !isTireV2ResearchMigrationConfirmed({
   confirmation: process.env.FCM_TIRE_V2_RESEARCH_MIGRATION_CONFIRMATION,
   releaseSha: process.env.FCM_MIGRATION_RELEASE_SHA,
