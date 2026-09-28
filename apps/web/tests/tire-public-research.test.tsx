@@ -6,6 +6,7 @@ import { expect, it } from 'vitest'
 import { TirePublicResearch } from '../app/(app)/cost-bases/tires/tire-public-research'
 import imtReference from '../../../docs/FCM_TIRE_IMT_PT881_2025.json'
 import segmentMapping from '../../../docs/FCM_TIRE_IMT_SEGMENT_MAPPING_2026-09-28.json'
+import excludedSources from '../../../docs/FCM_TIRE_EXCLUDED_SEGMENT_SOURCES_2026-09-28.json'
 
 const segmentSource = readFileSync(resolve(process.cwd(), '../api/src/modules/cost-bases/operational-segments.ts'), 'utf8')
 const segmentEnum = segmentSource.match(/export const OperationalSegmentSchema = z\.enum\(\[([\s\S]*?)\]\)/)?.[1]
@@ -45,4 +46,24 @@ it('covers each governed segment once without promoting the IMT model into CVU o
   expect(html).toContain('Ningún costo del IMT entra a CVU, CFU o cotización')
   expect(segmentMapping.adoptedParameterCount).toBe(0)
   expect(segmentMapping.quoteEligible).toBe(false)
+})
+
+it('keeps public source signals distinct from segment-level tire cost parameters', () => {
+  const html = renderToStaticMarkup(createElement(TirePublicResearch))
+  const excludedIds = segmentMapping.segments
+    .filter(item => item.mode === 'NO_DIRECT_COMPARISON')
+    .map(item => item.id)
+  expect(excludedSources.excludedSegments.map(item => item.id).sort()).toEqual(excludedIds.sort())
+  expect(new Set(excludedSources.sources.map(source => source.id)).size).toBe(excludedSources.sources.length)
+  for (const source of excludedSources.sources) {
+    expect(html).toContain(`data-source-id="${source.id}"`)
+    expect(html).toContain(source.url)
+  }
+  for (const segment of excludedSources.excludedSegments) {
+    expect(html).toContain(`data-source-gap-segment="${segment.id}"`)
+    expect(segment.sourceIds.every(id => excludedSources.sources.some(source => source.id === id))).toBe(true)
+  }
+  expect(html).toContain('El +6.4% de ATRI en 2025 es una tendencia, no USD/milla')
+  expect(excludedSources.adoptedParameterCount).toBe(0)
+  expect(excludedSources.quoteEligible).toBe(false)
 })

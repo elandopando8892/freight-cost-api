@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "fcm.tire-excluded-segment-sources.v1",
+  "classification": "PUBLIC_RESEARCH_NOT_CALIBRATION",
+  "reviewedOn": "2026-09-28",
+  "adoptedParameterCount": 0,
+  "quoteEligible": false,
+  "sources": [
+    {
+      "id": "ATRI_2026_FORM",
+      "publisher": "American Transportation Research Institute",
+      "label": "ATRI · definición del costo de llantas",
+      "url": "https://truckingresearch.org/wp-content/uploads/2026/02/2026-Ops-Cost-Motor-Carrier-Form.pdf",
+      "year": 2026,
+      "kind": "METHOD_ONLY",
+      "findingEs": "El formulario pide USD por milla de tractocamión y suma compra, mantenimiento, renovado y reemplazo de llantas sobre millas que soportan costo.",
+      "limitEs": "Es una definición de encuesta, no una cifra observada ni un desglose por drayage, posición o vehículo XBF."
+    },
+    {
+      "id": "ATRI_2026_RELEASE",
+      "publisher": "American Transportation Research Institute",
+      "label": "ATRI · tendencia 2025",
+      "url": "https://truckingresearch.org/2026/07/new-atri-report-details-accelerating-costs-and-low-profitability-despite-cuts/",
+      "year": 2026,
+      "kind": "TREND_ONLY",
+      "findingEs": "El comunicado reporta que el rubro de llantas subió 6.4% en 2025.",
+      "limitEs": "El porcentaje no es un costo absoluto USD/milla y no permite inferir el valor de 2025 sin una base verificada."
+    },
+    {
+      "id": "EPA_SMARTWAY_DRAY",
+      "publisher": "United States Environmental Protection Agency",
+      "label": "EPA SmartWay · drayage",
+      "url": "https://www.epa.gov/smartway/smartway-high-performers-dray-truck-carriers-particulate-matter-and-nitrogen-oxides",
+      "year": null,
+      "kind": "OPERATION_ONLY",
+      "findingEs": "SmartWay identifica drayage como movimiento corto en puertos y terminales intermodales.",
+      "limitEs": "La página trata emisiones, no gasto de llantas, desgaste por posición ni costo por milla."
+    },
+    {
+      "id": "IMT_PT536",
+      "publisher": "Instituto Mexicano del Transporte",
+      "label": "IMT · método histórico precio/vida",
+      "url": "https://www.imt.mx/archivos/Publicaciones/PublicacionTecnica/pt536.pdf",
+      "year": 2018,
+      "kind": "METHOD_ONLY",
+      "findingEs": "La publicación ilustra la sensibilidad del costo por kilómetro al precio y rendimiento de la llanta.",
+      "limitEs": "Sus ejemplos históricos no representan precios actuales ni ciclos observados de drayage o reparto local."
+    }
+  ],
+  "excludedSegments": [
+    {
+      "id": "INTRA_US",
+      "sourceIds": ["ATRI_2026_FORM", "ATRI_2026_RELEASE"],
+      "missingEs": "Falta verificar un costo absoluto reciente de llantas USD/milla para flota y servicio comparables; el +6.4% no lo sustituye."
+    },
+    {
+      "id": "US_DRAYAGE",
+      "sourceIds": ["EPA_SMARTWAY_DRAY", "ATRI_2026_FORM"],
+      "missingEs": "Faltan gasto de llantas y millas del ciclo portuario, con tractor/chasis y reparto de costos separados."
+    },
+    {
+      "id": "MX_DRAYAGE",
+      "sourceIds": ["IMT_PT536"],
+      "missingEs": "Faltan precio instalado vigente, vida y renovados por posición y ciclo mexicano de patio/puerto; el ejemplo histórico no basta."
+    },
+    {
+      "id": "MX_LOCAL",
+      "sourceIds": ["IMT_PT536"],
+      "missingEs": "Faltan configuración del vehículo, precio instalado y vida por posición bajo reparto local mexicano."
+    },
+    {
+      "id": "D2D_US_MX_PARTNER",
+      "sourceIds": [],
+      "missingEs": "Se requiere tarifa y condiciones verificables del socio mexicano; un costo de llantas público no equivale al precio de tercero."
+    }
+  ]
+}

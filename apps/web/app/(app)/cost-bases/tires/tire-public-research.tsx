@@ -2,6 +2,7 @@ import { ExternalLink } from 'lucide-react'
 import research from '../../../../../../docs/FCM_TIRE_LIFECYCLE_SOURCES_2026-09-27.json'
 import imtReference from '../../../../../../docs/FCM_TIRE_IMT_PT881_2025.json'
 import segmentMapping from '../../../../../../docs/FCM_TIRE_IMT_SEGMENT_MAPPING_2026-09-28.json'
+import excludedSources from '../../../../../../docs/FCM_TIRE_EXCLUDED_SEGMENT_SOURCES_2026-09-28.json'
 
 const formatMxn = (value: number) => new Intl.NumberFormat('es-MX', {
   style: 'currency', currency: 'MXN', maximumFractionDigits: 2,
@@ -20,6 +21,7 @@ export function TirePublicResearch() {
   const discrepancy = research.identityDiscrepancies
   const conditionalSegments = segmentMapping.segments.filter(item => item.mode === 'CONDITIONAL_MX_INTERURBAN')
   const excludedSegments = segmentMapping.segments.filter(item => item.mode === 'NO_DIRECT_COMPARISON')
+  const segmentLabels = new Map(segmentMapping.segments.map(item => [item.id, item.label]))
 
   return (
     <section id="tire-public-research" className="rounded-lg border bg-card p-5" aria-labelledby="tire-public-research-title">
@@ -122,6 +124,35 @@ export function TirePublicResearch() {
           </ol>
         </details>
         <p className="mt-2 text-xs text-amber-200">Sin conversión automática de segmentos históricos de cohortes. Ningún costo del IMT entra a CVU, CFU o cotización.</p>
+      </div>
+
+      <div className="mt-5 rounded border border-dashed p-4" aria-labelledby="tire-alternative-sources-title">
+        <p className="text-xs font-semibold uppercase tracking-wide text-primary">Siguiente capa de investigación</p>
+        <h3 id="tire-alternative-sources-title" className="mt-1 font-semibold">Fuentes para los segmentos sin contraste IMT</h3>
+        <p className="mt-2 text-sm text-muted-foreground">ATRI define el gasto de llantas en tractocamión y reporta una variación anual; EPA distingue drayage e IMT aporta una relación histórica precio/vida. Ninguna de estas fuentes verifica un importe actual aplicable a XBF por segmento.</p>
+        <p className="mt-2 text-xs text-amber-200">El +6.4% de ATRI en 2025 es una tendencia, no USD/milla. No se aplica a una base desconocida ni entra a CVU.</p>
+        <details className="mt-3 text-sm">
+          <summary className="min-h-11 cursor-pointer text-primary">Ver {excludedSources.sources.length} fuentes y {excludedSources.excludedSegments.length} brechas por segmento</summary>
+          <div className="grid gap-2 md:grid-cols-2">
+            {excludedSources.sources.map(source => (
+              <article key={source.id} data-source-id={source.id} className="rounded border p-3">
+                <h4 className="text-sm font-semibold">{source.label}</h4>
+                <p className="mt-1 text-xs">{source.findingEs}</p>
+                <p className="mt-1 text-xs text-muted-foreground">Límite: {source.limitEs}</p>
+                <SourceLink href={source.url}>Abrir fuente</SourceLink>
+              </article>
+            ))}
+          </div>
+          <h4 className="mt-4 text-sm font-semibold">Evidencia todavía necesaria</h4>
+          <ul className="mt-2 grid gap-2 md:grid-cols-2">
+            {excludedSources.excludedSegments.map(item => (
+              <li key={item.id} data-source-gap-segment={item.id} className="rounded border p-2 text-xs">
+                <span className="font-semibold">{segmentLabels.get(item.id) ?? item.id}:</span> {item.missingEs}
+              </li>
+            ))}
+          </ul>
+        </details>
+        <p className="mt-2 text-xs text-muted-foreground">{excludedSources.adoptedParameterCount} parámetros adoptados · sin cambio al motor ni a cotizaciones.</p>
       </div>
 
       <div className="mt-5 rounded border border-dashed p-4">
