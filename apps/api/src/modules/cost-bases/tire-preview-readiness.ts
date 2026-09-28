@@ -5,6 +5,7 @@ const safeKey = z.string().regex(/^[a-z0-9][a-z0-9_-]{2,63}$/)
 
 export const TirePreviewReadinessEvidenceSchema = z.object({
   schemaVersion: z.literal('fcm.tire-preview-readiness.v1'),
+  reviewMode: z.enum(['DUAL_REVIEW', 'ECONOMIC_ONLY']).default('DUAL_REVIEW'),
   release: z.object({
     expectedSha: sha,
     apiSha: sha.nullable(),
@@ -15,6 +16,7 @@ export const TirePreviewReadinessEvidenceSchema = z.object({
   database: z.object({
     migrationId: z.literal('20260927000100_tire_calibration_multitenant'),
     migrationApplied: z.boolean(),
+    economicReviewMigrationApplied: z.boolean().default(false),
     prismaRoleBypassRls: z.boolean().nullable(),
     backupVerified: z.boolean(),
     restoreVerified: z.boolean(),
@@ -35,6 +37,7 @@ export const TirePreviewReadinessEvidenceSchema = z.object({
     economicDecisionRecorded: z.boolean(),
     independentDecisionRecorded: z.boolean(),
     approvalPackageReadAfterReload: z.boolean(),
+    economicDecisionReadAfterReload: z.boolean().default(false),
     crossTenantDenied: z.boolean(),
   }).strict(),
   productionEnabled: z.literal(false),
@@ -73,6 +76,10 @@ export function evaluateTirePreviewReadiness(input: unknown) {
       ? 'El rol Prisma verificado no puede omitir RLS.'
       : 'Debe probarse que el rol Prisma efectivo no tiene BYPASSRLS.',
   })
+  if (evidence.reviewMode === 'ECONOMIC_ONLY') checks.push({
+    key: 'ECONOMIC_REVIEW_MIGRATION', status: evidence.database.economicReviewMigrationApplied ? 'PASS' : 'BLOCK',
+    detail: 'La modalidad individual requiere la migración 20260928000100_tire_economic_review en la base aislada.',
+  })
   const rollbackReady = evidence.database.backupVerified && evidence.database.restoreVerified
   checks.push({
     key: 'ROLLBACK_REHEARSED', status: rollbackReady ? 'PASS' : 'BLOCK',
@@ -83,23 +90,25 @@ export function evaluateTirePreviewReadiness(input: unknown) {
 
   const identityKeys = new Set(evidence.identities.map(identity => identity.identityKey))
   const orgKeys = new Set(evidence.identities.map(identity => identity.orgKey))
-  const identitySetReady = identityKeys.size >= 3 && identityKeys.size === evidence.identities.length && orgKeys.size === 1
+  const economicOnly = evidence.reviewMode === 'ECONOMIC_ONLY'
+  const requiredIdentities = economicOnly ? 2 : 3
+  const identitySetReady = identityKeys.size >= requiredIdentities && identityKeys.size === evidence.identities.length && orgKeys.size === 1
   checks.push({
-    key: 'THREE_SAME_TENANT_IDENTITIES', status: identitySetReady ? 'PASS' : 'BLOCK',
+    key: economicOnly ? 'TWO_SAME_TENANT_IDENTITIES' : 'THREE_SAME_TENANT_IDENTITIES', status: identitySetReady ? 'PASS' : 'BLOCK',
     detail: identitySetReady
-      ? 'Hay tres o más identidades distintas del mismo tenant.'
-      : 'Se requieren tres identidades distintas del mismo tenant, sin reutilizar cuentas.',
+      ? `Hay ${requiredIdentities} o más identidades distintas del mismo tenant.`
+      : `Se requieren ${requiredIdentities} identidades distintas del mismo tenant, sin reutilizar cuentas.`,
   })
   const admins = evidence.identities.filter(identity => identity.role === 'ADMIN')
   const authors = evidence.identities.filter(identity => identity.role === 'ADMIN' || identity.role === 'OPERATOR')
-  const dutiesReady = authors.some(author => admins.filter(admin => admin.identityKey !== author.identityKey).length >= 2)
+  const dutiesReady = authors.some(author => admins.filter(admin => admin.identityKey !== author.identityKey).length >= (economicOnly ? 1 : 2))
   checks.push({
     key: 'SEPARATION_OF_DUTIES', status: dutiesReady ? 'PASS' : 'BLOCK',
     detail: dutiesReady
-      ? 'Existe un autor y dos ADMIN diferentes para los dictámenes.'
-      : 'El flujo necesita un autor y dos ADMIN distintos; VIEWER no sustituye a un revisor.',
+      ? (economicOnly ? 'Existe un autor y un ADMIN distinto para la revisión económica.' : 'Existe un autor y dos ADMIN diferentes para los dictámenes.')
+      : (economicOnly ? 'Se necesita un autor y un ADMIN distinto; VIEWER no sustituye al revisor.' : 'El flujo necesita un autor y dos ADMIN distintos; VIEWER no sustituye a un revisor.'),
   })
-  const sessionsReady = evidence.identities.length >= 3 && evidence.identities.every(identity =>
+  const sessionsReady = evidence.identities.length >= requiredIdentities && evidence.identities.every(identity =>
     identity.loginVerified && identity.reloadVerified && identity.renewalVerified)
   checks.push({
     key: 'AUTHENTICATED_SESSION_LIFECYCLE', status: sessionsReady ? 'PASS' : 'BLOCK',
@@ -107,7 +116,10 @@ export function evaluateTirePreviewReadiness(input: unknown) {
       ? 'Login, recarga y renovación están acreditados para todas las identidades.'
       : 'Falta acreditar login, recarga y renovación para cada identidad del ensayo.',
   })
-  const workflowReady = Object.values(evidence.workflow).every(Boolean)
+  const { independentDecisionRecorded, approvalPackageReadAfterReload, economicDecisionReadAfterReload, ...commonWorkflow } = evidence.workflow
+  const workflowReady = Object.values(commonWorkflow).every(Boolean) && (economicOnly
+    ? economicDecisionReadAfterReload && !independentDecisionRecorded && !approvalPackageReadAfterReload
+    : independentDecisionRecorded && approvalPackageReadAfterReload)
   checks.push({
     key: 'END_TO_END_WORKFLOW', status: workflowReady ? 'PASS' : 'BLOCK',
     detail: workflowReady

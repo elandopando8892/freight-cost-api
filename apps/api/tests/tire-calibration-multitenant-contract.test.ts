@@ -16,6 +16,12 @@ const base = {
 } as const
 
 describe('tire calibration multi-tenant contract', () => {
+  it('requires explicit economic-only mode without faking an independent reviewer', () => {
+    expect(authorizeTireCalibrationTenantAction({ ...base, independentReviewerId: null }).code).toBe('REVIEWER_ASSIGNMENT_REQUIRED')
+    expect(authorizeTireCalibrationTenantAction({ ...base, reviewMode: 'ECONOMIC_ONLY', independentReviewerId: null }).allowed).toBe(true)
+    expect(authorizeTireCalibrationTenantAction({ ...base, reviewMode: 'ECONOMIC_ONLY' }).code).toBe('INDEPENDENT_REVIEW_NOT_APPLICABLE')
+    expect(authorizeTireCalibrationTenantAction({ ...base, reviewMode: 'ECONOMIC_ONLY', independentReviewerId: null, economicOwnerId: base.authorId }).code).toBe('SEPARATION_OF_DUTIES_REQUIRED')
+  })
   it('conceals cross-tenant resources before evaluating role or state', () => {
     const result = authorizeTireCalibrationTenantAction({ ...base, resourceOrgId: 'org-b' })
     expect(result).toMatchObject({ allowed: false, concealResource: true, code: 'TENANT_RESOURCE_NOT_FOUND' })

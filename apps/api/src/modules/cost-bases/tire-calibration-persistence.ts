@@ -32,8 +32,11 @@ export const OpenTireCalibrationDraftSchema = z.object({
 export const AssignTireCalibrationReviewersSchema = z.object({
   ...continuation,
   economicOwnerId: text,
-  independentReviewerId: text,
-}).strict()
+  independentReviewerId: text.nullable().default(null),
+  reviewMode: z.enum(['DUAL_REVIEW', 'ECONOMIC_ONLY']).default('DUAL_REVIEW'),
+}).strict().refine(command => command.reviewMode === 'ECONOMIC_ONLY'
+  ? command.independentReviewerId === null : command.independentReviewerId !== null,
+{ message: 'Reviewer assignment must match the explicit review mode' })
 
 export const TireCalibrationEconomicDecisionSchema = z.object({
   ...continuation,
@@ -136,6 +139,7 @@ const StoredEventPayloadSchema = z.object({
   decision: z.string().optional(),
   economicOwnerId: text.optional(),
   independentReviewerId: text.optional(),
+  reviewMode: z.enum(['DUAL_REVIEW', 'ECONOMIC_ONLY']).optional(),
   receipt: z.object({
     sequence: z.number().int().positive(), requestId: z.string().uuid(), recordedAt: z.string().datetime(),
     entryHash: hash, dossierId: text, proposalId: text, revision: z.number().int().positive(), status: text,
@@ -181,7 +185,7 @@ function authorizationContext(
   action: 'READ_DOSSIER' | 'OPEN_DRAFT' | 'ASSIGN_REVIEWERS' | 'RECORD_ECONOMIC_DECISION' | 'RECORD_INDEPENDENT_DECISION',
   dossier: Dossier | null,
   command: { expectedRevision: number; expectedProposalFingerprint?: string },
-  assignments?: { economicOwnerId?: string | null; independentReviewerId?: string | null },
+  assignments?: { economicOwnerId?: string | null; independentReviewerId?: string | null; reviewMode?: string },
   authoritativeSourceFingerprint?: string | null,
 ) {
   return {
@@ -189,6 +193,7 @@ function authorizationContext(
     action,
     resourceOrgId: dossier?.orgId ?? identity.orgId,
     status: dossier?.status ?? 'NEW',
+    reviewMode: assignments?.reviewMode ?? dossier?.reviewMode ?? 'DUAL_REVIEW',
     expectedRevision: command.expectedRevision,
     currentRevision: dossier?.revision ?? 0,
     expectedProposalFingerprint: command.expectedProposalFingerprint ?? null,
@@ -213,6 +218,7 @@ async function appendEvent(input: {
   decision?: string
   economicOwnerId?: string
   independentReviewerId?: string
+  reviewMode?: 'DUAL_REVIEW' | 'ECONOMIC_ONLY'
 }) {
   const previous = await input.tx.tireCalibrationReviewEvent.findFirst({
     where: { dossierId: input.dossier.id, orgId: input.identity.orgId },
@@ -243,6 +249,7 @@ async function appendEvent(input: {
     ...(input.decision ? { decision: input.decision } : {}),
     ...(input.economicOwnerId ? { economicOwnerId: input.economicOwnerId } : {}),
     ...(input.independentReviewerId ? { independentReviewerId: input.independentReviewerId } : {}),
+    ...(input.reviewMode ? { reviewMode: input.reviewMode } : {}),
     receipt,
   }
   await input.tx.tireCalibrationReviewEvent.create({ data: {
@@ -268,6 +275,14 @@ function transactionOptions() {
 
 export class TireCalibrationPersistence {
   constructor(private readonly database: PrismaClient) {}
+
+  async reviewers(identityInput: unknown) {
+    const identity = TireCalibrationTenantIdentitySchema.parse(identityInput)
+    return this.database.user.findMany({
+      where: { orgId: identity.orgId, role: 'ADMIN' },
+      select: { id: true, email: true }, orderBy: { email: 'asc' },
+    })
+  }
 
   async list(identityInput: unknown) {
     const identity = TireCalibrationTenantIdentitySchema.parse(identityInput)
@@ -334,21 +349,24 @@ export class TireCalibrationPersistence {
     return this.mutate(identity, dossierId, command, 'ASSIGN_REVIEWERS', async (tx, dossier) => {
       const proposal = verifyTireCalibrationProposal(dossier.proposalSnapshot)
       if (!proposal.proposalEligibleForEconomicReview) deny('PROPOSAL_NOT_ELIGIBLE_FOR_ECONOMIC_REVIEW')
+      const reviewerIds = [command.economicOwnerId, command.independentReviewerId].filter((id): id is string => id !== null)
       const users = await tx.user.findMany({
-        where: { orgId: identity.orgId, id: { in: [command.economicOwnerId, command.independentReviewerId] } },
+        where: { orgId: identity.orgId, id: { in: reviewerIds } },
         select: { id: true, role: true },
       })
-      if (users.length !== 2 || users.some(user => user.role !== 'ADMIN')) deny('REVIEWERS_MUST_BE_SAME_TENANT_ADMINS')
+      if (users.length !== reviewerIds.length || users.some(user => user.role !== 'ADMIN')) deny('REVIEWERS_MUST_BE_SAME_TENANT_ADMINS')
       const updated = await tx.tireCalibrationDossier.update({ where: { id: dossier.id }, data: {
         economicOwnerId: command.economicOwnerId,
         independentReviewerId: command.independentReviewerId,
+        reviewMode: command.reviewMode,
         status: 'PENDING_ECONOMIC',
         revision: { increment: 1 },
       } })
       return appendEvent({
         tx, identity, dossier: updated, requestId: command.requestId, command,
         action: 'REVIEWERS_ASSIGNED', fromStatus: dossier.status, note: command.note,
-        economicOwnerId: command.economicOwnerId, independentReviewerId: command.independentReviewerId,
+        economicOwnerId: command.economicOwnerId, independentReviewerId: command.independentReviewerId ?? undefined,
+        reviewMode: command.reviewMode,
       })
     })
   }
@@ -357,7 +375,8 @@ export class TireCalibrationPersistence {
     const identity = TireCalibrationTenantIdentitySchema.parse(identityInput)
     const command = TireCalibrationEconomicDecisionSchema.parse(input)
     return this.mutate(identity, dossierId, command, 'RECORD_ECONOMIC_DECISION', async (tx, dossier) => {
-      const status = command.decision === 'ENDORSED' ? 'PENDING_INDEPENDENT' : 'RETURNED'
+      const status = command.decision === 'ENDORSED'
+        ? (dossier.reviewMode === 'ECONOMIC_ONLY' ? 'ECONOMIC_REVIEWED' : 'PENDING_INDEPENDENT') : 'RETURNED'
       const updated = await tx.tireCalibrationDossier.update({ where: { id: dossier.id }, data: {
         status,
         revision: { increment: 1 },
@@ -405,7 +424,7 @@ export class TireCalibrationPersistence {
       const proposal = verifyTireCalibrationProposal(dossier.proposalSnapshot)
       const source = await resolveCurrentTireCohortSource(tx, identity.orgId, proposal.request.cohortKey)
       const assignments = action === 'ASSIGN_REVIEWERS'
-        ? { economicOwnerId: (command as Continuation).economicOwnerId, independentReviewerId: (command as Continuation).independentReviewerId }
+        ? { economicOwnerId: (command as Continuation).economicOwnerId, independentReviewerId: (command as Continuation).independentReviewerId, reviewMode: (command as Continuation).reviewMode }
         : undefined
       assertAuthorized(authorizationContext(identity, action, dossier, command, assignments, source.aggregationFingerprint))
       await lockDossier(tx, dossier.id, identity.orgId)

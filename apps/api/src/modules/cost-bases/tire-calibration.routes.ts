@@ -11,7 +11,7 @@ import {
 import { TireCohortSourcePersistence } from './tire-cohort-source-persistence.js'
 
 const ParamsSchema = z.object({ id: z.string().trim().min(1) }).strict()
-type TireCalibrationPersistencePort = Pick<TireCalibrationPersistence, 'list' | 'get' | 'open' | 'assign' | 'economicDecision' | 'independentDecision'>
+type TireCalibrationPersistencePort = Pick<TireCalibrationPersistence, 'reviewers' | 'list' | 'get' | 'open' | 'assign' | 'economicDecision' | 'independentDecision'>
 type TireCohortSourcePersistencePort = Pick<TireCohortSourcePersistence, 'capture' | 'current'>
 const SourceQuerySchema = z.object({ cohortKey: z.string().trim().min(1) }).strict()
 
@@ -32,6 +32,9 @@ function identityFrom(user: JwtPayload): TireCalibrationIdentity {
 export function createTireCalibrationRoutes(persistence: TireCalibrationPersistencePort, sources: TireCohortSourcePersistencePort) {
   return async function registeredTireCalibrationRoutes(app: FastifyInstance) {
     app.addHook('preHandler', authenticate)
+
+    app.get('/cost-bases/tire-calibration-reviewers', async request =>
+      persistence.reviewers(identityFrom(request.user as JwtPayload)))
 
     app.get('/cost-bases/tire-cohort-sources/current', async request => {
       const { cohortKey } = SourceQuerySchema.parse(request.query)

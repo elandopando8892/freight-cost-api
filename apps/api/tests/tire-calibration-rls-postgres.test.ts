@@ -47,14 +47,14 @@ function calibrationRecord(id: string, lifeKm: number): any {
   }
 }
 
-function calibrationProposal() {
+function calibrationProposal(proposalId = 'adapter-proposal-v1') {
   const rows = [80_000, 81_000, 82_000, 83_000, 200_000].map((life, index) => calibrationRecord(`adapter-cycle-${index}`, life))
   const reviewed = reviewTireCohortRecord(rows[0])
   const cohortKey = ['INTRA_MEX', 'TRACTOR', '6x4 synthetic', 'DRIVE', 'Synthetic', 'Controlled', '11R22.5', 'H', '146/143L', reviewed.stageLabel].join('|')
   const statisticsPolicy = { minimumClosedCycles: 4, minimumInspectionsPerStage: 3, outlierFenceMultiplier: 1.5, maximumOutlierShare: 0.25, maximumCoefficientOfVariation: 0.8, shapeMeanMedianGapRatio: 0.1, confidenceZ: 1.96 }
   const proposal = buildTireCalibrationProposal(rows,
     statisticsPolicy,
-    { proposalId: 'adapter-proposal-v1', version: 1, supersedesProposalId: null, createdOn: '2026-09-27', status: 'DRAFT', cohortKey,
+    { proposalId, version: 1, supersedesProposalId: null, createdOn: '2026-09-27', status: 'DRAFT', cohortKey,
       policy: { id: 'adapter-policy', version: 1, rationale: 'Synthetic policy for persistence adapter integration', lifeEstimator: { method: 'MEDIAN' }, installedCostEstimator: { method: 'MEDIAN' }, observedRateEstimator: { method: 'MEDIAN' }, maximumMethodDivergenceRatio: 0.05 },
       impactScenario: { quantityOnVehicle: 8, baselineTireStageCvuMxnPerKm: 0.7, baselineEvidenceId: 'synthetic-baseline', tripDistanceKm: 1_000, currency: 'MXN' } })
   return { proposal, rows, cohortKey, statisticsPolicy }
@@ -118,10 +118,44 @@ afterAll(async () => {
 })
 
 describe('tire calibration PostgreSQL RLS candidate', () => {
+  it('completes economic-only review with one assigned ADMIN and no independent package', async () => {
+    const persistence = new TireCalibrationPersistence(app)
+    const sources = new TireCohortSourcePersistence(app)
+    const fixture = calibrationProposal('single-review-proposal-v1')
+    const actor = { ...author, supabaseId: '00000000-0000-4000-8000-000000000101' }
+    const economicOwner = { ...owner, supabaseId: '00000000-0000-4000-8000-000000000102' }
+    const readOnly = { ...viewer, supabaseId: '00000000-0000-4000-8000-000000000104' }
+    await sources.capture(actor, { requestId: randomUUID(), note: 'Synthetic source', cohortKey: fixture.cohortKey, records: fixture.rows, statisticsPolicy: fixture.statisticsPolicy })
+    const opened = await persistence.open(actor, { requestId: randomUUID(), note: 'Single review draft', expectedRevision: 0, proposal: fixture.proposal })
+    const assignment = { requestId: randomUUID(), note: 'One economic reviewer available', expectedRevision: 1, expectedProposalFingerprint: fixture.proposal.fingerprint, economicOwnerId: owner.internalUserId, independentReviewerId: null, reviewMode: 'ECONOMIC_ONLY' }
+    await expect(persistence.assign(actor, opened.dossierId, { ...assignment, economicOwnerId: author.internalUserId })).rejects.toMatchObject({ code: 'SEPARATION_OF_DUTIES_REQUIRED' })
+    await expect(persistence.assign(actor, opened.dossierId, { ...assignment, economicOwnerId: otherViewer.internalUserId })).rejects.toMatchObject({ code: 'REVIEWERS_MUST_BE_SAME_TENANT_ADMINS' })
+    const assigned = await persistence.assign(actor, opened.dossierId, assignment)
+    expect(assigned).toMatchObject({ revision: 2, status: 'PENDING_ECONOMIC' })
+    await expect(persistence.assign(actor, opened.dossierId, assignment)).resolves.toEqual(assigned)
+    const decision = { requestId: randomUUID(), note: 'Economic evidence reviewed', expectedRevision: 2, expectedProposalFingerprint: fixture.proposal.fingerprint, decision: 'ENDORSED' }
+    await expect(persistence.economicDecision(readOnly, opened.dossierId, decision)).rejects.toMatchObject({ code: 'ROLE_FORBIDDEN' })
+    const approved = await persistence.economicDecision(economicOwner, opened.dossierId, decision)
+    expect(approved).toMatchObject({ revision: 3, status: 'ECONOMIC_REVIEWED', quoteEligible: false })
+    await expect(persistence.economicDecision(economicOwner, opened.dossierId, decision)).resolves.toEqual(approved)
+    const dossier = await persistence.get(readOnly, opened.dossierId)
+    expect(dossier).toMatchObject({ reviewMode: 'ECONOMIC_ONLY', status: 'ECONOMIC_REVIEWED', independentReviewerId: null, approvalPackage: null })
+    expect(dossier.events).toHaveLength(3)
+    expect(dossier.events[1].payload).toMatchObject({ reviewMode: 'ECONOMIC_ONLY' })
+    expect(dossier.events[2].previousEventHash).toBe(dossier.events[1].eventHash)
+    await expect(persistence.independentDecision(economicOwner, opened.dossierId, { ...decision, requestId: randomUUID(), expectedRevision: 3, decision: 'APPROVED' })).rejects.toMatchObject({ code: 'INDEPENDENT_REVIEW_NOT_APPLICABLE' })
+    await expect(inContext(owner, tx => tx.tireCalibrationDossier.update({ where: { id: opened.dossierId }, data: { status: 'REVIEWED' } }))).rejects.toThrow()
+    await expect(inContext(owner, tx => tx.tireCalibrationApprovalPackage.create({ data: {
+      orgId: owner.orgId, dossierId: opened.dossierId, createdById: owner.internalUserId,
+      proposalFingerprint: fixture.proposal.fingerprint, sourceAggregationFingerprint: fixture.proposal.sourceAggregationFingerprint,
+      ledgerHeadHash: approved.entryHash, packageFingerprint: '0'.repeat(64), snapshot: {},
+    } }))).rejects.toThrow()
+  })
+
   it('fails closed without context and conceals another tenant', async () => {
     await createDossier()
     expect(await app.tireCalibrationDossier.findMany()).toEqual([])
-    expect(await inContext(viewer, tx => tx.tireCalibrationDossier.count())).toBe(1)
+    expect(await inContext(viewer, tx => tx.tireCalibrationDossier.count({ where: { id: 'tire-dossier-a' } }))).toBe(1)
     expect(await inContext(otherViewer, tx => tx.tireCalibrationDossier.count())).toBe(0)
     expect(await app.tireCalibrationDossier.findMany()).toEqual([])
   })

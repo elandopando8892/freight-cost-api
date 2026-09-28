@@ -668,6 +668,7 @@ model TireCalibrationDossier {
   proposalId                   String
   version                      Int
   status                       String   @default("DRAFT")
+  reviewMode                   String   @default("DUAL_REVIEW")
   revision                     Int      @default(0)
   proposalFingerprint          String
   sourceAggregationFingerprint String

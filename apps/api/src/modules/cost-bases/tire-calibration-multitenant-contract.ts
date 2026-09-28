@@ -25,7 +25,8 @@ export const TireCalibrationTenantContextSchema = z.object({
   actor: TireCalibrationTenantIdentitySchema,
   action: TireCalibrationTenantActionSchema,
   resourceOrgId: text,
-  status: z.enum(['NEW', 'DRAFT', 'PENDING_ECONOMIC', 'PENDING_INDEPENDENT', 'RETURNED', 'REJECTED', 'REVIEWED']),
+  status: z.enum(['NEW', 'DRAFT', 'PENDING_ECONOMIC', 'PENDING_INDEPENDENT', 'RETURNED', 'REJECTED', 'REVIEWED', 'ECONOMIC_REVIEWED']),
+  reviewMode: z.enum(['DUAL_REVIEW', 'ECONOMIC_ONLY']).default('DUAL_REVIEW'),
   expectedRevision: z.number().int().nonnegative(),
   currentRevision: z.number().int().nonnegative(),
   expectedProposalFingerprint: hash.nullable(),
@@ -77,6 +78,8 @@ export function authorizeTireCalibrationTenantAction(input: unknown): TireCalibr
   if (!requiredRole.includes(context.actor.role)) return { allowed: false, concealResource: false, code: 'ROLE_FORBIDDEN', requiredRole, checks }
   checks.push('ROLE_ALLOWED')
   if (context.action === 'READ_DOSSIER') return { allowed: true, concealResource: false, code: 'ALLOWED', requiredRole, checks }
+  if (context.reviewMode === 'ECONOMIC_ONLY' && (context.independentReviewerId !== null || context.action === 'RECORD_INDEPENDENT_DECISION')) return { allowed: false, concealResource: false, code: 'INDEPENDENT_REVIEW_NOT_APPLICABLE', requiredRole, checks }
+  if (context.action === 'ASSIGN_REVIEWERS' && (!context.economicOwnerId || (context.reviewMode === 'DUAL_REVIEW' && !context.independentReviewerId))) return { allowed: false, concealResource: false, code: 'REVIEWER_ASSIGNMENT_REQUIRED', requiredRole, checks }
 
   if (context.expectedRevision !== context.currentRevision) return { allowed: false, concealResource: false, code: 'REVISION_CONFLICT', requiredRole, checks }
   checks.push('REVISION_MATCHED')

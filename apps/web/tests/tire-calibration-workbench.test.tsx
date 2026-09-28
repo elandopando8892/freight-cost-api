@@ -6,6 +6,7 @@ import {
   type TireCalibrationSummary,
 } from '../app/(app)/cost-bases/tires/tire-calibration-workbench'
 import { fetcher } from '../lib/fetcher'
+import { TireReviewActions } from '../app/(app)/cost-bases/tires/tire-review-actions'
 
 vi.mock('../lib/fetcher', async importOriginal => ({
   ...(await importOriginal<typeof import('../lib/fetcher')>()),
@@ -125,4 +126,40 @@ it('verifies the current cohort source without mutating it', async () => {
   )
   expect(host.textContent).toContain('v4')
   expect(host.textContent).toContain('Revisión de cabeza4')
+})
+
+it('assigns one reviewer with an explicit economic-only command', async () => {
+  const onUpdated = vi.fn(async () => {})
+  await act(async () => root.render(createElement(TireReviewActions, {
+    dossier: { ...dossiers[0], status: 'DRAFT', revision: 1, economicOwnerId: null, independentReviewerId: null },
+    currentUserId: 'operator-1', role: 'OPERATOR', reviewers: [{ id: 'admin-1', email: 'reviewer@example.invalid' }], onUpdated,
+  })))
+  const note = host.querySelector('textarea')!
+  await act(async () => {
+    Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')!.set!.call(note, 'Evidencia preparada para revisión económica')
+    note.dispatchEvent(new Event('input', { bubbles: true }))
+  })
+  await act(async () => host.querySelector('form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })))
+  expect(fetcher).toHaveBeenCalledWith('/api/v1/cost-bases/tire-calibrations/dossier-1/assign-reviewers', expect.objectContaining({
+    method: 'POST', json: expect.objectContaining({ reviewMode: 'ECONOMIC_ONLY', economicOwnerId: 'admin-1', independentReviewerId: null, expectedRevision: 1 }),
+  }))
+  expect(onUpdated).toHaveBeenCalledOnce()
+})
+
+it('does not offer a decision to VIEWER or an unassigned ADMIN', async () => {
+  for (const [role, id] of [['VIEWER', 'admin-1'], ['ADMIN', 'other-admin']] as const) {
+    await act(async () => root.render(createElement(TireReviewActions, {
+      dossier: { ...dossiers[0], reviewMode: 'ECONOMIC_ONLY', independentReviewerId: null }, currentUserId: id, role, reviewers: [], onUpdated: async () => {},
+    })))
+    expect(host.querySelector('form')).toBeNull()
+  }
+})
+
+it('shows completion without demanding an independent reviewer', async () => {
+  await act(async () => root.render(createElement(TireCalibrationWorkbench, {
+    key: 'economic-only-loaded', initialDossiers: [{ ...dossiers[0], status: 'ECONOMIC_REVIEWED', reviewMode: 'ECONOMIC_ONLY', independentReviewerId: null }], role: 'VIEWER',
+  })))
+  expect(host.textContent).toContain('Revisión económica completa')
+  expect(host.textContent).toContain('No se requiere un segundo revisor')
+  expect(host.textContent).not.toContain('Pendiente de revisor independiente')
 })

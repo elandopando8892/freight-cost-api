@@ -23,6 +23,19 @@ const complete = {
 } as const
 
 describe('tire authenticated preview readiness', () => {
+  it('accepts an explicitly economic-only workflow with an author and one ADMIN', () => {
+    const economic = { ...complete, reviewMode: 'ECONOMIC_ONLY',
+      database: { ...complete.database, economicReviewMigrationApplied: true },
+      identities: [identity('author-operator', 'OPERATOR'), identity('economic-admin', 'ADMIN')],
+      workflow: { ...complete.workflow, independentDecisionRecorded: false, approvalPackageReadAfterReload: false, economicDecisionReadAfterReload: true },
+    }
+    expect(evaluateTirePreviewReadiness(economic)).toMatchObject({ ready: true, blockers: 0 })
+    expect(evaluateTirePreviewReadiness({ ...economic, database: complete.database }).ready).toBe(false)
+    expect(evaluateTirePreviewReadiness({ ...economic, workflow: { ...economic.workflow, independentDecisionRecorded: true } }).ready).toBe(false)
+    expect(evaluateTirePreviewReadiness({ ...economic, identities: [identity('same-author', 'ADMIN'), identity('same-author', 'ADMIN')] }).ready).toBe(false)
+    expect(evaluateTirePreviewReadiness({ ...economic, identities: [identity('author-operator', 'OPERATOR'), identity('read-only', 'VIEWER')] }).ready).toBe(false)
+    expect(evaluateTirePreviewReadiness({ ...economic, identities: economic.identities.map(item => ({ ...item, renewalVerified: false })) }).ready).toBe(false)
+  })
   it('passes only a clean paired release with isolated database and separated duties', () => {
     expect(evaluateTirePreviewReadiness(complete)).toMatchObject({ ready: true, blockers: 0 })
   })

@@ -11,6 +11,7 @@ import {
   ShieldCheck,
 } from 'lucide-react'
 import { ClientApiError, fetcher } from '@/lib/fetcher'
+import { TireReviewActions, type TireReviewer } from './tire-review-actions'
 
 type CalibrationStatus =
   | 'DRAFT'
@@ -19,6 +20,7 @@ type CalibrationStatus =
   | 'RETURNED'
   | 'REJECTED'
   | 'REVIEWED'
+  | 'ECONOMIC_REVIEWED'
 
 type ApprovalPackage = {
   id: string
@@ -32,6 +34,7 @@ export type TireCalibrationSummary = {
   proposalId: string
   version: number
   status: CalibrationStatus
+  reviewMode?: 'DUAL_REVIEW' | 'ECONOMIC_ONLY'
   revision: number
   proposalFingerprint: string
   sourceAggregationFingerprint: string
@@ -74,6 +77,7 @@ const statusLabels: Record<CalibrationStatus, string> = {
   RETURNED: 'Devuelto',
   REJECTED: 'Rechazado',
   REVIEWED: 'Revisado',
+  ECONOMIC_REVIEWED: 'Revisión económica completa',
 }
 
 const actionLabels: Record<string, string> = {
@@ -92,7 +96,7 @@ const formatDate = (value: string) => new Intl.DateTimeFormat('es-MX', {
 }).format(new Date(value))
 
 function statusTone(status: CalibrationStatus): string {
-  if (status === 'REVIEWED') return 'border-emerald-700/40 bg-emerald-950/30 text-emerald-300'
+  if (status === 'REVIEWED' || status === 'ECONOMIC_REVIEWED') return 'border-emerald-700/40 bg-emerald-950/30 text-emerald-300'
   if (status === 'REJECTED' || status === 'RETURNED') return 'border-rose-700/40 bg-rose-950/30 text-rose-300'
   return 'border-amber-700/40 bg-amber-950/30 text-amber-300'
 }
@@ -119,10 +123,15 @@ function ReviewStep({ complete, label, detail }: { complete: boolean; label: str
 export function TireCalibrationWorkbench({
   initialDossiers,
   role,
+  currentUserId,
+  reviewers = [],
 }: {
   initialDossiers: TireCalibrationSummary[]
   role: 'ADMIN' | 'OPERATOR' | 'VIEWER'
+  currentUserId?: string
+  reviewers?: TireReviewer[]
 }) {
+  const [dossiers, setDossiers] = useState(initialDossiers)
   const [filter, setFilter] = useState('')
   const [selectedId, setSelectedId] = useState(initialDossiers[0]?.id ?? '')
   const [detail, setDetail] = useState<TireCalibrationDetail | null>(null)
@@ -133,15 +142,15 @@ export function TireCalibrationWorkbench({
 
   const filtered = useMemo(() => {
     const query = filter.trim().toLocaleLowerCase('es-MX')
-    if (!query) return initialDossiers
-    return initialDossiers.filter(item =>
+    if (!query) return dossiers
+    return dossiers.filter(item =>
       item.proposalId.toLocaleLowerCase('es-MX').includes(query)
       || statusLabels[item.status].toLocaleLowerCase('es-MX').includes(query))
-  }, [filter, initialDossiers])
+  }, [filter, dossiers])
 
-  const selectedSummary = initialDossiers.find(item => item.id === selectedId) ?? null
+  const selectedSummary = dossiers.find(item => item.id === selectedId) ?? null
   const selected = detail?.id === selectedId ? detail : selectedSummary
-  const reviewedCount = initialDossiers.filter(item => item.status === 'REVIEWED').length
+  const reviewedCount = dossiers.filter(item => item.status === 'REVIEWED' || item.status === 'ECONOMIC_REVIEWED').length
 
   async function selectDossier(id: string) {
     setSelectedId(id)
@@ -153,6 +162,7 @@ export function TireCalibrationWorkbench({
         { silent: true },
       )
       setDetail(result)
+      setDossiers(current => current.map(item => item.id === result.id ? result : item))
       setDetailState('idle')
     } catch {
       setDetailState('error')
@@ -177,7 +187,7 @@ export function TireCalibrationWorkbench({
     }
   }
 
-  const economicComplete = selected ? ['PENDING_INDEPENDENT', 'REVIEWED'].includes(selected.status) : false
+  const economicComplete = selected ? ['PENDING_INDEPENDENT', 'REVIEWED', 'ECONOMIC_REVIEWED'].includes(selected.status) : false
   const independentComplete = selected?.status === 'REVIEWED'
 
   return (
@@ -190,7 +200,7 @@ export function TireCalibrationWorkbench({
             Consulta la evidencia, la fuente vigente y la cadena de revisión antes de incorporar parámetros al motor de costos.
           </p>
         </div>
-        <span className="rounded-full border px-3 py-1.5 text-xs font-semibold">Rol {role} · sólo consulta</span>
+        <span className="rounded-full border px-3 py-1.5 text-xs font-semibold">Rol {role} · {role === 'VIEWER' || !currentUserId ? 'sólo consulta' : 'revisión económica'}</span>
       </header>
 
       <section className="grid gap-4 rounded-lg border border-primary/35 bg-primary/5 p-4 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center">
@@ -289,11 +299,15 @@ export function TireCalibrationWorkbench({
                   <ol className="mt-3 grid gap-2">
                     <ReviewStep complete label="Borrador reproducible" detail="La propuesta y su fuente quedaron fijadas por huella." />
                     <ReviewStep complete={economicComplete} label="Revisión económica" detail={selected.economicOwnerId ? 'Responsable asignado.' : 'Pendiente de responsable económico.'} />
-                    <ReviewStep complete={independentComplete} label="Revisión independiente" detail={selected.independentReviewerId ? 'Revisor independiente asignado.' : 'Pendiente de revisor independiente.'} />
+                    {selected.reviewMode === 'ECONOMIC_ONLY'
+                      ? <li className="rounded border border-dashed p-3 text-sm text-muted-foreground">Revisión individual · no incluye dictamen independiente. No se requiere un segundo revisor.</li>
+                      : <ReviewStep complete={independentComplete} label="Revisión independiente" detail={selected.independentReviewerId ? 'Revisor independiente asignado.' : 'Pendiente de revisor independiente.'} />}
                     <ReviewStep complete={false} label="Autorización de publicación" detail="Requiere una autorización separada; no forma parte de este workbench." />
                   </ol>
                 </div>
               </div>
+
+              {currentUserId && <TireReviewActions key={`${selected.id}:${selected.revision}`} dossier={selected} currentUserId={currentUserId} role={role} reviewers={reviewers} onUpdated={() => selectDossier(selected.id)} />}
 
               <div className="border-t p-5">
                 <h3 className="font-semibold">Bitácora inmutable</h3>
@@ -353,7 +367,7 @@ export function TireCalibrationWorkbench({
           {[
             ['1', 'Fuente vigente', 'Cohorte y política estadística verificables.'],
             ['2', 'Propuesta reproducible', 'Huella de inputs, benchmark y resultados.'],
-            ['3', 'Doble revisión', 'Responsable económico y revisor independiente.'],
+            ['3', 'Revisión económica', 'Un responsable distinto del autor; modalidad documentada.'],
             ['4', 'Publicación separada', 'Fuera de alcance; requiere autorización explícita.'],
           ].map(([number, label, description]) => (
             <div key={number} className="rounded border p-3"><span className="font-mono text-xs font-bold text-primary">{number}</span><p className="mt-2 text-sm font-semibold">{label}</p><p className="mt-1 text-xs text-muted-foreground">{description}</p></div>

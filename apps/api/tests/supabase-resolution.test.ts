@@ -43,6 +43,8 @@ describe("Supabase identity resolution", () => {
     process.env.SUPABASE_URL = "https://fcm-auth.supabase.co";
     process.env.SUPABASE_PUBLISHABLE_KEY = "sb_publishable_test";
     delete process.env.SUPABASE_EXPECTED_PROJECT_REF;
+    delete process.env.FCM_PREVIEW_EXISTING_USERS_ONLY;
+    delete process.env.VERCEL_ENV;
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue(
@@ -71,6 +73,18 @@ describe("Supabase identity resolution", () => {
     await expect(resolveUser(claims(), "token-1")).rejects.toThrow(/already linked/i);
     expect(prisma.user.update).not.toHaveBeenCalled();
     expect(prisma.user.create).not.toHaveBeenCalled();
+  });
+
+  it("uses existing preview identities without generating default cost assumptions", async () => {
+    process.env.VERCEL_ENV = 'preview';
+    process.env.FCM_PREVIEW_EXISTING_USERS_ONLY = 'true';
+    prisma.user.findUnique.mockResolvedValueOnce({ id: 'existing', orgId: 'org-preview', role: 'OPERATOR' });
+    await expect(resolveUser(claims(), 'token')).resolves.toMatchObject({ id: 'existing', role: 'OPERATOR' });
+    expect(prisma.assumptionSet.findFirst).not.toHaveBeenCalled();
+    expect(prisma.assumptionSet.create).not.toHaveBeenCalled();
+    await expect(resolveUser(claims('unknown'), 'token')).rejects.toThrow('PREVIEW_IDENTITY_NOT_PROVISIONED');
+    expect(prisma.user.create).not.toHaveBeenCalled();
+    expect(fetch).not.toHaveBeenCalled();
   });
 
   it("links an existing unlinked user by verified Supabase email without changing tenant or role", async () => {

@@ -2,6 +2,8 @@
 
 Sprint 12 · 2026-09-27
 
+Actualización 2026-09-28: el flujo de acciones y la modalidad con un único revisor están definidos en [tire-economic-review-wireframe.md](tire-economic-review-wireframe.md). El wireframe de consulta siguiente se conserva como referencia histórica; ya no implica que todas las modalidades requieran revisión independiente.
+
 ## Objetivo de usuario
 
 Dar a un usuario autenticado un punto de entrada real —no un harness— para consultar el estado de los expedientes de calibración de llantas, comprobar la fuente vigente de una cohorte y entender por qué un expediente todavía no puede alimentar CFU/CVU ni cotizaciones.

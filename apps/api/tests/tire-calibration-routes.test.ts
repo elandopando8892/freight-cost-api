@@ -16,6 +16,7 @@ import { createTireCalibrationRoutes } from '../src/modules/cost-bases/tire-cali
 
 const receipt = { status: 'DRAFT', quoteEligible: false }
 const persistence = {
+  reviewers: vi.fn(async () => [{ id: 'admin-2', email: 'reviewer@example.invalid' }]),
   list: vi.fn(async () => [{ id: 'dossier-1' }]),
   get: vi.fn(async () => ({ id: 'dossier-1' })),
   open: vi.fn(async () => receipt),
@@ -41,6 +42,9 @@ describe('tire calibration authenticated HTTP boundary', () => {
   it('forwards the resolved internal identity to tenant-scoped reads', async () => {
     const list = await app.inject({ method: 'GET', url: '/cost-bases/tire-calibrations' })
     const detail = await app.inject({ method: 'GET', url: '/cost-bases/tire-calibrations/dossier-1' })
+    const reviewers = await app.inject({ method: 'GET', url: '/cost-bases/tire-calibration-reviewers' })
+    expect(reviewers.statusCode).toBe(200)
+    expect(persistence.reviewers).toHaveBeenCalledWith(expect.objectContaining({ orgId: 'org-route-test' }))
     expect(list.statusCode).toBe(200)
     expect(detail.statusCode).toBe(200)
     expect(persistence.list).toHaveBeenCalledWith(expect.objectContaining({

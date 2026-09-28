@@ -5,14 +5,16 @@ import {
   TireCalibrationWorkbench,
   type TireCalibrationSummary,
 } from './tire-calibration-workbench'
+import type { TireReviewer } from './tire-review-actions'
 
 export const dynamic = 'force-dynamic'
 export const metadata: Metadata = { title: 'Calibración de llantas' }
 
 export default async function TireCalibrationPage() {
-  const [dossiers, user] = await Promise.all([
+  const [dossiers, user, reviewers] = await Promise.all([
     api<TireCalibrationSummary[]>('/cost-bases/tire-calibrations'),
-    api<{ role: 'ADMIN' | 'OPERATOR' | 'VIEWER' }>('/auth/me'),
+    api<{ id: string; role: 'ADMIN' | 'OPERATOR' | 'VIEWER' }>('/auth/me'),
+    api<TireReviewer[]>('/cost-bases/tire-calibration-reviewers'),
   ])
 
   return (
@@ -24,7 +26,7 @@ export default async function TireCalibrationPage() {
           Calibración de llantas
         </Link>
       </nav>
-      <TireCalibrationWorkbench initialDossiers={dossiers} role={user.role} />
+      <TireCalibrationWorkbench initialDossiers={dossiers} role={user.role} currentUserId={user.id} reviewers={reviewers} />
     </main>
   )
 }

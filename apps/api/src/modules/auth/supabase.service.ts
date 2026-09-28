@@ -149,11 +149,15 @@ export async function resolveUser(
   token: string,
 ): Promise<ResolvedUser> {
   const supabaseId = claims.sub;
+  const existingPreviewUsersOnly = process.env.VERCEL_ENV === "preview"
+    && process.env.FCM_PREVIEW_EXISTING_USERS_ONLY === "true";
   const existing = await prisma.user.findUnique({ where: { supabaseId } });
   if (existing) {
-    await ensureActiveSet(existing.orgId);
+    if (!existingPreviewUsersOnly) await ensureActiveSet(existing.orgId);
     return { id: existing.id, orgId: existing.orgId, role: existing.role, supabaseId };
   }
+
+  if (existingPreviewUsersOnly) throw new Error("PREVIEW_IDENTITY_NOT_PROVISIONED");
 
   const email = await verifiedEmailForFirstLink(token, claims);
 
