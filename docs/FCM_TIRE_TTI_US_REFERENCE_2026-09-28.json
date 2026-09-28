@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "fcm.tire-us-public-reference.v1",
+  "classification": "PUBLIC_RESEARCH_NOT_CALIBRATION",
+  "reviewedOn": "2026-09-28",
+  "source": {
+    "publisher": "Texas A&M Transportation Institute",
+    "title": "2025 Urban Mobility Report, Appendix C: Value of Delay Time for Use in Mobility Monitoring Efforts",
+    "url": "https://static.tti.tamu.edu/tti.tamu.edu/documents/mobility-report-2025-appx-c.pdf",
+    "table": "Exhibit C-3",
+    "pdfPage": 7,
+    "methodPdfPage": 8
+  },
+  "reference": {
+    "costYear": 2024,
+    "tireCostUsdPerVehicleMile": 0.048,
+    "unit": "USD por vehiculo-milla",
+    "population": "Camiones comerciales estadounidenses agregados; no cohorte XBF ni drayage",
+    "method": "Estimacion TTI para 2024 basada en datos ATRI hasta 2023 y mediana del crecimiento de costos marginales no combustible/no mano de obra",
+    "observedCarrierCost": false
+  },
+  "governance": {
+    "segmentForMagnitudeCheck": "INTRA_US",
+    "adoptedParameterCount": 0,
+    "parameterWriteAllowed": false,
+    "quoteEligible": false,
+    "notComparableWithout": [
+      "Alinear ano y alcance de costos incluidos",
+      "Verificar tipo de vehiculo y ciclo operativo",
+      "Separar costos propios de tarifas de terceros",
+      "Obtener precio instalado y rendimiento de ciclos XBF por posicion"
+    ],
+    "notApplicableDirectlyTo": ["US_DRAYAGE", "MX_DRAYAGE", "MX_LOCAL", "D2D_US_MX_PARTNER"]
+  }
+}

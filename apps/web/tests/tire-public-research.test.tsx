@@ -7,6 +7,7 @@ import { TirePublicResearch } from '../app/(app)/cost-bases/tires/tire-public-re
 import imtReference from '../../../docs/FCM_TIRE_IMT_PT881_2025.json'
 import segmentMapping from '../../../docs/FCM_TIRE_IMT_SEGMENT_MAPPING_2026-09-28.json'
 import excludedSources from '../../../docs/FCM_TIRE_EXCLUDED_SEGMENT_SOURCES_2026-09-28.json'
+import usReference from '../../../docs/FCM_TIRE_TTI_US_REFERENCE_2026-09-28.json'
 
 const segmentSource = readFileSync(resolve(process.cwd(), '../api/src/modules/cost-bases/operational-segments.ts'), 'utf8')
 const segmentEnum = segmentSource.match(/export const OperationalSegmentSchema = z\.enum\(\[([\s\S]*?)\]\)/)?.[1]
@@ -66,4 +67,20 @@ it('keeps public source signals distinct from segment-level tire cost parameters
   expect(html).toContain('El +6.4% de ATRI en 2025 es una tendencia, no USD/milla')
   expect(excludedSources.adoptedParameterCount).toBe(0)
   expect(excludedSources.quoteEligible).toBe(false)
+})
+
+it('shows a sourced US absolute magnitude without adopting it or extrapolating ATRI trend', () => {
+  const html = renderToStaticMarkup(createElement(TirePublicResearch))
+  expect(html).toContain('TTI · magnitud modelada de llantas')
+  expect(html).toContain('$0.048')
+  expect(html).toContain('vehículo-milla · 2024')
+  expect(html).toContain(`${usReference.source.url}#page=${usReference.source.pdfPage}`)
+  expect(html).toContain('no es gasto observado de XBF')
+  expect(html).toContain('No se combina con el +6.4% de ATRI 2025')
+  expect(usReference.reference.observedCarrierCost).toBe(false)
+  expect(usReference.governance.segmentForMagnitudeCheck).toBe('INTRA_US')
+  expect(usReference.governance.notApplicableDirectlyTo).toContain('US_DRAYAGE')
+  expect(usReference.governance.adoptedParameterCount).toBe(0)
+  expect(usReference.governance.parameterWriteAllowed).toBe(false)
+  expect(usReference.governance.quoteEligible).toBe(false)
 })

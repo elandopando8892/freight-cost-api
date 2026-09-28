@@ -6,6 +6,16 @@
   "quoteEligible": false,
   "sources": [
     {
+      "id": "TTI_2025_APPENDIX_C",
+      "publisher": "Texas A&M Transportation Institute",
+      "label": "TTI · estimación absoluta EE. UU. 2024",
+      "url": "https://static.tti.tamu.edu/tti.tamu.edu/documents/mobility-report-2025-appx-c.pdf#page=7",
+      "year": 2024,
+      "kind": "MODELED_MAGNITUDE_ONLY",
+      "findingEs": "Exhibit C-3 estima 0.048 USD por vehículo-milla para llantas de camiones comerciales en 2024.",
+      "limitEs": "Es una estimación TTI agregada para valor de demoras, no gasto observado por segmento ni parámetro XBF."
+    },
+    {
       "id": "ATRI_2026_FORM",
       "publisher": "American Transportation Research Institute",
       "label": "ATRI · definición del costo de llantas",
@@ -49,12 +59,12 @@
   "excludedSegments": [
     {
       "id": "INTRA_US",
-      "sourceIds": ["ATRI_2026_FORM", "ATRI_2026_RELEASE"],
-      "missingEs": "Falta verificar un costo absoluto reciente de llantas USD/milla para flota y servicio comparables; el +6.4% no lo sustituye."
+      "sourceIds": ["TTI_2025_APPENDIX_C", "ATRI_2026_FORM", "ATRI_2026_RELEASE"],
+      "missingEs": "TTI da una magnitud modelada 2024, pero falta costo observado reciente de llantas USD/milla para una flota y servicio comparables; el +6.4% no actualiza por sí solo esa cifra."
     },
     {
       "id": "US_DRAYAGE",
-      "sourceIds": ["EPA_SMARTWAY_DRAY", "ATRI_2026_FORM"],
+      "sourceIds": ["EPA_SMARTWAY_DRAY", "ATRI_2026_FORM", "TTI_2025_APPENDIX_C"],
       "missingEs": "Faltan gasto de llantas y millas del ciclo portuario, con tractor/chasis y reparto de costos separados."
     },
     {

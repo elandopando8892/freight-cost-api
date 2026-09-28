@@ -3,12 +3,16 @@ import research from '../../../../../../docs/FCM_TIRE_LIFECYCLE_SOURCES_2026-09-
 import imtReference from '../../../../../../docs/FCM_TIRE_IMT_PT881_2025.json'
 import segmentMapping from '../../../../../../docs/FCM_TIRE_IMT_SEGMENT_MAPPING_2026-09-28.json'
 import excludedSources from '../../../../../../docs/FCM_TIRE_EXCLUDED_SEGMENT_SOURCES_2026-09-28.json'
+import usReference from '../../../../../../docs/FCM_TIRE_TTI_US_REFERENCE_2026-09-28.json'
 
 const formatMxn = (value: number) => new Intl.NumberFormat('es-MX', {
   style: 'currency', currency: 'MXN', maximumFractionDigits: 2,
 }).format(value)
 const formatMxnPerKm = (value: number) => new Intl.NumberFormat('es-MX', {
   style: 'currency', currency: 'MXN', minimumFractionDigits: 5, maximumFractionDigits: 5,
+}).format(value)
+const formatUsdPerMile = (value: number) => new Intl.NumberFormat('en-US', {
+  style: 'currency', currency: 'USD', minimumFractionDigits: 3, maximumFractionDigits: 3,
 }).format(value)
 
 function SourceLink({ href, children }: { href: string; children: React.ReactNode }) {
@@ -126,10 +130,23 @@ export function TirePublicResearch() {
         <p className="mt-2 text-xs text-amber-200">Sin conversión automática de segmentos históricos de cohortes. Ningún costo del IMT entra a CVU, CFU o cotización.</p>
       </div>
 
+      <div className="mt-5 rounded border border-sky-800/50 bg-sky-950/10 p-4" aria-labelledby="tire-us-reference-title">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-sky-300">Referencia primaria · EE. UU. agregado</p>
+            <h3 id="tire-us-reference-title" className="mt-1 font-semibold">TTI · magnitud modelada de llantas</h3>
+          </div>
+          <SourceLink href={`${usReference.source.url}#page=${usReference.source.pdfPage}`}>Exhibit C-3 · PDF</SourceLink>
+        </div>
+        <p className="mt-3 text-2xl font-semibold tabular-nums">{formatUsdPerMile(usReference.reference.tireCostUsdPerVehicleMile)} <span className="text-sm font-normal text-muted-foreground">por vehículo-milla · {usReference.reference.costYear}</span></p>
+        <p className="mt-2 text-sm text-muted-foreground">Estimación TTI para camiones comerciales estadounidenses. TTI partió de datos ATRI hasta 2023 y proyectó costos no combustible/no mano de obra para 2024; no es gasto observado de XBF ni un valor específico para drayage.</p>
+        <p className="mt-2 text-xs text-amber-200">Sirve sólo para contrastar la magnitud de FTL Intra-EE. UU. tras verificar vehículo, ciclo y alcance. No se combina con el +6.4% de ATRI 2025, no se convierte a MXN ni entra a CVU, CFU o cotización.</p>
+      </div>
+
       <div className="mt-5 rounded border border-dashed p-4" aria-labelledby="tire-alternative-sources-title">
         <p className="text-xs font-semibold uppercase tracking-wide text-primary">Siguiente capa de investigación</p>
         <h3 id="tire-alternative-sources-title" className="mt-1 font-semibold">Fuentes para los segmentos sin contraste IMT</h3>
-        <p className="mt-2 text-sm text-muted-foreground">ATRI define el gasto de llantas en tractocamión y reporta una variación anual; EPA distingue drayage e IMT aporta una relación histórica precio/vida. Ninguna de estas fuentes verifica un importe actual aplicable a XBF por segmento.</p>
+        <p className="mt-2 text-sm text-muted-foreground">TTI estima una magnitud agregada en EE. UU.; ATRI define el gasto de llantas y reporta una variación anual; EPA distingue drayage e IMT aporta una relación histórica precio/vida. Ninguna de estas fuentes verifica un importe actual aplicable a XBF por segmento.</p>
         <p className="mt-2 text-xs text-amber-200">El +6.4% de ATRI en 2025 es una tendencia, no USD/milla. No se aplica a una base desconocida ni entra a CVU.</p>
         <details className="mt-3 text-sm">
           <summary className="min-h-11 cursor-pointer text-primary">Ver {excludedSources.sources.length} fuentes y {excludedSources.excludedSegments.length} brechas por segmento</summary>
