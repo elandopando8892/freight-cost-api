@@ -24,4 +24,24 @@ La aceptación de login real, recarga y renovación no se deduce de estas prueba
 
 ## Continuidad
 
-El segundo ADMIN deja de ser un requisito para ECONOMIC_ONLY. La siguiente validación usa las cuentas existentes y la decisión económica persistida; no requiere cuentas inventadas ni elevar permisos. El despliegue y la verificación del navegador se registran como evidencia posterior del mismo desarrollo.
+El segundo ADMIN deja de ser un requisito para ECONOMIC_ONLY. La siguiente validación usa las cuentas existentes y la decisión económica persistida; no requiere cuentas inventadas ni elevar permisos.
+
+## Despliegue y navegador
+
+- Frontend y API READY, exclusivamente preview, ambos del commit `2d805204d74840ba5cb1a34352387553e67046d6`.
+- Web: `dpl_97dba4KwdUZwF4C8zqhBnGLBbDTL`, https://freight-cost-fucetsa8j-elandopando8892s-projects.vercel.app/cost-bases/tires
+- API: `dpl_BQVSWsXiM5MUafD4PZvU5QYVdSd7`, https://freight-cost-88gm9pqkf-elandopando8892s-projects.vercel.app
+- `/health` y `/ready`: HTTP 200; readiness identifica el commit correcto. Endpoint de revisores sin sesión: HTTP 401.
+- Login real Google de OPERATOR: retorno al mismo origen, sesión reconocida y acceso al módulo; recarga conserva sesión y organización. El retorno OAuth termina en raíz, no conserva el destino profundo; se navegó después al módulo.
+- Pantalla real: cero expedientes, revisión económica individual, publicación bloqueada. Los controles de asignar/aprobar/devolver tienen pruebas de componente, no una operación autenticada real sobre un expediente.
+- Lectura posterior al login: tres usuarios, una organización, cero conjuntos de supuestos y cero expedientes. 45 migraciones terminadas; runtime sin superuser ni bypass RLS. El login de preview no sembró valores predeterminados.
+- ADMIN y VIEWER no validados con login real en esta entrega; tampoco renovación de sesión ni decisión económica real. No se usó el logout global de Supabase para cambiar de cuenta, evitando afectar sesiones de otras aplicaciones.
+- No se modificaron producción, Auth compartido ni parámetros de costos. La falta de datos económicos reales no se sustituye con fixtures en preview.
+
+## Rollback
+
+Puede retirarse el nuevo par de previews sin afectar producción. Para volver al código anterior en la base aislada, redeplegar el par anterior con la credencial vigente: la rotación exclusiva de preview impide asumir que el deployment antiguo siga operativo. Conservar la migración aditiva y los eventos; no borrar `reviewMode` ni registros económicos para simular una revisión independiente. La reversión funcional debe preservar la evidencia y volver a bloquear acciones no soportadas.
+
+## Siguiente entrega
+
+Incorporar un expediente derivado de benchmark público verificable y probar su revisión económica persistida con las identidades existentes. No se declara calibración completa, publicación ni aceptación operativa basándose solamente en estas pruebas.
