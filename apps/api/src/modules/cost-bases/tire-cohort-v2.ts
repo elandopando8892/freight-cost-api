@@ -120,6 +120,10 @@ export function reviewTireCohortRecordV2(input: unknown) {
     ? parts.reduce<number>((total, value) => total + value!, 0) : null
   const observedCostNativePerKm = observedKm != null && installedCostNative != null
     ? installedCostNative / observedKm : null
+  if ([installedCostNative, observedCostNativePerKm]
+    .some(value => value != null && !Number.isFinite(value))) {
+    throw new Error('Non-finite tire cohort v2 arithmetic')
+  }
   const stage = record.tire.stage.kind === 'NEW' ? 'NEW' : `RETREAD_${record.tire.stage.sequence}`
   const comparisonKey = JSON.stringify([
     record.operationalSegment, record.leg.country, costs.currency,
