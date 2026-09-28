@@ -65,7 +65,7 @@ async function main() {
       hasKindeIdColumn: result.columns.some(row => row.column_name === 'kindeId'),
       existingTireTables: result.tables.map(row => row.table_name).sort(),
       appliedMigrationCount: applied.size, artifactCount: artifacts.length,
-      pending, failed, writesAttempted: false, backupTaken: false,
+      pending, failed, writesAttempted: false, backupTakenByThisCheck: false,
       migrationApplied: false, previewDeployed: false,
     }, null, 2))
   } finally {
