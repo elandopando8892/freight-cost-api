@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -7,6 +8,8 @@ import {
   FCM_VERCEL_PROJECT,
   findCoveringRedirect,
   isFreightCostVercelPreview,
+  isRecognizedFreightCostCheckoutProject,
+  isVerifiedFreightCostWebDeployment,
   previewCallbackUrl,
 } from "../src/modules/pilot/oauth-preview-coverage.js";
 
@@ -44,15 +47,35 @@ if (!accessToken) {
     "Falta SUPABASE_ACCESS_TOKEN en el proceso. Úsalo sólo para esta lectura; no lo guardes como variable del deployment.",
   );
 }
-if (
-  linkedProject.projectId !== FCM_VERCEL_PROJECT.id ||
-  linkedProject.orgId !== FCM_VERCEL_PROJECT.teamId ||
-  linkedProject.projectName !== FCM_VERCEL_PROJECT.name
-) {
-  stop("El checkout no está vinculado al proyecto Vercel verificado de Freight Cost Model.");
+if (!isRecognizedFreightCostCheckoutProject(linkedProject)) {
+  stop("El checkout no está vinculado a uno de los dos proyectos FCM verificados del equipo.");
 }
 if (!isFreightCostVercelPreview(previewUrl)) {
   stop("La URL no pertenece al prefijo y equipo Vercel verificados para Freight Cost Model.");
+}
+
+const cli = process.env.VERCEL_CLI_PATH?.trim();
+if (!cli) stop("Falta VERCEL_CLI_PATH para verificar el deployment Web exacto en Vercel.");
+let deployment: {
+  id?: string;
+  projectId?: string;
+  url?: string;
+  readyState?: string;
+  target?: string | null;
+  meta?: { gitCommitSha?: string; gitCommitRef?: string };
+};
+try {
+  const hostname = new URL(previewUrl).hostname;
+  const endpoint = `/v13/deployments/${hostname}?teamId=${FCM_VERCEL_PROJECT.teamId}`;
+  deployment = JSON.parse(execFileSync(process.execPath,
+    [cli, "api", endpoint, "--method", "GET", "--raw"],
+    { encoding: "utf8", windowsHide: true, timeout: 30_000, stdio: ["ignore", "pipe", "pipe"] },
+  ));
+} catch {
+  stop("No se pudo verificar el deployment exacto en Vercel; no se evaluó la cobertura OAuth.");
+}
+if (!isVerifiedFreightCostWebDeployment(previewUrl, deployment)) {
+  stop("La URL no resuelve a un deployment Preview READY del proyecto Web FCM verificado.");
 }
 
 const headers = { Authorization: `Bearer ${accessToken}` };
@@ -98,6 +121,9 @@ async function main() {
     schemaVersion: "fcm.oauth-preview-coverage.v1",
     status: coveringRedirect ? "PASS" : "BLOCK",
     vercelProject: FCM_VERCEL_PROJECT.name,
+    vercelDeploymentId: deployment.id ?? null,
+    deployedSha: deployment.meta?.gitCommitSha ?? null,
+    deployedRef: deployment.meta?.gitCommitRef ?? null,
     supabaseProject: FCM_SUPABASE_PROJECT.name,
     supabaseStatus: project.status ?? "UNKNOWN",
     callback,

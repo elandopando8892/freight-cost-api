@@ -5,6 +5,12 @@ export const FCM_VERCEL_PROJECT = {
   teamSlug: "elandopando8892s-projects",
 } as const;
 
+export const FCM_API_VERCEL_PROJECT = {
+  id: "prj_mw1xLIqutlRSIG2F2BryfPqDvN2L",
+  name: "freight-cost-api",
+  teamId: FCM_VERCEL_PROJECT.teamId,
+} as const;
+
 export const FCM_SUPABASE_PROJECT = {
   ref: "alqjqzqagdmcywpjtnnr",
   name: "rateware-prod",
@@ -13,6 +19,17 @@ export const FCM_SUPABASE_PROJECT = {
 export const FCM_AUTH_CALLBACK_PATH = "/auth/callback";
 export const FCM_SCOPED_PREVIEW_CALLBACK_PATTERN =
   `https://freight-cost-*-${FCM_VERCEL_PROJECT.teamSlug}.vercel.app${FCM_AUTH_CALLBACK_PATH}`;
+
+export function isRecognizedFreightCostCheckoutProject(linked: {
+  orgId?: string;
+  projectId?: string;
+  projectName?: string;
+}) {
+  return linked.orgId === FCM_VERCEL_PROJECT.teamId && (
+    (linked.projectId === FCM_VERCEL_PROJECT.id && linked.projectName === FCM_VERCEL_PROJECT.name) ||
+    (linked.projectId === FCM_API_VERCEL_PROJECT.id && linked.projectName === FCM_API_VERCEL_PROJECT.name)
+  );
+}
 
 function escapeRegex(value: string) {
   return value.replace(/[|\\{}()[\]^$+?.]/g, "\\$&");
@@ -59,6 +76,22 @@ export function isFreightCostVercelPreview(previewUrl: string) {
   } catch {
     return false;
   }
+}
+
+export function isVerifiedFreightCostWebDeployment(
+  previewUrl: string,
+  deployment: {
+    projectId?: string;
+    url?: string;
+    readyState?: string;
+    target?: string | null;
+  },
+) {
+  return isFreightCostVercelPreview(previewUrl) &&
+    deployment.projectId === FCM_VERCEL_PROJECT.id &&
+    deployment.url === new URL(previewUrl).hostname &&
+    deployment.readyState === "READY" &&
+    deployment.target !== "production";
 }
 
 export function findCoveringRedirect(
