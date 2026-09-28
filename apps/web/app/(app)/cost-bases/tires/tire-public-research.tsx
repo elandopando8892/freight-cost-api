@@ -4,6 +4,7 @@ import imtReference from '../../../../../../docs/FCM_TIRE_IMT_PT881_2025.json'
 import segmentMapping from '../../../../../../docs/FCM_TIRE_IMT_SEGMENT_MAPPING_2026-09-28.json'
 import excludedSources from '../../../../../../docs/FCM_TIRE_EXCLUDED_SEGMENT_SOURCES_2026-09-28.json'
 import usReference from '../../../../../../docs/FCM_TIRE_TTI_US_REFERENCE_2026-09-28.json'
+import cohortContract from '../../../../../../docs/FCM_TIRE_COHORT_SEGMENT_CONTRACT_2026-09-28.json'
 
 const formatMxn = (value: number) => new Intl.NumberFormat('es-MX', {
   style: 'currency', currency: 'MXN', maximumFractionDigits: 2,
@@ -26,6 +27,7 @@ export function TirePublicResearch() {
   const conditionalSegments = segmentMapping.segments.filter(item => item.mode === 'CONDITIONAL_MX_INTERURBAN')
   const excludedSegments = segmentMapping.segments.filter(item => item.mode === 'NO_DIRECT_COMPARISON')
   const segmentLabels = new Map(segmentMapping.segments.map(item => [item.id, item.label]))
+  const cohortAlignedCount = cohortContract.segments.filter(item => item.cohortIdAccepted).length
 
   return (
     <section id="tire-public-research" className="rounded-lg border bg-card p-5" aria-labelledby="tire-public-research-title">
@@ -141,6 +143,28 @@ export function TirePublicResearch() {
         <p className="mt-3 text-2xl font-semibold tabular-nums">{formatUsdPerMile(usReference.reference.tireCostUsdPerVehicleMile)} <span className="text-sm font-normal text-muted-foreground">por vehículo-milla · {usReference.reference.costYear}</span></p>
         <p className="mt-2 text-sm text-muted-foreground">Estimación TTI para camiones comerciales estadounidenses. TTI partió de datos ATRI hasta 2023 y proyectó costos no combustible/no mano de obra para 2024; no es gasto observado de XBF ni un valor específico para drayage.</p>
         <p className="mt-2 text-xs text-amber-200">Sirve sólo para contrastar la magnitud de FTL Intra-EE. UU. tras verificar vehículo, ciclo y alcance. No se combina con el +6.4% de ATRI 2025, no se convierte a MXN ni entra a CVU, CFU o cotización.</p>
+      </div>
+
+      <div className="mt-5 rounded border border-amber-700/40 bg-amber-950/10 p-4" aria-labelledby="tire-cohort-contract-title">
+        <p className="text-xs font-semibold uppercase tracking-wide text-amber-200">Puerta de datos · antes de calibrar</p>
+        <h3 id="tire-cohort-contract-title" className="mt-1 font-semibold">Contrato de cohortes por segmento</h3>
+        <p className="mt-2 text-sm"><span className="font-semibold tabular-nums">{cohortAlignedCount} de {cohortContract.segments.length}</span> identificadores de bases coinciden con el expediente de llantas. Coincidir no significa tener ciclos, importes ni aprobación.</p>
+        <p className="mt-2 text-xs text-amber-200">El expediente v{cohortContract.cohortRecordSchemaVersion} sólo admite costos en {cohortContract.cohortCostCurrency}. Dos nombres históricos no tienen conversión automática; Intra-EE. UU. y Drayage EE. UU. tampoco admiten aún una captura USD. El benchmark TTI no resuelve ese contrato.</p>
+        <details className="mt-3 text-sm">
+          <summary className="min-h-11 cursor-pointer text-primary">Ver puerta de captura para los {cohortContract.segments.length} segmentos</summary>
+          <div className="grid gap-2 md:grid-cols-2">
+            {cohortContract.segments.map(item => (
+              <article key={item.id} data-cohort-contract-segment={item.id} className="rounded border bg-background/60 p-3">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <h4 className="text-sm font-semibold">{segmentLabels.get(item.id) ?? item.id}</h4>
+                  <span className="text-xs text-muted-foreground">{item.cohortIdAccepted ? 'ID coincide' : 'ID no admitido'}</span>
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">{item.nextRequirementEs}</p>
+              </article>
+            ))}
+          </div>
+        </details>
+        <p className="mt-2 text-xs text-muted-foreground">{cohortContract.adoptedParameterCount} parámetros adoptados · ninguna conversión, captura o publicación automática.</p>
       </div>
 
       <div className="mt-5 rounded border border-dashed p-4" aria-labelledby="tire-alternative-sources-title">

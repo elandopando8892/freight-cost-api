@@ -8,6 +8,7 @@ import imtReference from '../../../docs/FCM_TIRE_IMT_PT881_2025.json'
 import segmentMapping from '../../../docs/FCM_TIRE_IMT_SEGMENT_MAPPING_2026-09-28.json'
 import excludedSources from '../../../docs/FCM_TIRE_EXCLUDED_SEGMENT_SOURCES_2026-09-28.json'
 import usReference from '../../../docs/FCM_TIRE_TTI_US_REFERENCE_2026-09-28.json'
+import cohortContract from '../../../docs/FCM_TIRE_COHORT_SEGMENT_CONTRACT_2026-09-28.json'
 
 const segmentSource = readFileSync(resolve(process.cwd(), '../api/src/modules/cost-bases/operational-segments.ts'), 'utf8')
 const segmentEnum = segmentSource.match(/export const OperationalSegmentSchema = z\.enum\(\[([\s\S]*?)\]\)/)?.[1]
@@ -83,4 +84,18 @@ it('shows a sourced US absolute magnitude without adopting it or extrapolating A
   expect(usReference.governance.adoptedParameterCount).toBe(0)
   expect(usReference.governance.parameterWriteAllowed).toBe(false)
   expect(usReference.governance.quoteEligible).toBe(false)
+})
+
+it('makes the cohort contract gap visible without calling identifier alignment calibration', () => {
+  const html = renderToStaticMarkup(createElement(TirePublicResearch))
+  expect(html).toContain('4 de 9')
+  expect(html).toContain('sólo admite costos en')
+  expect(html).toContain('Dos nombres históricos no tienen conversión automática')
+  expect(cohortContract.segments.map(item => item.id).sort()).toEqual(governedIds.sort())
+  for (const segment of cohortContract.segments) {
+    expect(html).toContain(`data-cohort-contract-segment="${segment.id}"`)
+    expect(html).toContain(segment.nextRequirementEs)
+  }
+  expect(cohortContract.adoptedParameterCount).toBe(0)
+  expect(cohortContract.quoteEligible).toBe(false)
 })

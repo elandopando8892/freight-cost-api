@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "fcm.tire-cohort-segment-contract.v1",
+  "classification": "SCHEMA_AUDIT_NOT_CALIBRATION",
+  "reviewedOn": "2026-09-28",
+  "cohortRecordSchemaVersion": 1,
+  "cohortCostCurrency": "MXN",
+  "legacyCohortIdsWithoutAutomaticMapping": [
+    "D2D_MX_US_HANDOFF",
+    "D2D_BINATIONAL_SAME_COMPANY"
+  ],
+  "adoptedParameterCount": 0,
+  "quoteEligible": false,
+  "segments": [
+    {
+      "id": "D2D_BINATIONAL_OWN",
+      "status": "IDENTIFIER_MISMATCH",
+      "cohortIdAccepted": false,
+      "nextRequirementEs": "Definir tramos, propietario de llantas y moneda por costo antes de capturar; el identificador historico no se convierte automaticamente."
+    },
+    {
+      "id": "D2D_MX_US_PARTNER",
+      "status": "IDENTIFIER_MISMATCH",
+      "cohortIdAccepted": false,
+      "nextRequirementEs": "Separar llantas de la linea mexicana propia de la tarifa del socio estadounidense; no convertir el identificador historico por nombre."
+    },
+    {
+      "id": "D2D_US_MX_PARTNER",
+      "status": "IDENTIFIER_MISSING_PARTNER_BOUNDARY",
+      "cohortIdAccepted": false,
+      "nextRequirementEs": "Distinguir costo propio del tramo estadounidense y tarifa del socio mexicano; incorporar moneda y titularidad verificadas."
+    },
+    {
+      "id": "D2D_TRANSSHIPMENT",
+      "status": "IDENTIFIER_ACCEPTED_ONLY",
+      "cohortIdAccepted": true,
+      "nextRequirementEs": "El identificador coincide, pero el ciclo debe separar arrastre propio, maniobras y otros activos; exige evidencia real."
+    },
+    {
+      "id": "MX_DRAYAGE",
+      "status": "IDENTIFIER_ACCEPTED_ONLY",
+      "cohortIdAccepted": true,
+      "nextRequirementEs": "El identificador coincide, pero faltan ciclos cortos, gasto instalado y vida observada por posicion."
+    },
+    {
+      "id": "INTRA_MEX",
+      "status": "IDENTIFIER_ACCEPTED_ONLY",
+      "cohortIdAccepted": true,
+      "nextRequirementEs": "El identificador coincide, pero la cohorte requiere costo instalado y ciclos observados del equipo propio."
+    },
+    {
+      "id": "MX_LOCAL",
+      "status": "IDENTIFIER_ACCEPTED_ONLY",
+      "cohortIdAccepted": true,
+      "nextRequirementEs": "El identificador coincide; verificar tipo de activo y ciclo local, pues el esquema actual solo admite tractor o remolque."
+    },
+    {
+      "id": "INTRA_US",
+      "status": "IDENTIFIER_AND_USD_MISSING",
+      "cohortIdAccepted": false,
+      "nextRequirementEs": "Crear captura con identificador canonico y USD con linaje de moneda; no convertir la referencia TTI a MXN sin fecha y fuente FX."
+    },
+    {
+      "id": "US_DRAYAGE",
+      "status": "IDENTIFIER_AND_USD_MISSING",
+      "cohortIdAccepted": false,
+      "nextRequirementEs": "Crear captura USD y ciclo puerto/chasis separado; el benchmark agregado TTI no es costo de drayage."
+    }
+  ]
+}
