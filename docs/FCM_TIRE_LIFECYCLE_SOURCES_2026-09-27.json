@@ -103,5 +103,14 @@
     "Installed retread price and observed retread life by stage",
     "Terminal casing credit or disposal cost",
     "Documented quantity by actual tractor and trailer configuration"
+  ],
+  "missingTargetEvidenceEs": [
+    "Producto y compatibilidad aprobados por posición: dirección, tracción y remolque",
+    "Costo entregado e instalado con IVA, flete, montaje, balanceo y disposición",
+    "Kilómetros observados de primera vida por posición y segmento operativo",
+    "Inspección de carcasa y tasa de aceptación por cada etapa de renovado",
+    "Precio instalado y vida observada del renovado por etapa",
+    "Valor residual de la carcasa o costo de disposición final",
+    "Cantidad documentada según configuración real de tracto y remolque"
   ]
 }

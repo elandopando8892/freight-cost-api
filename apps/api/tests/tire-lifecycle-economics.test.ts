@@ -87,6 +87,7 @@ describe('tire lifecycle economics', () => {
     expect(observations.length).toBeGreaterThan(0)
     expect(observations.every((row: { adoptionStatus: string }) => row.adoptionStatus === 'BLOCKED')).toBe(true)
     expect(pack.governance.adoptedParameterCount).toBe(0)
+    expect(pack.missingTargetEvidenceEs).toHaveLength(pack.missingTargetEvidence.length)
     expect(pack.identityDiscrepancies).toHaveLength(2)
     expect(pack.identityDiscrepancies.every((row: { status: string }) => row.status === 'UNRESOLVED')).toBe(true)
   })

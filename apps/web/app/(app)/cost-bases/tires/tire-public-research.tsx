@@ -53,9 +53,9 @@ export function TirePublicResearch() {
         <h3 className="text-sm font-semibold">Qué falta para abrir un expediente de calibración</h3>
         <p className="mt-1 text-sm text-muted-foreground">La metodología exige ciclos completos y comparables. Hoy no hay un costo por kilómetro defendible ni una cohorte lista para revisión económica.</p>
         <details className="mt-3 text-sm">
-          <summary className="min-h-11 cursor-pointer text-primary">Ver las {research.missingTargetEvidence.length} evidencias pendientes</summary>
+          <summary className="min-h-11 cursor-pointer text-primary">Ver las {research.missingTargetEvidenceEs.length} evidencias pendientes</summary>
           <ol className="mt-2 grid list-decimal gap-1 pl-5 text-muted-foreground sm:grid-cols-2 sm:gap-x-8">
-            {research.missingTargetEvidence.map(item => <li key={item}>{item}</li>)}
+            {research.missingTargetEvidenceEs.map(item => <li key={item}>{item}</li>)}
           </ol>
         </details>
       </div>
