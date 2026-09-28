@@ -24,4 +24,14 @@ La clasificación `CONDITIONAL_MX_INTERURBAN` es una invitación a comprobar, no
 
 ## Validación y rollback
 
-La prueba del panel verifica que el mapa cubre exactamente los nueve IDs del catálogo actual, sin duplicados, que la UI los muestra y que la referencia no es elegible para cotización. La compilación y evidencia de preview se añaden al ejecutarlas. El cambio sólo agrega un JSON de investigación y presentación del servidor; retirar esa sección y el archivo restituye el panel anterior sin transformar datos persistidos.
+La prueba del panel verifica que el mapa cubre exactamente los nueve IDs del catálogo actual, sin duplicados, que la UI los muestra y que la referencia no es elegible para cotización. Pasaron nueve pruebas focalizadas y `npm run build -w freight-cost-web`. El cambio sólo agrega un JSON de investigación y presentación del servidor; retirar esa sección y el archivo restituye el panel anterior sin transformar datos persistidos.
+
+El primer build remoto (`dpl_4eH8E8aNcBEkoMgFXKvG5mF8madg`) falló porque una prueba web importaba el módulo de la API y Vercel no disponía allí de los tipos Prisma generados. La prueba ahora lee sólo el inventario textual de IDs; la API no se incluye en el grafo web. Un segundo build remoto terminó `READY`.
+
+## Evidencia de preview
+
+- Frontend: https://freight-cost-6op2vdgiy-elandopando8892s-projects.vercel.app/cost-bases/tires, deployment `dpl_72neFNyVW7XcvVz2uvALu9aaB4fr`, `READY`, SHA funcional `55bb6834547046b6eb27f9067a95da92c52f3542`. Sólo preview; no promoción a producción.
+- API aislada existente: `/health` HTTP 200, release `192f8577a8442d407c61b907e37c4decd40a0a01`. No se desplegó ni modificó la API, su base, Auth o los datos. El par web/API no comparte SHA porque este cambio es sólo de presentación e investigación.
+- OAuth Google con OPERATOR existente completó en el nuevo origen. La ruta mostró cuatro alcances condicionados, cinco exclusiones, cero parámetros adoptados y cero expedientes; se desplegaron las seis comprobaciones. La recarga conservó el acceso. Esto no valida renuevo de token a largo plazo ni costeo/cotización.
+- Capturas: `D:\andre\apps\codex-home\visualizations\2026\08\26\01a03cbb-7378-7dc0-9dd0-24077f169b51\tire-imt-segment-map-preview.png` (escritorio) y `tire-imt-segment-map-mobile.png` (viewport temporal de 390 px, restaurado después).
+- El build remoto volvió a reportar 13 avisos de vulnerabilidades en el árbol npm completo (2 low, 4 moderate, 6 high, 1 critical). No cambió ninguna dependencia ni se ejecutó `npm audit fix`.
