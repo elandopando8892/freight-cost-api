@@ -27,3 +27,11 @@ El costo agregado del vehículo no revela vida útil por posición, aceptación 
 ## Verificación y rollback
 
 El PDF y sus tablas se confrontaron con el registro JSON y coincidió el SHA-256. Pasaron 8 pruebas focalizadas (7 del workbench y 1 nueva que comprueba la presentación, unidades, fuente y no adopción). `npm run build -w freight-cost-web` compiló el frontend. La UI sólo lee ese registro, sin DB ni migración. Revertir el bloque de referencia y el archivo versionado devuelve la pantalla previa; no hay datos de usuario que transformar. La revisión visual y el estado de despliegue se registran después de ejecutarse.
+
+## Preview y límites de aceptación
+
+- Frontend de revisión: https://freight-cost-ixrj0wy81-elandopando8892s-projects.vercel.app/cost-bases/tires, deployment `dpl_9n22D8ag2kXvugRjJy2zuKpKCcyH`, `READY`, SHA funcional `2fddfb92867a5b9b377e58e16a1d0a47807c8d98`, sin promoción a producción.
+- API existente y sin cambios: https://freight-cost-p6i5zd05x-elandopando8892s-projects.vercel.app, `/health` HTTP 200 y release `192f8577a8442d407c61b907e37c4decd40a0a01`. La revisión es web-only porque la API no cambió y no se obtuvo de forma segura la credencial de su base exclusiva para redeplegarla; por tanto el par no comparte SHA en este incremento.
+- En navegador, OAuth Google con un OPERATOR existente regresó al mismo origen del nuevo preview; se abrió `/cost-bases/tires`, se observaron las tres cifras, `0 parámetros adoptados`, `0 expedientes` y el mensaje de que ninguna cifra entra al motor. La recarga conservó la sesión y la pantalla. Esto comprueba acceso autenticado de esta ruta, no renuevo de token a largo plazo, cálculos ni aceptación productiva.
+- Captura visual: `D:\andre\apps\codex-home\visualizations\2026\08\26\01a03cbb-7378-7dc0-9dd0-24077f169b51\tire-imt-benchmark-preview.png`.
+- El build de Vercel reportó 13 avisos de vulnerabilidades en el árbol npm completo (2 low, 4 moderate, 6 high, 1 critical), sin cambio de dependencias en este sprint. Se requiere triage aparte; no se ejecutó `npm audit fix` ni se alteró el lockfile.
