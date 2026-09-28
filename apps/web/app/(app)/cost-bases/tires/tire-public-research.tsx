@@ -1,6 +1,7 @@
 import { ExternalLink } from 'lucide-react'
 import research from '../../../../../../docs/FCM_TIRE_LIFECYCLE_SOURCES_2026-09-27.json'
 import imtReference from '../../../../../../docs/FCM_TIRE_IMT_PT881_2025.json'
+import segmentMapping from '../../../../../../docs/FCM_TIRE_IMT_SEGMENT_MAPPING_2026-09-28.json'
 
 const formatMxn = (value: number) => new Intl.NumberFormat('es-MX', {
   style: 'currency', currency: 'MXN', maximumFractionDigits: 2,
@@ -17,6 +18,8 @@ export function TirePublicResearch() {
   const [steer, drive] = research.newTirePriceObservations
   const retread = research.retreadPriceObservations[0]
   const discrepancy = research.identityDiscrepancies
+  const conditionalSegments = segmentMapping.segments.filter(item => item.mode === 'CONDITIONAL_MX_INTERURBAN')
+  const excludedSegments = segmentMapping.segments.filter(item => item.mode === 'NO_DIRECT_COMPARISON')
 
   return (
     <section id="tire-public-research" className="rounded-lg border bg-card p-5" aria-labelledby="tire-public-research-title">
@@ -85,6 +88,40 @@ export function TirePublicResearch() {
             <p className="break-all sm:col-span-2">SHA-256 del PDF verificado: {imtReference.source.pdfSha256}</p>
           </div>
         </details>
+      </div>
+
+      <div className="mt-5 rounded border p-4" aria-labelledby="tire-imt-segment-title">
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-primary">Mapa de comparabilidad · COST_TIRES</p>
+            <h3 id="tire-imt-segment-title" className="mt-1 font-semibold">¿Dónde sirve el contraste IMT?</h3>
+          </div>
+          <span className="rounded-full border px-2.5 py-1 text-xs text-muted-foreground">{segmentMapping.adoptedParameterCount} parámetros adoptados</span>
+        </div>
+        <p className="mt-2 text-sm text-muted-foreground">La referencia es por vehículo-km interurbano mexicano, no por llanta individual ni por tarifa contratada. Estos son alcances posibles, no bases calibradas.</p>
+        <h4 className="mt-4 text-sm font-semibold">Contraste condicionado · sólo tramo MX comparable</h4>
+        <div className="mt-2 grid gap-2 md:grid-cols-2">
+          {conditionalSegments.map(item => (
+            <article key={item.id} data-segment-id={item.id} className="rounded border border-sky-800/40 bg-sky-950/10 p-3">
+              <h5 className="text-sm font-semibold">{item.label}</h5>
+              <p className="mt-1 text-sm">{item.sliceEs}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{item.limitEs}</p>
+            </article>
+          ))}
+        </div>
+        <h4 className="mt-4 text-sm font-semibold">Sin comparación directa</h4>
+        <div className="mt-2 grid gap-2 md:grid-cols-2">
+          {excludedSegments.map(item => (
+            <p key={item.id} data-segment-id={item.id} className="rounded border p-2 text-xs"><span className="font-semibold">{item.label}:</span> {item.limitEs}</p>
+          ))}
+        </div>
+        <details className="mt-3 text-sm">
+          <summary className="min-h-11 cursor-pointer text-primary">Ver 6 verificaciones antes de contrastar CVU</summary>
+          <ol className="grid list-decimal gap-1 rounded border p-3 pl-7 text-xs text-muted-foreground md:grid-cols-2 md:gap-x-8">
+            {segmentMapping.requiredChecksEs.map(item => <li key={item}>{item}</li>)}
+          </ol>
+        </details>
+        <p className="mt-2 text-xs text-amber-200">Sin conversión automática de segmentos históricos de cohortes. Ningún costo del IMT entra a CVU, CFU o cotización.</p>
       </div>
 
       <div className="mt-5 rounded border border-dashed p-4">

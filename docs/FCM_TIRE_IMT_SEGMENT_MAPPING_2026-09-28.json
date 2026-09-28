@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "fcm.tire-imt-segment-mapping.v1",
+  "reference": "FCM_TIRE_IMT_PT881_2025.json",
+  "classification": "RESEARCH_ONLY",
+  "adoptedParameterCount": 0,
+  "quoteEligible": false,
+  "requiredChecksEs": [
+    "Identificar el tramo mexicano interurbano separado del cruce, transbordo y tramo estadounidense.",
+    "Confirmar quién opera y paga las llantas de ese vehículo; un costo propio no sustituye la tarifa de un socio.",
+    "Conciliar configuración y número de llantas con T3-S3, T3-S2 o T3-S2-R4 de la tabla oficial.",
+    "Contrastar especificación 1100-20.00, carga y condiciones de carretera con el vehículo real.",
+    "Alinear año de precios 2025 y unidad MXN por vehículo-km antes de comparar con un CVU.",
+    "Obtener costo instalado y ciclos observados por posición si se pretende calibrar COST_TIRES de XBF."
+  ],
+  "segments": [
+    {
+      "id": "INTRA_MEX",
+      "label": "FTL Intra-México",
+      "mode": "CONDITIONAL_MX_INTERURBAN",
+      "sliceEs": "Viaje mexicano interurbano con equipo propio.",
+      "limitEs": "Sólo contraste del costo de llantas del vehículo completo; verificar configuración y condiciones."
+    },
+    {
+      "id": "D2D_BINATIONAL_OWN",
+      "label": "D2D · operación propia MX/EE. UU.",
+      "mode": "CONDITIONAL_MX_INTERURBAN",
+      "sliceEs": "Únicamente el tramo mexicano interurbano operado con equipo propio.",
+      "limitEs": "Separar distancias y costos MX/US; no aplicar al cruce ni al tramo estadounidense."
+    },
+    {
+      "id": "D2D_MX_US_PARTNER",
+      "label": "D2D · línea mexicana y socio estadounidense",
+      "mode": "CONDITIONAL_MX_INTERURBAN",
+      "sliceEs": "Tramo mexicano interurbano sólo si el vehículo y las llantas son costo propio.",
+      "limitEs": "No sustituye la tarifa ni el costo pactado del socio estadounidense."
+    },
+    {
+      "id": "D2D_TRANSSHIPMENT",
+      "label": "D2D · transbordo",
+      "mode": "CONDITIONAL_MX_INTERURBAN",
+      "sliceEs": "Tramo mexicano interurbano de arrastre, si está separado y se conoce su operador.",
+      "limitEs": "No cubre maniobras, patio, almacén, espera ni otros vehículos del transbordo."
+    },
+    {
+      "id": "D2D_US_MX_PARTNER",
+      "label": "D2D · línea estadounidense y socio mexicano",
+      "mode": "NO_DIRECT_COMPARISON",
+      "sliceEs": "El tramo mexicano queda bajo un socio, no bajo un costo propio verificado.",
+      "limitEs": "El costo modelado por IMT no equivale a la tarifa contratada del socio."
+    },
+    {
+      "id": "MX_DRAYAGE",
+      "label": "Drayage México",
+      "mode": "NO_DIRECT_COMPARISON",
+      "sliceEs": "Ciclos cortos y maniobras mexicanos.",
+      "limitEs": "No son el vehículo interurbano cargado a capacidad límite que modela el IMT."
+    },
+    {
+      "id": "MX_LOCAL",
+      "label": "Locales México",
+      "mode": "NO_DIRECT_COMPARISON",
+      "sliceEs": "Reparto o movimiento local mexicano.",
+      "limitEs": "Perfil de viaje, velocidad y vehículo pueden diferir del modelo interurbano."
+    },
+    {
+      "id": "INTRA_US",
+      "label": "FTL Intra-EE. UU.",
+      "mode": "NO_DIRECT_COMPARISON",
+      "sliceEs": "Viaje doméstico estadounidense.",
+      "limitEs": "La referencia usa precios, vehículos y operación mexicanos."
+    },
+    {
+      "id": "US_DRAYAGE",
+      "label": "Drayage EE. UU.",
+      "mode": "NO_DIRECT_COMPARISON",
+      "sliceEs": "Ciclo portuario/intermodal estadounidense.",
+      "limitEs": "Difieren geografía, ciclo, activos y estructura de costos."
+    }
+  ],
+  "unresolvedSchemaDifference": "TireCohortRecordSchema usa D2D_MX_US_HANDOFF y D2D_BINATIONAL_SAME_COMPANY mientras las bases actuales usan D2D_MX_US_PARTNER y D2D_BINATIONAL_OWN. No hay conversión automática ni cohortes persistidas para este mapa."
+}
