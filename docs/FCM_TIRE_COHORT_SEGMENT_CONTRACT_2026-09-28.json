@@ -15,13 +15,13 @@
       "id": "D2D_BINATIONAL_OWN",
       "status": "IDENTIFIER_MISMATCH",
       "cohortIdAccepted": false,
-      "nextRequirementEs": "Definir tramos, propietario de llantas y moneda por costo antes de capturar; el identificador historico no se convierte automaticamente."
+      "nextRequirementEs": "Definir tramos, propietario de llantas y moneda por costo antes de capturar; el identificador histórico no se convierte automáticamente."
     },
     {
       "id": "D2D_MX_US_PARTNER",
       "status": "IDENTIFIER_MISMATCH",
       "cohortIdAccepted": false,
-      "nextRequirementEs": "Separar llantas de la linea mexicana propia de la tarifa del socio estadounidense; no convertir el identificador historico por nombre."
+      "nextRequirementEs": "Separar llantas de la línea mexicana propia de la tarifa del socio estadounidense; no convertir el identificador histórico por nombre."
     },
     {
       "id": "D2D_US_MX_PARTNER",
@@ -39,7 +39,7 @@
       "id": "MX_DRAYAGE",
       "status": "IDENTIFIER_ACCEPTED_ONLY",
       "cohortIdAccepted": true,
-      "nextRequirementEs": "El identificador coincide, pero faltan ciclos cortos, gasto instalado y vida observada por posicion."
+      "nextRequirementEs": "El identificador coincide, pero faltan ciclos cortos, gasto instalado y vida observada por posición."
     },
     {
       "id": "INTRA_MEX",
@@ -51,13 +51,13 @@
       "id": "MX_LOCAL",
       "status": "IDENTIFIER_ACCEPTED_ONLY",
       "cohortIdAccepted": true,
-      "nextRequirementEs": "El identificador coincide; verificar tipo de activo y ciclo local, pues el esquema actual solo admite tractor o remolque."
+      "nextRequirementEs": "El identificador coincide; verificar tipo de activo y ciclo local, pues el esquema actual sólo admite tractor o remolque."
     },
     {
       "id": "INTRA_US",
       "status": "IDENTIFIER_AND_USD_MISSING",
       "cohortIdAccepted": false,
-      "nextRequirementEs": "Crear captura con identificador canonico y USD con linaje de moneda; no convertir la referencia TTI a MXN sin fecha y fuente FX."
+      "nextRequirementEs": "Crear captura con identificador canónico y USD con linaje de moneda; no convertir la referencia TTI a MXN sin fecha y fuente FX."
     },
     {
       "id": "US_DRAYAGE",
