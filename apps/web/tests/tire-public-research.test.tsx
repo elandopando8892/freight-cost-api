@@ -1,10 +1,16 @@
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { expect, it } from 'vitest'
 import { TirePublicResearch } from '../app/(app)/cost-bases/tires/tire-public-research'
 import imtReference from '../../../docs/FCM_TIRE_IMT_PT881_2025.json'
 import segmentMapping from '../../../docs/FCM_TIRE_IMT_SEGMENT_MAPPING_2026-09-28.json'
-import { OPERATIONAL_SEGMENTS } from '../../api/src/modules/cost-bases/operational-segments'
+
+const segmentSource = readFileSync(resolve(process.cwd(), '../api/src/modules/cost-bases/operational-segments.ts'), 'utf8')
+const segmentEnum = segmentSource.match(/export const OperationalSegmentSchema = z\.enum\(\[([\s\S]*?)\]\)/)?.[1]
+if (!segmentEnum) throw new Error('Operational segment inventory was not found')
+const governedIds = [...segmentEnum.matchAll(/'([A-Z0-9_]+)'/g)].map(match => match[1])
 
 it('shows the official tire model as a non-adopted comparison with traceable units', () => {
   const html = renderToStaticMarkup(createElement(TirePublicResearch))
@@ -28,7 +34,7 @@ it('covers each governed segment once without promoting the IMT model into CVU o
   const html = renderToStaticMarkup(createElement(TirePublicResearch))
   const mappedIds = segmentMapping.segments.map(item => item.id)
   expect(new Set(mappedIds).size).toBe(mappedIds.length)
-  expect([...mappedIds].sort()).toEqual(OPERATIONAL_SEGMENTS.map(item => item.id).sort())
+  expect([...mappedIds].sort()).toEqual(governedIds.sort())
   expect(segmentMapping.segments.filter(item => item.mode === 'CONDITIONAL_MX_INTERURBAN')).toHaveLength(4)
   expect(segmentMapping.segments.filter(item => item.mode === 'NO_DIRECT_COMPARISON')).toHaveLength(5)
   expect(segmentMapping.requiredChecksEs).toHaveLength(6)
