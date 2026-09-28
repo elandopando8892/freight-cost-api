@@ -16,6 +16,7 @@
     "db:validate": "prisma validate --schema prisma/schema.prisma",
     "db:status": "prisma migrate status --schema prisma/schema.prisma",
     "preflight:release": "tsx scripts/release-preflight.ts",
+    "verify:preview-pair": "tsx scripts/verify-preview-pair.ts",
     "db:generate": "prisma generate",
     "test": "vitest run",
     "test:watch": "vitest",
