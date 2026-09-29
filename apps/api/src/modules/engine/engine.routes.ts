@@ -111,7 +111,7 @@ export async function engineRoutes(app: FastifyInstance) {
     }).strict(),
   }).strict()
 
-  app.post('/engine/compare-observed-cost', async (request, reply) => {
+  app.post('/engine/compare-observed-cost', { preHandler: requireRole('ADMIN', 'OPERATOR') }, async (request, reply) => {
     reply.header('Cache-Control', 'no-store')
     const { orgId } = request.user as JwtPayload
     const body = EconomicComparisonSchema.parse(request.body)
@@ -133,7 +133,7 @@ export async function engineRoutes(app: FastifyInstance) {
     return reply.send(compareObservedTripCosts(parsedSegment.data, calculateForQuoteSnapshot(snapshot), body.observed))
   })
 
-  app.post('/engine/calculate', async (request, reply) => {
+  app.post('/engine/calculate', { preHandler: requireRole('ADMIN', 'OPERATOR') }, async (request, reply) => {
     const { orgId } = request.user as JwtPayload
     const body = CalculateSchema.parse(request.body)
 
@@ -215,7 +215,7 @@ export async function engineRoutes(app: FastifyInstance) {
     fxRate: z.number().positive().optional(),
   })
 
-  app.post('/engine/quote-by-route', async (request, reply) => {
+  app.post('/engine/quote-by-route', { preHandler: requireRole('ADMIN', 'OPERATOR') }, async (request, reply) => {
     reply.header('Cache-Control', 'no-store')
     const { orgId } = request.user as JwtPayload
     const body = ByRouteSchema.parse(request.body)

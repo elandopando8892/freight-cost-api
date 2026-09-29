@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import Fastify, { type FastifyInstance } from 'fastify'
 import { errorHandler } from '../src/middleware/error-handler.js'
 
-const auth = vi.hoisted(() => ({ orgId: 'org-1', role: 'VIEWER' }))
+const auth = vi.hoisted(() => ({ orgId: 'org-1', role: 'OPERATOR' as 'ADMIN' | 'OPERATOR' | 'VIEWER' }))
 vi.mock('../src/middleware/authenticate.js', () => ({
   authenticate: async (request: { user?: unknown }) => {
     request.user = { sub: 'viewer-1', orgId: auth.orgId, role: auth.role }
@@ -27,6 +27,7 @@ describe('server-issued route calculation preview', () => {
   beforeEach(async () => {
     vi.clearAllMocks()
     auth.orgId = 'org-1'
+    auth.role = 'OPERATOR'
     vi.mocked(resolveRoute).mockResolvedValue({
       mexLeg: { baseKm: 225, routeExpensesMxn: 0, baseHours: 0, returnKm: 240, returnLoaded: false,
         operation: 'D2D Export', service: 'One Way', route: 'Straight & Danger', equipment },
@@ -69,4 +70,18 @@ describe('server-issued route calculation preview', () => {
     expect(response.statusCode).toBe(422)
     expect(prisma.quoteCalculationPreview.create).not.toHaveBeenCalled()
   })
+
+  it.each(['/engine/quote-by-route', '/engine/calculate', '/engine/compare-observed-cost'])(
+    'rejects VIEWER from %s before calculation or preview writes', async url => {
+      auth.role = 'VIEWER'
+      const response = await app.inject({ method: 'POST', url, payload: {
+        outboundLocation: 'Monterrey', inboundLocation: 'Dallas', operation: 'D2D Export', equipment,
+      } })
+      expect(response.statusCode).toBe(403)
+      expect(response.json()).toMatchObject({ error: 'Forbidden' })
+      expect(resolveRoute).not.toHaveBeenCalled()
+      expect(resolveCalculationContext).not.toHaveBeenCalled()
+      expect(prisma.quoteCalculationPreview.create).not.toHaveBeenCalled()
+    },
+  )
 })

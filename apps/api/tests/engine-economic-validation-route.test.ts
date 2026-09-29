@@ -6,7 +6,7 @@ import { buildQuoteCalculationSnapshot } from '../src/modules/quotes/quote-snaps
 
 vi.mock('../src/middleware/authenticate.js', () => ({
   authenticate: async (request: { user?: unknown }) => {
-    request.user = { sub: 'viewer-1', orgId: 'org-1', role: 'VIEWER' }
+    request.user = { sub: 'operator-1', orgId: 'org-1', role: 'OPERATOR' }
   },
 }))
 vi.mock('../src/config/prisma.js', () => ({ prisma: {

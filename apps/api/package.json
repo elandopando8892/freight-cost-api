@@ -17,6 +17,7 @@
     "db:status": "prisma migrate status --schema prisma/schema.prisma",
     "preflight:release": "tsx scripts/release-preflight.ts",
     "verify:preview-pair": "tsx scripts/verify-preview-pair.ts",
+    "audit:c1:quote-readiness": "tsx scripts/audit-c1-quote-readiness.ts",
     "db:generate": "prisma generate",
     "test": "vitest run",
     "test:watch": "vitest",
