@@ -94,6 +94,16 @@ function httpError(message: string, statusCode: number) {
   return Object.assign(new Error(message), { statusCode })
 }
 
+async function quoteOr404<T>(query: Promise<T>): Promise<T> {
+  try { return await query }
+  catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      throw httpError('La cotización no está disponible.', 404)
+    }
+    throw error
+  }
+}
+
 type QuoteLaneContext = {
   costBaseId: string | null
   operationType: string
@@ -384,7 +394,7 @@ export async function quotesRoutes(app: FastifyInstance) {
   app.get('/quotes/:id', async (request) => {
     const { orgId } = request.user as JwtPayload
     const { id } = request.params as { id: string }
-    return prisma.quote.findFirstOrThrow({
+    return quoteOr404(prisma.quote.findFirstOrThrow({
       where: { id, orgId },
       include: {
         lane: { include: { equipment: true } },
@@ -394,7 +404,7 @@ export async function quotesRoutes(app: FastifyInstance) {
         confirmedBy: { select: { id: true, email: true } },
         auditEvents: { include: { actor: { select: { id: true, email: true } } }, orderBy: { createdAt: 'asc' } },
       },
-    })
+    }))
   })
 
   app.post('/quotes/:id/customer-proposal-draft/preview', { preHandler: requireRole('ADMIN', 'OPERATOR') }, async (request, reply) => {
@@ -433,7 +443,7 @@ export async function quotesRoutes(app: FastifyInstance) {
   app.post('/quotes/:id/replay', async (request, reply) => {
     const { orgId } = request.user as JwtPayload
     const { id } = request.params as { id: string }
-    const quote = await prisma.quote.findFirstOrThrow({ where: { id, orgId }, select: { explanation: true } })
+    const quote = await quoteOr404(prisma.quote.findFirstOrThrow({ where: { id, orgId }, select: { explanation: true } }))
     const explanation = quote.explanation as { snapshot?: unknown } | null
     if (!isQuoteCalculationSnapshot(explanation?.snapshot)) {
       return reply.status(409).send({ error: 'This historical quote does not have a reproducible calculation snapshot.' })
@@ -445,7 +455,7 @@ export async function quotesRoutes(app: FastifyInstance) {
     const user = request.user as JwtPayload
     const { id } = request.params as { id: string }
     const { note } = ConfirmQuoteSchema.parse(request.body)
-    const quote = await prisma.quote.findFirstOrThrow({ where: { id, orgId: user.orgId }, select: { id: true, status: true, explanation: true } })
+    const quote = await quoteOr404(prisma.quote.findFirstOrThrow({ where: { id, orgId: user.orgId }, select: { id: true, status: true, explanation: true } }))
     if (quote.status !== 'DRAFT') throw Object.assign(new Error('Only a draft quote can be confirmed.'), { statusCode: 409 })
     const eligibility = confirmationEligibility(quote.explanation)
     if (!eligibility.eligible) throw Object.assign(new Error(`Quote cannot be confirmed: ${eligibility.reasons.join(' ')}`), { statusCode: 422 })
@@ -478,7 +488,7 @@ export async function quotesRoutes(app: FastifyInstance) {
   app.get('/integration/rateware/quotes/:id', async (request) => {
     const { orgId } = request.user as JwtPayload
     const { id } = request.params as { id: string }
-    const quote = await prisma.quote.findFirstOrThrow({
+    const quote = await quoteOr404(prisma.quote.findFirstOrThrow({
       where: { id, orgId },
       include: {
         lane: { select: { origin: true, destination: true } },
@@ -486,7 +496,7 @@ export async function quotesRoutes(app: FastifyInstance) {
         confirmedBy: { select: { id: true, email: true } },
         auditEvents: { where: { action: 'RATEWARE_ENRICHED' }, orderBy: { createdAt: 'desc' }, take: 1, select: { payload: true } },
       },
-    })
+    }))
     if (quote.status !== 'CONFIRMED') throw Object.assign(new Error('Only confirmed quotes can be packaged for Rateware.'), { statusCode: 409 })
     const eligibility = confirmationEligibility(quote.explanation)
     const handoff = eligibility.snapshot
@@ -558,7 +568,7 @@ export async function quotesRoutes(app: FastifyInstance) {
     const user = request.user as JwtPayload
     const { id } = request.params as { id: string }
     const enrichment = RatewareEnrichmentSchema.parse(request.body)
-    const quote = await prisma.quote.findFirstOrThrow({ where: { id, orgId: user.orgId }, select: { id: true, status: true, explanation: true } })
+    const quote = await quoteOr404(prisma.quote.findFirstOrThrow({ where: { id, orgId: user.orgId }, select: { id: true, status: true, explanation: true } }))
     if (quote.status !== 'CONFIRMED') throw Object.assign(new Error('Only confirmed quotes can be enriched for Rateware.'), { statusCode: 409 })
     if (!confirmationEligibility(quote.explanation).eligible) throw Object.assign(new Error('Quote evidence is not eligible for Rateware enrichment.'), { statusCode: 409 })
     return prisma.quoteAuditEvent.create({ data: { orgId: user.orgId, quoteId: id, actorId: user.sub, action: 'RATEWARE_ENRICHED', note: `Rateware enrichment recorded for ${enrichment.carrier}.`, payload: enrichment as Prisma.InputJsonValue }, include: { actor: { select: { id: true, email: true } } } })
@@ -567,7 +577,7 @@ export async function quotesRoutes(app: FastifyInstance) {
   app.delete('/quotes/:id', { preHandler: requireRole('ADMIN', 'OPERATOR') }, async (request, reply) => {
     const { orgId } = request.user as JwtPayload
     const { id } = request.params as { id: string }
-    await prisma.quote.findFirstOrThrow({ where: { id, orgId } })
+    await quoteOr404(prisma.quote.findFirstOrThrow({ where: { id, orgId } }))
     await prisma.quote.delete({ where: { id } })
     return reply.status(204).send()
   })

@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import Fastify, { type FastifyInstance } from 'fastify'
+import { Prisma } from '@prisma/client'
 import { calculate } from '../src/modules/engine/engine.calculator.js'
 import { buildQuoteCalculationSnapshot } from '../src/modules/quotes/quote-snapshot.js'
 import { errorHandler } from '../src/middleware/error-handler.js'
@@ -12,7 +13,8 @@ vi.mock('../src/middleware/authenticate.js', () => ({
 }))
 vi.mock('../src/config/prisma.js', () => ({
   prisma: {
-    quote: { create: vi.fn(), findFirstOrThrow: vi.fn() },
+    quote: { create: vi.fn(), findFirstOrThrow: vi.fn(), updateMany: vi.fn(), delete: vi.fn() },
+    quoteAuditEvent: { create: vi.fn() },
     quoteSaveIntent: { findUnique: vi.fn(), create: vi.fn() },
     quoteCalculationPreview: { findFirst: vi.fn() },
     assumptionSet: { findFirst: vi.fn() },
@@ -80,7 +82,7 @@ describe('saving a reviewed server preview', () => {
     })
     vi.mocked(prisma.quote.findFirstOrThrow).mockImplementation(async (args) => {
       if (saved && args?.where?.id === saved.id && args?.where?.orgId === saved.orgId) return saved as never
-      throw new Error('Quote not found')
+      throw new Prisma.PrismaClientKnownRequestError('Quote not found', { code: 'P2025', clientVersion: '5.14.0' })
     })
     vi.mocked(prisma.quoteSaveIntent.create).mockImplementation(async (args) => {
       intents.set(args.data.key, { intentHash: args.data.intentHash, quote: saved! })
@@ -124,6 +126,43 @@ describe('saving a reviewed server preview', () => {
     const replay = await app.inject({ method: 'POST', url: `/quotes/${id}/replay` })
     expect(replay.statusCode).toBe(200)
     expect(replay.json()).toMatchObject({ reproducible: true, checksumMatches: true, outputMatches: true })
+  })
+
+  it('returns the same 404 for foreign and missing quote routes before any write', async () => {
+    const created = await send()
+    const id = created.json().id as string
+    const routes = [
+      (quoteId: string) => app.inject({ method: 'GET', url: `/quotes/${quoteId}` }),
+      (quoteId: string) => app.inject({ method: 'POST', url: `/quotes/${quoteId}/replay` }),
+      (quoteId: string) => app.inject({ method: 'POST', url: `/quotes/${quoteId}/confirm`, payload: { note: 'Reviewed for test' } }),
+      (quoteId: string) => app.inject({ method: 'GET', url: `/integration/rateware/quotes/${quoteId}` }),
+      (quoteId: string) => app.inject({ method: 'POST', url: `/integration/rateware/quotes/${quoteId}/enrichment`,
+        payload: { carrier: 'Synthetic carrier', effectiveDate: '2026-09-22', rateOwner: 'Synthetic owner' } }),
+      (quoteId: string) => app.inject({ method: 'DELETE', url: `/quotes/${quoteId}` }),
+    ]
+    for (const route of routes) {
+      auth.orgId = 'org-2'
+      const foreign = await route(id)
+      auth.orgId = 'org-1'
+      const missing = await route('missing')
+      for (const response of [foreign, missing]) {
+        expect(response.statusCode).toBe(404)
+        expect(response.json()).toMatchObject({ error: 'La cotización no está disponible.' })
+      }
+      expect(foreign.json().error).toBe(missing.json().error)
+    }
+    expect(prisma.quote.findFirstOrThrow).toHaveBeenCalledWith(expect.objectContaining({ where: { id, orgId: 'org-2' } }))
+    expect(prisma.quote.create).toHaveBeenCalledTimes(1)
+    expect(prisma.quote.updateMany).not.toHaveBeenCalled()
+    expect(prisma.quote.delete).not.toHaveBeenCalled()
+    expect(prisma.quoteAuditEvent.create).not.toHaveBeenCalled()
+  })
+
+  it('does not disguise an unrelated storage failure as a missing quote', async () => {
+    vi.mocked(prisma.quote.findFirstOrThrow).mockRejectedValueOnce(new Error('synthetic storage failure'))
+    const response = await app.inject({ method: 'GET', url: '/quotes/missing' })
+    expect(response.statusCode).toBe(500)
+    expect(response.json()).toMatchObject({ error: 'Internal server error' })
   })
 
   it('rejects a changed label with the same idempotency key', async () => {
