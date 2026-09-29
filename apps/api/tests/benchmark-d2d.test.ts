@@ -69,12 +69,13 @@ describe('D2D benchmark assembly', () => {
 
 function sharedFixture() {
   const input = fixture()
-  const datum = (value: number, unit: string) => ({ value, unit, derivation: 'Synthetic only' })
+  const datum = (value: number, unit: string) => ({ value, unit, evidenceIds: ['test'], derivation: 'Synthetic only' })
   return { ...input, assetAllocation: 'SHARED_TRAILER',
     mx: { ...input.mx, parameters: { ...input.mx.parameters, assetCostScope: 'TRACTOR_ONLY' } },
     us: { ...input.us, parameters: { ...input.us.parameters, assetCostScope: 'TRACTOR_ONLY' } },
     sharedTrailer: { assetReference: 'SYNTHETIC-TRAILER', scopeDeclaration: 'LEG_INPUTS_EXCLUDE_ALL_TRAILER_COSTS',
       allocationEvidence: 'Synthetic tractor-only allocation, not verified operational evidence',
+      allocationEvidenceIds: ['test'],
       monthlyFixedUsd: datum(1000, 'USD/trailer-month'), productiveKmPerMonth: datum(10000, 'km/trailer-month'),
       productiveDaysPerMonth: datum(20, 'days/trailer-month'), maintenanceUsdPerKm: datum(0.1, 'USD/km'),
       tiresUsdPerKm: datum(0.05, 'USD/km'), totalKm: datum(240, 'km'), cycleDays: datum(2, 'days'),
@@ -83,6 +84,45 @@ function sharedFixture() {
 }
 
 describe('shared trailer D2D', () => {
+  it.each(['monthlyFixedUsd', 'productiveKmPerMonth', 'productiveDaysPerMonth', 'maintenanceUsdPerKm', 'tiresUsdPerKm', 'totalKm', 'cycleDays'] as const)('requires explicit references for %s even when its dossier exists', field => {
+    const input = sharedFixture()
+    input.sharedTrailer[field].evidenceIds = []
+    const result = calculateBenchmarkD2D(input)
+    expect(result.costs).toBeNull()
+    expect(result.issues).toContainEqual({ field: `sharedTrailer.${field}`, code: 'MISSING_EVIDENCE_REFERENCE' })
+  })
+  it.each(['missing-allocation', 'unknown-allocation', 'duplicate-allocation', 'unknown-input', 'duplicate-input'] as const)('blocks reference defect %s', mode => {
+    const input = sharedFixture()
+    if (mode === 'missing-allocation') input.sharedTrailer.allocationEvidenceIds = []
+    if (mode === 'unknown-allocation') input.sharedTrailer.allocationEvidenceIds = ['other']
+    if (mode === 'duplicate-allocation') input.sharedTrailer.allocationEvidenceIds = ['test', 'test']
+    if (mode === 'unknown-input') input.sharedTrailer.monthlyFixedUsd.evidenceIds = ['other']
+    if (mode === 'duplicate-input') input.sharedTrailer.monthlyFixedUsd.evidenceIds = ['test', 'test']
+    const result = calculateBenchmarkD2D(input)
+    expect(result.status).toBe('INCOMPLETE')
+    expect(result.costs).toBeNull()
+    expect(result.sharedTrailer!.calibrated).toBe(false)
+  })
+  it('reports legacy missing references as incomplete rather than inventing a link', () => {
+    const input = sharedFixture()
+    const { evidenceIds, ...legacyValue } = input.sharedTrailer.monthlyFixedUsd
+    const { allocationEvidenceIds, ...legacyTrailer } = input.sharedTrailer
+    const result = calculateBenchmarkD2D({ ...input, sharedTrailer: { ...legacyTrailer, monthlyFixedUsd: legacyValue } })
+    expect(result.costs).toBeNull()
+    expect(result.sharedTrailer!.evidenceCoverage.monthlyFixedUsd).toEqual([])
+    expect(result.sharedTrailer!.evidenceCoverage.allocationEvidence).toEqual([])
+  })
+  it('preserves individual source mappings without claiming source validation', () => {
+    const input = sharedFixture()
+    input.sharedTrailer.evidence = [...input.sharedTrailer.evidence, { ...input.sharedTrailer.evidence[0], id: 'tires-source' }]
+    input.sharedTrailer.tiresUsdPerKm.evidenceIds = ['tires-source']
+    const result = calculateBenchmarkD2D(input)
+    expect(result.status).toBe('BENCHMARK_ESTIMATE')
+    expect(result.sharedTrailer!.evidenceCoverage.tiresUsdPerKm).toEqual(['tires-source'])
+    expect(result.sharedTrailer!.evidenceCoverage.allocationEvidence).toEqual(['test'])
+    expect(Object.keys(result.sharedTrailer!.evidenceCoverage)).toHaveLength(8)
+    expect(result.sharedTrailer!.sourceStatus).toBe('DOCUMENTED_UNVERIFIED')
+  })
   it('allocates trailer fixed, maintenance and tires once and reconciles to cents', () => {
     const result = calculateBenchmarkD2D(sharedFixture())
     expect(result.status).toBe('BENCHMARK_ESTIMATE')

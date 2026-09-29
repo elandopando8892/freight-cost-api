@@ -1,5 +1,7 @@
 # D2D: remolque compartido, cálculo local
 
+Actualización: [referencias obligatorias por input y asignación](C1_SHARED_TRAILER_INPUT_EVIDENCE_2026-09-29.md). Amplía la trazabilidad del dossier descrita en este documento.
+
 Inicio: `65bf934d938a83dc6262c334f9e97dddb414e378`, rama `codex/cost-tires-release-s14`, worktree `D:\andre\worktrees\freight-cost-model\cost-tires-release-20260927`, limpio al inicio. Modelo recomendado para implementación y revisión matemática: Astra, esfuerzo alto. No se cambió el selector de modelo.
 
 ## Resultado
