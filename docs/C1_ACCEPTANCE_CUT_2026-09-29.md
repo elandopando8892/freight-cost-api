@@ -21,6 +21,8 @@ Validación: API 659 PASS, 25 SKIP al excluir la suite que exige PostgreSQL dese
 
 `npm run audit:c1:quote-readiness -w freight-cost-api` consulta únicamente el proyecto Neon staging verificado `broad-art-99750179/neondb`, usando una transacción READ ONLY. Resultado 2026-09-29 03:54 UTC: `XBF-XB-PILOT` está ACTIVE/default, pero su única versión v1 está PUBLISHED/active **sin applicabilityContext**. `targetCandidateForNewCalculation=false`, salida 1. La API rechaza por diseño el cálculo nuevo sobre esa versión con 409; un login exitoso no cerraría A3. La consulta no valida valores económicos, compatibilidad completa del perfil ni el resultado de una cotización.
 
+El gate se endureció en la fuente local para fallar cerrado si el código aparece en más de una organización, la base no está ACTIVE, no hay exactamente una versión activa y PUBLISHED, faltan los 210 parámetros canónicos o el perfil es nulo/inválido. Relectura de staging a las **04:16 UTC** con esquema `fcm.c1-quote-readiness.v2`: una base, v1 PUBLISHED/activa, 210 parámetros; `targetCandidateForNewCalculation=false` y bloqueador único `APPLICABILITY_PROFILE_MISSING` (salida 1 esperada). Typecheck API y 11/11 pruebas del evaluador PASS. Contar parámetros y validar la estructura del perfil **no** prueba valores económicos, cobertura de un viaje concreto ni autorización remota. Este auditor no forma parte del SHA desplegado del Web/API; no se redeplegó el par por un cambio local de preflight.
+
 No se creó, publicó ni activó una versión, ni se guardó cotización. La decisión y recuperación de datos siguen en `C1_PROFILE_DECISION_2026-09-19.md`; activar una versión nueva no tiene rollback equivalente a reactivar v1 sin perfil. No convertir este bloqueo en un permiso para inventar parámetros o relajar el guard.
 
 ## Lectura autenticada del mismo candidato (29 sep, ~04:04 UTC)
@@ -43,7 +45,7 @@ Fuente primaria inmutable: [USDA AMS, Specialty Crops National Truck Rate Report
 | --- | --- | --- | --- |
 | A1 | E2E en **este** origen: Google → callback → rol; recarga y renovación | Tres roles existentes sin exponer tokens; ninguna sesión antigua sustituye el candidato | PARCIAL: ADMIN y recarga observados; faltan callback, renovación y otros roles en este SHA |
 | A2 | E2E/UI + API: ADMIN/OPERATOR habilitados, VIEWER lectura y 403 en las tres rutas; recurso ajeno 404/403 | Denegación remota antes de cómputo/escritura, más aislamiento entre organizaciones | PARCIAL: ADMIN y regresión local; faltan sesión VIEWER, denegación remota y tenant cruzado |
-| A3 | Integración autenticada tras disponer de base gobernada: captura → cálculo → guardado → detalle → reapertura | Resultado y linaje iguales; original intacto; sin publicación ni envío | BLOQUEADO: v1 sin perfil; bases de socios vacías; QA históricos no son tarifas vigentes |
+| A3 | Integración autenticada tras disponer de base gobernada: captura → cálculo → guardado → detalle → reapertura | Resultado y linaje iguales; original intacto; sin publicación ni envío | BLOQUEADO: auditor v2 confirma perfil ausente; bases de socios vacías; QA históricos no son tarifas vigentes |
 
 El siguiente cambio de datos requiere identificar perfil operativo real, impacto, fuente de parámetros y recuperación posible, además de autorización puntual para crear/revisar, para activar y para una cotización sintética. Hasta entonces avanzar en A1/A2 sin afirmar C1 cerrado.
 

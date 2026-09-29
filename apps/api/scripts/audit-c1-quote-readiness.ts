@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { readVerifiedPartnerPreviewTarget } from './inspect-partner-preview.js'
+import { evaluateC1QuoteReadiness } from '../src/modules/pilot/c1-quote-readiness.js'
 
 const expectedCode = 'XBF-XB-PILOT'
 
@@ -24,12 +25,26 @@ async function main() {
               status: true,
               isActive: true,
               applicabilityContext: true,
+              _count: { select: { params: true } },
             },
             orderBy: { version: 'asc' },
           },
         },
       })
     }, { timeout: 15_000 })
+    const readiness = evaluateC1QuoteReadiness(bases.map(base => ({
+      code: base.code,
+      scope: base.scope,
+      status: base.status,
+      isDefault: base.isDefault,
+      versions: base.versions.map(version => ({
+        version: version.version,
+        status: version.status,
+        isActive: version.isActive,
+        applicabilityContext: version.applicabilityContext,
+        parameterCount: version._count.params,
+      })),
+    })))
     const inventory = bases.map(base => ({
       code: base.code,
       scope: base.scope,
@@ -40,24 +55,21 @@ async function main() {
         status: version.status,
         isActive: version.isActive,
         hasApplicabilityProfile: version.applicabilityContext !== null,
+        parameterCount: version._count.params,
       })),
     }))
-    const readyBases = inventory.filter(base => base.status !== 'ARCHIVED' &&
-      base.versions.some(version => version.status === 'PUBLISHED' && version.isActive && version.hasApplicabilityProfile))
-    const targetReady = readyBases.length > 0
     console.log(JSON.stringify({
-      schemaVersion: 'fcm.c1-quote-readiness.v1',
+      schemaVersion: 'fcm.c1-quote-readiness.v2',
       checkedAt: new Date().toISOString(),
       target: 'Neon staging broad-art-99750179/neondb',
       mode: 'READ_ONLY',
       inventory,
       targetBaseCode: expectedCode,
-      targetBaseFound: inventory.length > 0,
-      targetCandidateForNewCalculation: targetReady,
-      note: 'Profile presence is necessary, not sufficient; this does not run a quote, prove authorization, or approve parameter economics.',
+      ...readiness,
+      note: 'Active base, exactly one published active version, 210 parameters and a valid profile are necessary, not sufficient. This does not check trip compatibility, run a quote, prove authorization, or approve parameter economics.',
       writesAttempted: false,
     }))
-    if (!targetReady) process.exitCode = 1
+    if (!readiness.targetCandidateForNewCalculation) process.exitCode = 1
   } finally {
     await db.$disconnect()
   }
