@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { parseReview, type ReviewResult } from './review-contract'
 
-const usd = (n: number) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }).format(n)
+const usd = (n: number) => new Intl.NumberFormat('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n)
 export function ReviewResults({ result }: { result: ReviewResult | null }) {
   if (!result) return <p className="rounded-lg border bg-card p-4">Sin resultados cargados. No hay importes adoptados desde esta pantalla.</p>
   if (result.status === 'INCOMPLETE') return <section className="rounded-lg border bg-card p-4"><h2 className="font-semibold">Datos pendientes · sin total</h2><ul className="mt-3 grid gap-2">{result.issues.map((issue, i) => <li key={i} className="break-words text-sm">{issue.field}: {issue.code}</li>)}</ul></section>
