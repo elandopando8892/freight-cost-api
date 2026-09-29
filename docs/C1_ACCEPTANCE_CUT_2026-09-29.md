@@ -23,13 +23,27 @@ Validación: API 659 PASS, 25 SKIP al excluir la suite que exige PostgreSQL dese
 
 No se creó, publicó ni activó una versión, ni se guardó cotización. La decisión y recuperación de datos siguen en `C1_PROFILE_DECISION_2026-09-19.md`; activar una versión nueva no tiene rollback equivalente a reactivar v1 sin perfil. No convertir este bloqueo en un permiso para inventar parámetros o relajar el guard.
 
+## Lectura autenticada del mismo candidato (29 sep, ~04:04 UTC)
+
+En el Web Preview citado arriba se observó una sesión existente de `sales@heymarksman.com` como ADMIN de HeyMarksman. `/quote` abrió en ese mismo origen y **conservó la sesión tras recarga**. `/settings` mostró la identidad Supabase vinculada, el rol ADMIN actual y el equipo con OPERATOR y VIEWER. No se observó el intercambio inicial del código OAuth ni se esperó la expiración del token: callback y renovación siguen sin acreditarse. Tampoco se usaron credenciales o tokens en pruebas automatizadas.
+
+En `/quote`, la UI etiquetó `XBF-XB-PILOT` v1 «requiere revisión» y advirtió que no hay base gobernada para el cálculo nuevo, consistente con la auditoría de solo lectura. `/cost-bases/partners` mostró **cero bases de socios**; no hay tarifa reutilizable publicada. `/quote/partners` ofrece la captura manual de compra; `/quote/partners/saved` permitió leer dos versiones históricas expresamente QA de una estimación sintética, sin verificar su vigencia ni convertirlas en benchmark o precio de venta. No se presionó Calcular, Guardar, Publicar ni Enviar.
+
+El historial `/quotes` cargó 11 cotizaciones históricas. Se abrió la cotización existente `cmsr2lcy2000bidzgq4d2oqst` y su enlace «Volver a cotizar»: el formulario recuperó ruta, operación, servicio, base y versión, **sin recalcular ni cambiar el original**. El aviso de reapertura explicó explícitamente que v1 carece de perfil y sólo permite consultar cálculos históricos. Esta lectura acredita la parte de consulta/reapertura de un registro previo, no el recorrido A3 de crear una cotización nueva en el candidato.
+
+## Contraste público de compra a terceros: sólo referencia, no parámetro
+
+Fuente primaria inmutable: [USDA AMS, Specialty Crops National Truck Rate Report del 22 sep 2026, publicado el 23 sep](https://mymarketnews.ams.usda.gov/filerepo/sites/default/files/2375/2026-09-21/1353300/ams_2375_00344.pdf), pp. 1, 4–5. Para cruces de México por el sur de Texas a Dallas reporta un rango de **$2,000–$2,400 por carga**, con rango predominante de **$2,200–$2,400**. El propio informe define estas cifras como precios de venta spot pagados por cargadores o receptores, incluidas comisiones de brokers, para carga completa de productos frescos en remolques refrigerados de 48–53 pies y un destino. No cubre necesariamente terminal, múltiples paradas, tramo mexicano ni intercambio entre líneas.
+
+**Elegibilidad para el motor: NO.** Esa observación no es la tarifa de compra contratada por XBF, no es dry van ni un costo D2D Monterrey–Dallas, y tampoco prueba el desglose MX/EE. UU., vigencia o condiciones de una contraparte. Sirve sólo para contrastar una eventual propuesta comercial comparable de reefer en ese corredor. Antes de crear una base de socios se necesita una fuente verificable de compra para cada tramo/modalidad, con proveedor, equipo, origen/destino, moneda, fecha y vigencia, incluidos/excluidos y aprobación; la ausencia de esa fuente se mantiene visible como `sin cobertura`, sin usar las estimaciones QA históricas ni convertir este rango público en CFU, CVU o precio de venta.
+
 ## Plan de prueba de aceptación pendiente
 
 | Gate | Tipo y caso mínimo | Criterio de cobertura | Estado |
 | --- | --- | --- | --- |
-| A1 | E2E en **este** origen: Google → callback → rol; recarga y renovación | Tres roles existentes sin exponer tokens; ninguna sesión antigua sustituye el candidato | PENDIENTE: Preview nuevo inicia sin sesión |
-| A2 | E2E/UI + API: ADMIN/OPERATOR habilitados, VIEWER lectura y 403 en las tres rutas; recurso ajeno 404/403 | Denegación remota antes de cómputo/escritura, más aislamiento entre organizaciones | PARCIAL: regresión local y mismo SHA; falta sesión VIEWER y tenant remoto |
-| A3 | Integración autenticada tras disponer de base gobernada: captura → cálculo → guardado → detalle → reapertura | Resultado y linaje iguales; original intacto; sin publicación ni envío | BLOQUEADO: v1 sin perfil y sin candidato activo alternativo aprobado |
+| A1 | E2E en **este** origen: Google → callback → rol; recarga y renovación | Tres roles existentes sin exponer tokens; ninguna sesión antigua sustituye el candidato | PARCIAL: ADMIN y recarga observados; faltan callback, renovación y otros roles en este SHA |
+| A2 | E2E/UI + API: ADMIN/OPERATOR habilitados, VIEWER lectura y 403 en las tres rutas; recurso ajeno 404/403 | Denegación remota antes de cómputo/escritura, más aislamiento entre organizaciones | PARCIAL: ADMIN y regresión local; faltan sesión VIEWER, denegación remota y tenant cruzado |
+| A3 | Integración autenticada tras disponer de base gobernada: captura → cálculo → guardado → detalle → reapertura | Resultado y linaje iguales; original intacto; sin publicación ni envío | BLOQUEADO: v1 sin perfil; bases de socios vacías; QA históricos no son tarifas vigentes |
 
 El siguiente cambio de datos requiere identificar perfil operativo real, impacto, fuente de parámetros y recuperación posible, además de autorización puntual para crear/revisar, para activar y para una cotización sintética. Hasta entonces avanzar en A1/A2 sin afirmar C1 cerrado.
 
