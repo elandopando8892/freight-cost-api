@@ -47,3 +47,31 @@ Antes de solicitar autorización de ejecución para el lote de cuatro:
 5. Después, desplegar API en Preview y activar la ruta únicamente en la rama/revisión prevista. Validar captura y relectura con datos de investigación aprobados, sin promover a producción ni enlazar a CFU/CVU/cotizaciones.
 
 Rollback: antes de writes v2, apagar la bandera y retirar el preview detiene capturas; **no** restaura `kindeId`. Para fallas de datos/esquema tras el corte se requiere el respaldo probado o una corrección hacia delante aprobada. No borrar tablas ni revertir migraciones aplicadas a ciegas. Producción no forma parte de este plan.
+
+## Corte actualizado (2026-09-29 01:40–01:41 UTC)
+
+La inspección read-only del mismo destino Neon Preview volvió a encontrar 3 usuarios, 0 identidades Supabase vacías o mal formadas, 3 `kindeId` históricos, 42/46 migraciones aplicadas, las mismas cuatro pendientes, 0 fallidas y ninguna tabla de llantas. No se intentó escritura en Neon.
+
+Se creó un respaldo fresco cifrado fuera del repositorio: `D:\andre\backups\freight-cost-model\staging-neon-20260929014046-00a06193.manifest.json` (SHA-256 del archivo cifrado `efa758ea3118b2f3b45842e4f2925a355012d9947cf410c3fb0bc397e2b8e5fe`). La restauración en PostgreSQL 17 aislado pasó y coincidió con el origen: 3 usuarios, 42 entradas del ledger, 51 tablas y 3 IDs heredados. Continúa la limitación DPAPI `CurrentUser` de recuperación dependiente de este perfil Windows.
+
+Sobre otro clon desechable de ese respaldo, `prisma migrate deploy` y `prisma migrate status` pasaron. El clon terminó con 46 migraciones, 58 tablas, 3 usuarios, `supabaseId` obligatorio, 0 columnas `kindeId`, 7 tablas con RLS forzado y 0 restricciones inválidas; las pruebas de aislamiento tenant/RLS pasaron 17/17. El clon fue eliminado. Este ensayo **no** es aplicación en Neon ni prueba autenticada posterior al cambio.
+
+El ejecutor de staging existente bloquea expresamente el lote porque sólo admite que v2 sea la única migración pendiente; no se alteró ese control ni se ejecutó otro migrador. El corte sobre Neon continúa pendiente de autorización puntual para el `DROP COLUMN` y las cuatro migraciones. El login Supabase real anterior al corte sí se validó en Preview y quedó documentado en `FCM_SPRINT_32_SUPABASE_RETURN_HARDENING_2026-09-28.md`; aún falta repetirlo después de cualquier cambio de esquema.
+
+## Corte aplicado y verificado (2026-09-29 02:03–02:05 UTC)
+
+**Estado vigente: las cuatro migraciones están aplicadas en Neon staging.** Este resultado sustituye el NO-GO histórico anterior. El usuario respondió «continua» a la solicitud explícita de aplicar el lote, cuyo alcance incluía eliminar los tres valores históricos de `User.kindeId`. Se conservó el alcance: proyecto Neon `broad-art-99750179`, sin producción ni cambios a Supabase Auth, roles o bandera de captura v2.
+
+El worktree de D: estaba en `codex/cost-tires-release-s14`, HEAD `0aab09cfaddde2e71f35b32c6dd2392ed82f8f75`; los únicos cambios previos eran la documentación de preflight. La inspección independiente a las 02:01 UTC confirmó 42/46, el lote exacto de cuatro y cero fallidas, desconocidas, duplicadas o checksums alterados.
+
+Se añadió `apps/api/scripts/apply-approved-staging-cut.ts` como ejecutor específico de este corte. Conserva el ejecutor habitual sin modificar y exige HEAD exacto, migraciones locales sin diferencias, 46 artefactos, respaldo reciente con hash correcto y restauración PASS, destino Preview verificado, identidades válidas, ledger consistente y sólo las cuatro pendientes conocidas. Su modo por defecto es read-only; la ejecución requirió `--apply` y confirmación ligada al SHA. Se probó primero el modo read-only y luego se ejecutó `prisma migrate deploy`. No se imprimieron credenciales ni logs crudos de Prisma. Este ejecutor queda como evidencia de un corte único: no es un comando reutilizable para futuros releases y rechaza un HEAD diferente o un ledger ya actualizado.
+
+Resultado a las 02:03:27 UTC: 46 migraciones aplicadas, 3 usuarios conservados, `supabaseId` obligatorio, `kindeId` eliminado y 7 tablas nuevas con RLS habilitado y forzado. La inspección independiente a las 02:04:52 UTC confirmó 46 registros/46 artefactos, ninguna pendiente, fallida, desconocida, alterada o duplicada. Las 17 pruebas tenant/RLS corresponden al ensayo previo en clon; no se ejecutaron escrituras sintéticas de pruebas sobre Neon.
+
+En el Preview Web `freight-cost-mlfj4xmbx-elandopando8892s-projects.vercel.app`, una recarga de `/settings` conservó la sesión real de `sales@heymarksman.com`, organización HeyMarksman y los tres integrantes vinculados a Supabase. `/cost-bases/tires` cargó y sobrevivió una recarga, mostrando 0 expedientes y 0 parámetros adoptados. La página realiza en servidor las lecturas de expedientes, identidad y revisores; por ello no se observaron solicitudes BFF `/api/` en la captura de red de esa página. No se atribuye a dicha captura evidencia de código HTTP para esas lecturas. No se abrió ni publicó un expediente.
+
+La API Preview emparejada `freight-cost-1j1u2np1p-elandopando8892s-projects.vercel.app` respondió HTTP 200 en `/health` y `/ready`, con base conectada y release `577225f4717e6952ee51bfcfccaa60a06cc2e775`. No hubo nuevo deployment ni modificación de aliases. Se verificó la sesión existente tras el cambio; no se repitió login desde cero ni se observó renovación por vencimiento.
+
+Recuperación: los tres IDs históricos eliminados permanecen en el respaldo cifrado indicado arriba, restaurable en el perfil Windows que pasó el ensayo. Un rollback de código no restaura la columna. Ante necesidad de recuperar datos, restaurar primero ese respaldo a una instancia aislada, comparar el estado actual y preparar una restauración selectiva o corrección de esquema aprobada; no sobrescribir Neon ni borrar las tablas nuevas automáticamente. No fue necesario ejecutar rollback.
+
+Siguiente incremento: validar captura y relectura de investigación v2 con evidencia pública documentada antes de habilitar su uso operativo. La calibración económica y adopción a CFU/CVU siguen pendientes y no se derivan del éxito de estas migraciones. Modelo recomendado para este corte de identidad/datos: GPT-6 Astra, esfuerzo alto; para documentación y comprobaciones de lectura, GPT-6 Sol, esfuerzo medio. No se cambió UI y no corresponde wireframe nuevo.
