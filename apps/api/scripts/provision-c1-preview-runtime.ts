@@ -149,7 +149,9 @@ async function main() {
         projectError: /project.*not found|not found.*project/i.test(diagnostics),
         invalidTarget: /invalid.*target|target.*invalid/i.test(diagnostics),
         buildError: /build.*fail|fail.*build/i.test(diagnostics),
-        authError: /unauthorized|not authenticated/i.test(diagnostics) }))
+        authError: /unauthorized|not authenticated/i.test(diagnostics),
+        redactedLines: diagnostics.split(/\r?\n/).filter(Boolean).slice(-8)
+          .map(line => line.replace(/\S{24,}/g, '[REDACTED]').slice(0, 180)) }))
       throw new Error('API Preview deployment failed; inspect Vercel without exposing credentials')
     }
     const url = deployment.stdout.match(/https:\/\/freight-cost-[a-z0-9-]+\.vercel\.app/)?.[0]
