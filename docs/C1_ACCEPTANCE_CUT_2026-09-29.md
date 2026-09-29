@@ -55,6 +55,8 @@ Fuente primaria inmutable: [USDA AMS, Specialty Crops National Truck Rate Report
 
 El siguiente cambio de datos requiere identificar perfil operativo real, impacto, fuente de parámetros y recuperación posible, además de autorización puntual para crear/revisar, para activar y para una cotización sintética. Hasta entonces avanzar en A1/A2 sin afirmar C1 cerrado.
 
+El despliegue del fix A2 está detenido por el runtime del nuevo API Preview; el preflight y el rollback propuesto están en `C1_PREVIEW_DEPLOY_GATE_2026-09-29.md`. No sustituir el rol limitado por el `STAGING_DATABASE_URL` compartido ni rotar el rol del par vigente sin un corte aprobado.
+
 ## Recuperación
 
 La corrección es sólo de código y restringe acceso. Si afecta a usuarios autorizados, inspeccionar logs del deployment inmutable, revertir el commit de código en una rama limpia y publicar **otro** par Preview comprobado; no reutilizar los previews anteriores de runtime rotado. El script de auditoría sólo lee. No se modificaron producción, Supabase Auth, usuarios, migraciones, parámetros, bases o cotizaciones.
