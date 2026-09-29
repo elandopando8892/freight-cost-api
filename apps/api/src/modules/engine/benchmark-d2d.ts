@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { BenchmarkLegSchema } from './benchmark-leg.js'
 import { BenchmarkParametersSchema, calculateBenchmarkFromParameters } from './benchmark-rates.js'
+import { SharedTrailerSchema, calculateSharedTrailer } from './benchmark-shared-trailer.js'
 
 const text = z.string().trim().min(1).max(1000)
 const leg = z.object({ parameters: BenchmarkParametersSchema, trip: BenchmarkLegSchema.shape.trip }).strict()
@@ -10,8 +11,8 @@ export const BenchmarkD2DSchema = z.object({
   model: z.literal('FCM_CARRIER_BENCHMARK_D2D_V1'),
   direction: z.enum(['MX_TO_US', 'US_TO_MX']),
   serviceDate: BenchmarkLegSchema.shape.serviceDate,
-  // Shared trailers, binational tractors and transloading require other allocation contracts.
-  assetAllocation: z.literal('SEPARATE_TRACTOR_TRAILER_PER_LEG'),
+  assetAllocation: z.enum(['SEPARATE_TRACTOR_TRAILER_PER_LEG', 'SHARED_TRAILER']),
+  sharedTrailer: SharedTrailerSchema.optional(),
   allocationRationale: text,
   route: z.object({ mxEndpoint: text, mxGateway: text, usGateway: text, usEndpoint: text }).strict(),
   mx: leg, us: leg,
@@ -29,7 +30,11 @@ export const BenchmarkD2DSchema = z.object({
 export function calculateBenchmarkD2D(raw: unknown) {
   const input = BenchmarkD2DSchema.parse(raw)
   const issues: { field: string; code: string }[] = []
+  const shared = input.assetAllocation === 'SHARED_TRAILER'
+  if (shared !== Boolean(input.sharedTrailer)) issues.push({ field: 'sharedTrailer', code: 'TRAILER_ALLOCATION_MISMATCH' })
   for (const [key, country] of [['mx', 'MX'], ['us', 'US']] as const) {
+    const expectedScope = shared ? 'TRACTOR_ONLY' : 'TRACTOR_AND_TRAILER'
+    if (input[key].parameters.assetCostScope !== expectedScope) issues.push({ field: key, code: 'LEG_ASSET_SCOPE_MISMATCH' })
     if (input[key].parameters.country !== country) issues.push({ field: key, code: 'LEG_COUNTRY_MISMATCH' })
     if (input[key].parameters.serviceDate !== input.serviceDate) issues.push({ field: key, code: 'LEG_DATE_MISMATCH' })
   }
@@ -56,17 +61,21 @@ export function calculateBenchmarkD2D(raw: unknown) {
     const details = result.leg ? result.leg.issues : result.parameterLineage.issues
     issues.push(...details.map(issue => ({ ...issue, field: `${key}.${issue.field}` })))
   }
+  const trailer = input.sharedTrailer ? calculateSharedTrailer(input.sharedTrailer, input.serviceDate,
+    (input.mx.trip.loadedKm?.value ?? 0) + (input.us.trip.loadedKm?.value ?? 0),
+    (input.mx.trip.cycleDays?.value ?? 0) + (input.us.trip.cycleDays?.value ?? 0)) : null
+  if (trailer) issues.push(...trailer.issues.map(issue => ({ ...issue, field: `sharedTrailer.${issue.field}` })))
   const envelope = { model: input.model, direction: input.direction,
     travelOrder: input.direction === 'MX_TO_US' ? ['mx', 'border', 'us'] : ['us', 'border', 'mx'],
     calibrated: false, sourceStatus: 'DOCUMENTED_UNVERIFIED', purchaseCostUsd: null, sellPriceUsd: null,
     exclusions: ['Taxes', 'Transloading', 'Risk reserves', 'Carrier margin', 'XBF margin'],
-    lineage: input, legs: { mx, us } }
-  if (issues.length || !mx.leg?.costs || !us.leg?.costs) {
+    lineage: input, legs: { mx, us }, sharedTrailer: trailer }
+  if (issues.length || !mx.leg?.costs || !us.leg?.costs || (shared && !trailer?.costs)) {
     return { ...envelope, status: 'INCOMPLETE', issues, costs: null }
   }
   const cents = (value: number) => Math.round(value * 100)
-  const cfu = cents(mx.leg.costs.cfuUsd) + cents(us.leg.costs.cfuUsd)
-  const cvu = cents(mx.leg.costs.cvuUsd) + cents(us.leg.costs.cvuUsd)
+  const cfu = cents(mx.leg.costs.cfuUsd) + cents(us.leg.costs.cfuUsd) + cents(trailer?.costs?.cfuUsd ?? 0)
+  const cvu = cents(mx.leg.costs.cvuUsd) + cents(us.leg.costs.cvuUsd) + cents(trailer?.costs?.cvuUsd ?? 0)
   const border = input.borderCharges.reduce((sum, charge) => sum + cents(charge.amountUsd), 0)
   const total = cfu + cvu + border
   if (![cfu, cvu, border, total].every(Number.isSafeInteger)) {

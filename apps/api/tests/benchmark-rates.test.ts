@@ -6,7 +6,7 @@ import { calculateBenchmarkLeg } from '../src/modules/engine/benchmark-leg.js'
 // Catalog values are test data only; never emitted as researched benchmark values.
 function fixture(country: 'MX' | 'US' = 'MX') {
   const needed = new Set(Object.values(benchmarkRateRequirements(country)).flat())
-  return { country, serviceDate: '2026-09-29', baseRevision: 'SYNTHETIC-ONLY',
+  return { country, assetCostScope: 'TRACTOR_AND_TRAILER', serviceDate: '2026-09-29', baseRevision: 'SYNTHETIC-ONLY',
     parameters: PARAMETER_DEFINITIONS.filter(p => needed.has(p.key)).map(p => ({
       key: p.key, value: p.defaultValue, unit: p.unit, evidenceIds: ['test'], derivation: 'Test fixture only',
     })),
@@ -19,6 +19,24 @@ const set = (input: ReturnType<typeof fixture>, section: string, field: string, 
 }
 
 describe('canonical benchmark rates', () => {
+  it.each(['MX', 'US'] as const)('excludes trailer capital and tires from %s tractor-only dependencies', country => {
+    const input = fixture(country)
+    const complete = deriveBenchmarkRates(input)
+    input.assetCostScope = 'TRACTOR_ONLY'
+    const needed = new Set(Object.values(benchmarkRateRequirements(country, true)).flat())
+    const trailerKeys = PARAMETER_DEFINITIONS.filter(p => p.field.includes('Remolque')).map(p => p.key)
+    expect(trailerKeys.some(key => needed.has(key))).toBe(false)
+    input.parameters = input.parameters.filter(p => needed.has(p.key))
+    const tractor = deriveBenchmarkRates(input)
+    expect(tractor.status).toBe('DERIVED_UNVERIFIED')
+    expect(tractor.rates!.monthlyFixedUsd!.value).toBeLessThan(complete.rates!.monthlyFixedUsd!.value)
+    expect(tractor.rates!.tiresUsdPerKm!.value).toBeLessThan(complete.rates!.tiresUsdPerKm!.value)
+    expect(tractor.rates!.maintenanceUsdPerKm).toEqual(complete.rates!.maintenanceUsdPerKm)
+  })
+  it('preserves legacy full-asset scope when scope is omitted', () => {
+    const { assetCostScope, ...input } = fixture()
+    expect(deriveBenchmarkRates(input).lineage.assetCostScope).toBe(assetCostScope)
+  })
   it.each(['MX', 'US'] as const)('derives %s rates and composes with the leg adapter', country => {
     const input = fixture(country)
     const result = deriveBenchmarkRates(input)

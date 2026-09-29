@@ -8,6 +8,7 @@ export const BenchmarkParametersSchema = z.object({
   country: BenchmarkLegSchema.shape.country,
   serviceDate: BenchmarkLegSchema.shape.serviceDate,
   baseRevision: text,
+  assetCostScope: z.enum(['TRACTOR_AND_TRAILER', 'TRACTOR_ONLY']).default('TRACTOR_AND_TRAILER'),
   parameters: z.array(z.object({
     key: text, value: z.number().finite().nonnegative(), unit: text,
     evidenceIds: z.array(text).min(1), derivation: text,
@@ -19,11 +20,11 @@ const definitions = new Map(PARAMETER_DEFINITIONS.map(p => [`${p.section}__${p.f
 const byKey = new Map(PARAMETER_DEFINITIONS.map(p => [p.key, p]))
 const tirePositions = ['Direccion', 'Traccion', 'Recapeadas', 'Remolque'] as const
 
-function formulas(country: 'MX' | 'US') {
+function formulas(country: 'MX' | 'US', tractorOnly = false) {
   const p = (m: Record<string, number>, section: string, field: string) => m[`${section}__${field}`]
   return {
     monthlyFixedUsd: { unit: 'USD/fleet-month', run: (m: Record<string, number>) => deriveMonthlyFixedCost(m, {
-      includeCrossborderCosts: false, workingCapitalCountry: country, includeTrailerAssets: true, includeDollyAssets: false,
+      includeCrossborderCosts: false, workingCapitalCountry: country, includeTrailerAssets: !tractorOnly, includeDollyAssets: false,
     }) },
     productiveKmPerMonth: { unit: 'km/fleet-month', run: (m: Record<string, number>) =>
       p(m, 'GENERAL_BASE', 'Operadores') * p(m, 'GENERAL_BASE', 'Kilómetros promedio x operador') },
@@ -39,7 +40,7 @@ function formulas(country: 'MX' | 'US') {
       } })
       return deriveMaintTiresPerKm(maintenanceOnly)
     } },
-    tiresUsdPerKm: { unit: 'USD/km', run: (m: Record<string, number>) => tirePositions.reduce((sum, position) =>
+    tiresUsdPerKm: { unit: 'USD/km', run: (m: Record<string, number>) => tirePositions.filter(position => !tractorOnly || position !== 'Remolque').reduce((sum, position) =>
       sum + p(m, 'COST_TIRES', `Qty ${position}`) * p(m, 'COST_TIRES', `PU ${position}`) / p(m, 'COST_TIRES', `Life KM ${position}`), 0) },
     driverUsdPerKm: { unit: 'USD/km', run: (m: Record<string, number>) => p(m, 'LABOR', `Tarifa Operador ${country}`) / 1.60934 },
     dieselUsdPerLiter: { unit: 'USD/liter', run: (m: Record<string, number>) => country === 'MX'
@@ -50,8 +51,8 @@ function formulas(country: 'MX' | 'US') {
 }
 
 /** Enumerates actual formula dependencies; sentinel arithmetic is discarded. */
-export function benchmarkRateRequirements(country: 'MX' | 'US') {
-  return Object.fromEntries(Object.entries(formulas(country)).map(([rate, formula]) => {
+export function benchmarkRateRequirements(country: 'MX' | 'US', tractorOnly = false) {
+  return Object.fromEntries(Object.entries(formulas(country, tractorOnly)).map(([rate, formula]) => {
     const keys = new Set<string>()
     formula.run(new Proxy({}, { get(_target, field: string) {
       const definition = definitions.get(field)
@@ -66,7 +67,8 @@ export function benchmarkRateRequirements(country: 'MX' | 'US') {
 /** Local conversion only: source metadata is checked, not independently authenticated. */
 export function deriveBenchmarkRates(raw: unknown) {
   const input = BenchmarkParametersSchema.parse(raw)
-  const requirements = benchmarkRateRequirements(input.country)
+  const tractorOnly = input.assetCostScope === 'TRACTOR_ONLY'
+  const requirements = benchmarkRateRequirements(input.country, tractorOnly)
   const needed = new Set(Object.values(requirements).flat())
   const parameters = new Map(input.parameters.map(p => [p.key, p]))
   const evidence = new Map(input.evidence.map(e => [e.id, e]))
@@ -100,17 +102,17 @@ export function deriveBenchmarkRates(raw: unknown) {
   const positiveFields = ['COST_CAPITAL__Periodo Depreciacion', 'COST_INSURANCE__Periodo de Poliza',
     'GENERAL_BASE__Tamaño de Flota', 'GENERAL_BASE__Operadores', 'GENERAL_BASE__Kilómetros promedio x operador',
     'GENERAL_BASE__Índice de Operatividad', 'GENERAL_BASE__Periodo de Operación',
-    'FUEL__Rendimiento Cargado', 'FUEL__Rendimiento Vacío', ...tirePositions.map(p => `COST_TIRES__Life KM ${p}`),
+    'FUEL__Rendimiento Cargado', 'FUEL__Rendimiento Vacío', ...tirePositions.filter(p => !tractorOnly || p !== 'Remolque').map(p => `COST_TIRES__Life KM ${p}`),
     ...(input.country === 'MX' ? ['FINANCE__Tipo de Cambio'] : [])]
   for (const field of positiveFields) if (!(values[field] > 0)) issues.push({ field, code: 'NON_POSITIVE_DENOMINATOR' })
   for (const field of ['COST_CAPITAL__LTV Asset Financing', 'GENERAL_BASE__Índice de Operatividad']) {
     if (values[field] > 1) issues.push({ field, code: 'INVALID_FRACTION' })
   }
-  const asset = values['COST_CAPITAL__Qty Tracto'] * values['COST_CAPITAL__PU Tracto'] + values['COST_CAPITAL__Qty Remolque'] * values['COST_CAPITAL__PU Remolque']
-  const residual = values['COST_CAPITAL__Qty Rescue Tracto'] * values['COST_CAPITAL__PU Rescue Tracto'] + values['COST_CAPITAL__Qty Rescue Remolque'] * values['COST_CAPITAL__PU Rescue Remolque']
+  const asset = values['COST_CAPITAL__Qty Tracto'] * values['COST_CAPITAL__PU Tracto'] + (tractorOnly ? 0 : values['COST_CAPITAL__Qty Remolque'] * values['COST_CAPITAL__PU Remolque'])
+  const residual = values['COST_CAPITAL__Qty Rescue Tracto'] * values['COST_CAPITAL__PU Rescue Tracto'] + (tractorOnly ? 0 : values['COST_CAPITAL__Qty Rescue Remolque'] * values['COST_CAPITAL__PU Rescue Remolque'])
   if (residual > asset) issues.push({ field: 'COST_CAPITAL', code: 'RESIDUAL_EXCEEDS_ASSET' })
   if (issues.length) return { ...envelope, status: 'INCOMPLETE', issues, rates: null }
-  const rates = Object.fromEntries(Object.entries(formulas(input.country)).map(([rate, formula]) => [rate, {
+  const rates = Object.fromEntries(Object.entries(formulas(input.country, tractorOnly)).map(([rate, formula]) => [rate, {
     value: formula.run(values), unit: formula.unit,
     evidenceIds: [...new Set(requirements[rate].flatMap(key => parameters.get(key)!.evidenceIds))],
     derivation: `FCM_BENCHMARK_RATES_V1:${rate}; canonical dependencies in requirements.${rate}`,

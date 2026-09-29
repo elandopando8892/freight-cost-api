@@ -1,5 +1,7 @@
 # Composición local D2D de benchmark
 
+Actualización posterior: [asignación de remolque compartido](C1_BENCHMARK_SHARED_TRAILER_2026-09-29.md). El alcance original descrito abajo queda ampliado por ese contrato; tractor binacional y transbordo siguen pendientes.
+
 Inicio: `1e84e20a0d9d0026b61dc95a29bdc7326a7c10bf`, `codex/cost-tires-release-s14`, worktree D: limpio. Modelo recomendado: Astra alto. Entrega backend local, sin UI, migraciones ni despliegue.
 
 `calculateBenchmarkD2D` recibe parámetros canónicos y datos de viaje de dos tramos, recalcula tasas y CFU/CVU, y agrega cargos documentados de cruce/intercambio. No acepta totales externos. Soporta orden MX→US y US→MX sin intercambiar parámetros nacionales. La fecha de ambos tramos debe coincidir con el servicio; MX/US deben ocupar su lugar explícito.

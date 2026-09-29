@@ -62,7 +62,56 @@ describe('D2D benchmark assembly', () => {
   it('accepts documented zero services but rejects unsupported allocation and injected totals', () => {
     const input = fixture(); input.borderCharges[0].amountUsd = 0
     expect(calculateBenchmarkD2D(input).costs!.borderServicesUsd).toBe(0)
-    expect(() => calculateBenchmarkD2D({ ...input, assetAllocation: 'SHARED_TRAILER' })).toThrow()
+    expect(calculateBenchmarkD2D({ ...input, assetAllocation: 'SHARED_TRAILER' }).status).toBe('INCOMPLETE')
     expect(() => calculateBenchmarkD2D({ ...input, productionCostUsd: 1 })).toThrow()
+  })
+})
+
+function sharedFixture() {
+  const input = fixture()
+  const datum = (value: number, unit: string) => ({ value, unit, derivation: 'Synthetic only' })
+  return { ...input, assetAllocation: 'SHARED_TRAILER',
+    mx: { ...input.mx, parameters: { ...input.mx.parameters, assetCostScope: 'TRACTOR_ONLY' } },
+    us: { ...input.us, parameters: { ...input.us.parameters, assetCostScope: 'TRACTOR_ONLY' } },
+    sharedTrailer: { assetReference: 'SYNTHETIC-TRAILER', scopeDeclaration: 'LEG_INPUTS_EXCLUDE_ALL_TRAILER_COSTS',
+      allocationEvidence: 'Synthetic tractor-only allocation, not verified operational evidence',
+      monthlyFixedUsd: datum(1000, 'USD/trailer-month'), productiveKmPerMonth: datum(10000, 'km/trailer-month'),
+      productiveDaysPerMonth: datum(20, 'days/trailer-month'), maintenanceUsdPerKm: datum(0.1, 'USD/km'),
+      tiresUsdPerKm: datum(0.05, 'USD/km'), totalKm: datum(240, 'km'), cycleDays: datum(2, 'days'),
+      evidence: input.mx.parameters.evidence },
+  }
+}
+
+describe('shared trailer D2D', () => {
+  it('allocates trailer fixed, maintenance and tires once and reconciles to cents', () => {
+    const result = calculateBenchmarkD2D(sharedFixture())
+    expect(result.status).toBe('BENCHMARK_ESTIMATE')
+    expect(result.sharedTrailer!.costs).toMatchObject({ cfuUsd: 100, cvuUsd: 36, productionCostUsd: 136 })
+    const legCents = [result.legs.mx, result.legs.us].reduce((n, leg) => n + Math.round(leg.leg!.costs!.productionCostUsd * 100), 0)
+    expect(result.costs!.productionCostUsd).toBe((legCents + 13600 + 15025) / 100)
+    expect(result.calibrated).toBe(false)
+    expect(result.sourceStatus).toBe('DOCUMENTED_UNVERIFIED')
+    expect(result.purchaseCostUsd).toBeNull()
+  })
+  it.each(['scope', 'allocation', 'distance', 'time', 'expired', 'duplicate', 'overflow', 'missing'] as const)('blocks %s', mode => {
+    const input = sharedFixture()
+    if (mode === 'scope') input.mx.parameters.assetCostScope = 'TRACTOR_AND_TRAILER'
+    if (mode === 'allocation') input.assetAllocation = 'SEPARATE_TRACTOR_TRAILER_PER_LEG'
+    if (mode === 'distance') input.sharedTrailer.totalKm.value = 199
+    if (mode === 'time') input.sharedTrailer.cycleDays.value = 1
+    if (mode === 'expired') input.sharedTrailer.evidence[0].validUntil = '2026-09-28'
+    if (mode === 'duplicate') input.sharedTrailer.evidence.push({ ...input.sharedTrailer.evidence[0] })
+    if (mode === 'overflow') input.sharedTrailer.monthlyFixedUsd.value = 1e308
+    const result = calculateBenchmarkD2D(mode === 'missing' ? { ...input, sharedTrailer: { ...input.sharedTrailer, tiresUsdPerKm: null } } : input)
+    expect(result.status).toBe('INCOMPLETE')
+    expect(result.costs).toBeNull()
+  })
+  it('accepts documented zero variable costs but rejects incorrect units', () => {
+    const input = sharedFixture()
+    input.sharedTrailer.maintenanceUsdPerKm.value = 0
+    input.sharedTrailer.tiresUsdPerKm.value = 0
+    expect(calculateBenchmarkD2D(input).sharedTrailer!.costs!.cvuUsd).toBe(0)
+    input.sharedTrailer.totalKm.unit = 'miles'
+    expect(() => calculateBenchmarkD2D(input)).toThrow()
   })
 })
