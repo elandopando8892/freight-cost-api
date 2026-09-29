@@ -13,3 +13,16 @@ Pruebas locales: 64/64 tests Web y build de Next.js pasaron. Los nuevos tests cu
 ## Release y aceptación
 
 Publicar sólo un nuevo par Web/API del mismo SHA en Preview con migraciones explícitamente deshabilitadas; verificar cobertura OAuth, guarda de par, smoke sin sesión y ledger Neon read-only. El usuario debe completar Google Sign-In manualmente en el nuevo origen. Después comprobar `/api/v1/health` por BFF (mismo SHA), `/settings`, recarga, renovación y roles. La sesión de un Preview anterior no acepta el nuevo. Rollback: volver a las URLs inmutables del sprint 30, sin mover aliases ni revertir datos.
+
+## Publicación y comprobación (2026-09-29 00:07–00:08 UTC)
+
+Se exportó el árbol limpio del commit `577225f4717e6952ee51bfcfccaa60a06cc2e775` desde D: y se publicó **sólo en Preview**:
+
+| Componente | Deployment | URL |
+| --- | --- | --- |
+| API | `dpl_72m5FYGKUCbLSp9qtE9th7XHAtGi` | `https://freight-cost-1j1u2np1p-elandopando8892s-projects.vercel.app` |
+| Web | `dpl_6mbvtZHB4JLkh8z46HwV7LdXkzmd` | `https://freight-cost-mlfj4xmbx-elandopando8892s-projects.vercel.app` |
+
+Ambos deployments quedaron `READY` con el mismo SHA y rama. El Web recibió `API_URL` de build/runtime con la URL exacta de esa API. El log de API confirmó `Production migrations skipped outside Vercel Production.`; `/health` y `/ready` respondieron 200 con el SHA esperado y base conectada. La cobertura OAuth del callback exacto obtuvo `PASS` por el patrón limitado a FCM/equipo; la guarda de par obtuvo ocho checks `PASS`; el smoke sin sesión obtuvo cinco `PASS`, con CORS directo no aplicable al BFF. El preflight Neon read-only posterior mantuvo 42/46 migraciones, las mismas cuatro pendientes y cero fallidas. Site URL, Auth compartido, usuarios, aliases y producción permanecieron sin cambios.
+
+El navegador abrió este Web y mostró `/login` (sin sesión). Quedan **pendientes** Google/PKCE real, intercambio del código, lectura autenticada del BFF, recarga, renovación y revisión de roles en este mismo par. Los `PASS` anteriores son de configuración, despliegue y contrato sin sesión; no son aceptación autenticada.
