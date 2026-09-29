@@ -164,19 +164,21 @@ export function deriveMonthlyFixedCost(
   const capital = fleetDepreciation + fleetAssetFinance
 
   // Crossborder fixed = compliance + infrastructure (monthly)
-  const complianceTractor =
-    (P(m, 'COST_CROSSBORDER', 'Registro doble matricula', 3500) + P(m, 'COST_CROSSBORDER', 'Seguros adicionales', 3000)) * flota
-  const complianceCompany =
-    P(m, 'COST_CROSSBORDER', 'CTPAT', 5000) + P(m, 'COST_CROSSBORDER', 'FMCSA', 1500) +
-    P(m, 'COST_CROSSBORDER', 'Ajustes Regulatorios', 5000) + P(m, 'COST_CROSSBORDER', 'SCAC', 1000) +
-    P(m, 'COST_CROSSBORDER', 'BOC-3', 500) + P(m, 'COST_CROSSBORDER', 'Safety Audit', 2500)
-  const monthlyCompliance = (complianceTractor + complianceCompany) / 12
-  const monthlyInfra =
-    P(m, 'COST_CROSSBORDER', 'Renta Oficinas Patios', 2500) + P(m, 'COST_CROSSBORDER', 'Costos Comunicacion', 700) +
-    P(m, 'COST_CROSSBORDER', 'GPS', 1500) + P(m, 'COST_CROSSBORDER', 'Capacitacion Operadores', 1000) +
-    P(m, 'COST_CROSSBORDER', 'Mantenimientos', 750) + P(m, 'COST_CROSSBORDER', 'TMS', 2500) +
-    P(m, 'COST_CROSSBORDER', 'Border Yard Minimum', 1000)
-  const crossborderFixed = normalized.includeCrossborderCosts ? monthlyCompliance + monthlyInfra : 0
+  const crossborderFixed = normalized.includeCrossborderCosts ? (() => {
+    const complianceTractor =
+      (P(m, 'COST_CROSSBORDER', 'Registro doble matricula', 3500) + P(m, 'COST_CROSSBORDER', 'Seguros adicionales', 3000)) * flota
+    const complianceCompany =
+      P(m, 'COST_CROSSBORDER', 'CTPAT', 5000) + P(m, 'COST_CROSSBORDER', 'FMCSA', 1500) +
+      P(m, 'COST_CROSSBORDER', 'Ajustes Regulatorios', 5000) + P(m, 'COST_CROSSBORDER', 'SCAC', 1000) +
+      P(m, 'COST_CROSSBORDER', 'BOC-3', 500) + P(m, 'COST_CROSSBORDER', 'Safety Audit', 2500)
+    const monthlyCompliance = (complianceTractor + complianceCompany) / 12
+    const monthlyInfra =
+      P(m, 'COST_CROSSBORDER', 'Renta Oficinas Patios', 2500) + P(m, 'COST_CROSSBORDER', 'Costos Comunicacion', 700) +
+      P(m, 'COST_CROSSBORDER', 'GPS', 1500) + P(m, 'COST_CROSSBORDER', 'Capacitacion Operadores', 1000) +
+      P(m, 'COST_CROSSBORDER', 'Mantenimientos', 750) + P(m, 'COST_CROSSBORDER', 'TMS', 2500) +
+      P(m, 'COST_CROSSBORDER', 'Border Yard Minimum', 1000)
+    return monthlyCompliance + monthlyInfra
+  })() : 0
 
   // Working capital (small; uses AR/AP gap × COGS proxy × cost of capital)
   const gapDays = Math.max(

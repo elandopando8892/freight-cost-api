@@ -19,6 +19,12 @@ const set = (input: ReturnType<typeof fixture>, section: string, field: string, 
 }
 
 describe('canonical benchmark rates', () => {
+  it.each(['MX', 'US'] as const)('does not require excluded cross-border overhead for %s domestic carrier legs', country => {
+    const needed = new Set(Object.values(benchmarkRateRequirements(country)).flat())
+    const crossborderKeys = PARAMETER_DEFINITIONS.filter(p => p.section === 'COST_CROSSBORDER').map(p => p.key)
+    expect(crossborderKeys.some(key => needed.has(key))).toBe(false)
+    expect(deriveBenchmarkRates(fixture(country)).status).toBe('DERIVED_UNVERIFIED')
+  })
   it.each(['MX', 'US'] as const)('excludes trailer capital and tires from %s tractor-only dependencies', country => {
     const input = fixture(country)
     const complete = deriveBenchmarkRates(input)

@@ -1,5 +1,7 @@
 # Freight Cost Model · estado del MVP
 
+Actualización de negocio 2026-09-29: el objetivo vigente es un **MVP de estimación de costos de transportistas terceros**, no acumular pantallas del calculador. El [plan B0–B4 y mapa E1–E4](C1_MVP_BUSINESS_SPRINTS_2026-09-29.md) define un primer piloto D2D MX→EE. UU. con intercambio, la conciliación de 13 secciones y la salida comercial verificable. B0 fija el alcance; **0/4 gates de negocio están completos**. El cálculo local de remolque propio y los Preview históricos son evidencia parcial, no benchmark calibrado ni salida productiva. El plan C1/C2 anterior permanece como control de Auth/release y no justifica declarar C1 cerrado.
+
 Plan vigente desde 2026-09-19: `SPRINT_CLOSURE_2026-09-19.md`. Dos sprints de cierre C1/C2 y siete aceptaciones sustituyen el calendario previo. Corte C1 actual: `C1_ACCEPTANCE_CUT_2026-09-29.md` (permisos VIEWER corregidos en Preview; A1/A2 sin aceptación remota completa; A3 bloqueado por la versión histórica sin perfil). El contenido inferior conserva evidencia histórica, no el estado actual de producción.
 
 Fecha de corte: 2026-09-07  
