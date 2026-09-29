@@ -1,5 +1,7 @@
 # C1 — corte de permisos y aptitud de cotización
 
+Actualización vigente: el candidato `b83f2e24e16e5d0b13d75643c8179498a738bbdf` está publicado como Web `1lqzynk34` / API `aujrrwwwe`; incluye el fix A2 de 404. El recorrido Google y la recarga se comprobaron en los tres roles existentes. Véase [C1_AUTHENTICATED_REVIEW_2026-09-29.md](C1_AUTHENTICATED_REVIEW_2026-09-29.md). Las referencias a código «sólo local», deploy bloqueado y candidato `464ed48…` que siguen abajo conservan la cronología previa; no describen el deployment actual. C1 sigue abierto por renovación real, denegaciones API/tenant remotas y aptitud económica A3.
+
 Estado: **C1 abierto**. El defecto de permisos se corrigió y publicó en Preview; la cotización nueva con la base XBF sigue bloqueada por gobierno económico. Modelo recomendado: GPT-6 Sol, esfuerzo alto para implementación; GPT-6 Astra, esfuerzo alto para revisión final de Auth/tenant. Las etiquetas son recomendaciones, no afirman qué selector se usó. No hubo cambio visual, por lo que no se necesita otro wireframe.
 
 ## Candidato técnico del corte
