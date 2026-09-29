@@ -14,6 +14,7 @@
  *   Risk Adj 451.19, Required Tariff MROUND(1319.47,100) = $1,300 ✓
  */
 import { getParam, type ParamMap } from '../assumptions/assumptions.service.js'
+import { allocateFixedCost } from './fixed-cost-allocation.js'
 import {
   laneFactor, operationFactor, trailerFactor, driverFactor, equipmentFactors,
 } from './engine.factors.js'
@@ -181,7 +182,7 @@ export function calculateMexLeg(
   const cfuByTimeUsd = cycleDays * fixedCostPerDay * eq.fixed * workbookTandemCfu
   // CFU = max(distance, time) for ALL services — V3.0 mexLaneProd does NOT zero it
   // for backhaul (verified vs row Nuevo Laredo→Queretaro D2D Import Backhaul = $1,400).
-  const cfuUsd = Math.max(cfuByDistanceUsd, cfuByTimeUsd)
+  const cfuUsd = allocateFixedCost(cfuByDistanceUsd, cfuByTimeUsd)
 
   // ── Production & technical tariff ────────────────────────────────────
   // Belt-and-suspenders: after applying day/km floors, the trip production still

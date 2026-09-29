@@ -11,6 +11,7 @@
  * nulls operation/service risk for standard one-way lanes. Replicated faithfully.
  */
 import { getParam, type ParamMap } from '../assumptions/assumptions.service.js'
+import { allocateFixedCost } from './fixed-cost-allocation.js'
 import {
   trailerFactor, operationFactor, serviceFactor, driverFactor,
   equipmentFactors, repositionPct,
@@ -91,7 +92,7 @@ export function calculateUsaLeg(
   const cycleDays = (P > 0 ? transitDaysRaw * (totalOperationalMiles / P) : transitDaysRaw) + (loadTime + unloadTime) / 24
   const cfuByDistanceUsd = totalOperationalMiles * fixedPerMile * eq.fixed
   const cfuByTimeUsd = cycleDays * fixedPerDay * eq.fixed
-  const cfuUsd = isBackhaul ? 0 : Math.max(cfuByDistanceUsd, cfuByTimeUsd)
+  const cfuUsd = isBackhaul ? 0 : allocateFixedCost(cfuByDistanceUsd, cfuByTimeUsd)
 
   // ── Technical tariff (ex / incl fuel) ────────────────────────────────
   const utRate = isBackhaul

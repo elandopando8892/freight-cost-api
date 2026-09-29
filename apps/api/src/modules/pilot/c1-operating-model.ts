@@ -18,8 +18,11 @@ export function evaluateC1OperatingModel(rawPurpose: unknown, bases: C1Readiness
     blockers: [
       ...fleet.blockers,
       ...(!modelMatchesPurpose ? ['OPERATING_MODEL_MISMATCH'] : []),
-      ...(purpose === 'THIRD_PARTY_BENCHMARK' ? ['THIRD_PARTY_BENCHMARK_ADAPTER_NOT_IMPLEMENTED'] : []),
+      ...(purpose === 'THIRD_PARTY_BENCHMARK' ? ['THIRD_PARTY_BENCHMARK_ASSEMBLY_NOT_IMPLEMENTED'] : []),
     ],
+    benchmarkAdapter: purpose === 'THIRD_PARTY_BENCHMARK' ? {
+      model: 'FCM_CARRIER_BENCHMARK_LEG_V1', status: 'LEG_ONLY_NOT_INTEGRATED', calibrated: false,
+    } : null,
     existingAlternative: purpose === 'THIRD_PARTY_PURCHASE' ? {
       model: 'FCM_THIRD_PARTY_FLAT_V1',
       entryPoint: '/cost-bases/partners',
@@ -27,7 +30,7 @@ export function evaluateC1OperatingModel(rawPurpose: unknown, bases: C1Readiness
       requires: 'Versioned carrier purchase terms, inclusions, validity and trip FX',
     } : null,
     nextAction: purpose === 'THIRD_PARTY_BENCHMARK'
-      ? 'Define carrier operating assumptions and source-backed CFU/CVU by leg, then implement an explicit benchmark adapter; do not relabel the historical fleet base or substitute purchase quotes.'
+      ? 'Populate and review source-backed derived inputs, then compose benchmark legs with explicit asset and crossing allocation; the leg adapter is not yet a governed D2D base.'
       : purpose === 'THIRD_PARTY_PURCHASE'
         ? 'Inspect the separate partner tariff base and its purchase evidence; a fleet applicability profile cannot substitute for it.'
         : 'Review fleet profile, parameter economics and trip compatibility before governed publication.',
