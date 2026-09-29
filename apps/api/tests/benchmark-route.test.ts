@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import Fastify, { type FastifyInstance } from 'fastify'
 import { errorHandler } from '../src/middleware/error-handler.js'
+import formSnapshot from '../../web/tests/visual/benchmark-form-schema.json'
 vi.mock('../src/middleware/authenticate.js', () => ({ authenticate: async (request: any, reply: any) => {
   if (!request.headers.authorization) return reply.status(401).send({ error: 'Unauthorized' })
   request.user = { sub: 'test', orgId: request.headers['x-test-org'], role: request.headers.authorization }
@@ -13,6 +14,19 @@ beforeEach(async () => { app = Fastify(); app.setErrorHandler(errorHandler); awa
 afterEach(async () => { await app.close() })
 const url = '/engine/benchmark-owned-d2d'
 const headers = { authorization: 'OPERATOR', 'x-test-org': 'org-a' }
+it('serves field metadata without economic defaults', async () => {
+  const r = await app.inject({ method: 'GET', url: `${url}/form`, headers })
+  expect(r.statusCode).toBe(200)
+  expect(r.json()).toEqual(formSnapshot)
+  expect(r.headers['cache-control']).toBe('no-store')
+  const rows = r.json().fields.route.fields.mx.fields.parameters.fields.parameters.rows
+  expect(rows.length).toBeGreaterThan(0)
+  for (const row of rows) expect(Object.keys(row).sort()).toEqual(['key', 'unit'])
+})
+it.each([{}, { authorization: 'VIEWER', 'x-test-org': 'org-a' }])('protects form metadata', async headers => {
+  const r = await app.inject({ method: 'GET', url: `${url}/form`, headers })
+  expect([401, 403]).toContain(r.statusCode)
+})
 it.each(['ADMIN', 'OPERATOR'])('recomputes for %s, no persistence or adoption', async role => {
   const response = await app.inject({ method: 'POST', url, headers: { ...headers, authorization: role }, payload: ownedD2DFixture() })
   expect(response.statusCode).toBe(200); expect(response.headers['cache-control']).toBe('no-store')
@@ -28,6 +42,14 @@ it('rejects client tenant and total injection', async () => {
     const r = await app.inject({ method: 'POST', url, headers, payload: { ...ownedD2DFixture(), ...extra } })
     expect(r.statusCode).toBe(400)
   }
+})
+it('rejects empty economic values but accepts an explicit documented zero', async () => {
+  const input = ownedD2DFixture()
+  const empty = structuredClone(input) as any
+  empty.fixed.expenses[0].amount.value = ''
+  expect((await app.inject({ method: 'POST', url, headers, payload: empty })).statusCode).toBe(400)
+  input.fixed.expenses[0].amount.value = 0
+  expect((await app.inject({ method: 'POST', url, headers, payload: input })).json().status).toBe('SCENARIO_ONLY')
 })
 it('keeps incomplete evidence without totals', async () => {
   const input = ownedD2DFixture(); input.fixed.expenses.pop()
