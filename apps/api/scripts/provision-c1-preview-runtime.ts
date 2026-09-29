@@ -20,6 +20,8 @@ function git(...args: string[]) {
 
 async function main() {
   const apply = process.argv.includes('--apply')
+  const resume = process.argv.includes('--resume')
+  if (resume && !apply) throw new Error('Resume requires apply')
   const release = git('rev-parse', 'HEAD')
   if (git('symbolic-ref', '--short', 'HEAD') !== expectedBranch || git('status', '--porcelain')) {
     throw new Error('Clean expected branch required')
@@ -51,8 +53,9 @@ async function main() {
       return { database, roles, tables }
     }, { timeout: 15_000 })
     const previous = before.roles.find(item => item.name === priorRole)
+    const candidate = before.roles.find(item => item.name === role)
     if (before.database?.name !== 'neondb' || Number(before.database.migrations) !== expectedMigrations ||
-        Number(before.database.users) !== 3 || before.roles.some(item => item.name === role) ||
+        Number(before.database.users) !== 3 || Boolean(candidate) !== resume ||
         !previous || previous.superuser || previous.bypassrls || before.tables.length !== 2 ||
         before.tables.some(table => !table.rls || !table.forced)) {
       throw new Error('Neon staging, prior role or RLS inventory changed')
@@ -65,16 +68,35 @@ async function main() {
       throw new Error('Scoped role creation confirmation missing')
     }
 
+    if (resume) {
+      // A failed CLI call can leave the newly created role without a usable
+      // password in this process. Only rotate it if no deployment uses this SHA.
+      const result = JSON.parse(execFileSync(process.execPath, [cli, 'api',
+        `/v6/deployments?projectId=${FCM_API_VERCEL_PROJECT.id}&teamId=${FCM_VERCEL_PROJECT.teamId}&limit=20`,
+        '--method', 'GET', '--raw'], { encoding: 'utf8', windowsHide: true,
+        stdio: ['ignore', 'pipe', 'pipe'], timeout: 30_000 })) as {
+        deployments?: { meta?: { gitCommitSha?: string } }[]
+      }
+      if (!Array.isArray(result.deployments) ||
+          result.deployments.some(item => item.meta?.gitCommitSha === release)) {
+        throw new Error('An API deployment already references this release; do not rotate its role')
+      }
+    }
+
     const password = randomBytes(32).toString('hex')
     await owner.$transaction(async tx => {
       await tx.$executeRawUnsafe("SET LOCAL statement_timeout = '10000ms'")
-      await tx.$executeRawUnsafe(`CREATE ROLE ${role} LOGIN PASSWORD '${password}' NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOBYPASSRLS`)
-      await tx.$executeRawUnsafe(`GRANT CONNECT ON DATABASE neondb TO ${role}`)
-      await tx.$executeRawUnsafe(`GRANT USAGE ON SCHEMA public TO ${role}`)
-      await tx.$executeRawUnsafe(`GRANT SELECT ON ALL TABLES IN SCHEMA public TO ${role}`)
-      await tx.$executeRawUnsafe(`REVOKE ALL ON TABLE "_prisma_migrations" FROM ${role}`)
-      await tx.$executeRawUnsafe(`GRANT UPDATE ON TABLE "Organization" TO ${role}`)
-      // Existing tire v2 capture remains OFF in this deployment; no DML grant is needed.
+      if (resume) {
+        await tx.$executeRawUnsafe(`ALTER ROLE ${role} PASSWORD '${password}'`)
+      } else {
+        await tx.$executeRawUnsafe(`CREATE ROLE ${role} LOGIN PASSWORD '${password}' NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOBYPASSRLS`)
+        await tx.$executeRawUnsafe(`GRANT CONNECT ON DATABASE neondb TO ${role}`)
+        await tx.$executeRawUnsafe(`GRANT USAGE ON SCHEMA public TO ${role}`)
+        await tx.$executeRawUnsafe(`GRANT SELECT ON ALL TABLES IN SCHEMA public TO ${role}`)
+        await tx.$executeRawUnsafe(`REVOKE ALL ON TABLE "_prisma_migrations" FROM ${role}`)
+        await tx.$executeRawUnsafe(`GRANT UPDATE ON TABLE "Organization" TO ${role}`)
+        // Existing tire v2 capture remains OFF; no DML grant is needed.
+      }
     }, { timeout: 20_000 })
 
     const runtimeUrl = new URL(direct.toString())
@@ -119,7 +141,17 @@ async function main() {
       stdio: ['ignore', 'pipe', 'pipe'],
     })
     // Never print raw CLI output: deployment arguments contain a credential.
-    if (deployment.status !== 0) throw new Error('API Preview deployment failed; inspect Vercel without exposing credentials')
+    if (deployment.status !== 0) {
+      const diagnostics = `${deployment.stderr ?? ''}\n${deployment.stdout ?? ''}`
+      console.error(JSON.stringify({ deployExit: deployment.status,
+        unknownOption: /unknown or unexpected option/i.test(diagnostics),
+        invalidEnv: /invalid.*environment|environment.*invalid/i.test(diagnostics),
+        projectError: /project.*not found|not found.*project/i.test(diagnostics),
+        invalidTarget: /invalid.*target|target.*invalid/i.test(diagnostics),
+        buildError: /build.*fail|fail.*build/i.test(diagnostics),
+        authError: /unauthorized|not authenticated/i.test(diagnostics) }))
+      throw new Error('API Preview deployment failed; inspect Vercel without exposing credentials')
+    }
     const url = deployment.stdout.match(/https:\/\/freight-cost-[a-z0-9-]+\.vercel\.app/)?.[0]
     if (!url) throw new Error('API Preview URL unavailable; inspect Vercel deployment list')
     const [health, ready, capture] = await Promise.all([
