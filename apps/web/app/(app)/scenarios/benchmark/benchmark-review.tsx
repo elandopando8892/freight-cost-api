@@ -4,12 +4,12 @@ import { Button } from '@/components/ui/button'
 import { parseReview, type ReviewResult } from './review-contract'
 
 const usd = (n: number) => new Intl.NumberFormat('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n)
-export function ReviewResults({ result }: { result: ReviewResult | null }) {
+export function ReviewResults({ result, calculated = false }: { result: ReviewResult | null; calculated?: boolean }) {
   if (!result) return <p className="rounded-lg border bg-card p-4">Sin resultados cargados. No hay importes adoptados desde esta pantalla.</p>
   if (result.status === 'INCOMPLETE') return <section className="rounded-lg border bg-card p-4"><h2 className="font-semibold">Datos pendientes · sin total</h2><ul className="mt-3 grid gap-2">{result.issues.map((issue, i) => <li key={i} className="break-words text-sm">{issue.field}: {issue.code}</li>)}</ul></section>
   return <div className="grid gap-4 md:grid-cols-2">{result.scenarios!.map(s => <article key={s.id} className="min-w-0 rounded-lg border bg-card p-4">
     <h2 className="break-words font-semibold">Escenario {s.id}</h2>
-    <dl className="mt-4 grid gap-2 text-sm">{([['CFU', s.result.costs.cfuUsd], ['CVU', s.result.costs.cvuUsd], ['Frontera', s.result.costs.borderServicesUsd], ['Total declarado', s.result.costs.productionCostUsd]] as const).map(([label, value]) => <div key={label} className="flex flex-wrap justify-between gap-2"><dt>{label}</dt><dd className="font-mono">{usd(value)} USD</dd></div>)}</dl>
+    <dl className="mt-4 grid gap-2 text-sm">{([['CFU', s.result.costs.cfuUsd], ['CVU', s.result.costs.cvuUsd], ['Frontera', s.result.costs.borderServicesUsd], [calculated ? 'Total calculado' : 'Total declarado', s.result.costs.productionCostUsd]] as const).map(([label, value]) => <div key={label} className="flex flex-wrap justify-between gap-2"><dt>{label}</dt><dd className="font-mono">{usd(value)} USD</dd></div>)}</dl>
     <details className="mt-4 border-t pt-3"><summary className="cursor-pointer py-2 focus-visible:outline-2">Fuentes del remolque ({s.result.sharedTrailer.lineage.evidence.length})</summary><ul className="grid gap-3">{s.result.sharedTrailer.lineage.evidence.map((e, i) => <li key={i} className="break-words text-sm"><a className="break-all text-primary underline" href={e.url} target="_blank" rel="noopener noreferrer">{e.id} ↗</a><p>{e.locator}</p></li>)}</ul></details>
   </article>)}</div>
 }
