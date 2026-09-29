@@ -1,5 +1,7 @@
 # C1: decisión operativa antes de modificar la base
 
+Actualización 2026-09-29: el usuario ya definió que XBF estima costos de terceros y que los supuestos se sustentan con investigación pública. Esa definición resuelve la pregunta de negocio de este documento: no debe asumirse flota propia de XBF ni exigirse una tarifa privada como única forma de avanzar. La separación vigente entre estimación del transportista, tarifa de compra y precio de venta está en [C1_XBF_BENCHMARK_METHOD_2026-09-29.md](C1_XBF_BENCHMARK_METHOD_2026-09-29.md). La propuesta de clonación que sigue es histórica y condicionada; no es la solución elegida para XBF.
+
 Estado: propuesta, no ejecutada. Revisión local: 19 septiembre 2026, rama `codex/supabase-auth-slice`, HEAD `ea1a0f1c0db1e50696512a6bb4e14f738da3f2c7`, worktree D: limpio al comenzar. Modelo recomendado: Astra, esfuerzo alto.
 
 ## Decisión necesaria
