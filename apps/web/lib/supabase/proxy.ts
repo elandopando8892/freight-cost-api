@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { safeAuthNext } from "./safe-next";
 
 const PUBLIC_PREFIXES = ["/login", "/forgot-password", "/auth/"];
 
@@ -41,10 +42,9 @@ export async function updateSession(request: NextRequest) {
   }
   if (authenticated && path === "/login") {
     const next = request.nextUrl.searchParams.get("next");
-    const homeUrl = request.nextUrl.clone();
-    homeUrl.pathname = next?.startsWith("/") && !next.startsWith("//") ? next : "/";
-    homeUrl.search = "";
-    return NextResponse.redirect(homeUrl);
+    const destination = safeAuthNext(next, request.url);
+    const homeUrl = new URL(destination, request.url);
+    return NextResponse.redirect(homeUrl.pathname === "/login" ? new URL("/", request.url) : homeUrl);
   }
   return response;
 }

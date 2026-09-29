@@ -1,14 +1,11 @@
 import { type NextRequest } from "next/server";
 import { noStoreRedirect } from "@/lib/supabase/auth-response";
+import { safeAuthNext } from "@/lib/supabase/safe-next";
 import { createClient } from "@/lib/supabase/server";
-
-function safeNext(value: string | null) {
-  return value?.startsWith("/") && !value.startsWith("//") ? value : "/";
-}
 
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get("code");
-  const next = safeNext(request.nextUrl.searchParams.get("next"));
+  const next = safeAuthNext(request.nextUrl.searchParams.get("next"), request.url);
   if (code) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
