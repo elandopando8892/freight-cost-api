@@ -1,6 +1,6 @@
 # C1 — preflight del siguiente par Preview
 
-Estado 2026-09-29 04:36 UTC: **NO DEPLOY / requiere autorización puntual del runtime**. Esta lista se limita a Freight Cost Model; no es autorización para producción, migraciones, Auth ni cambios económicos. Modelo recomendado: GPT-6 Sol, esfuerzo medio para preflight; GPT-6 Astra, esfuerzo alto para el corte de credenciales/aislamiento.
+Estado del preflight a las 04:36 UTC: **NO DEPLOY / requería autorización puntual del runtime**. El usuario la otorgó posteriormente y el corte Preview quedó registrado en [C1_PREVIEW_RELEASE_2026-09-29.md](C1_PREVIEW_RELEASE_2026-09-29.md). Esta lista conserva el estado previo como evidencia; no es autorización para producción, migraciones, Auth ni cambios económicos. Modelo recomendado: GPT-6 Sol, esfuerzo medio para preflight; GPT-6 Astra, esfuerzo alto para el corte de credenciales/aislamiento.
 
 ## Pre-deploy
 
