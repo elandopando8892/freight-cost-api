@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { PARAMETER_DEFINITIONS } from '../src/data/parameter-catalog.js'
 import { benchmarkRateRequirements } from '../src/modules/engine/benchmark-rates.js'
 import { calculateBenchmarkD2D } from '../src/modules/engine/benchmark-d2d.js'
+import { calculateOwnedD2DScenarios } from '../src/modules/engine/benchmark-owned-d2d.js'
 
 // Synthetic arithmetic fixtures, not adopted benchmark data.
 function fixture() {
@@ -84,6 +85,50 @@ function sharedFixture() {
       evidence: input.mx.parameters.evidence },
   }
 }
+
+function ownedFixture() {
+  const { sharedTrailer, ...route } = sharedFixture()
+  const { monthlyFixedUsd, costAgreement, ...trailer } = sharedTrailer
+  const datum = (value: number, unit: string) => ({ value, unit, evidenceIds: ['test'], derivation: 'Synthetic only' })
+  const evidence = trailer.evidence.map(e => ({ ...e }))
+  const fixed = { capital: { assetReference: trailer.assetReference, country: 'MX', condition: 'NEW',
+    serviceDate: route.serviceDate, evidence, acquisitionCost: datum(40000, 'USD'),
+    scenarios: [{ id: 'A', horizonBasis: 'FROM_NEW', horizon: datum(120, 'months'), residual: datum(10000, 'USD'), applicabilityRationale: 'Synthetic' }] },
+    allocation: 'TRAILER_ONLY_EXCLUDES_TRACTOR_AND_VARIABLE_COSTS', allocationRationale: 'Synthetic', allocationEvidenceIds: ['test'], evidence,
+    financing: [{ scenarioId: 'A', basis: 'INTEREST_ONLY_MONTHLY_AVERAGE', interest: datum(50, 'USD/trailer-month') }],
+    expenses: ['INSURANCE', 'PERMITS', 'OVERHEAD'].map(concept => ({ concept, amount: datum(10, 'USD/trailer-month') })) }
+  return { route, trailer, fixed }
+}
+
+describe('owned D2D scenario composition', () => {
+  it('derives fixed cost and counts trailer CFU/CVU once, retaining namespaced evidence', () => {
+    const result = calculateOwnedD2DScenarios(ownedFixture())
+    expect(result.status).toBe('SCENARIO_ONLY')
+    const d2d = result.scenarios![0].result
+    expect(d2d.sharedTrailer!.costs).toMatchObject({ cfuUsd: 33, cvuUsd: 36, productionCostUsd: 69 })
+    const cents = [d2d.legs.mx, d2d.legs.us].reduce((n, leg) => n + Math.round(leg.leg!.costs!.productionCostUsd * 100), 0)
+    expect(d2d.costs!.productionCostUsd).toBe((cents + 6900 + 15025) / 100)
+    expect(d2d.sharedTrailer!.lineage.monthlyFixedUsd!.value).toBe(330)
+    expect(d2d.sharedTrailer!.lineage.monthlyFixedUsd!.evidenceIds).toEqual(['capital:test', 'fixed:test'])
+    expect(result.calibrated).toBe(false); expect(result.sellPriceUsd).toBeNull()
+  })
+  it.each(['asset', 'date', 'expense', 'trip', 'border', 'days', 'country'] as const)('blocks %s', failure => {
+    const input = ownedFixture()
+    if (failure === 'asset') input.trailer.assetReference = 'OTHER'
+    if (failure === 'date') input.fixed.capital.serviceDate = '2026-09-28'
+    if (failure === 'expense') input.fixed.expenses.pop()
+    if (failure === 'trip') input.trailer.totalKm.value = 1
+    if (failure === 'border') input.route.borderCharges = []
+    if (failure === 'days') input.trailer.productiveDaysPerMonth.value = 32
+    if (failure === 'country') input.trailer.evidence = input.trailer.evidence.map(e => ({ ...e, country: 'US' }))
+    expect(calculateOwnedD2DScenarios(input).scenarios).toBeNull()
+  })
+  it('rejects recaptured fixed and arbitrary totals', () => {
+    const input = ownedFixture()
+    expect(() => calculateOwnedD2DScenarios({ ...input, trailer: { ...input.trailer, monthlyFixedUsd: sharedFixture().sharedTrailer.monthlyFixedUsd } })).toThrow()
+    expect(() => calculateOwnedD2DScenarios({ ...input, productionCostUsd: 1 })).toThrow()
+  })
+})
 
 describe('shared trailer D2D', () => {
   it.each([[], ['MAINTENANCE'], ['TIRES'], ['MAINTENANCE', 'TIRES']])('accounts for leased monthly inclusions %j once', (...concepts) => {
