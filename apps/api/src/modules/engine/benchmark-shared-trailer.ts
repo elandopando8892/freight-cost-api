@@ -14,6 +14,13 @@ export const SharedTrailerSchema = z.object({
   scopeDeclaration: z.literal('LEG_INPUTS_EXCLUDE_ALL_TRAILER_COSTS'),
   allocationEvidence: z.string().trim().min(1).max(1000),
   allocationEvidenceIds: z.array(z.string().trim().min(1)).default([]),
+  costAgreement: z.object({
+    tenure: z.enum(['OWNED', 'LEASED']),
+    fixedCostBasis: z.enum(['DEPRECIATION_AND_FINANCING', 'LEASE_RENT']),
+    includedInMonthlyFixed: z.array(z.enum(['MAINTENANCE', 'TIRES'])).max(2),
+    derivation: z.string().trim().min(1).max(1000),
+    evidenceIds: z.array(z.string().trim().min(1)).default([]),
+  }).strict().optional(),
   monthlyFixedUsd: datum('USD/trailer-month', true),
   productiveKmPerMonth: datum('km/trailer-month', true),
   productiveDaysPerMonth: datum('days/trailer-month', true),
@@ -50,6 +57,22 @@ export function calculateSharedTrailer(raw: unknown, serviceDate: string, minimu
   }
   for (const key of keys) if (input[key]) checkReferences(key, input[key]!.evidenceIds)
   checkReferences('allocationEvidence', input.allocationEvidenceIds)
+  const agreement = input.costAgreement
+  if (!agreement) issues.push({ field: 'costAgreement', code: 'MISSING_COST_AGREEMENT' })
+  else {
+    checkReferences('costAgreement', agreement.evidenceIds)
+    const expected = agreement.tenure === 'OWNED' ? 'DEPRECIATION_AND_FINANCING' : 'LEASE_RENT'
+    if (agreement.fixedCostBasis !== expected) issues.push({ field: 'costAgreement', code: 'TENURE_BASIS_MISMATCH' })
+    const covered = new Set(agreement.includedInMonthlyFixed)
+    if (covered.size !== agreement.includedInMonthlyFixed.length) issues.push({ field: 'costAgreement', code: 'DUPLICATE_INCLUDED_CONCEPT' })
+    if (agreement.tenure === 'OWNED' && covered.size) issues.push({ field: 'costAgreement', code: 'OWNED_PACKAGE_UNSUPPORTED' })
+    for (const [concept, field] of [['MAINTENANCE', 'maintenanceUsdPerKm'], ['TIRES', 'tiresUsdPerKm']] as const) {
+      // Inclusion requires an explicit documented zero, never silently discards a cost.
+      if (covered.has(concept) && input[field] && input[field]!.value !== 0) {
+        issues.push({ field, code: 'COST_ALREADY_INCLUDED_IN_MONTHLY_FIXED' })
+      }
+    }
+  }
   // Referential coverage does not prove authenticity, economic scope or calibration.
   const envelope = { lineage: input, evidenceCoverage, calibrated: false as const,
     sourceStatus: 'DOCUMENTED_UNVERIFIED' as const }

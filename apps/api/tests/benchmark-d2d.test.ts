@@ -76,6 +76,8 @@ function sharedFixture() {
     sharedTrailer: { assetReference: 'SYNTHETIC-TRAILER', scopeDeclaration: 'LEG_INPUTS_EXCLUDE_ALL_TRAILER_COSTS',
       allocationEvidence: 'Synthetic tractor-only allocation, not verified operational evidence',
       allocationEvidenceIds: ['test'],
+      costAgreement: { tenure: 'OWNED', fixedCostBasis: 'DEPRECIATION_AND_FINANCING',
+        includedInMonthlyFixed: [] as string[], derivation: 'Synthetic owned asset cost, not rent', evidenceIds: ['test'] },
       monthlyFixedUsd: datum(1000, 'USD/trailer-month'), productiveKmPerMonth: datum(10000, 'km/trailer-month'),
       productiveDaysPerMonth: datum(20, 'days/trailer-month'), maintenanceUsdPerKm: datum(0.1, 'USD/km'),
       tiresUsdPerKm: datum(0.05, 'USD/km'), totalKm: datum(240, 'km'), cycleDays: datum(2, 'days'),
@@ -84,6 +86,38 @@ function sharedFixture() {
 }
 
 describe('shared trailer D2D', () => {
+  it.each([[], ['MAINTENANCE'], ['TIRES'], ['MAINTENANCE', 'TIRES']])('accounts for leased monthly inclusions %j once', (...concepts) => {
+    const input = sharedFixture()
+    input.sharedTrailer.costAgreement.tenure = 'LEASED'
+    input.sharedTrailer.costAgreement.fixedCostBasis = 'LEASE_RENT'
+    input.sharedTrailer.costAgreement.includedInMonthlyFixed = concepts
+    if (concepts.includes('MAINTENANCE')) input.sharedTrailer.maintenanceUsdPerKm.value = 0
+    if (concepts.includes('TIRES')) input.sharedTrailer.tiresUsdPerKm.value = 0
+    const result = calculateBenchmarkD2D(input)
+    expect(result.status).toBe('BENCHMARK_ESTIMATE')
+    expect(result.sharedTrailer!.costs!.cfuUsd).toBe(100)
+    expect(result.sharedTrailer!.costs!.cvuUsd).toBe((concepts.includes('MAINTENANCE') ? 0 : 24) + (concepts.includes('TIRES') ? 0 : 12))
+  })
+  it.each(['missing', 'basis', 'owned-package', 'duplicate', 'maintenance', 'tires', 'source'] as const)('blocks agreement defect %s', mode => {
+    const input = sharedFixture()
+    const agreement = input.sharedTrailer.costAgreement
+    if (mode === 'basis') agreement.fixedCostBasis = 'LEASE_RENT'
+    if (mode === 'owned-package') agreement.includedInMonthlyFixed = ['TIRES']
+    if (mode === 'duplicate') agreement.includedInMonthlyFixed = ['TIRES', 'TIRES']
+    if (mode === 'maintenance' || mode === 'tires') {
+      agreement.tenure = 'LEASED'; agreement.fixedCostBasis = 'LEASE_RENT'
+      agreement.includedInMonthlyFixed = [mode === 'maintenance' ? 'MAINTENANCE' : 'TIRES']
+    }
+    if (mode === 'source') agreement.evidenceIds = ['not-in-dossier']
+    const { costAgreement, ...legacy } = input.sharedTrailer
+    const result = calculateBenchmarkD2D(mode === 'missing' ? { ...input, sharedTrailer: legacy } : input)
+    expect(result.costs).toBeNull()
+    expect(result.status).toBe('INCOMPLETE')
+    if (mode === 'maintenance' || mode === 'tires') expect(result.issues).toContainEqual({
+      field: `sharedTrailer.${mode === 'maintenance' ? 'maintenanceUsdPerKm' : 'tiresUsdPerKm'}`,
+      code: 'COST_ALREADY_INCLUDED_IN_MONTHLY_FIXED',
+    })
+  })
   it.each(['monthlyFixedUsd', 'productiveKmPerMonth', 'productiveDaysPerMonth', 'maintenanceUsdPerKm', 'tiresUsdPerKm', 'totalKm', 'cycleDays'] as const)('requires explicit references for %s even when its dossier exists', field => {
     const input = sharedFixture()
     input.sharedTrailer[field].evidenceIds = []
@@ -120,7 +154,7 @@ describe('shared trailer D2D', () => {
     expect(result.status).toBe('BENCHMARK_ESTIMATE')
     expect(result.sharedTrailer!.evidenceCoverage.tiresUsdPerKm).toEqual(['tires-source'])
     expect(result.sharedTrailer!.evidenceCoverage.allocationEvidence).toEqual(['test'])
-    expect(Object.keys(result.sharedTrailer!.evidenceCoverage)).toHaveLength(8)
+    expect(Object.keys(result.sharedTrailer!.evidenceCoverage)).toHaveLength(9)
     expect(result.sharedTrailer!.sourceStatus).toBe('DOCUMENTED_UNVERIFIED')
   })
   it('allocates trailer fixed, maintenance and tires once and reconciles to cents', () => {
