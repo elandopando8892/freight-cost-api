@@ -14,8 +14,8 @@ describe('C1 operating purpose', () => {
     expect(evaluateC1OperatingModel('THIRD_PARTY_BENCHMARK', [fleet])).toMatchObject({
       modelMatchesPurpose: false, structuralCandidateForRequestedPurpose: false,
       economicCalibrationVerified: false, existingAlternative: null,
-      blockers: ['OPERATING_MODEL_MISMATCH', 'THIRD_PARTY_BENCHMARK_ASSEMBLY_NOT_IMPLEMENTED'],
-      benchmarkAdapter: { status: 'LEG_ONLY_NOT_INTEGRATED', calibrated: false },
+      blockers: ['OPERATING_MODEL_MISMATCH', 'THIRD_PARTY_BENCHMARK_NOT_GOVERNED'],
+      benchmarkAdapter: { status: 'LOCAL_D2D_NOT_INTEGRATED', calibrated: false },
     })
   })
   it('points purchase costing to the separate model without claiming readiness', () => {
