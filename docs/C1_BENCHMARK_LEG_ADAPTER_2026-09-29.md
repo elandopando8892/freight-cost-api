@@ -1,5 +1,7 @@
 # Benchmark por tramo — primer adaptador económico
 
+Continuación: el conversor local de parámetros canónicos y la composición parámetros→tramo se implementaron en [C1_BENCHMARK_CANONICAL_RATES_2026-09-29.md](C1_BENCHMARK_CANONICAL_RATES_2026-09-29.md). Este documento conserva el alcance del primer corte; calibración y composición D2D siguen pendientes.
+
 Fuente inicial: `b00a498c3bb4b0f05fd5e50e790fab48014c638e`, rama `codex/cost-tires-release-s14`, worktree limpio en D:. Modelo recomendado: Astra, esfuerzo alto. AGENTS de codex-home vacío; no se editaron archivos de UI.
 
 Se implementó `calculateBenchmarkLeg` (`FCM_CARRIER_BENCHMARK_LEG_V1`) como función pura local sin endpoint ni persistencia. Calcula el costo productivo estimado de un transportista de referencia, en un tramo doméstico MX o US, tractor/caja seca sencilla, viaje sencillo. Requiere inputs derivados explícitos en USD y km; no carga defaults ni adopta los 210 parámetros históricos. No habilita D2D completo, transbordo, reefer, hazmat, flatbed ni otras modalidades.
