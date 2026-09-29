@@ -129,7 +129,7 @@ async function main() {
     const childEnv = Object.fromEntries(Object.entries(process.env).filter(([key]) =>
       !['SUPABASE_ACCESS_TOKEN', 'DATABASE_URL', 'STAGING_DATABASE_URL', 'STAGING_DATABASE_URL_UNPOOLED'].includes(key)))
     const deployment = spawnSync(process.execPath, [cli, 'deploy', '--yes', '--scope', FCM_VERCEL_PROJECT.teamId,
-      '--project', FCM_API_VERCEL_PROJECT.id, '--target', 'preview', '--skip-domain',
+      '--project', FCM_API_VERCEL_PROJECT.id, '--target', 'preview',
       '--env', `STAGING_DATABASE_URL=${runtimeUrl.toString()}`,
       '--env', `RELEASE_SHA=${release}`,
       '--env', 'FCM_TIRE_V2_RESEARCH_CAPTURE_ENABLED=false',
