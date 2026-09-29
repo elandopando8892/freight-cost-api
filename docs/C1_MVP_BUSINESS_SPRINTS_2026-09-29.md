@@ -80,6 +80,6 @@ La regla de terminado es **E1–E4 PASS** para la modalidad piloto y evidencia e
 
 ## Próxima ejecución concreta
 
-Empezar B1 por la matriz de dependencias **efectivamente leídas** por `benchmark-rates.ts` para el tramo MX y US; investigar fuentes públicas primarias por familia económica, no seguir agregando controles de captura. Primera salida: qué parámetros del piloto tienen fuente comparable, cuáles sólo contraste y cuáles carecen de sustento, con decisión adoptable/no adoptable. No fijar una cifra de ahorro, costo o precio antes de ese corte. Después B2; sólo corregir el formulario si impide ejecutar el piloto.
+Continuar B1 con la [revisión de fuentes públicas](C1_B1_PUBLIC_EVIDENCE_REVIEW_2026-09-29.md) y el registro canónico por cada key efectivamente leída por `benchmark-rates.ts` para MX/US. La revisión inicial encontró fuentes fechables candidatas para combustible, FX y algunos peajes; salarios, costos de operación y llantas sirven por ahora de contraste; el fijo mensual y gastos desagregados quedan insuficientes. El registro debe decidir por parámetro qué es comparable/adoptable y qué falta. Después comparar el método fijo detallado con alternativas de costo por milla antes de B2; no fijar ahorro, costo, precio ni activar una base antes de cerrar ese análisis.
 
 Rollback de este corte: revertir este documento y el enlace en `SPRINT_STATUS.md`. No se cambiaron motor, datos, usuarios, Auth, infraestructura ni despliegues.
