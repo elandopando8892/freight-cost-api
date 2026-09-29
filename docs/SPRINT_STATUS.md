@@ -1,6 +1,6 @@
 # Freight Cost Model · estado del MVP
 
-Plan vigente desde 2026-09-19: `SPRINT_CLOSURE_2026-09-19.md`. Dos sprints de cierre C1/C2 y siete aceptaciones sustituyen el calendario previo. El contenido inferior conserva evidencia histórica, no el estado actual de producción.
+Plan vigente desde 2026-09-19: `SPRINT_CLOSURE_2026-09-19.md`. Dos sprints de cierre C1/C2 y siete aceptaciones sustituyen el calendario previo. Corte C1 actual: `C1_ACCEPTANCE_CUT_2026-09-29.md` (permisos VIEWER corregidos en Preview; A1/A2 sin aceptación remota completa; A3 bloqueado por la versión histórica sin perfil). El contenido inferior conserva evidencia histórica, no el estado actual de producción.
 
 Fecha de corte: 2026-09-07  
 Checkout: `D:\\andre\\worktrees\\freight-cost-model\\supabase-auth-migration-20260830`  
