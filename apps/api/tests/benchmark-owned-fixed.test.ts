@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { calculateOwnedFixedScenarios } from '../src/modules/engine/benchmark-owned-fixed.js'
+import { calculateOwnedCfuScenarios } from '../src/modules/engine/benchmark-owned-cfu.js'
 function fixture() {
   const datum = (value: number, unit: string) => ({ value, unit, evidenceIds: ['test'], derivation: 'Synthetic only' })
   const evidence = [{ id: 'test', url: 'https://example.org/test', locator: 'Fixture', country: 'US',
@@ -42,5 +43,39 @@ describe('owned fixed scenario composition', () => {
     expect(() => calculateOwnedFixedScenarios({ ...input, financing: [{ ...input.financing[0], principal: 500 }] })).toThrow()
     input.expenses[0].concept = 'RENT'
     expect(() => calculateOwnedFixedScenarios(input)).toThrow()
+  })
+})
+
+function cfuFixture() {
+  const fixed = fixture()
+  const datum = (value: number, unit: string) => ({ value, unit, evidenceIds: ['test'], derivation: 'Synthetic exposure only' })
+  return { fixed, exposure: { assetReference: 'TEST', serviceDate: '2026-09-29',
+    evidence: fixed.evidence.map(e => ({ ...e })), productiveKmPerMonth: datum(10000, 'km/trailer-month'),
+    productiveDaysPerMonth: datum(20, 'days/trailer-month'), totalKm: datum(1000, 'km'), cycleDays: datum(3, 'days') } }
+}
+describe('owned trailer CFU allocation', () => {
+  it.each([[3, 49.5, 'TIME'], [1, 33, 'DISTANCE'], [2, 33, 'TIE']])('allocates cycle %s without summing alternative bases', (days, expected, basis) => {
+    const input = cfuFixture(); input.exposure.cycleDays.value = days as number
+    const result = calculateOwnedCfuScenarios(input)
+    expect(result.scenarios![0]).toMatchObject({ cfuUsd: expected, bindingBasis: basis, cfuByDistanceUsd: 33 })
+    expect(result.productionCostUsd).toBeNull(); expect(result.calibrated).toBe(false)
+  })
+  it.each(['asset', 'date', 'missing', 'source', 'expired', 'country', 'days', 'fixed', 'overflow'] as const)('blocks %s', failure => {
+    const input = cfuFixture()
+    if (failure === 'asset') input.exposure.assetReference = 'OTHER'
+    if (failure === 'date') input.exposure.serviceDate = '2026-09-28'
+    if (failure === 'source') input.exposure.totalKm.evidenceIds = ['unknown']
+    if (failure === 'expired') input.exposure.evidence[0].validUntil = '2026-09-28'
+    if (failure === 'country') input.exposure.evidence[0].country = 'MX'
+    if (failure === 'days') input.exposure.productiveDaysPerMonth.value = 32
+    if (failure === 'fixed') input.fixed.expenses.pop()
+    if (failure === 'overflow') input.exposure.totalKm.value = 1e308
+    const result = calculateOwnedCfuScenarios(failure === 'missing' ? { ...input, exposure: { ...input.exposure, cycleDays: null } } : input)
+    expect(result.scenarios).toBeNull(); expect(result.status).toBe('INCOMPLETE')
+  })
+  it('rejects zero denominators and injected fixed totals', () => {
+    const input = cfuFixture(); input.exposure.productiveKmPerMonth.value = 0
+    expect(() => calculateOwnedCfuScenarios(input)).toThrow()
+    expect(() => calculateOwnedCfuScenarios({ ...cfuFixture(), monthlyFixedUsd: 1 })).toThrow()
   })
 })
