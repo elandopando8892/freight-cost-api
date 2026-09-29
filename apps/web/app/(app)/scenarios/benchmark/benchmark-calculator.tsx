@@ -43,7 +43,7 @@ export function BenchmarkCalculator() {
         : 'No se pudo calcular. Verifica tu sesión, los inputs y la conexión; no se adoptó ningún importe.')
     } finally { if (current === generation.current) setPending(false) }
   }
-  return <div className="grid gap-4">
+  return <div className="grid min-w-0 gap-4">
     <header><p className="font-mono text-xs uppercase tracking-widest text-primary">Benchmark operativo</p><h1 className="mt-2 text-2xl font-semibold">Escenarios D2D</h1><p className="mt-2 text-sm text-muted-foreground">Remolque propio compartido · Cálculo desde inputs · No calibrado</p></header>
     <p className="rounded-lg border bg-card p-4 text-sm">El servidor recalcula CFU y CVU desde los inputs enviados con tu sesión. No guarda ni adopta bases. Las fuentes siguen pendientes de validación económica; el resultado no es una tarifa de compra o venta.</p>
     {expired ? <p role="alert">Sesión vencida. Vuelve a iniciar sesión; se limpió el expediente local.</p> : <BenchmarkForm key={formKey} onChange={change} />}
