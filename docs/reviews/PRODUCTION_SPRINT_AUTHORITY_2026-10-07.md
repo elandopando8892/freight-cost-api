@@ -1,0 +1,11 @@
+# Autoridad del sprint de corte productivo
+
+Referencia humana directa: «Procede hasta completar el sprint», recibida en el turno `01a117f3-a0ff-7f93-9248-2d851a715e62` del chat Should-Cost Engine. El host fecha el inicio de ese turno en 2026-10-07T20:00:04Z (14:00:04 America/Mexico_City). Este registro no autentica al autor ni inventa una firma.
+
+La respuesta sigue a la propuesta de migración productiva: respaldar identidades, conciliar exclusivamente usuarios FCM existentes, aplicar sólo migraciones realmente necesarias, conservar IDs internos/organizaciones/roles/valores económicos y retirar kindeId sólo tras probar respaldo y conciliación completa. Permite preparar, verificar y publicar el par Web/API existente del mismo commit. No crear cuentas de Auth, cambiar el Site URL compartido de Rateware ni adoptar importes/modelos de costos por esa autorización.
+
+Modelos propuestos y aceptados para este trabajo: Codex GPT-6.1 Sol/high para implementación y verificación; Claude `claude-opus-5-5`/high para una revisión de sólo lectura vía MCP. El modelo nativo de Codex no se cambia mediante JSON/MCP; modelo servido y esfuerzo efectivo se registran desconocidos cuando no observables. La propuesta previa explicitó disponibilidad Claude desconocida y esfuerzo efectivo no observable; el encargo conserva esas limitaciones.
+
+Presupuesto Claude: una llamada, máximo15min, cero reintentos/resume/fallback; prompt<=24000bytes y salida<=2097152bytes. Contexto sanitizado mínimo, herramientas/MCP/skills/plugins vacíos, sin DB, usuarios reales, secretos o historiales ajenos. Los estados y consumos desconocidos cuentan, no se devuelven reservas. Vigencia de admisión: un día desde la decisión; cierre al terminar/bloquear. No se reabre el sprint s2 consumido ni se resetean sus contadores. El problema nuevo es corte de identidad/esquema productivo, distinto de adopción económica por familias.
+
+Codex conserva integración y despliegue. Los subagentes sólo tienen rutas locales expresamente delimitadas. Una identidad sin correspondencia verificada, backup no recuperable, ledger divergente, efecto incierto o bloqueo de facturación/modelo detiene la parte dependiente y se conserva la evidencia. No se infiere autorización de cargos, nuevas conexiones o credenciales por este registro.
