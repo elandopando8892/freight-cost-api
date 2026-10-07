@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import { readFileSync, readdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { PrismaClient } from '@prisma/client'
+import { selectIdentityContacts, type IdentityContactPin } from './lib/production-identity-contacts.js'
 
 const sha = (value: string) => createHash('sha256').update(value).digest('hex')
 
@@ -9,13 +10,16 @@ const sha = (value: string) => createHash('sha256').update(value).digest('hex')
  * backup creation, migration application, account provisioning or logins.
  * Email and legacy identities stay inside this process; only their hashes leave.
  */
-export async function productionCutoverInventory(env: NodeJS.ProcessEnv = process.env) {
+export async function productionCutoverInventory(env: NodeJS.ProcessEnv = process.env, contactPins?: IdentityContactPin[]) {
   if (env.VERCEL_ENV !== 'production' ||
       (env.VERCEL_PROJECT_ID && env.VERCEL_PROJECT_ID !== 'prj_mw1xLIqutlRSIG2F2BryfPqDvN2L'))
     throw new Error('CUTOVER_PRODUCTION_API_SCOPE_REQUIRED')
   const target = new URL(env.DATABASE_URL ?? '')
   if (!['postgres:', 'postgresql:'].includes(target.protocol) || !target.hostname.endsWith('.neon.tech'))
     throw new Error('CUTOVER_NEON_TARGET_REQUIRED')
+  if (contactPins && (env.VERCEL_PROJECT_ID !== 'prj_mw1xLIqutlRSIG2F2BryfPqDvN2L' ||
+      sha(target.hostname + target.pathname) !== env.FCM_PRODUCTION_TARGET_FINGERPRINT))
+    throw new Error('CONTACT_TARGET_NOT_PINNED')
   target.searchParams.set('connect_timeout', '10')
   const db = new PrismaClient({ datasourceUrl: target.toString(), log: [] })
   try {
@@ -39,6 +43,10 @@ export async function productionCutoverInventory(env: NodeJS.ProcessEnv = proces
           encode(sha256(convert_to(to_jsonb(u)::text, 'UTF8')), 'hex') AS identity_fingerprint
         FROM "User" u ORDER BY u.id
       `
+      if (contactPins) return { contacts: selectIdentityContacts(records.map(r => ({
+        id: String(r.document.id), email: String(r.document.email), emailHash: r.email_hash,
+        identityFingerprint: r.identity_fingerprint,
+      })), contactPins) }
       const users = records.map(({ document: u, email_hash, identity_fingerprint }) => {
         const email = String(u.email ?? '').trim().toLowerCase()
         if (!email.includes('@') || /[\x00-\x20\x7f]/.test(email)) throw new Error('CUTOVER_USER_EMAIL_INVALID')
@@ -57,6 +65,6 @@ export async function productionCutoverInventory(env: NodeJS.ProcessEnv = proces
     }, { timeout: 20_000 })
     return { schemaVersion: 'fcm.production-cutover-inventory.v1', mode: 'READ_ONLY',
       targetFingerprint: sha(target.hostname + target.pathname), ...report,
-      userFingerprint: sha(JSON.stringify(report.users)), writesPerformed: false }
+      ...('users' in report ? { userFingerprint: sha(JSON.stringify(report.users)) } : {}), writesPerformed: false }
   } finally { await db.$disconnect() }
 }

@@ -18,10 +18,14 @@ export function buildDeployment(
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   if (process.argv.length !== 2) throw new Error('BUILD_DEPLOYMENT_NO_ARGUMENTS')
-  if (process.env.FCM_PRODUCTION_CUTOVER_MODE === 'inventory') {
+  if (['inventory', 'identity-contacts'].includes(process.env.FCM_PRODUCTION_CUTOVER_MODE ?? '')) {
     buildOnly()
     void import('./production-cutover-inventory.js').then(async ({ productionCutoverInventory }) => {
-      for (const line of encodeCutoverEvidence(await productionCutoverInventory())) console.log(line)
+      const pins = process.env.FCM_PRODUCTION_CUTOVER_MODE === 'identity-contacts'
+        ? JSON.parse(process.env.FCM_IDENTITY_CONTACT_PINS ?? 'null') : undefined
+      if (process.env.FCM_PRODUCTION_CUTOVER_MODE === 'identity-contacts' && !pins)
+        throw new Error('CONTACT_PINS_REQUIRED')
+      for (const line of encodeCutoverEvidence(await productionCutoverInventory(process.env, pins))) console.log(line)
       // Inspection deployments never replace an operational deployment.
       console.error('CUTOVER_INVENTORY_ONLY_NO_PUBLICATION')
       process.exitCode = 1
