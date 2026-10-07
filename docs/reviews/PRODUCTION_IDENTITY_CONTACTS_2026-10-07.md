@@ -15,7 +15,7 @@ Checkout D: y rama `codex/cost-tires-release-s14`, baseline `9327e1a8879d821be14
 
 ## Pruebas y límites
 
-TDD observado: siete pruebas fallaron contra el stub; tras implementación pasaron. Suite focal de contacto/evidencia/gate de esquema: 18/18. TypeScript scripts en modo ESNext/Bundler estricto: exit0. El primer comando de TypeScript usó por error NodeNext/CommonJS, incompatible con el import.meta preexistente; no se presenta ese fallo de invocación como defecto arreglado ni se cambió el runtime.
+TDD observado: siete pruebas fallaron contra el stub; tras implementación pasaron. Suite focal de contacto/evidencia/gate de esquema: 18/18. Última verificación de seis archivos del corte: **71/71**, exit0 (plan35, SQL16, esquema10, contacto7, builder2 y evidencia1). TypeScript scripts en modo ESNext/Bundler estricto: exit0. El primer comando de TypeScript usó por error NodeNext/CommonJS, incompatible con el import.meta preexistente; no se presenta ese fallo de invocación como defecto arreglado ni se cambió el runtime.
 
 `npm test` completo se lanzó: web 29 archivos / 264 casos aprobados; API no completó. `tire-calibration-rls-postgres.test.ts` reportó cero casos/error en colección y su contrato exige el par de URLs de Postgres desechable loopback; no se declara probado RLS. El runner global se interrumpió al alcanzar el checkpoint humano, exit1; no hay resultado global PASS ni aceptación de release.
 
