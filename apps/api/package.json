@@ -28,7 +28,7 @@
     "verify:research-package": "tsx scripts/package-family-base-source.ts --check",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "vercel-build": "tsx scripts/build-only.ts"
+    "vercel-build": "tsx scripts/build-deployment.ts"
   },
   "dependencies": {
     "@fastify/cors": "^11.2.0",
