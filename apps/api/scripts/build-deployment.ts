@@ -2,6 +2,7 @@ import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { buildOnly } from './build-only.js'
 import { reviewProductionSchema } from './review-production-schema.js'
+import { encodeCutoverEvidence } from './lib/cutover-evidence.js'
 
 /** Normal builds retain the database-free builder. A explicitly requested
  * Production review must pass BEFORE compilation; it never applies migrations.
@@ -20,7 +21,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   if (process.env.FCM_PRODUCTION_CUTOVER_MODE === 'inventory') {
     buildOnly()
     void import('./production-cutover-inventory.js').then(async ({ productionCutoverInventory }) => {
-      console.log('FCM_PRODUCTION_INVENTORY=' + JSON.stringify(await productionCutoverInventory()))
+      for (const line of encodeCutoverEvidence(await productionCutoverInventory())) console.log(line)
       // Inspection deployments never replace an operational deployment.
       console.error('CUTOVER_INVENTORY_ONLY_NO_PUBLICATION')
       process.exitCode = 1
