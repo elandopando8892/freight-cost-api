@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
+    "build:release": "tsx scripts/build-only.ts",
     "start": "node dist/server.js",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
@@ -23,9 +24,11 @@
     "provision:c1:preview-runtime": "tsx scripts/provision-c1-preview-runtime.ts",
     "db:generate": "prisma generate",
     "test": "vitest run",
+    "test:runtime-package": "vitest run tests/family-base-source.test.ts",
+    "verify:research-package": "tsx scripts/package-family-base-source.ts --check",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "vercel-build": "tsx scripts/vercel-build.ts"
+    "vercel-build": "tsx scripts/build-only.ts"
   },
   "dependencies": {
     "@fastify/cors": "^11.2.0",

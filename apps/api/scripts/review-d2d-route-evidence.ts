@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import { readFileSync, realpathSync } from 'node:fs'
 import { dirname, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { readOriginal } from '../../../tools/evidence-package/package.mjs'
 import { z } from 'zod'
 
 // Offline evidence review only. No engine, Prisma, network, defaults or trip writes.
@@ -54,7 +55,13 @@ export const RouteEvidenceSchema = z.object({ artifact: z.literal('FCM_B2_D2D_RO
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
 export function readRouteSource(path: string): Buffer {
   localPath.parse(path)
-  const resolved = realpathSync(resolve(repoRoot, path))
+  let resolved: string
+  try { resolved = realpathSync(resolve(repoRoot, path)) }
+  catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error
+    if (!process.env.FCM_EVIDENCE_VAULT) throw new Error(`RESEARCH_SOURCE_REQUIRED:${path}; configure FCM_EVIDENCE_VAULT for registered external originals`)
+    return readOriginal({ root: repoRoot, vault: process.env.FCM_EVIDENCE_VAULT, file: path }) as Buffer
+  }
   const fromRoot = relative(realpathSync(repoRoot), resolved)
   if (fromRoot === '..' || fromRoot.startsWith(`..${sep}`) || resolve(repoRoot, fromRoot) !== resolved) {
     throw new Error('SOURCE_OUTSIDE_REPO')

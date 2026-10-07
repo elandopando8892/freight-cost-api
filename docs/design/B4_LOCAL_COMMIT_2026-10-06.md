@@ -20,6 +20,18 @@ Codex/OpenAI actual, recomendado GPT-6.1Sol/high, modelo/esfuerzo efectivos/cuot
 
 Lista final, verificación de blobs y SHA del commit: pendientes de registrar resultados efectivos. No tratar preparación o gitwrite-tree como commit terminado.
 
+### Cierre efectivo · 7oct2026 00:14 CDMX
+
+**Commit local689432674e65619352318182e2cc05fc97af53d8**, padre4f5fc2de0c3d178dace917231e1092040dec21fd, árbol5cb72926a229f22f135e12c38ed1595da94bd39c.899archivos modificados/añadidos. [Selección sellada previa](../reviews/B4_LOCAL_COMMIT_SELECTION_2026-10-06.json), [recibo posterior local](../reviews/B4_LOCAL_COMMIT_RECEIPT_2026-10-07.json). Este párrafo/recibo son posteriores y no se presentan como incluidos en su propio commit; sin amend ni segundo commit automático.
+
+52blobs inicialmente normalizados por Git: diagnóstico por bytes confirmó sóloCRLF→LF, datos de workspace idénticos al inventario. La primera clasificación UTF8 falló por no preservar bytes de una captura; se corrigió sólo la lectura diagnóstica aLatin1, sin modificar fuente. Añadidos52patrones exactos -text en.gitattributes (incluida ruta escapada [setId]); no global Gitconfig/código de producto/pares económicos modificados. Un add normal reutilizó el statcache: --renormalize aplicado únicamente a esos52paths, después899/899blobs exactos al inventario,0drift. No repin de evidencias, ninguna pérdida o corrección de importes.
+
+Scanner existente sobre exportación del índice final:1564archivosPASS/exit0; originales9fuera. PruebaWeb nueva264/264PASS,29archivos/0SKIP/sin unhandled,350.79s/exit0. Gatesclosed de lint/tipos/defaultTurbopack del corte anterior se conservan con hashes de código idénticos. No reejecución deAPI/DB ni actual OAuth/cloud. Antes de stage hubo error206 de longitud de comando Windows, sin escritura; se reutilizó la lista JSON existente en vez de enviar cientos de paths por argumento. Comprobación prematura durante gitadd leyó índice vacío y NO contó como verificación; se esperó cierre y repitió sobre índice completo.
+
+**Whitespace no verde**: gitdiff--cached--check señaló espacios de capturas públicas byte-pinned y formatos documentales/3EOF de scripts/tests. No editar originales, esconderlos con scanner permisivo ni afirmar verify:ci completo. Los10warningslint y29SKIPAPI anteriores siguen declarados; npmci/Linux/browsermultiu/economía/producción no aceptados. El commit es checkpoint local aprobado, no GO productivo.43excluidos originales/capturas/contratosClaude conservados íntegros; índice vacío al cerrar, sin push/deploy/DB/Auth/IAauxiliar. En vez de borrar locks, se esperó al escritor propio.
+
+Rollback: proponer revert de6894326 sólo con autorización y revisión de cambios posteriores; no ejecutado. Los originales/snapshots/archivos excluidos permanecen disponibles. Checkpoint siguiente: revisión de release/aceptación operativa y autorización productiva específica; no ampliar permisos ni publicar automáticamente.
+
 ## Recuperación
 
 El padre es4f5fc2de0c3d178dace917231e1092040dec21fd. No ejecutar reset/revert automáticamente. Para deshacer publicación del checkpoint local, proponer un revert explícito después de revisar los cambios posteriores; los originales excluidos, snapshots y trabajo ajeno permanecen. Si falla antes de commit, preservar el índice y entregar paths/estado, sin unstaging/reset indiscriminado. No eliminación material autorizada por este checkpoint.

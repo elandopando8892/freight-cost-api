@@ -61,6 +61,21 @@ export function verifyPackage({ root, vault }) {
     manifestSha256: sha256(readFileSync(containedFile(root, manifestPath))) };
 }
 
+/** Explicit offline research input. Never writes originals into a checkout. */
+export function readOriginal({ root, vault, file }) {
+  if (!/^docs\/research\/sources\/[A-Za-z0-9_.-]+\.html$/.test(file)) throw new Error('UNSAFE_PATH');
+  vault = externalVault(root, vault);
+  const manifest = JSON.parse(readFileSync(containedFile(root, manifestPath), 'utf8'));
+  if (manifest.schemaVersion !== 'fcm.sanitized-evidence.v1' || manifest.transformation !== transformation || !Array.isArray(manifest.records)) throw new Error('INVALID_MANIFEST');
+  const matches = manifest.records.filter(row => row.originalPath === file);
+  if (matches.length !== 1) throw new Error('ORIGINAL_NOT_REGISTERED');
+  const row = matches[0];
+  if (!/^[a-f0-9]{64}$/.test(row.originalSha256) || row.derivedPath !== folder + '/' + basename(file)) throw new Error('INVALID_MANIFEST');
+  const original = readFileSync(containedFile(vault, row.originalSha256 + '.html'));
+  verifyArchive(row, readFileSync(containedFile(root, row.derivedPath)), original);
+  return original;
+}
+
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
     const [mode, ...options] = process.argv.slice(2);

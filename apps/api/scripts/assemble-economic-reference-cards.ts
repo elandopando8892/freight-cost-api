@@ -2,6 +2,7 @@ import { readFileSync, realpathSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { dirname, isAbsolute, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { readOriginal } from '../../../tools/evidence-package/package.mjs'
 import { z } from 'zod'
 import { PublicReferenceLedgerSchema, combinePublicReferenceLedger,
   auditD2DPublicReferenceComponents } from '../src/modules/engine/benchmark-public-reference-components.js'
@@ -110,7 +111,13 @@ export function assembleEconomicCards(raw: unknown, readSource: (file: string) =
 const repositoryRoot = fileURLToPath(new URL('../../../', import.meta.url))
 export function readLocalDocumentBytes(file: string) {
   const docsRoot = realpathSync(resolve(repositoryRoot, 'docs'))
-  const target = realpathSync(resolve(repositoryRoot, file))
+  let target: string
+  try { target = realpathSync(resolve(repositoryRoot, file)) }
+  catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error
+    if (!process.env.FCM_EVIDENCE_VAULT) throw new Error(`RESEARCH_SOURCE_REQUIRED:${file}; configure FCM_EVIDENCE_VAULT for registered external originals`)
+    return readOriginal({ root: repositoryRoot, vault: process.env.FCM_EVIDENCE_VAULT, file }) as Buffer
+  }
   const scoped = relative(docsRoot, target)
   if (isAbsolute(scoped) || scoped === '..' || scoped.startsWith(`..${sep}`) || resolve(docsRoot, scoped) !== target) throw new Error('SOURCE_OUTSIDE_DOCS')
   return readFileSync(target)

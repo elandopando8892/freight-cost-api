@@ -213,7 +213,8 @@ describe('B2 authorized planning closure is not operational calibration or adopt
     const root = resolve(process.cwd(), process.cwd().endsWith('api') ? '../..' : '.')
     const cli = (args: string[]) => spawnSync(process.execPath, ['--import', 'tsx', 'apps/api/scripts/compose-b2-planning-scenario.ts', ...args],
       { cwd: root, encoding: 'utf8', timeout: 45000, maxBuffer: 20 * 1024 * 1024,
-        env: { PATH: process.env.PATH, SystemRoot: process.env.SystemRoot, TEMP: process.env.TEMP, TMP: process.env.TMP, NODE_ENV: 'test' } })
+        env: { PATH: process.env.PATH, SystemRoot: process.env.SystemRoot, TEMP: process.env.TEMP, TMP: process.env.TMP, NODE_ENV: 'test',
+          FCM_EVIDENCE_VAULT: process.env.FCM_EVIDENCE_VAULT } })
     const success = cli([])
     expect(success.error).toBeUndefined(); expect(success.status).toBe(0)
     const parsed = JSON.parse(success.stdout)

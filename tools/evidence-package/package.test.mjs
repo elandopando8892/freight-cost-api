@@ -48,3 +48,24 @@ test('fails closed for corrupt external original; never reports original verific
   writeFileSync(join(config.vault, manifest.records[0].originalSha256 + '.html'), 'wrong');
   assert.throws(() => api.verifyPackage(config), /ORIGINAL_HASH/);
 });
+
+test('reads a manifest-bound original from the vault without copying it into the repo', t => {
+  const config = setup(t);
+  api.preparePackage(config);
+  rmSync(join(config.root, config.file));
+  assert.deepEqual(api.readOriginal(config), config.raw);
+  assert.throws(() => readFileSync(join(config.root, config.file)), { code: 'ENOENT' });
+  assert.throws(() => api.readOriginal({ ...config, file: '../outside.html' }), /UNSAFE_PATH/);
+  assert.throws(() => api.readOriginal({ ...config, file: 'docs/research/sources/unknown.html' }), /ORIGINAL_NOT_REGISTERED/);
+  assert.throws(() => api.readOriginal({ ...config, vault: undefined }), /UNSAFE_VAULT/);
+});
+
+test('rejects a derivative substituted for an original and rejects duplicate manifest bindings', t => {
+  const config = setup(t), manifest = api.preparePackage(config);
+  const row = manifest.records[0];
+  writeFileSync(join(config.vault, row.originalSha256 + '.html'), readFileSync(join(config.root, row.derivedPath)));
+  assert.throws(() => api.readOriginal(config), /ORIGINAL_HASH/);
+  manifest.records.push(row);
+  writeFileSync(join(config.root, 'docs/research/sources-sanitized/manifest.json'), JSON.stringify(manifest));
+  assert.throws(() => api.readOriginal(config), /ORIGINAL_NOT_REGISTERED/);
+});

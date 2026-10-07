@@ -1,0 +1,230 @@
+{
+  "scope": "R2_REVIEW_FOR_HUMAN_ACCEPTANCE_NOT_ADOPTION",
+  "referencePeriod": "2026-09",
+  "reviewedOn": "2026-10-07",
+  "packageSha256": "d1235ca788312cb5f0dd7b82a8354809ab93756e57bf5385483e52f0026d7df0",
+  "scenarioSha256": "a8598d73a31f62246d540c293aee548f971a35096b0f1f0742341e42c2473655",
+  "sourcePinsVerified": 88,
+  "reconciledCases": [
+    {
+      "caseKey": "NETWORK_EXPECTED_EMPTY_PROXY|2026-09-28|RATE_EXCLUDES_WEEKLY_REST|CASH",
+      "reconciled": true,
+      "cfuUsd": 1119.6199521232606,
+      "cvuUsd": 4355.939318818451,
+      "productiveCostUsd": 5475.559270941712
+    },
+    {
+      "caseKey": "NETWORK_EXPECTED_EMPTY_PROXY|2026-09-28|RATE_EXCLUDES_WEEKLY_REST|FINANCED",
+      "reconciled": true,
+      "cfuUsd": 1232.9876397045298,
+      "cvuUsd": 4355.939318818451,
+      "productiveCostUsd": 5588.926958522981
+    },
+    {
+      "caseKey": "NETWORK_EXPECTED_EMPTY_PROXY|2026-09-28|RATE_INCLUDES_WEEKLY_REST|CASH",
+      "reconciled": true,
+      "cfuUsd": 1119.6199521232606,
+      "cvuUsd": 4309.714918118231,
+      "productiveCostUsd": 5429.334870241491
+    },
+    {
+      "caseKey": "NETWORK_EXPECTED_EMPTY_PROXY|2026-09-28|RATE_INCLUDES_WEEKLY_REST|FINANCED",
+      "reconciled": true,
+      "cfuUsd": 1232.9876397045298,
+      "cvuUsd": 4309.714918118231,
+      "productiveCostUsd": 5542.702557822761
+    },
+    {
+      "caseKey": "DEDICATED_EMPTY_SAME_BOX_RETURN|2026-09-28|RATE_EXCLUDES_WEEKLY_REST|CASH",
+      "reconciled": true,
+      "cfuUsd": 2588.464253872024,
+      "cvuUsd": 8237.979004407202,
+      "productiveCostUsd": 10826.443258279225
+    },
+    {
+      "caseKey": "DEDICATED_EMPTY_SAME_BOX_RETURN|2026-09-28|RATE_EXCLUDES_WEEKLY_REST|FINANCED",
+      "reconciled": true,
+      "cfuUsd": 2852.829737671085,
+      "cvuUsd": 8237.979004407202,
+      "productiveCostUsd": 11090.808742078287
+    },
+    {
+      "caseKey": "DEDICATED_EMPTY_SAME_BOX_RETURN|2026-09-28|RATE_INCLUDES_WEEKLY_REST|CASH",
+      "reconciled": true,
+      "cfuUsd": 2588.464253872024,
+      "cvuUsd": 8152.473751785981,
+      "productiveCostUsd": 10740.938005658005
+    },
+    {
+      "caseKey": "DEDICATED_EMPTY_SAME_BOX_RETURN|2026-09-28|RATE_INCLUDES_WEEKLY_REST|FINANCED",
+      "reconciled": true,
+      "cfuUsd": 2852.829737671085,
+      "cvuUsd": 8152.473751785981,
+      "productiveCostUsd": 11005.303489457066
+    },
+    {
+      "caseKey": "NETWORK_EXPECTED_EMPTY_PROXY|2026-09-29|RATE_EXCLUDES_WEEKLY_REST|CASH",
+      "reconciled": true,
+      "cfuUsd": 1115.5769717113367,
+      "cvuUsd": 4326.4772576426385,
+      "productiveCostUsd": 5442.054229353975
+    },
+    {
+      "caseKey": "NETWORK_EXPECTED_EMPTY_PROXY|2026-09-29|RATE_EXCLUDES_WEEKLY_REST|FINANCED",
+      "reconciled": true,
+      "cfuUsd": 1227.8177872659264,
+      "cvuUsd": 4326.4772576426385,
+      "productiveCostUsd": 5554.295044908565
+    },
+    {
+      "caseKey": "NETWORK_EXPECTED_EMPTY_PROXY|2026-09-29|RATE_INCLUDES_WEEKLY_REST|CASH",
+      "reconciled": true,
+      "cfuUsd": 1115.5769717113367,
+      "cvuUsd": 4280.840414069354,
+      "productiveCostUsd": 5396.417385780691
+    },
+    {
+      "caseKey": "NETWORK_EXPECTED_EMPTY_PROXY|2026-09-29|RATE_INCLUDES_WEEKLY_REST|FINANCED",
+      "reconciled": true,
+      "cfuUsd": 1227.8177872659264,
+      "cvuUsd": 4280.840414069354,
+      "productiveCostUsd": 5508.65820133528
+    },
+    {
+      "caseKey": "DEDICATED_EMPTY_SAME_BOX_RETURN|2026-09-29|RATE_EXCLUDES_WEEKLY_REST|CASH",
+      "reconciled": true,
+      "cfuUsd": 2577.966389048416,
+      "cvuUsd": 8180.4305337063415,
+      "productiveCostUsd": 10758.396922754757
+    },
+    {
+      "caseKey": "DEDICATED_EMPTY_SAME_BOX_RETURN|2026-09-29|RATE_EXCLUDES_WEEKLY_REST|FINANCED",
+      "reconciled": true,
+      "cfuUsd": 2839.552146934315,
+      "cvuUsd": 8180.4305337063415,
+      "productiveCostUsd": 11019.982680640656
+    },
+    {
+      "caseKey": "DEDICATED_EMPTY_SAME_BOX_RETURN|2026-09-29|RATE_INCLUDES_WEEKLY_REST|CASH",
+      "reconciled": true,
+      "cfuUsd": 2577.966389048416,
+      "cvuUsd": 8096.012136075276,
+      "productiveCostUsd": 10673.978525123694
+    },
+    {
+      "caseKey": "DEDICATED_EMPTY_SAME_BOX_RETURN|2026-09-29|RATE_INCLUDES_WEEKLY_REST|FINANCED",
+      "reconciled": true,
+      "cfuUsd": 2839.552146934315,
+      "cvuUsd": 8096.012136075276,
+      "productiveCostUsd": 10935.564283009591
+    },
+    {
+      "caseKey": "NETWORK_EXPECTED_EMPTY_PROXY|2026-09-30|RATE_EXCLUDES_WEEKLY_REST|CASH",
+      "reconciled": true,
+      "cfuUsd": 1115.6092721214666,
+      "cvuUsd": 4326.705219511041,
+      "productiveCostUsd": 5442.314491632507
+    },
+    {
+      "caseKey": "NETWORK_EXPECTED_EMPTY_PROXY|2026-09-30|RATE_EXCLUDES_WEEKLY_REST|FINANCED",
+      "reconciled": true,
+      "cfuUsd": 1227.8584223040903,
+      "cvuUsd": 4326.705219511041,
+      "productiveCostUsd": 5554.563641815132
+    },
+    {
+      "caseKey": "NETWORK_EXPECTED_EMPTY_PROXY|2026-09-30|RATE_INCLUDES_WEEKLY_REST|CASH",
+      "reconciled": true,
+      "cfuUsd": 1115.6092721214666,
+      "cvuUsd": 4281.063829731038,
+      "productiveCostUsd": 5396.673101852504
+    },
+    {
+      "caseKey": "NETWORK_EXPECTED_EMPTY_PROXY|2026-09-30|RATE_INCLUDES_WEEKLY_REST|FINANCED",
+      "reconciled": true,
+      "cfuUsd": 1227.8584223040903,
+      "cvuUsd": 4281.063829731038,
+      "productiveCostUsd": 5508.922252035129
+    },
+    {
+      "caseKey": "DEDICATED_EMPTY_SAME_BOX_RETURN|2026-09-30|RATE_EXCLUDES_WEEKLY_REST|CASH",
+      "reconciled": true,
+      "cfuUsd": 2578.0497506255006,
+      "cvuUsd": 8180.875813377248,
+      "productiveCostUsd": 10758.925564002748
+    },
+    {
+      "caseKey": "DEDICATED_EMPTY_SAME_BOX_RETURN|2026-09-30|RATE_EXCLUDES_WEEKLY_REST|FINANCED",
+      "reconciled": true,
+      "cfuUsd": 2839.655997891594,
+      "cvuUsd": 8180.875813377248,
+      "productiveCostUsd": 11020.531811268842
+    },
+    {
+      "caseKey": "DEDICATED_EMPTY_SAME_BOX_RETURN|2026-09-30|RATE_INCLUDES_WEEKLY_REST|CASH",
+      "reconciled": true,
+      "cfuUsd": 2578.0497506255006,
+      "cvuUsd": 8096.449006236313,
+      "productiveCostUsd": 10674.498756861813
+    },
+    {
+      "caseKey": "DEDICATED_EMPTY_SAME_BOX_RETURN|2026-09-30|RATE_INCLUDES_WEEKLY_REST|FINANCED",
+      "reconciled": true,
+      "cfuUsd": 2839.655997891594,
+      "cvuUsd": 8096.449006236313,
+      "productiveCostUsd": 10936.105004127907
+    }
+  ],
+  "centralComparison": [
+    {
+      "caseKey": "NETWORK_EXPECTED_EMPTY_PROXY|2026-09-30|RATE_EXCLUDES_WEEKLY_REST|CASH",
+      "matchedMonthlySubtotalUsd": 9007.947808646759,
+      "cfuUsd": 1115.6092721214666,
+      "cvuUsd": 4326.705219511041,
+      "productiveCostUsd": 5442.314491632507,
+      "purchaseUsd": null,
+      "sellUsd": null
+    },
+    {
+      "caseKey": "NETWORK_EXPECTED_EMPTY_PROXY|2026-09-30|RATE_EXCLUDES_WEEKLY_REST|FINANCED",
+      "matchedMonthlySubtotalUsd": 9858.737808646758,
+      "cfuUsd": 1227.8584223040903,
+      "cvuUsd": 4326.705219511041,
+      "productiveCostUsd": 5554.563641815132,
+      "purchaseUsd": null,
+      "sellUsd": null
+    },
+    {
+      "caseKey": "DEDICATED_EMPTY_SAME_BOX_RETURN|2026-09-30|RATE_EXCLUDES_WEEKLY_REST|CASH",
+      "matchedMonthlySubtotalUsd": 9007.947808646759,
+      "cfuUsd": 2578.0497506255006,
+      "cvuUsd": 8180.875813377248,
+      "productiveCostUsd": 10758.925564002748,
+      "purchaseUsd": null,
+      "sellUsd": null
+    },
+    {
+      "caseKey": "DEDICATED_EMPTY_SAME_BOX_RETURN|2026-09-30|RATE_EXCLUDES_WEEKLY_REST|FINANCED",
+      "matchedMonthlySubtotalUsd": 9858.737808646758,
+      "cfuUsd": 2839.655997891594,
+      "cvuUsd": 8180.875813377248,
+      "productiveCostUsd": 11020.531811268842,
+      "purchaseUsd": null,
+      "sellUsd": null
+    }
+  ],
+  "explicitMonthlyReservesUsd": 959.77,
+  "referenceFixedPoolUsd": 8966.669999999998,
+  "humanAcceptedResults": false,
+  "quoteReady": false,
+  "adoptedValues": 0,
+  "limitations": [
+    "Modeled budget is not observed carrier cost, market calibration, lowest/highest market bound or actual trip.",
+    "Every reserve is an identified planning judgment, not a published charge for its target scope.",
+    "Dates, source population and price units are transferred explicitly; no historical Sep pricing or truck itinerary certified.",
+    "Existing employer risk, full benefits/roster, territory/custody, fiscal invoices and actual purchased lodging remain unverified.",
+    "Additional unmeasured approach movements, paid local bobtail access and customer customs are outside this reference scope, not certified free.",
+    "Legacy detailed tire price bindings/retread lifecycle are not repaired or calibrated by this aggregate planning scenario.",
+    "No HTTP, UI, persistence, Auth, source parameter adoption, business quote, deployment or new infrastructure."
+  ]
+}

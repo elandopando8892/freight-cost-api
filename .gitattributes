@@ -1,6 +1,13 @@
 # Derived audit artifacts have byte-pinned SHA256; no EOL normalization.
 docs/research/sources-sanitized/** -text
 
+# Research pins hash original bytes, including Markdown and JSON line endings.
+# Preserve the entire evidence namespace, including future pinned sources.
+docs/** -text
+*.md -text
+*.snapshot.json -text
+apps/api/src/modules/cost-bases/b2-family-source.pack.json -text
+
 # Exact byte preservation for reviewed B4 files; no economic/source repinning.
 ".gitignore" -text
 "apps/api/package.json" -text

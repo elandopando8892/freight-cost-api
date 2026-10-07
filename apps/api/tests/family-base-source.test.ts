@@ -1,16 +1,16 @@
 import {createHash} from 'node:crypto'
 import {gzipSync,gunzipSync} from 'node:zlib'
-import {beforeAll,expect,it} from 'vitest'
-import {composeB2PlanningScenario} from '../scripts/compose-b2-planning-scenario.js'
-import {packageFamilySource} from '../scripts/package-family-base-source.js'
+import {expect,it} from 'vitest'
+import packed from '../src/modules/cost-bases/b2-family-source.pack.json'
+import snapshot from '../src/modules/engine/b2-own-relay.snapshot.json'
 import {decodeFamilySource} from '../src/modules/cost-bases/family-base-source.js'
-let packed:ReturnType<typeof packageFamilySource>
-beforeAll(()=>{packed=packageFamilySource()},20_000)
 
 it('preserves all 24 case objects and their economic literals in an immutable runtime package',()=>{
-  const source=composeB2PlanningScenario()
+  const source=decodeFamilySource(packed)
   expect(JSON.stringify(packed).length).toBeLessThan(2_000_000)
-  expect(decodeFamilySource(packed)).toEqual(source)
+  expect(source.cases).toHaveLength(24)
+  expect(createHash('sha256').update(JSON.stringify(source.cases)).digest('hex')).toBe(snapshot.payload.sourceScenarioSha256)
+  expect(source.sourcePins).toEqual(snapshot.payload.sourcePins)
 })
 it('rejects changed checksum, compressed content and oversized envelope without fallback',()=>{
   for(const changed of [{...packed,sha256:'0'.repeat(64)},{...packed,gzipBase64:'AAAA'},

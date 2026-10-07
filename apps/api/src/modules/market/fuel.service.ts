@@ -21,31 +21,70 @@ const EIA_DIESEL_RSS = 'https://www.eia.gov/petroleum/gasdiesel/includes/gas_die
 
 /**
  * Parse the EIA diesel RSS "On-Highway Diesel Fuel Retail Price" section into
- * region → $/gal. Mirrors the spreadsheet's fetchFuelData() Apps Script:
- * for each region, take the max numeric price across matching lines (handles
- * the "West Coast" / "West Coast less California" / "California" substring overlap).
+ * region → $/gal. Match complete region names: a substring match or maximum
+ * across different regions is not a valid geographical price observation.
+ * Missing diesel is not permission to substitute the gasoline section.
  */
 export function parseDieselRss(xml: string): Record<string, number> {
   const idx = xml.indexOf('On-Highway Diesel Fuel Retail Price')
-  const section = idx >= 0 ? xml.slice(idx) : xml
+  if (idx < 0) return {}
+  // End at the containing RSS description; never read a later item's prices.
+  const section = xml.slice(idx).split(/\]\]>|<\/description>/i)[0]
   const lines = section.split(/<br\s*\/?>/i)
   const prices: Record<string, number> = {}
   for (const line of lines.map((l) => l.trim())) {
-    for (const region of EIA_REGIONS) {
-      if (line.includes(region)) {
-        const price = parseFloat(line.replace(region, '').replace(/[^0-9.]/g, ''))
-        if (!isNaN(price)) prices[region] = Math.max(prices[region] ?? -Infinity, price)
-      }
-    }
+    const match = /^(\d+(?:\.\d+)?)\s+\.{2,}\s+(.+?)\s*$/.exec(line)
+    if (!match || !EIA_REGIONS.includes(match[2])) continue
+    const price = Number(match[1]), region = match[2]
+    if (!Number.isFinite(price) || price <= 0) continue
+    if (prices[region] !== undefined && prices[region] !== price)
+      throw new Error(`EIA_RSS_CONFLICTING_REGION:${region}`)
+    prices[region] = price
   }
   return prices
 }
 
+/** Strict reader for EIA's current single-item RSS contract, not a general XML
+ * parser. Keep dates and prices in the SAME item. Never equate publication,
+ * observation and cache update dates, or manufacture validity from any of them.
+ */
+export function parseDieselRssObservation(xml: string) {
+  const items = [...xml.matchAll(/<item\b[^>]*>([\s\S]*?)<\/item>/gi)]
+  if (items.length !== 1) throw new Error('EIA_RSS_SINGLE_OBSERVATION_REQUIRED')
+  const item = items[0][1]
+  const titles = [...item.matchAll(/<title>([\s\S]*?)<\/title>/gi)]
+  const date = titles.length === 1
+    ? /^Data For (\d{2})\/(\d{2})\/(\d{4}|\d{2})$/.exec(titles[0][1].trim()) : null
+  if (!date) throw new Error('EIA_RSS_OBSERVATION_DATE_REQUIRED')
+  const year = date[3].length === 2 ? `20${date[3]}` : date[3]
+  const observationDate = `${year}-${date[1]}-${date[2]}`
+  const parsed = new Date(`${observationDate}T00:00:00Z`)
+  if (!Number.isFinite(parsed.valueOf()) || parsed.toISOString().slice(0, 10) !== observationDate)
+    throw new Error('EIA_RSS_OBSERVATION_DATE_REQUIRED')
+  const descriptions = [...item.matchAll(/<description>([\s\S]*?)<\/description>/gi)]
+  if (descriptions.length !== 1 || !descriptions[0][1].includes('On-Highway Diesel Fuel Retail Price'))
+    throw new Error('EIA_RSS_DIESEL_SECTION_REQUIRED')
+  if (!/On-Highway Diesel Fuel Retail Price\s*<br\s*\/?\s*>\s*\(Dollars\s+per\s+Gallon\)/i.test(descriptions[0][1]))
+    throw new Error('EIA_RSS_DIESEL_UNIT_REQUIRED')
+  const publications = [...item.matchAll(/<pubDate>([\s\S]*?)<\/pubDate>/gi)]
+  if (publications.length > 1) throw new Error('EIA_RSS_AMBIGUOUS_PUBLICATION_DATE')
+  return { observationDate, publicationDate: publications[0]?.[1].trim() || null,
+    sourceUrl: EIA_DIESEL_RSS, unit: 'USD/US_GALLON' as const,
+    prices: parseDieselRss(descriptions[0][1]) }
+}
+
 /** Fetch live EIA diesel-by-region and upsert RegionDiesel (no API key needed). */
-export async function fetchEiaCurrentDiesel(): Promise<{ updated: number; regions: { region: string; dieselUsdGal: number }[] }> {
+export async function fetchEiaCurrentDiesel(): Promise<{ updated: number; regions: { region: string; dieselUsdGal: number }[];
+  observation: Omit<ReturnType<typeof parseDieselRssObservation>, 'prices'>; observationDatePersisted: false }> {
   const res = await fetch(EIA_DIESEL_RSS)
   if (!res.ok) throw new Error(`EIA RSS fetch failed: ${res.status}`)
-  const prices = parseDieselRss(await res.text())
+  const { prices, ...observation } = parseDieselRssObservation(await res.text())
+  if (observation.observationDate > new Date().toISOString().slice(0, 10))
+    throw new Error('EIA_RSS_FUTURE_OBSERVATION')
+  // Validate the full published cohort before the first write. An upstream
+  // format change must not silently combine new and stale regional values.
+  if (EIA_REGIONS.some(region => prices[region] === undefined))
+    throw new Error('EIA_RSS_INCOMPLETE_DIESEL_REGIONS')
   const regions = Object.entries(prices).map(([region, dieselUsdGal]) => ({ region, dieselUsdGal: round4(dieselUsdGal) }))
   if (regions.length === 0) throw new Error('EIA RSS: no diesel prices parsed')
   for (const r of regions) {
@@ -55,7 +94,9 @@ export async function fetchEiaCurrentDiesel(): Promise<{ updated: number; region
       update: { dieselUsdGal: r.dieselUsdGal },
     })
   }
-  return { updated: regions.length, regions }
+  // RegionDiesel has no observation-date column. Expose the limitation rather
+  // than labelling updatedAt as a source date or silently changing the schema.
+  return { updated: regions.length, regions, observation, observationDatePersisted: false }
 }
 
 /** Truckload FSC ($/mile) for a diesel price via the V3.0 step schedule. */
