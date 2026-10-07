@@ -1,0 +1,237 @@
+{
+  "artifact": "FCM_B2_PUBLIC_REFERENCE_RESEARCH_LEDGER",
+  "createdDate": "2026-09-29",
+  "state": "DRAFT_INCOMPLETE",
+  "coreTemplateFile": "B2_PAYROLL_CAPITAL_CONTRACT_TEMPLATE_2026-09-29.json",
+  "coreTemplateSha256": "cabfda00873356406d838306bfa87b912eccd9a6026449c0ebb26046acd8bd85",
+  "profiles": [
+    {
+      "country": "MX",
+      "components": [
+        {
+          "id": "MX-INSURANCE-UNRESOLVED",
+          "kind": "INSURANCE",
+          "disposition": "MISSING",
+          "costBearer": null,
+          "quantity": null,
+          "evidenceIds": [],
+          "derivation": null,
+          "includedItems": [],
+          "excludedFamilies": [],
+          "zeroRationale": null,
+          "scopeRationale": null
+        },
+        {
+          "id": "MX-COMPANY-UNRESOLVED",
+          "kind": "COMPANY",
+          "disposition": "MISSING",
+          "costBearer": null,
+          "quantity": null,
+          "evidenceIds": [],
+          "derivation": null,
+          "includedItems": [],
+          "excludedFamilies": [],
+          "zeroRationale": null,
+          "scopeRationale": null
+        },
+        {
+          "id": "MX-MAINTENANCE-UNRESOLVED",
+          "kind": "MAINTENANCE",
+          "disposition": "MISSING",
+          "costBearer": null,
+          "quantity": null,
+          "evidenceIds": [],
+          "derivation": null,
+          "includedItems": [],
+          "excludedFamilies": [],
+          "zeroRationale": null,
+          "scopeRationale": null
+        },
+        {
+          "id": "MX-TIRES-UNRESOLVED",
+          "kind": "TIRES",
+          "disposition": "MISSING",
+          "costBearer": null,
+          "quantity": null,
+          "evidenceIds": [],
+          "derivation": null,
+          "includedItems": [],
+          "excludedFamilies": [],
+          "zeroRationale": null,
+          "scopeRationale": null
+        },
+        {
+          "id": "MX-FUEL_PRICE-UNRESOLVED",
+          "kind": "FUEL_PRICE",
+          "disposition": "MISSING",
+          "costBearer": null,
+          "quantity": null,
+          "evidenceIds": [],
+          "derivation": null,
+          "includedItems": [],
+          "excludedFamilies": [],
+          "zeroRationale": null,
+          "scopeRationale": null
+        },
+        {
+          "id": "MX-LOADED_PERFORMANCE-UNRESOLVED",
+          "kind": "LOADED_PERFORMANCE",
+          "disposition": "MISSING",
+          "costBearer": null,
+          "quantity": null,
+          "evidenceIds": [],
+          "derivation": null,
+          "includedItems": [],
+          "excludedFamilies": [],
+          "zeroRationale": null,
+          "scopeRationale": null
+        },
+        {
+          "id": "MX-EMPTY_PERFORMANCE-UNRESOLVED",
+          "kind": "EMPTY_PERFORMANCE",
+          "disposition": "MISSING",
+          "costBearer": null,
+          "quantity": null,
+          "evidenceIds": [],
+          "derivation": null,
+          "includedItems": [],
+          "excludedFamilies": [],
+          "zeroRationale": null,
+          "scopeRationale": null
+        },
+        {
+          "id": "MX-WORKING_CAPITAL-UNRESOLVED",
+          "kind": "WORKING_CAPITAL",
+          "disposition": "MISSING",
+          "costBearer": null,
+          "quantity": null,
+          "evidenceIds": [],
+          "derivation": null,
+          "includedItems": [],
+          "excludedFamilies": [],
+          "zeroRationale": null,
+          "scopeRationale": null
+        }
+      ],
+      "evidence": [],
+      "policies": {
+        "risk": null,
+        "margin": null
+      }
+    },
+    {
+      "country": "US",
+      "components": [
+        {
+          "id": "US-INSURANCE-UNRESOLVED",
+          "kind": "INSURANCE",
+          "disposition": "MISSING",
+          "costBearer": null,
+          "quantity": null,
+          "evidenceIds": [],
+          "derivation": null,
+          "includedItems": [],
+          "excludedFamilies": [],
+          "zeroRationale": null,
+          "scopeRationale": null
+        },
+        {
+          "id": "US-COMPANY-UNRESOLVED",
+          "kind": "COMPANY",
+          "disposition": "MISSING",
+          "costBearer": null,
+          "quantity": null,
+          "evidenceIds": [],
+          "derivation": null,
+          "includedItems": [],
+          "excludedFamilies": [],
+          "zeroRationale": null,
+          "scopeRationale": null
+        },
+        {
+          "id": "US-MAINTENANCE-UNRESOLVED",
+          "kind": "MAINTENANCE",
+          "disposition": "MISSING",
+          "costBearer": null,
+          "quantity": null,
+          "evidenceIds": [],
+          "derivation": null,
+          "includedItems": [],
+          "excludedFamilies": [],
+          "zeroRationale": null,
+          "scopeRationale": null
+        },
+        {
+          "id": "US-TIRES-UNRESOLVED",
+          "kind": "TIRES",
+          "disposition": "MISSING",
+          "costBearer": null,
+          "quantity": null,
+          "evidenceIds": [],
+          "derivation": null,
+          "includedItems": [],
+          "excludedFamilies": [],
+          "zeroRationale": null,
+          "scopeRationale": null
+        },
+        {
+          "id": "US-FUEL_PRICE-UNRESOLVED",
+          "kind": "FUEL_PRICE",
+          "disposition": "MISSING",
+          "costBearer": null,
+          "quantity": null,
+          "evidenceIds": [],
+          "derivation": null,
+          "includedItems": [],
+          "excludedFamilies": [],
+          "zeroRationale": null,
+          "scopeRationale": null
+        },
+        {
+          "id": "US-LOADED_PERFORMANCE-UNRESOLVED",
+          "kind": "LOADED_PERFORMANCE",
+          "disposition": "MISSING",
+          "costBearer": null,
+          "quantity": null,
+          "evidenceIds": [],
+          "derivation": null,
+          "includedItems": [],
+          "excludedFamilies": [],
+          "zeroRationale": null,
+          "scopeRationale": null
+        },
+        {
+          "id": "US-EMPTY_PERFORMANCE-UNRESOLVED",
+          "kind": "EMPTY_PERFORMANCE",
+          "disposition": "MISSING",
+          "costBearer": null,
+          "quantity": null,
+          "evidenceIds": [],
+          "derivation": null,
+          "includedItems": [],
+          "excludedFamilies": [],
+          "zeroRationale": null,
+          "scopeRationale": null
+        },
+        {
+          "id": "US-WORKING_CAPITAL-UNRESOLVED",
+          "kind": "WORKING_CAPITAL",
+          "disposition": "MISSING",
+          "costBearer": null,
+          "quantity": null,
+          "evidenceIds": [],
+          "derivation": null,
+          "includedItems": [],
+          "excludedFamilies": [],
+          "zeroRationale": null,
+          "scopeRationale": null
+        }
+      ],
+      "evidence": [],
+      "policies": {
+        "risk": null,
+        "margin": null
+      }
+    }
+  ]
+}

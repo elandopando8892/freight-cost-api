@@ -1,0 +1,16 @@
+{
+  "source": {
+    "id": "LOGROCK_OWNED_TRAILER_PD_2026",
+    "url": "https://www.logrock.com/commercial-truck-insurance/truck-trailer-insurance-2/",
+    "publishedOn": "2026-02-19",
+    "verifiedAt": "2026-10-02T05:25:48Z",
+    "kind": "BROKER_PUBLISHED_PLANNING_RULE",
+    "territory": "US",
+    "coverage": "OWNED_TRAILER_PHYSICAL_DAMAGE"
+  },
+  "currency": "USD",
+  "physicalBoxCount": 1,
+  "publishedMonthlyRangeUsd": { "low": 25, "high": 150 },
+  "annualValueRate": { "low": 0.01, "high": 0.03 },
+  "statedValueUsd": null
+}

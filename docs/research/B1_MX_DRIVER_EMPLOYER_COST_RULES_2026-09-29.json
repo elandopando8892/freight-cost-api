@@ -1,0 +1,117 @@
+{
+  "schema": "fcm.b1.mx-driver-employer-cost-evidence.v1",
+  "cutDate": "2026-09-29",
+  "head": "4f5fc2de0c3d178dace917231e1092040dec21fd",
+  "country": "MX",
+  "pilot": "THIRD_PARTY_D2D_DRY_VAN_T3_S2_INTERCHANGE",
+  "status": "RESEARCH_RULES_AND_CONTRAST_NOT_CALIBRATION",
+  "calibrated": false, "quoteReady": false, "adoptedValues": 0,
+  "canonicalInventory": { "required": 135, "documented": 135, "candidate": 3, "contrast": 47, "missingEvidence": 85, "adopted": 0 },
+  "sources": [
+    {
+      "id": "TRAYECTO_OFFER",
+      "url": "https://careers.trayecto.com/operador-sencillo-caja-seca-xI1ywOf9L4-o/",
+      "kind": "PUBLIC_CONTRAST", "authority": "EMPLOYER_PUBLISHED_RECRUITMENT_OFFER",
+      "observedDate": "2026-09-29", "publicationDate": null,
+      "readMethod": "SEARCH_READER_INDEXED_TEXT_FROM_PRIMARY_DOMAIN",
+      "directLiveRead": "BLOCKED_ACCESS_PROTECTION", "fullyVerified": false, "sha256": null
+    },
+    {
+      "id": "LSS", "url": "https://www.diputados.gob.mx/LeyesBiblio/pdf/LSS.pdf",
+      "kind": "TAX_RULE", "authority": "OFFICIAL_CURRENT_LEGAL_TEXT", "lastReform": "2026-01-15",
+      "readMethod": "PUBLIC_PDF_TEXT_AND_VISUAL_CEAV", "observedDate": "2026-09-29",
+      "sha256": "8a28a16e1dce1f8e666f4cce5ed19745bc912b2ab1ca49787d5d4bef229398ed"
+    },
+    {
+      "id": "UMA2026", "url": "https://www.inegi.org.mx/contenidos/saladeprensa/boletines/2026/uma/uma2026.pdf",
+      "kind": "TAX_RULE", "authority": "INEGI_OFFICIAL_UNIT", "publicationDate": "2026-01-08",
+      "readMethod": "PUBLIC_PDF_TEXT_AND_VISUAL", "observedDate": "2026-09-29",
+      "sha256": "9c9c4ff3da9b34852d5e3b8165c50c346ff3ef7ba74737489f6d1f544c353e1c"
+    },
+    {
+      "id": "IMSS_A3", "url": "https://www.imss.gob.mx/sites/all/statics/pdf/informes/20242025/15-anexos.pdf",
+      "kind": "TAX_RULE", "authority": "OFFICIAL_IMSS_COMPONENT_CORROBORATION", "referencePeriod": "2024-12",
+      "locator": "Table A.3, printed p232 / PDF p6",
+      "readMethod": "PUBLIC_PDF_TEXT_AND_VISUAL_WITH_FOOTNOTES", "observedDate": "2026-09-29",
+      "sha256": "2e8f6d923c4794c4d85503fea99dc368328d6b008ba687351a6be10917cb400a",
+      "historicalAverageRiskAndCeavAdopted": false
+    },
+    {
+      "id": "INFONAVIT_LAW", "url": "https://www.diputados.gob.mx/LeyesBiblio/pdf/LIFNVT.pdf",
+      "kind": "TAX_RULE", "authority": "OFFICIAL_CURRENT_LEGAL_TEXT", "lastReform": "2025-02-21",
+      "locator": "Article 29-II, PDF p16; absence/incapacity p17",
+      "readMethod": "PUBLIC_PDF_TEXT", "observedDate": "2026-09-29",
+      "sha256": "9ee6e5ef336dee5700726bd3c570d24f91fc458136e298ae2e3806bd12217912"
+    },
+    {
+      "id": "CANACAR_NOTICE", "url": "https://canacar.com.mx/circulares/recordatorio-del-salario-base-cotizacion-referente-2026-acuerdo-imss-canacar/",
+      "kind": "PUBLIC_CONTRAST", "authority": "ISSUER_NOTICE_ACCESS_LIMITED",
+      "discoveryUrl": "https://canacar.com.mx/?s=salario+base+cotizacion+2026",
+      "constancyUrl": "https://canacar.com.mx/circulares/constancia-del-acuerdo-imss-canacar-2025/",
+      "readMethod": "DIRECT_PUBLIC_SEARCH_EXCERPT_AND_MEMBERS_ONLY_NOTICE", "observedDate": "2026-09-29",
+      "fullContentRead": false, "carrierEligibilityConfirmed": false, "factorAdopted": null
+    }
+  ],
+  "remunerationObservation": {
+    "id": "MX_DRY_VAN_SINGLE_ANNOUNCED_KM_RATE", "sourceId": "TRAYECTO_OFFER",
+    "cohort": "DRY_VAN_SINGLE_LONG_DISTANCE_ADVERTISED_NOT_PILOT_CONFIRMED",
+    "baseLocation": "Queretaro", "routes": ["Irapuato-Chihuahua", "Irapuato-Hermosillo"],
+    "payPerKm": 2.10, "currency": "MXN", "currencyBasis": "INFERRED_SAME_OFFER_MXN_SALARY_CARD",
+    "loadedAndEmptyPayStated": true, "paidKmEqualsVehicleKmConfirmed": false,
+    "weeklyCardMxn": { "low": 5500, "high": 8000 }, "weeklyBodyApproximationMxn": { "low": 6000, "high": 8000 },
+    "weeklyAmountsAddedToKmRate": false, "grossNetBasis": null, "publicationDate": null,
+    "benefitAmountsAndPeriodsVerified": false, "completeEmployerCostConfirmed": false,
+    "pilotConfigurationAndInterchangeConfirmed": false, "independentEmployerSamples": 1,
+    "canonicalKey": "fcm.v3.labor.tarifa-operador-mx", "status": "CONTRAST_DIRECT_VERIFICATION_PENDING",
+    "transform": { "kmPerMile": 1.60934, "mxnPerMile": 3.379614, "factorBasis": "CURRENT_ENGINE_APPROXIMATION", "usdPerMileExpression": "mxnPerMile / FX_MXN_PER_USD", "fxMxnPerUsd": null, "usdPerMile": null },
+    "sbcInferredFromKmRate": false, "exposureInferredFromWeeklySalary": false, "adopted": false
+  },
+  "normativeRulePack": {
+    "applicationStatus": "LEGAL_REFERENCE_NOT_CARRIER_DETERMINATION",
+    "year": 2026,
+    "uma": { "dailyMxn": 117.31, "validFrom": "2026-02-01", "validUntil": null, "endDateConfirmedByThisSource": false, "sourceId": "UMA2026", "january2026ValueProvided": false },
+    "dailyReferenceAmounts": { "threeUmaMxn": 351.93, "twentyFiveUmaMxn": 2932.75, "fixedEmQuotaPerCoveredDayMxn": 23.93124 },
+    "sbcRules": { "sourceId": "LSS", "integrationArticle": 27, "limitsArticle": 28, "variableAndMixedArticle": 30, "absenceArticle": 31, "minimumSalaryEmployerPaysWorkerShareArticle": 36, "integratedSbcDailyMxn": null, "minimumSalaryZoneAndDate": null, "benefitExclusionsConfirmed": false },
+    "patronalComponents": [
+      { "id": "EM_FIXED", "rateFraction": 0.204, "expression": "0.204 * UMA_DAILY * EM_DAYS", "sourceIds": ["LSS", "IMSS_A3"], "locator": "Art106-I + transitory nineteenth (1995)", "historicalRateDerivation": "(13.9 + 10 * 0.65) / 100" },
+      { "id": "EM_EXCESS", "rateFraction": 0.011, "expression": "0.011 * max(SBC_DAILY - 3 * UMA_DAILY, 0) * EM_DAYS", "sourceIds": ["LSS", "IMSS_A3"], "locator": "Art106-II + transitory nineteenth (1995)", "historicalRateDerivation": "(6 - 10 * 0.49) / 100" },
+      { "id": "EM_CASH", "rateFraction": 0.007, "expression": "0.007 * SBC_DAILY * EM_CASH_DAYS", "sourceIds": ["LSS", "IMSS_A3"], "locator": "Art107" },
+      { "id": "PENSIONERS_MEDICAL", "rateFraction": 0.0105, "expression": "0.0105 * SBC_DAILY * GMP_DAYS", "sourceIds": ["LSS", "IMSS_A3"], "locator": "Art25" },
+      { "id": "INVALIDITY_LIFE", "rateFraction": 0.0175, "expression": "0.0175 * SBC_DAILY * IV_DAYS", "sourceIds": ["LSS", "IMSS_A3"], "locator": "Art147" },
+      { "id": "CHILDCARE_SOCIAL", "rateFraction": 0.01, "expression": "0.01 * SBC_DAILY * GPS_DAYS", "sourceIds": ["LSS", "IMSS_A3"], "locator": "Art211-212" },
+      { "id": "RETIREMENT", "rateFraction": 0.02, "expression": "0.02 * SBC_DAILY * RETIREMENT_DAYS", "sourceIds": ["LSS", "IMSS_A3"], "locator": "Art168-I" },
+      { "id": "CEAV", "rateFraction": null, "expression": "CEAV_2026_SELECTED_RATE * SBC_DAILY * CEAV_DAYS", "sourceIds": ["LSS"], "locator": "2020 decree second transitory, PDF p153, column2026" },
+      { "id": "WORK_RISK", "rateFraction": null, "expression": "CARRIER_WORK_RISK_RATE * SBC_DAILY * WORK_RISK_DAYS", "sourceIds": ["LSS"], "locator": "Art72-74", "statisticalAverageAdopted": false },
+      { "id": "HOUSING", "rateFraction": 0.05, "expression": "0.05 * SBC_DAILY * HOUSING_DAYS", "sourceIds": ["INFONAVIT_LAW"], "locator": "Art29-II", "creditWithholdingIncluded": false }
+    ],
+    "ceav2026PublishedRows": [
+      { "label": "1.0 SM", "ratePercent": 3.150 },
+      { "label": "1.01 SM to 1.50 UMA", "ratePercent": 3.676 },
+      { "label": "1.51 to 2.00 UMA", "ratePercent": 4.851 },
+      { "label": "2.01 to 2.50 UMA", "ratePercent": 5.556 },
+      { "label": "2.51 to 3.00 UMA", "ratePercent": 6.026 },
+      { "label": "3.01 to 3.50 UMA", "ratePercent": 6.361 },
+      { "label": "3.51 to 4.00 UMA", "ratePercent": 6.613 },
+      { "label": "4.01 UMA and above", "ratePercent": 7.513 }
+    ],
+    "ceav2030LastRowPercentForYearContrastOnly": 11.875,
+    "ceavRangeSelectionImplemented": false, "componentCoveredDays": null,
+    "minimumSalarySpecialCaseFullyModeled": false, "carrierContributionTotalMxn": null,
+    "localPayrollTaxJurisdictionAndRate": null, "effectiveBurdenPercent": null,
+    "statutoryReferencesAreActualCarrierCosts": false
+  },
+  "engineBridge": {
+    "canonicalDriverKey": "fcm.v3.labor.tarifa-operador-mx", "canonicalDriverUnit": "USD/mile",
+    "driverConversionExpression": "canonicalDriverRate / 1.60934",
+    "canonicalSocialBurdenKey": "fcm.v3.labor.carga-social",
+    "socialBurdenFormulaDependency": "monthlyFixedUsd_ADMIN_PAYROLL_NOT_driverUsdPerKm",
+    "wagesOnlyRequiresSeparateBenefits": true, "employerTotalMustNotAddBenefitsAgain": true,
+    "legacyDefault30PercentAdopted": false, "normativeSourcesCertifyB2Contract": false,
+    "proposedComposition": "documented remuneration + nonincluded accrued benefits + applicable employer contributions + housing + documented local payroll taxes + allocated other employer costs",
+    "denominator": "same period, same driver/vehicle cohort, documented attributable vehicle kilometers",
+    "completeEmployerUsdPerKm": null, "administrativeEffectiveBurdenPercent": null
+  },
+  "openInputs": ["DIRECT_CURRENT_REMUNERATION_VERIFICATION", "GROSS_NET_AND_BENEFIT_INCLUSIONS", "PILOT_COHORT_AND_EQUIPMENT", "FIXED_VARIABLE_MIXED_SBC_AND_REGIME", "COMPONENT_COVERED_DAYS", "WORK_RISK_RATE", "CEAV_RANGE_SELECTION", "LOCAL_PAYROLL_TAX", "DRIVER_ASSIGNMENT_AND_SAME_PERIOD_KM", "DATE_COMPATIBLE_FX", "CONTRACT_BENEFIT_AND_ACCRUAL_SCOPE"],
+  "activeEngineChanged": false, "databaseAccessed": false, "authChanged": false,
+  "deployed": false, "businessOperationsExecuted": false, "applicationAiCalls": 0
+}

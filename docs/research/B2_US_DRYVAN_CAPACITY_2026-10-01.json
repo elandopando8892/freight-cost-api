@@ -1,0 +1,118 @@
+{
+  "artifact": "FCM_B2_US_DRYVAN_CAPACITY_REFERENCE",
+  "observedAt": "2026-10-01",
+  "baseHead": "4f5fc2de0c3d178dace917231e1092040dec21fd",
+  "status": "PUBLIC_CARRIER_OBSERVATIONS_NOT_SELECTED_PILOT_CAPACITY",
+  "captureKind": "STRUCTURED_EXTRACTION_FROM_PRIMARY_WEB_READER_NOT_ORIGINAL_HTTP_ARCHIVE",
+  "rawHttpArchiveObtained": false,
+  "accessNote": "One ordinary SEC release download returned 403; no bypass or identity submission. Numeric tables and source notes were read through the web reader. This JSON preserves the reviewed extraction, not original HTML.",
+  "calibrated": false,
+  "quoteReady": false,
+  "adoptedValues": 0,
+  "sources": [
+    {
+      "id": "PAMT_FY2025_RELEASE",
+      "url": "https://www.sec.gov/Archives/edgar/data/798287/000143774926004695/ex_920725.htm",
+      "publishedAt": "2026-02-13",
+      "locator": "Truckload Operations, annual 2025/2024 columns; footnote 1 after non-GAAP reconciliation",
+      "statisticsAudited": false,
+      "milesNote": "Reported total miles exclude third-party power-only carriers."
+    },
+    {
+      "id": "PAMT_Q22026_RELEASE",
+      "url": "https://www.sec.gov/Archives/edgar/data/798287/000143774926025703/ex_998666.htm",
+      "publishedAt": "2026-08-04",
+      "locator": "Truckload Operations, quarter and six-month 2026/2025 columns; footnote 1; management productivity statement",
+      "statisticsAudited": false,
+      "milesNote": "Reported total miles exclude third-party power-only carriers.",
+      "emptyNote": "Management describes the empty-mile improvement as uncompensated empty miles; equivalence to every physically empty mile is unconfirmed.",
+      "reportedQ2ProductivityChangePercent": 12.8
+    },
+    {
+      "id": "PAMT_2025_10K",
+      "url": "https://www.sec.gov/Archives/edgar/data/798287/000143774926007960/ptsi20251231_10k.htm",
+      "filedAt": "2026-03-12",
+      "locator": "Item 1 Business / Revenue Equipment / Human Capital; Item 7 2025 Compared to 2024",
+      "use": "PROFILE_AND_POINT_IN_TIME_CONTEXT_NOT_MONTHLY_CAPACITY",
+      "reportedAnnualAverageTrucksChangePercent": -10.4,
+      "reportedAnnualAverageMilesPerTruckChangePercent": 2.7
+    }
+  ],
+  "comparison": [
+    {
+      "id": "PAMT",
+      "decision": "REUSE_FOR_DRYVAN_PUBLIC_CONTRAST_NOT_ADOPTED_DENOMINATOR",
+      "basis": "Dry-van carrier with Laredo/El Paso gateways; physical activity and empty-factor tables. MX services use Mexican-carrier agreements, not proof of the pilot own-group relay.",
+      "cost": "Public read-only documents; no subscription or activated service."
+    },
+    {
+      "id": "WERNER_ONE_WAY",
+      "url": "https://www.sec.gov/Archives/edgar/data/793074/000079307426000071/wern-20251231.htm",
+      "decision": "CONTEXT_ONLY",
+      "basis": "One-Way combines van, regional, expedited teams and temperature-controlled fleets; table reports mileage percentage change rather than absolute miles."
+    },
+    {
+      "id": "SCHNEIDER_NETWORK",
+      "url": "https://www.sec.gov/Archives/edgar/data/1692063/000169206326000013/sndr-20251231.htm",
+      "decision": "CONTEXT_ONLY",
+      "basis": "Average available company/owner-operator trucks and revenue KPIs do not supply absolute miles or productive asset-days; all owned trailers are not a Network-only average stock."
+    }
+  ],
+  "cohort": {
+    "reference": "PAMT_TRUCKLOAD_REPORTED_STATISTICS",
+    "dryVanServiceConfirmed": true,
+    "usOnlyMilesConfirmed": false,
+    "singleDriverOnlyConfirmed": false,
+    "sameUsedAssetsAsPilot": false,
+    "ownMxUsRelayConfirmed": false,
+    "milesToCompanyOrOwnerTruckPopulationJoinConfirmed": false,
+    "sameBudgetPopulationConfirmed": false,
+    "selectedForPilot": false
+  },
+  "observations": [
+    { "id": "FY2024", "sourceId": "PAMT_FY2025_RELEASE", "start": "2024-01-01", "end": "2024-12-31", "months": 12, "reportedThousandTotalMiles": 178640, "reportedEmptyMilesPercent": 9.2, "averageCompanyDriverTrucks": 1822, "averageOwnerOperatorTrucks": 467 },
+    { "id": "FY2025", "sourceId": "PAMT_FY2025_RELEASE", "start": "2025-01-01", "end": "2025-12-31", "months": 12, "reportedThousandTotalMiles": 163767, "reportedEmptyMilesPercent": 8.6, "averageCompanyDriverTrucks": 1593, "averageOwnerOperatorTrucks": 502 },
+    { "id": "H12025", "sourceId": "PAMT_Q22026_RELEASE", "start": "2025-01-01", "end": "2025-06-30", "months": 6, "reportedThousandTotalMiles": 81571, "reportedEmptyMilesPercent": 8.97, "averageCompanyDriverTrucks": 1623, "averageOwnerOperatorTrucks": 509 },
+    { "id": "H12026", "sourceId": "PAMT_Q22026_RELEASE", "start": "2026-01-01", "end": "2026-06-30", "months": 6, "reportedThousandTotalMiles": 84270, "reportedEmptyMilesPercent": 7.61, "averageCompanyDriverTrucks": 1545, "averageOwnerOperatorTrucks": 454 },
+    { "id": "Q22025", "sourceId": "PAMT_Q22026_RELEASE", "start": "2025-04-01", "end": "2025-06-30", "months": 3, "reportedThousandTotalMiles": 40355, "reportedEmptyMilesPercent": 8.90, "averageCompanyDriverTrucks": 1579, "averageOwnerOperatorTrucks": 505 },
+    { "id": "Q22026", "sourceId": "PAMT_Q22026_RELEASE", "start": "2026-04-01", "end": "2026-06-30", "months": 3, "reportedThousandTotalMiles": 43567, "reportedEmptyMilesPercent": 7.35, "averageCompanyDriverTrucks": 1540, "averageOwnerOperatorTrucks": 454 }
+  ],
+  "pointInTimeContext": {
+    "sourceId": "PAMT_2025_10K",
+    "asOf": "2025-12-31",
+    "operatedTrucks": 2094,
+    "independentContractorTrucks": 493,
+    "trailers": 8020,
+    "averageTruckAgeYears": 2.0,
+    "averageTrailerAgeYears": 5.7,
+    "employees": 2365,
+    "employeeDrivers": 1598,
+    "isPeriodAverage": false,
+    "nonDriverEmployeesAreAllAdmin": false,
+    "stockRatioIsSharedTrailerCycleExposure": false
+  },
+  "calculationPolicy": {
+    "mileToKm": 1.609344,
+    "fleetMeanMonthMeaning": "Published period total divided by its months; not observed calendar-month seasonality or per-tractor exposure.",
+    "quarterAndHalfYearAreOverlapping": true,
+    "emptyContrast": "Hypothesis only: if e is all physical empty miles divided by total physical miles, total km per loaded km = 1/(1-e). That definition is not established for the published uncompensated metric.",
+    "actualTripReturnFactor": null,
+    "actualTripLoadedKm": null,
+    "actualTripTotalKm": null,
+    "productiveAssetDaysPerMonth": null,
+    "budgetCfUAdoption": false
+  },
+  "inventoryLinks": [
+    { "section": "GENERAL_BASE", "supports": "Dated carrier profile and separate average/closing asset counts", "unresolved": "Pilot fleet size, MX/US legal scope and own-relay applicability" },
+    { "section": "UTILIZATION", "supports": "Period fleet miles and published empty-factor series", "unresolved": "Matched per-resource denominators, full physical empty definition and productive days" },
+    { "section": "COST_PAYROLL", "supports": "Closing non-driver count context only", "unresolved": "Seven-role FTE distribution, monthly employer expense and compatible fleet capacity" },
+    { "section": "COST_CAPITAL", "supports": "Stock ages as profile contrast, not remaining-life estimates", "unresolved": "Capital and residual of selected used assets" }
+  ],
+  "remainingForCapacity": [
+    "Reconcile total-mile scope with company/owner-operator counts before any per-tractor denominator.",
+    "Resolve productive-day definition and supported monthly quantity for each resource.",
+    "MX and shared-box capacity need independent compatible evidence or an explicit reviewed public-model assumption.",
+    "Do not apply a national fleet empty-factor or stock ratio as this trip's return distance or box cycle."
+  ],
+  "outputs": { "cfuUsd": null, "cvuUsd": null, "productiveCostUsd": null, "purchaseUsd": null, "sellUsd": null }
+}

@@ -1,0 +1,34 @@
+{
+  "model": "FCM_US_TRACTOR_INSURANCE_PUBLIC_MODEL_V1",
+  "verifiedAt": "2026-10-02T06:26:00Z",
+  "referencePeriod": "2026-10",
+  "resourceId": "US_TRACTOR",
+  "profileReference": "US_USED_CASCADIA2021_SLEEPER_D2D_OWN_RELAY_REFERENCE_V1",
+  "currency": "USD",
+  "planningUsPowerUnits": 1,
+  "planningCargoPolicies": 1,
+  "operatingTerritory": "US_ONLY_OWN_RELAY",
+  "paymentModes": ["CASH", "FINANCED"],
+  "premiumPaymentBasis": "ANNUAL_PREMIUM_EXPENSE_NO_PREMIUM_FINANCE_MODEL",
+  "autoMonthlyProxyUsd": 926,
+  "cargoAnnualProxyUsd": 1553,
+  "monthlyCargoDisplayUsd": 129,
+  "autoProxyApplication": "PUBLISHED_POWER_UNIT_MEAN_APPLIED_TO_TRACTOR_ONLY_AS_MODEL_NOT_OBSERVED_MATCH",
+  "cargoProxyApplication": "PUBLISHED_POLICY_MEDIAN_APPLIED_TO_ONE_US_POLICY_NOT_PER_TRAILER_OR_TRIP",
+  "sources": [
+    {"id":"PROGRESSIVE_US_2025","url":"https://www.progressivecommercial.com/commercial-auto-insurance/truck-insurance/commercial-truck-insurance-cost/","locator":"USD926 for-hire transport; footnote2025 new policy premium per power unit liability and physical damage with no driver violations","archive":{"file":"docs/research/sources/PROGRESSIVE_TRUCK_COST_REVIEW_20261001.html","sha256":"90a00898ed49045ebffcc4a5daf103110bf6dfac1cb2100d49b2f36d744a010c"}},
+    {"id":"INSUREON_CARGO_2025","url":"https://www.insureon.com/trucking-business-insurance/cost","locator":"Motor truck cargo1553USD/year,129USD/month display; methodology states median of customer trucking policies; updatedJune23 2025","archive":{"file":"docs/research/sources/INSUREON_TRUCK_COST_REVIEW_20261002.html","sha256":"f8a7094abfa99376d3299a7365196b69d67ab331a2ff7ee7080933082228f6dd"}}
+  ],
+  "modelAssumptions": [
+    "One US planning tractor under own authority, no personal leased-on use; quantity is a model unit, not actual carrier fleet inferred from service count",
+    "General freight dryvan, US tractor stays in US; no hazmat, reefer, oversize or Mexico endorsement claimed",
+    "Apply national clean-record transport power-unit mean to the reference tractor; no asset-age, Texas, deductible or stated-value match asserted",
+    "Cargo policy median is allocated wholly once to the sole US planning power unit; no statistical joint sample or negotiated bundle claimed",
+    "Liability and physical damage are represented once by the Progressive proxy; do not add Insureon auto or another tractor PD charge",
+    "Shared-box PD premium and MX cargo territorial continuity remain separate unresolved families; no box coverage inferred from a power-unit denominator",
+    "General premises liability and workers compensation belong to company and employer costs respectively, not an extra tractor-auto premium",
+    "Same planning premium in cash and asset-financed cases retains physical damage; this does not certify lender insurance terms or actual premium financing",
+    "Published premium expense is a benchmark model, not a complete itemized invoice; taxes, fees, limits and endorsements are not separately observed or set to zero"
+  ],
+  "decision": "REVIEWED_PUBLIC_PLANNING_PREMIUM_MODEL_NOT_POLICY_OR_CANONICAL_PARAMETER_ADOPTION"
+}

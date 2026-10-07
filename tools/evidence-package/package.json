@@ -1,0 +1,6 @@
+{
+  "name": "fcm-evidence-package",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node --test *.test.mjs" }
+}

@@ -1,0 +1,33 @@
+{
+  "artifact":"FCM_B2_IRP_US_RULE_BATCH",
+  "observedAt":"2026-10-01",
+  "status":"DATED_UNROUNDED_COMPONENTS_NOT_CURRENT_COMPLETE_FEES",
+  "sourceRef":"irpRules#/sources/1",
+  "sourceArchive":{"file":"docs/research/sources/IRP_FEE_TEST_GUIDELINES_2026_REVIEW_20261001.xlsx","sha256":"5db191bc435844030366c5edd0b44401b7f832f73edc67ef587b30475b3f9df1"},
+  "profile":{"operation":"HAUL_FOR_HIRE","effectiveDateOfReference":"2026-01-01","termMonths":12,"gvwLb":80000,"currency":"USD","invoiceRoundingConfirmedForApvd":false,"selected":false,"completeJurisdictionFee":false,"currentFeeConfirmed":false},
+  "rules":[
+    {"id":"AL","worksheet":"Alabama","part":"xl/worksheets/sheet1.xml","locator":"Alabama D29:D34/E29:E31","baseCell":"D30","baseRegistrationUsd":815,"additionalApportionableComponentUsd":0,"additionalComponent":"NO_OTHER_COMPONENT_ADOPTED_NOT_ZERO_OTHER_FEES","testRoundedInvoiceUsd":13.81},
+    {"id":"AZ","worksheet":"Arizona","part":"xl/worksheets/sheet3.xml","locator":"Arizona B22:B29","baseCell":"B24","baseRegistrationUsd":3957,"additionalApportionableComponentUsd":0,"additionalComponent":"NO_OTHER_COMPONENT_ADOPTED_NOT_ZERO_OTHER_FEES","fuel":"DIESEL","minimumModelYear":1979,"testRoundedInvoiceUsd":67.07},
+    {"id":"CT","worksheet":"Connecticut","part":"xl/worksheets/sheet8.xml","locator":"Connecticut B30:B34","baseCell":"B32","baseRegistrationUsd":1546,"additionalApportionableComponentUsd":0,"additionalComponent":"NO_OTHER_COMPONENT_ADOPTED_NOT_ZERO_OTHER_FEES","testRoundedInvoiceUsd":26.20},
+    {"id":"DE","worksheet":"Delaware","part":"xl/worksheets/sheet9.xml","locator":"Delaware B27:B30","baseCell":"B28","baseRegistrationUsd":1390,"additionalApportionableComponentUsd":0,"additionalComponent":"NO_OTHER_COMPONENT_ADOPTED_NOT_ZERO_OTHER_FEES","testRoundedInvoiceUsd":23.56},
+    {"id":"GA","worksheet":"Georgia","part":"xl/worksheets/sheet12.xml","locator":"Georgia B29:B35","baseCell":"B29","baseRegistrationUsd":725,"additionalApportionableComponentUsd":275,"extraCell":"B32","additionalComponent":"AAVT_TEST2_COMPONENT","testRoundedInvoiceUsd":16.95,"privateCarrierBaseUsdNotUsed":400},
+    {"id":"IL","worksheet":"Illinois","part":"xl/worksheets/sheet14.xml","locator":"Illinois B30:C33","baseCell":"C31","baseRegistrationUsd":2890,"additionalApportionableComponentUsd":0,"additionalComponent":"NO_OTHER_COMPONENT_ADOPTED_NOT_ZERO_OTHER_FEES","testRoundedInvoiceUsd":48.99},
+    {"id":"IN","worksheet":"Indiana","part":"xl/worksheets/sheet15.xml","locator":"Indiana B33:F43","baseCell":"F35","baseRegistrationUsd":1692,"additionalApportionableComponentUsd":540,"extraCell":"F37","additionalComponent":"CVET_TEST2_COMPONENT","testRoundedInvoiceUsd":37.83,"explicitTestZeroComponents":["TII","HYBRID_ELECTRIC"],"zeroComponentsAreGeneralExemptions":false},
+    {"id":"IA","worksheet":"Iowa","part":"xl/worksheets/sheet16.xml","locator":"Iowa B29:D32","baseCell":"D30","baseRegistrationUsd":1695,"additionalApportionableComponentUsd":0,"additionalComponent":"NO_OTHER_COMPONENT_ADOPTED_NOT_ZERO_OTHER_FEES","testRoundedInvoiceUsd":28.73},
+    {"id":"KS","worksheet":"Kansas","part":"xl/worksheets/sheet17.xml","locator":"Kansas B39:C54","baseCell":"C44","baseRegistrationUsd":1870,"additionalApportionableComponentUsd":400,"extraCell":"C49","additionalComponent":"CMV_REGISTRATION_COMPONENT","lastRuleChangeDateInSource":"2024-09-01","lastFeeChangeDateInSource":"2021-08-01","testRawCombinedUsd":38.4765,"testRoundedInvoiceUsd":38.48},
+    {"id":"LA","worksheet":"Louisiana","part":"xl/worksheets/sheet19.xml","locator":"Louisiana B29:D33","baseCell":"D31","baseRegistrationUsd":504,"additionalApportionableComponentUsd":0,"additionalComponent":"NO_OTHER_COMPONENT_ADOPTED_NOT_ZERO_OTHER_FEES","testRoundedInvoiceUsd":8.54},
+    {"id":"MO","worksheet":"Missouri","part":"xl/worksheets/sheet27.xml","locator":"Missouri B30:D35","baseCell":"D33","baseRegistrationUsd":1050.50,"additionalApportionableComponentUsd":669,"extraCell":"D33","additionalComponent":"SCHEDULE_II_SEPARATE_FROM_SCHEDULE_I","testRoundedInvoiceUsd":29.15},
+    {"id":"OH","worksheet":"Ohio","part":"xl/worksheets/sheet40.xml","locator":"Ohio A22/F40:F42","baseCell":"F40","baseRegistrationUsd":1395,"additionalApportionableComponentUsd":0,"additionalComponent":"NO_OTHER_COMPONENT_ADOPTED_NOT_ZERO_OTHER_FEES","feeScheduleDateInSource":"2018-01-01","testRoundedInvoiceUsd":23.65},
+    {"id":"TN","worksheet":"Tennessee","part":"xl/worksheets/sheet51.xml","locator":"Tennessee C29:I34","baseCell":"I30","baseRegistrationUsd":1386.50,"additionalApportionableComponentUsd":0,"additionalComponent":"NO_OTHER_COMPONENT_ADOPTED_NOT_ZERO_OTHER_FEES","testRoundedInvoiceUsd":23.50}
+  ],
+  "excludedDependentRules":[
+    {"id":"KY","locator":"Kentucky G53:G68 (xl/worksheets/sheet18.xml)","plateBaseUsd":1440,"examplePurchasePriceUsd":53000,"examplePurchaseDate":"2024-12-18","exampleYearFactor":0.00623,"exampleAdValoremUsd":330.19,"exampleRuleTotalUsd":30.01,"texasReporterInvoiceUsd":24.41,"onlyPlateReporterVsValueInclusiveRuleConflict":true,"internalYearLabelConflict":"C59 states year factor 3; C63 label states year 2","usedForPilot":false},
+    {"id":"FL","locator":"Florida A3:A8 (xl/worksheets/sheet11.xml)","genericTractorExampleBaseUsd":1322,"explicitTest2OperationMapping":false,"reason":"Generic example not labelled Test 2; not integrated as a complete compatible rule"},
+    {"id":"CA","sourceRef":"irpRules#/californiaValueDependency","reason":"Vehicle value dependency remains unresolved; not transferred to Ryder asking reference"}
+  ],
+  "unknownOtherFeesAreZero":false,
+  "apvdNumbersAreActualInvoices":false,
+  "remainingCompatibleRuleCount":43,
+  "remaining":["43 jurisdiction rules have no supported underlying component in this projection","All 59 still require current effective-date/profile/extra-fee and invoice-rounding checks; publication date is not fee date","Value and purchase-date dependencies including KY/CA, Canadian monetary basis, registrant/base jurisdiction and APVD eligibility","Full permits family, matching budget exposure and CFU/CVU remain incomplete"],
+  "adoptedValues":0,"quoteReady":false,"externalChanges":false
+}

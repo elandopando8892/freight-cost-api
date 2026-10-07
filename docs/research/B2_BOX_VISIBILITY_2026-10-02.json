@@ -1,0 +1,23 @@
+{
+ "model":"FCM_SHARED_BOX_VISIBILITY_V1","reviewedAt":"2026-10-02T22:05:00Z",
+ "resourceId":"SHARED_TRAILER","units":1,"scope":"PASSIVE_DETACHED_BOX_LOCATION_NOT_HUMAN_SECURITY_OR_INSURANCE",
+ "installedSolarBundleNetMxn":3500,"monthlyGoldenNetMxn":250,"vatRate":0.16,
+ "installationAllocationMonths":24,"allocationBasis":"PLANNING_SERVICE_HORIZON_NOT_OWNED_ASSET_DEPRECIATION",
+ "deviceOwnership":"COMODATO_NOT_PURCHASE","separateGenericInstallationAdded":false,
+ "valuation":{"observationDate":"2026-10-01","mxnPerUsd":18.3688,"taxBasis":"GROSS_NO_INPUT_VAT_CREDIT_ASSUMED"},
+ "eldCorrection":{"devicePriceWithSubscriptionUsd":0,"freeShippingRequiresAnnualPlan":true,"monthlyShippingInstallationTaxUsd":null,"currentRegistrationVerified":false},
+ "sources":[
+  {"id":"DUKETRACK_INSTALLED_BOX","url":"https://duketrack.com/","archive":{"file":"docs/research/sources/DUKETRACK_BOX_PLANS_20261002.html","sha256":"d4087ed24e8ef171a0854bb7ad065f6675214059de2df917c8d344c34a5e76f1"},"locator":"Cajas secas/remolques: battery up to30days installed2500MXN or solar installed3500MXN; Golden250 or Premium299monthly, prices plus IVA. General GPS offered in comodato, MX/US/Canada connectivity, technical support. Generic999installation must not be added to already installed box price."},
+  {"id":"MATRACK_DEVICE_SUBSCRIPTION","url":"https://matrackinc.com/shopping-cart/?product=asset","archive":{"file":"docs/research/sources/MATRACK_DEVICE_SUBSCRIPTION_20261002.html","sha256":"e847e431a748553c045cfa3fd546b01ce1e8735e8a59aa99fe7e86d71c005cb5"},"locator":"Public product catalogue read only: ELD device included with subscription, monthlyBasic19.95/Premium24.95; FAQ month-to-month. Empty-cart shipping zero is not a shipping quote. No cart interaction/order performed."}
+ ],
+ "assumptions":[
+  "Use solar bundle with Golden as a public planning reference: independent of tractor power and no recharge task assumed; vendor autonomy/coverage claims are not route-tested reliability or a freight security SLA.",
+  "Battery2500 alternative is cheaper but30-day maximum autonomy and recharge process not measured. Premium299 adds mirror accounts/controls not needed to budget simple box visibility; neither alternative is added to selected bundle.",
+  "Installed3500 includes installation; do not add generic999, hardware ownership depreciation, battery bundle or second box. Comodato is not a purchased asset with residual value.",
+  "Spread nonrecurring installed service charge over explicit24-month continuous-service planning horizon. Not provider term, fiscal useful life, loan term or observed retention. First-month cash and average economic allocation are different; no interest or annual discount assumed.",
+  "Use16percent VAT gross/no credit as existing MX reference policy. Same service-tax policy in both asset-VAT alternatives, no extra foreign SIM subscription.",
+  "ELD evidence correction: hardware ships free on annual plans concerns shipping, not device price. Catalogue independently supports included device with monthly subscription. Shipping, installation labor, tax and official registration remain unverified; aggregate cost is not set to zero.",
+  "Passive box visibility does not fill human monitoring, cargo insurance, roadside recovery or theft prevention. No provider chosen, contract, API, subscription, production adoption or external write."
+ ],
+ "completeD2DCostUsd":null,"quoteReady":false,"adoptedValues":0
+}

@@ -1,0 +1,27 @@
+{
+  "artifact": "FCM_B2_FIXED_EXPOSURE_TRAILER_CONSOLIDATION",
+  "cutDate": "2026-09-30",
+  "baseHead": "4f5fc2de0c3d178dace917231e1092040dec21fd",
+  "mode": "LOCAL_RESEARCH_HANDOFF_ONLY",
+  "calibrated": false,
+  "quoteReady": false,
+  "adoptedValues": 0,
+  "sources": [
+    {
+      "id": "assembly",
+      "file": "docs/research/B2_ECONOMIC_REFERENCE_CARDS_2026-09-30.json",
+      "sha256": "3b7fc38bdbef7b6692a18b50c785f601eb91956e1d958ce186e5d613c3894b1e"
+    },
+    {
+      "id": "fuel",
+      "file": "docs/research/B2_FUEL_PRICE_PERFORMANCE_REFERENCE_2026-09-30.json",
+      "sha256": "8824dcdb1180e28c9b7950bb4b77155b94edce78410f6a392a3cdaecc8c80be1"
+    },
+    {
+      "id": "maintenance",
+      "file": "docs/research/B2_MAINTENANCE_TIRES_REFERENCE_2026-09-30.json",
+      "sha256": "021cc89442452036fd1c6edc782fc42db89c6e5b5b8398db56150fdf89dfdbdb"
+    }
+  ],
+  "nextCut": "D2D_CASE_READINESS_AND_HANDOFF"
+}

@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { fetcher } from '@/lib/fetcher'
+import { validateDossierInput } from '@/lib/benchmark-dossier'
 
 export type FormNode = { kind: 'object' | 'array' | 'text' | 'number' | 'choice' | 'fixed'; fields?: Record<string, FormNode>; item?: FormNode; choices?: string[]; value?: string; max?: number; rows?: Record<string, unknown>[] }
 export type FormValue = string | number | FormValue[] | { [key: string]: FormValue }
@@ -80,14 +81,18 @@ export function FormField({ node, value, path, name, root, onChange }: { node: F
   const accessible = `${label(name)} · ${path}`
   return <label className="grid min-w-0 gap-2 text-sm">{label(name)}{node.kind === 'choice' ? <select className={control} aria-label={accessible} value={String(value)} onChange={e => onChange(e.target.value)}><option value="">Selecciona…</option>{node.choices!.map(v => <option key={v} value={v}>{choices[v] ?? v}</option>)}</select> : <input className={control} aria-label={accessible} type={node.kind === 'number' ? 'number' : /^(serviceDate|observedAt|validFrom|validUntil)$/.test(name) ? 'date' : 'text'} step="any" maxLength={2000} value={value as string | number} onChange={e => onChange(node.kind === 'number' && e.target.value !== '' ? Number(e.target.value) : e.target.value)} />}</label>
 }
-export function GuidedFields({ schema, onChange }: { schema: FormNode; onChange: (text: string) => void }) {
-  const [value, setValue] = useState(() => emptyForm(schema) as Record<string, FormValue>)
+export function GuidedFields({ schema, onChange, initialValue }: { schema: FormNode; onChange: (text: string) => void; initialValue?: Record<string, FormValue> }) {
+  const [value, setValue] = useState(() => initialValue ?? emptyForm(schema) as Record<string, FormValue>)
   const [section, setSection] = useState('route')
   const titles = { route: '1. Ruta y tramos', fixed: '2. Capital y costos fijos', trailer: '3. Utilización' }
   const update = (next: Record<string, FormValue>) => { setValue(next); onChange(JSON.stringify(next)) }
   const route = record(value.route)
+  const endpoints = record(route.route)
   const capital = record(record(value.fixed).capital)
   return <section className="grid min-w-0 gap-4" aria-label="Captura guiada">
+    {(endpoints.mxEndpoint || endpoints.usEndpoint) && <p aria-label="Resumen de ruta" className="break-words rounded-lg border bg-card p-4 text-sm">
+      {route.direction === 'US_TO_MX' ? `${endpoints.usEndpoint || 'Destino US pendiente'} → ${endpoints.mxEndpoint || 'Destino MX pendiente'}` : `${endpoints.mxEndpoint || 'Origen MX pendiente'} → ${endpoints.usEndpoint || 'Destino US pendiente'}`}
+      <span className="mt-1 block text-muted-foreground">Cruce: {String(endpoints.mxGateway || 'MX pendiente')} / {String(endpoints.usGateway || 'US pendiente')}</span></p>}
     <div className="grid gap-3 rounded-lg border bg-card p-4 md:grid-cols-2" aria-label="Datos compartidos">
       <label className="grid gap-2 text-sm">Fecha del servicio<input className={control} type="date" aria-label="Fecha compartida del servicio" value={String(route.serviceDate)} onInput={e => update(setSharedContext(value, 'serviceDate', e.currentTarget.value))} /></label>
       <label className="grid gap-2 text-sm">Referencia del remolque<input className={control} type="text" maxLength={1000} aria-label="Referencia compartida del remolque" value={String(capital.assetReference)} onChange={e => update(setSharedContext(value, 'assetReference', e.target.value))} /></label>
@@ -101,17 +106,21 @@ export function GuidedFields({ schema, onChange }: { schema: FormNode; onChange:
     }} />)}</div>
   </section>
 }
-export function BenchmarkForm({ onChange }: { onChange: (text: string) => void }) {
+export function BenchmarkForm({ onChange, initialValue }: { onChange: (text: string) => void; initialValue?: Record<string, FormValue> }) {
   const [schema, setSchema] = useState<FormNode | null>(null)
   const [failed, setFailed] = useState(false)
   const [attempt, setAttempt] = useState(0)
   useEffect(() => {
     let active = true
-    setFailed(false)
     fetcher<FormNode>('/api/v1/engine/benchmark-owned-d2d/form', { silent: true }).then(s => { if (active) setSchema(s) }).catch(() => { if (active) setFailed(true) })
     return () => { active = false }
   }, [attempt])
-  if (failed) return <div role="alert">No se pudo cargar el formulario. Verifica tu sesión y permisos.<Button variant="outline" onClick={() => setAttempt(a => a + 1)}>Reintentar</Button></div>
+  if (failed) return <div role="alert">No se pudo cargar el formulario. Verifica tu sesión y permisos.<Button variant="outline" onClick={() => { setFailed(false); setAttempt(a => a + 1) }}>Reintentar</Button></div>
   if (!schema) return <p role="status">Cargando campos del motor…</p>
-  return <GuidedFields schema={schema} onChange={onChange} />
+  if (initialValue) {
+    try { validateDossierInput(initialValue, schema) } catch {
+      return <p role="alert">El formulario cambió durante la apertura. Limpia la captura y abre un archivo compatible; no se muestran campos incompatibles.</p>
+    }
+  }
+  return <GuidedFields schema={schema} onChange={onChange} initialValue={initialValue} />
 }

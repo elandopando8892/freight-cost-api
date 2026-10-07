@@ -1,0 +1,30 @@
+{
+  "model":"FCM_US_PROSPECTIVE_MARKET_CAPITAL_V1",
+  "reviewedAt":"2026-10-02T07:25:14Z",
+  "referencePeriod":"2026-10",
+  "profileReference":"US_USED_CASCADIA2021_SLEEPER_D2D_OWN_RELAY_REFERENCE_V1",
+  "exposureId":"H12026",
+  "planningPowerUnits":1,
+  "measurement":"MARKET_VALUE_USE_LOSS_NO_PURCHASE_OR_DISPOSAL_EVENT",
+  "financing":"EXISTING_REFERENCE_DEBT_NO_NEW_ORIGINATION_EVENT",
+  "permissionEvidence":"USER_AUTORIZO_CAMBIO_METODOLOGICO_2026_10_02",
+  "sources":[
+    {"id":"RYDER_MARKET_PROXY","url":"https://www.ryder.com/en-us/used-trucks/inventory/oklahoma/oklahoma-city/tractor/tandem-axle-sleeper-tractor/2021/freightliner-mercedes/new-cascadia-px12664/526505","locator":"Stock526505 asking40495USD excluding fees/taxes. Used2021 sleeper; public asking proxy, not fair-value appraisal or actual purchase."},
+    {"id":"ANL_INCREMENTAL_VALUE_MODEL","url":"https://publications.anl.gov/anlpubs/2021/05/167399.pdf","locator":"Eq3.8/Table3.11 sleeper annual age retention .9071 and per1000 additional miles .999; historical2019 listings, not survival, used remaining life or realized net sale."},
+    {"id":"PAMT_H12026_USE_PROXY","url":"https://www.sec.gov/Archives/edgar/data/798287/000143774926025703/ex_998666.htm","locator":"H12026 total84270 thousand miles, average1545company+454owner-operated trucks,6months. Declared forward proxy, not observed use of offered VIN or US-only own relay."},
+    {"id":"USMFCU_APR_CONTEXT_NOT_NOMINAL_SOURCE","url":"https://www.usmfcu.org/auto-loans","locator":"Published used-semi APR9% from/10%down/up to72months. Nominal9% is independent analytical hypothesis; existing reference debt is assumed, not lender offer, origination or borrower eligibility."}
+  ],
+  "modelAssumptions":[
+    "User explicitly authorized prospective market-value methodology; original acquisition-based artifacts remain historical and unchanged",
+    "One already-in-use reference US tractor, not an actual XBF asset or fleet; current market anchor is asking40495USD, not a completed transaction",
+    "36month forward holding/comparison window, not established service life or survival of this high-mileage tractor",
+    "Apply H12026 historical combined-truck mean11307.27187593797km/month as declared future planning use; same miles in incremental residual and per-km component",
+    "Terminal gross market value is a valuation, not a sale; no purchase, listing, disposal, loan opening or refinancing event modeled; their unknown charges remain outside this measurement, not actual zero charges",
+    "Cash has no reference debt; financed uses an existing balance equal to90% of market proxy,72 remaining level-payment months and independent nominal9% hypothesis, no grace/balloon in this model",
+    "Finance amount covers modeled debt interest only; no actual lender all-in fees or contract completeness claimed; unknown historic origination/ancillary fees not certified zero",
+    "Budget month is an average over36months, not first-month interest or Oct2026 lender invoice; monthly cent rounding is explicit",
+    "Equity required return/opportunity cost remains a separate finance policy, not depreciation, debt interest or implicit zero; not hidden inside margin",
+    "No transfer of US residual coefficients to MX or shared53ft box; both remain distinct unresolved capital families",
+    "Model family completion is not calibration, actual accounting completeness, quotation readiness or B2 closure"
+  ]
+}

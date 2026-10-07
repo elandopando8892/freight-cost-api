@@ -1,0 +1,6 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": { "incremental": false },
+  "include": ["../next-env.d.ts", "../lib/cost-base-wizard-contract.ts", "../app/(app)/cost-bases/version-wizard.tsx"],
+  "exclude": ["../node_modules"]
+}

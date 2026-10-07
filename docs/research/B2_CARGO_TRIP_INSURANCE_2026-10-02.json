@@ -1,0 +1,38 @@
+{
+ "model":"FCM_CARGO_VALUE_TRIP_REFERENCE_V1",
+ "reviewedAt":"2026-10-02T21:01:00Z",
+ "referencePeriod":"2026-10",
+ "pricingDate":"2026-09-20",
+ "insuredInterest":"SUPPLEMENTAL_DECLARED_GOODS_VALUE_NOT_CARRIER_AUTO_OR_BOX_PD",
+ "scope":"PUBLIC_PLANNING_REFERENCE_NOT_BOUND_INSURANCE",
+ "premiumRate":0.0045,"minimumNetPremiumMxn":250,"vatRate":0.16,
+ "feeMethod":"PUBLISHED_POINTS_ONLY_NO_INFERRED_INTERVALS",
+ "publishedPoints":[
+  {"declaredValueMxn":50000,"netPremiumMxn":250,"policyFeeMxn":50,"netTotalMxn":300},
+  {"declaredValueMxn":100000,"netPremiumMxn":450,"policyFeeMxn":50,"netTotalMxn":500},
+  {"declaredValueMxn":250000,"netPremiumMxn":1125,"policyFeeMxn":50,"netTotalMxn":1175},
+  {"declaredValueMxn":450000,"netPremiumMxn":2025,"policyFeeMxn":150,"netTotalMxn":2175},
+  {"declaredValueMxn":500000,"netPremiumMxn":2250,"policyFeeMxn":150,"netTotalMxn":2400},
+  {"declaredValueMxn":750000,"netPremiumMxn":3375,"policyFeeMxn":200,"netTotalMxn":3575},
+  {"declaredValueMxn":1000000,"netPremiumMxn":4500,"policyFeeMxn":250,"netTotalMxn":4750},
+  {"declaredValueMxn":2000000,"netPremiumMxn":9000,"policyFeeMxn":500,"netTotalMxn":9500}
+ ],
+ "pilotSelection":{"mode":"UNDECIDED","declaredValueMxn":null,"cargoDescription":null,"taxTreatment":null},
+ "sources":[
+  {"id":"TIMI_CARGO_PRICE_20260920","url":"https://timi.mx/carga/cuanto-cuesta","locator":"Price table reviewed20Sep2026, eight net premium/fee/subtotal rows; international same rate subject to eligibility;500000MXN example2400net+384IVA=2784gross.","archive":{"file":"docs/research/sources/TIMI_CARGO_PRICE_20261002.html","sha256":"32098a67f7f78dfb66b4c310be89adc42e240327197a8ed196be0da9ca67fe3c"}},
+  {"id":"TIMI_CROSS_BORDER_NO_LIST_PRICE","url":"https://timi.mx/seguro-tractocamion","requestedUrl":"https://timi.mx/guias/seguro-tractocamion-cubre-estados-unidos","locator":"Requested guide redirects to tractor product page. Section Sirve para cruzar a Estados Unidos: commercial QIC program quote per unit/carrier, no public list price; personal RC excludes commercial cargo. Only RC scope, not a denial of all possible physical-damage territorial extensions.","archive":{"file":"docs/research/sources/TIMI_CROSS_BORDER_20261002.html","sha256":"7c0be90666283ea23d6ee7c0a61b310c61cdd09f6de39fccca7712c96cea9e89"}},
+  {"id":"FMCSA_MX_REGISTRATION_INSURANCE","url":"https://li-public.fmcsa.dot.gov/LIVIEW/PKG_MX_POPUP_ONLINE.prc_popup_english/pkg_registration.prc_option","locator":"Official OP2 instructions sectionIV: MCS90 and trip evidence24hours or longer, or continuing insurance, for registered border-zone carrier. Not a price, long-haul authorization or validated pilot carrier/yard.","archive":{"file":"docs/research/sources/FMCSA_MX_REGISTRATION_INSURANCE_20261002.html","sha256":"647a7bdff0d1beb34f359e9ac8490f74df08f42c85922ef3fa5b6ef617655bd7"}}
+ ],
+ "assumptions":[
+  "Published shipment values are source examples, not the pilot cargo, a population sample or selected benchmark cargo value.",
+  "One outbound insured shipment for this pilot. A dedicated empty return, relay, second country or second tractor does not create another merchandise premium. Different future loaded returns require their own declared shipment.",
+  "A fee at each published value is observed; boundaries of all fee intervals are not published in the table. Do not interpolate or infer a complete fee schedule.",
+  "Report premium, policy fee, net and gross amounts separately. Do not infer recoverable VAT; tax treatment requires an explicit planning choice. Use dated FIX valuation once, not a forecast or settlement rate.",
+  "Published international pricing is not confirmation of this commodity, route, handoff, yards, certificate, exclusions or limits. No chat, quote, policy purchase or insurer acceptance is performed.",
+  "Existing1553USDannual US cargo-policy proxy stays in the carrier fixed budget. Cargo-value coverage does not automatically replace carrier cargo liability and must not be appended to the baseline without explicit cost scope.",
+  "If selected as a transport expense, this is a per-shipment CVU component, not monthly CFU; no exposure, distance, country or tractor multiplier.",
+  "MX tractor US-border RC remains required to resolve for the modeled crossing and has no compatible public premium found in the reviewed sources. Do not borrow personal-auto price, US tractor full policy, or a liability limit as a premium.",
+  "Observed price is broker primary evidence, not an insurer quotation or statistical market average. Older search snippets at0.37percent are not substituted for the archived20Sep0.45percent schedule."
+ ],
+ "completeCarrierInsuranceUsd":null,"completeD2DCostUsd":null,"quoteReady":false,"adoptedValues":0
+}

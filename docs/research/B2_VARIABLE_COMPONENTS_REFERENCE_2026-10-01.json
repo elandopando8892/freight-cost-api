@@ -1,0 +1,61 @@
+{
+  "artifact": "FCM_B2_VARIABLE_COMPONENTS_REFERENCE",
+  "reviewedAt": "2026-10-01T22:23:00-06:00",
+  "status": "COHERENT_MODEL_COMPONENTS_NOT_COMPLETE_PILOT_CVU",
+  "source": {
+    "id": "IMT_PT881",
+    "url": "https://imt.mx/archivos/Publicaciones/PublicacionTecnica/pt881.pdf",
+    "archive": {
+      "file": "docs/research/sources/IMT_PT881_2025.pdf",
+      "sha256": "816728964103158f0a99f44c41bbe5d2bb7240c33e35651fcbd90c0b391412f4"
+    },
+    "locator": "Section4.1 printed49/PDF59; Table4.2 printed51/PDF61; full pages visually inspected",
+    "costPeriod": "2025",
+    "kind": "OFFICIAL_TECHNICAL_BASE_MODEL_NOT_CARRIER_OBSERVATION"
+  },
+  "reusedPins": [
+    {"id":"fuelReference","file":"docs/research/B2_FUEL_PRICE_PERFORMANCE_REFERENCE_2026-09-30.json","sha256":"8824dcdb1180e28c9b7950bb4b77155b94edce78410f6a392a3cdaecc8c80be1"},
+    {"id":"maintenanceReference","file":"docs/research/B2_MAINTENANCE_TIRES_REFERENCE_2026-09-30.json","sha256":"021cc89442452036fd1c6edc782fc42db89c6e5b5b8398db56150fdf89dfdbdb"},
+    {"id":"sakbeMxDetail","file":"docs/research/B2_SAKBE_MX_LIVE_DETAIL_2026-09-30.json","sha256":"731cb21c1f7bfe2196ab90b12d56a91d4ebd4b1ef5b698ce73209341958b2970"}
+  ],
+  "model": {
+    "country": "MX",
+    "configuration": "T3-S2",
+    "tractor": "INTERNATIONAL9200i_CUMMINS_ISX450HP",
+    "trailerLengthFeet": 40,
+    "trailer": "TWO_AXLE_ALUMINUM_BOX",
+    "tires": "1100-20.00_NORMAL",
+    "assetScope": "TRACTOR_AND_TRAILER_COMPOSITE_UNSPLIT",
+    "baseRoad": {"curvature":0,"grade":0,"iriMetersPerKm":2,"serviceIndex":4.3},
+    "taxBasis": "NATIONAL_ECONOMIC_MODEL_EXCLUDES_TAXES_AND_DUTIES",
+    "loadedEmptySplitEstablished": false,
+    "targetProfileMatched": false
+  },
+  "fuel": {
+    "litersPer1000VehicleKm": 483.92,
+    "unitPriceMxnPerLiter": 22.12,
+    "publishedCostMxnPer1000VehicleKm": 10704.21,
+    "precisionRule": "PRESERVE_PRINTED_COST_NOT_ROUNDED_INPUT_PRODUCT"
+  },
+  "maintenanceGroupId": "MX_IMT_MODEL",
+  "maintenanceRecordIds": ["MX_LABOR","MX_PARTS","MX_LUBRICANTS","MX_TIRES"],
+  "excludedFamilies": ["DRIVER_COMPENSATION","DEPRECIATION","CAPITAL_INTEREST","INDIRECT_ADMIN_COMPANY","TOLLS","BORDER","EMPTY_RETURN","IDLING_AUXILIARIES","UNRESOLVED_DEF_AND_OTHER_RESERVES"],
+  "applicability": {
+    "targetTrailerLengthFeet": 53,
+    "constantBaseRateOverCandidateDistanceIsExplicitSensitivity": true,
+    "noWholeModelTotalAddedToFixedBudget": true,
+    "noSeparateTrailerRateAddedAgain": true,
+    "noArbitraryAssetSplit": true,
+    "retail2026PricesNotSummedIntoNet2025Model": true,
+    "noStatisticalRangeOrCarrierCostClaim": true
+  },
+  "remaining": [
+    "Translate the40ft flat-road2025 model to an explicitly supported53ft operational profile; do not call equal axle count sufficient",
+    "Current compatible price/tax basis, fuel loaded/empty and idling/auxiliary conditions remain unresolved",
+    "Maintenance/tires inclusion boundary, DEF and resource responsibility must match the target reference",
+    "US distance/time, compatible fuel-performance and variable components are not a joined model",
+    "Driver compensation, empty repositioning, border/tolls, fixed budgets and productive exposure still required for complete pilot cost"
+  ],
+  "adoptedValues": 0,
+  "quoteReady": false
+}

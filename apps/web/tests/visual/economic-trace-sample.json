@@ -1,0 +1,4010 @@
+{
+  "policy": "STATELESS_BENCHMARK_NO_ADOPTION",
+  "calculatedBy": "SERVER",
+  "calibrated": false,
+  "sourceStatus": "DOCUMENTED_UNVERIFIED",
+  "purchaseCostUsd": null,
+  "sellPriceUsd": null,
+  "status": "SCENARIO_ONLY",
+  "issues": [],
+  "sharedTractorResources": [
+    {
+      "id": "mx",
+      "scope": "TRACTOR_ONLY",
+      "revision": "QA",
+      "serviceDate": "2026-09-29",
+      "inputs": [
+        {
+          "key": "fcm.v3.general-base.periodo-de-operacion",
+          "label": "Periodo de Operación",
+          "section": "GENERAL_BASE",
+          "value": 26,
+          "unit": "days/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.general-base.tamano-de-flota",
+          "label": "Tamaño de Flota",
+          "section": "GENERAL_BASE",
+          "value": 50,
+          "unit": "tractors",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.general-base.indice-de-operatividad",
+          "label": "Índice de Operatividad",
+          "section": "GENERAL_BASE",
+          "value": 0.9,
+          "unit": "ratio",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.general-base.operadores",
+          "label": "Operadores",
+          "section": "GENERAL_BASE",
+          "value": 52,
+          "unit": "operators",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.general-base.kilometros-promedio-x-operador",
+          "label": "Kilómetros promedio x operador",
+          "section": "GENERAL_BASE",
+          "value": 22000,
+          "unit": "km/month/operator",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.fuel.diesel-mx",
+          "label": "Diesel MX",
+          "section": "FUEL",
+          "value": 28,
+          "unit": "MXN/L",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.fuel.rendimiento-cargado",
+          "label": "Rendimiento Cargado",
+          "section": "FUEL",
+          "value": 2.8,
+          "unit": "km/L",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.fuel.rendimiento-vacio",
+          "label": "Rendimiento Vacío",
+          "section": "FUEL",
+          "value": 3.2,
+          "unit": "km/L",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.labor.tarifa-operador-mx",
+          "label": "Tarifa Operador MX",
+          "section": "LABOR",
+          "value": 0.18,
+          "unit": "USD/mile",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.labor.carga-social",
+          "label": "Carga Social",
+          "section": "LABOR",
+          "value": 0.3,
+          "unit": "% payroll",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.finance.tipo-de-cambio",
+          "label": "Tipo de Cambio",
+          "section": "FINANCE",
+          "value": 17.5,
+          "unit": "MXN/USD",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.finance.cost-of-capital-mx",
+          "label": "Cost of Capital MX",
+          "section": "FINANCE",
+          "value": 0.14,
+          "unit": "annual rate",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.finance.carrier-payment-days",
+          "label": "Carrier Payment Days",
+          "section": "FINANCE",
+          "value": 14,
+          "unit": "days",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.finance.customer-collection-days",
+          "label": "Customer Collection Days",
+          "section": "FINANCE",
+          "value": 30,
+          "unit": "days",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.finance.monthly-cogs-proxy",
+          "label": "Monthly COGS Proxy",
+          "section": "FINANCE",
+          "value": 239577,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.10k-qty-aceite-de-motor",
+          "label": "10k Qty Aceite de Motor",
+          "section": "COST_MAINT",
+          "value": 60,
+          "unit": "L",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.10k-pu-aceite-de-motor",
+          "label": "10k PU Aceite de Motor",
+          "section": "COST_MAINT",
+          "value": 5,
+          "unit": "USD/L",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.10k-qty-filtros-de-aceite",
+          "label": "10k Qty Filtros de Aceite",
+          "section": "COST_MAINT",
+          "value": 1,
+          "unit": "piece",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.10k-pu-filtros-de-aceite",
+          "label": "10k PU Filtros de Aceite",
+          "section": "COST_MAINT",
+          "value": 65,
+          "unit": "USD/piece",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.10k-qty-filtros-de-diesel",
+          "label": "10k Qty Filtros de Diesel",
+          "section": "COST_MAINT",
+          "value": 2,
+          "unit": "pieces",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.10k-pu-filtros-de-diesel",
+          "label": "10k PU Filtros de Diesel",
+          "section": "COST_MAINT",
+          "value": 40,
+          "unit": "USD/piece",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.10k-qty-mano-de-obra",
+          "label": "10k Qty Mano de Obra",
+          "section": "COST_MAINT",
+          "value": 1,
+          "unit": "event",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.10k-pu-mano-de-obra",
+          "label": "10k PU Mano de Obra",
+          "section": "COST_MAINT",
+          "value": 250,
+          "unit": "USD/event",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.100k-qty-aceite-caja-cambios",
+          "label": "100k Qty Aceite Caja Cambios",
+          "section": "COST_MAINT",
+          "value": 19,
+          "unit": "L",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.100k-pu-aceite-caja-cambios",
+          "label": "100k PU Aceite Caja Cambios",
+          "section": "COST_MAINT",
+          "value": 8,
+          "unit": "USD/L",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.100k-qty-aceite-caja-transmision",
+          "label": "100k Qty Aceite Caja Transmision",
+          "section": "COST_MAINT",
+          "value": 19,
+          "unit": "L",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.100k-pu-aceite-caja-transmision",
+          "label": "100k PU Aceite Caja Transmision",
+          "section": "COST_MAINT",
+          "value": 15,
+          "unit": "USD/L",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.100k-qty-filtros",
+          "label": "100k Qty Filtros",
+          "section": "COST_MAINT",
+          "value": 1,
+          "unit": "piece",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.100k-pu-filtros",
+          "label": "100k PU Filtros",
+          "section": "COST_MAINT",
+          "value": 60,
+          "unit": "USD/piece",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.100k-qty-aceite-hidraulico",
+          "label": "100k Qty Aceite Hidraulico",
+          "section": "COST_MAINT",
+          "value": 19,
+          "unit": "L",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.100k-pu-aceite-hidraulico",
+          "label": "100k PU Aceite Hidraulico",
+          "section": "COST_MAINT",
+          "value": 8,
+          "unit": "USD/L",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.100k-qty-filtros-aire",
+          "label": "100k Qty Filtros Aire",
+          "section": "COST_MAINT",
+          "value": 2,
+          "unit": "pieces",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.100k-pu-filtros-aire",
+          "label": "100k PU Filtros Aire",
+          "section": "COST_MAINT",
+          "value": 95,
+          "unit": "USD/piece",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.250k-qty-baterias",
+          "label": "250k Qty Baterias",
+          "section": "COST_MAINT",
+          "value": 4,
+          "unit": "pieces",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.250k-pu-baterias",
+          "label": "250k PU Baterias",
+          "section": "COST_MAINT",
+          "value": 175,
+          "unit": "USD/piece",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.250k-qty-calibracion-inyectores",
+          "label": "250k Qty Calibracion Inyectores",
+          "section": "COST_MAINT",
+          "value": 1,
+          "unit": "event",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.250k-pu-calibracion-inyectores",
+          "label": "250k PU Calibracion Inyectores",
+          "section": "COST_MAINT",
+          "value": 1200,
+          "unit": "USD/event",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.250k-qty-clutch",
+          "label": "250k Qty Clutch",
+          "section": "COST_MAINT",
+          "value": 1,
+          "unit": "event",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.250k-pu-clutch",
+          "label": "250k PU Clutch",
+          "section": "COST_MAINT",
+          "value": 2750,
+          "unit": "USD/event",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.250k-qty-frenos",
+          "label": "250k Qty Frenos",
+          "section": "COST_MAINT",
+          "value": 1,
+          "unit": "event",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.250k-pu-frenos",
+          "label": "250k PU Frenos",
+          "section": "COST_MAINT",
+          "value": 1800,
+          "unit": "USD/event",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.reserve-def-urea",
+          "label": "Reserve DEF Urea",
+          "section": "COST_MAINT",
+          "value": 0.025,
+          "unit": "USD/km",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.reserve-lubricants",
+          "label": "Reserve Lubricants",
+          "section": "COST_MAINT",
+          "value": 0.005,
+          "unit": "USD/km",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.reserve-coolant",
+          "label": "Reserve Coolant",
+          "section": "COST_MAINT",
+          "value": 120,
+          "unit": "USD/100000km",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.reserve-dpf",
+          "label": "Reserve DPF",
+          "section": "COST_MAINT",
+          "value": 0.015,
+          "unit": "USD/km",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.reserve-pm-unscheduled",
+          "label": "Reserve PM Unscheduled",
+          "section": "COST_MAINT",
+          "value": 0.03,
+          "unit": "USD/km",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-tires.qty-direccion",
+          "label": "Qty Direccion",
+          "section": "COST_TIRES",
+          "value": 2,
+          "unit": "pieces",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-tires.pu-direccion",
+          "label": "PU Direccion",
+          "section": "COST_TIRES",
+          "value": 600,
+          "unit": "USD/piece",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-tires.life-km-direccion",
+          "label": "Life KM Direccion",
+          "section": "COST_TIRES",
+          "value": 180000,
+          "unit": "km",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-tires.qty-traccion",
+          "label": "Qty Traccion",
+          "section": "COST_TIRES",
+          "value": 8,
+          "unit": "pieces",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-tires.pu-traccion",
+          "label": "PU Traccion",
+          "section": "COST_TIRES",
+          "value": 550,
+          "unit": "USD/piece",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-tires.life-km-traccion",
+          "label": "Life KM Traccion",
+          "section": "COST_TIRES",
+          "value": 220000,
+          "unit": "km",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-tires.qty-recapeadas",
+          "label": "Qty Recapeadas",
+          "section": "COST_TIRES",
+          "value": 0,
+          "unit": "pieces",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética: sin recapeadas independientes; no adoptar ni calibrar"
+        },
+        {
+          "key": "fcm.v3.cost-tires.pu-recapeadas",
+          "label": "PU Recapeadas",
+          "section": "COST_TIRES",
+          "value": 225,
+          "unit": "USD/piece",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-tires.life-km-recapeadas",
+          "label": "Life KM Recapeadas",
+          "section": "COST_TIRES",
+          "value": 160000,
+          "unit": "km",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-insurance.prima-anual-por-vehiculo",
+          "label": "Prima Anual por Vehiculo",
+          "section": "COST_INSURANCE",
+          "value": 1,
+          "unit": "policy/vehicle",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-insurance.poliza-x-vehiculo",
+          "label": "Poliza x Vehiculo",
+          "section": "COST_INSURANCE",
+          "value": 12000,
+          "unit": "USD/year/tractor",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-insurance.periodo-de-poliza",
+          "label": "Periodo de Poliza",
+          "section": "COST_INSURANCE",
+          "value": 12,
+          "unit": "months",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-payroll.qty-despachador",
+          "label": "Qty Despachador",
+          "section": "COST_PAYROLL",
+          "value": 2,
+          "unit": "FTE",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-payroll.pu-despachador",
+          "label": "PU Despachador",
+          "section": "COST_PAYROLL",
+          "value": 2200,
+          "unit": "USD/month/FTE",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-payroll.qty-jefe-trafico",
+          "label": "Qty Jefe Trafico",
+          "section": "COST_PAYROLL",
+          "value": 2,
+          "unit": "FTE",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-payroll.pu-jefe-trafico",
+          "label": "PU Jefe Trafico",
+          "section": "COST_PAYROLL",
+          "value": 2750,
+          "unit": "USD/month/FTE",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-payroll.qty-gerente-operaciones",
+          "label": "Qty Gerente Operaciones",
+          "section": "COST_PAYROLL",
+          "value": 1,
+          "unit": "FTE",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-payroll.pu-gerente-operaciones",
+          "label": "PU Gerente Operaciones",
+          "section": "COST_PAYROLL",
+          "value": 5500,
+          "unit": "USD/month/FTE",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-payroll.qty-gerente-comercial",
+          "label": "Qty Gerente Comercial",
+          "section": "COST_PAYROLL",
+          "value": 0.5,
+          "unit": "FTE",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-payroll.pu-gerente-comercial",
+          "label": "PU Gerente Comercial",
+          "section": "COST_PAYROLL",
+          "value": 4500,
+          "unit": "USD/month/FTE",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-payroll.qty-safety-manager",
+          "label": "Qty Safety Manager",
+          "section": "COST_PAYROLL",
+          "value": 0.5,
+          "unit": "FTE",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-payroll.pu-safety-manager",
+          "label": "PU Safety Manager",
+          "section": "COST_PAYROLL",
+          "value": 4500,
+          "unit": "USD/month/FTE",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-payroll.qty-tracking-cs",
+          "label": "Qty Tracking CS",
+          "section": "COST_PAYROLL",
+          "value": 2,
+          "unit": "FTE",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-payroll.pu-tracking-cs",
+          "label": "PU Tracking CS",
+          "section": "COST_PAYROLL",
+          "value": 1800,
+          "unit": "USD/month/FTE",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-payroll.qty-billing-admin",
+          "label": "Qty Billing Admin",
+          "section": "COST_PAYROLL",
+          "value": 1,
+          "unit": "FTE",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-payroll.pu-billing-admin",
+          "label": "PU Billing Admin",
+          "section": "COST_PAYROLL",
+          "value": 2200,
+          "unit": "USD/month/FTE",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-agua",
+          "label": "Qty Agua",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "account",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-agua",
+          "label": "PU Agua",
+          "section": "COST_COMPANY",
+          "value": 250,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-luz",
+          "label": "Qty Luz",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "account",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-luz",
+          "label": "PU Luz",
+          "section": "COST_COMPANY",
+          "value": 900,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-telefonia-fija",
+          "label": "Qty Telefonia Fija",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "account",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-telefonia-fija",
+          "label": "PU Telefonia Fija",
+          "section": "COST_COMPANY",
+          "value": 50,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-telefonia-celular",
+          "label": "Qty Telefonia Celular",
+          "section": "COST_COMPANY",
+          "value": 60,
+          "unit": "lines",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-telefonia-celular",
+          "label": "PU Telefonia Celular",
+          "section": "COST_COMPANY",
+          "value": 30,
+          "unit": "USD/line/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-internet",
+          "label": "Qty Internet",
+          "section": "COST_COMPANY",
+          "value": 2,
+          "unit": "connections",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-internet",
+          "label": "PU Internet",
+          "section": "COST_COMPANY",
+          "value": 250,
+          "unit": "USD/connection/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-renta-patio",
+          "label": "Qty Renta Patio",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "facility",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-renta-patio",
+          "label": "PU Renta Patio",
+          "section": "COST_COMPANY",
+          "value": 3000,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-software",
+          "label": "Qty Software",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "bundle",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-software",
+          "label": "PU Software",
+          "section": "COST_COMPANY",
+          "value": 1250,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-capacitaciones",
+          "label": "Qty Capacitaciones",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-capacitaciones",
+          "label": "PU Capacitaciones",
+          "section": "COST_COMPANY",
+          "value": 2000,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-representacion",
+          "label": "Qty Representacion",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-representacion",
+          "label": "PU Representacion",
+          "section": "COST_COMPANY",
+          "value": 500,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-utiles",
+          "label": "Qty Utiles",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-utiles",
+          "label": "PU Utiles",
+          "section": "COST_COMPANY",
+          "value": 150,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-imprenta",
+          "label": "Qty Imprenta",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-imprenta",
+          "label": "PU Imprenta",
+          "section": "COST_COMPANY",
+          "value": 200,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-seguros-otros",
+          "label": "Qty Seguros Otros",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-seguros-otros",
+          "label": "PU Seguros Otros",
+          "section": "COST_COMPANY",
+          "value": 400,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-mant-otros",
+          "label": "Qty Mant Otros",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-mant-otros",
+          "label": "PU Mant Otros",
+          "section": "COST_COMPANY",
+          "value": 250,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-comb-otros",
+          "label": "Qty Comb Otros",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-comb-otros",
+          "label": "PU Comb Otros",
+          "section": "COST_COMPANY",
+          "value": 500,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-depr-otros",
+          "label": "Qty Depr Otros",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-depr-otros",
+          "label": "PU Depr Otros",
+          "section": "COST_COMPANY",
+          "value": 300,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-depr-equipos",
+          "label": "Qty Depr Equipos",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-depr-equipos",
+          "label": "PU Depr Equipos",
+          "section": "COST_COMPANY",
+          "value": 250,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-gestorias",
+          "label": "Qty Gestorias",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-gestorias",
+          "label": "PU Gestorias",
+          "section": "COST_COMPANY",
+          "value": 300,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-office-cleaning",
+          "label": "Qty Office Cleaning",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-office-cleaning",
+          "label": "PU Office Cleaning",
+          "section": "COST_COMPANY",
+          "value": 300,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-security",
+          "label": "Qty Security",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-security",
+          "label": "PU Security",
+          "section": "COST_COMPANY",
+          "value": 800,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-banking",
+          "label": "Qty Banking",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-banking",
+          "label": "PU Banking",
+          "section": "COST_COMPANY",
+          "value": 250,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-legal",
+          "label": "Qty Legal",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-legal",
+          "label": "PU Legal",
+          "section": "COST_COMPANY",
+          "value": 500,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-subscriptions",
+          "label": "Qty Subscriptions",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-subscriptions",
+          "label": "PU Subscriptions",
+          "section": "COST_COMPANY",
+          "value": 750,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-office-equip",
+          "label": "Qty Office Equip",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-office-equip",
+          "label": "PU Office Equip",
+          "section": "COST_COMPANY",
+          "value": 250,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-capital.qty-tracto",
+          "label": "Qty Tracto",
+          "section": "COST_CAPITAL",
+          "value": 1,
+          "unit": "unit",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-capital.pu-tracto",
+          "label": "PU Tracto",
+          "section": "COST_CAPITAL",
+          "value": 220000,
+          "unit": "USD/unit",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-capital.qty-rescue-tracto",
+          "label": "Qty Rescue Tracto",
+          "section": "COST_CAPITAL",
+          "value": 1,
+          "unit": "unit",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-capital.pu-rescue-tracto",
+          "label": "PU Rescue Tracto",
+          "section": "COST_CAPITAL",
+          "value": 60000,
+          "unit": "USD/unit",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-capital.periodo-depreciacion",
+          "label": "Periodo Depreciacion",
+          "section": "COST_CAPITAL",
+          "value": 60,
+          "unit": "months",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-capital.ltv-asset-financing",
+          "label": "LTV Asset Financing",
+          "section": "COST_CAPITAL",
+          "value": 0.7,
+          "unit": "ratio",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-capital.asset-finance-annual-rate",
+          "label": "Asset Finance Annual Rate",
+          "section": "COST_CAPITAL",
+          "value": 0.1,
+          "unit": "annual rate",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        }
+      ],
+      "rates": [
+        {
+          "key": "monthlyFixedUsd",
+          "value": 297850.70133333333,
+          "unit": "USD/fleet-month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "FCM_BENCHMARK_RATES_V1:monthlyFixedUsd; canonical dependencies in requirements.monthlyFixedUsd",
+          "inputKeys": [
+            "fcm.v3.general-base.tamano-de-flota",
+            "fcm.v3.labor.carga-social",
+            "fcm.v3.cost-insurance.prima-anual-por-vehiculo",
+            "fcm.v3.cost-insurance.poliza-x-vehiculo",
+            "fcm.v3.cost-insurance.periodo-de-poliza",
+            "fcm.v3.cost-payroll.qty-despachador",
+            "fcm.v3.cost-payroll.pu-despachador",
+            "fcm.v3.cost-payroll.qty-jefe-trafico",
+            "fcm.v3.cost-payroll.pu-jefe-trafico",
+            "fcm.v3.cost-payroll.qty-gerente-operaciones",
+            "fcm.v3.cost-payroll.pu-gerente-operaciones",
+            "fcm.v3.cost-payroll.qty-gerente-comercial",
+            "fcm.v3.cost-payroll.pu-gerente-comercial",
+            "fcm.v3.cost-payroll.qty-safety-manager",
+            "fcm.v3.cost-payroll.pu-safety-manager",
+            "fcm.v3.cost-payroll.qty-tracking-cs",
+            "fcm.v3.cost-payroll.pu-tracking-cs",
+            "fcm.v3.cost-payroll.qty-billing-admin",
+            "fcm.v3.cost-payroll.pu-billing-admin",
+            "fcm.v3.cost-company.qty-agua",
+            "fcm.v3.cost-company.pu-agua",
+            "fcm.v3.cost-company.qty-luz",
+            "fcm.v3.cost-company.pu-luz",
+            "fcm.v3.cost-company.qty-telefonia-fija",
+            "fcm.v3.cost-company.pu-telefonia-fija",
+            "fcm.v3.cost-company.qty-telefonia-celular",
+            "fcm.v3.cost-company.pu-telefonia-celular",
+            "fcm.v3.cost-company.qty-internet",
+            "fcm.v3.cost-company.pu-internet",
+            "fcm.v3.cost-company.qty-renta-patio",
+            "fcm.v3.cost-company.pu-renta-patio",
+            "fcm.v3.cost-company.qty-software",
+            "fcm.v3.cost-company.pu-software",
+            "fcm.v3.cost-company.qty-capacitaciones",
+            "fcm.v3.cost-company.pu-capacitaciones",
+            "fcm.v3.cost-company.qty-representacion",
+            "fcm.v3.cost-company.pu-representacion",
+            "fcm.v3.cost-company.qty-utiles",
+            "fcm.v3.cost-company.pu-utiles",
+            "fcm.v3.cost-company.qty-imprenta",
+            "fcm.v3.cost-company.pu-imprenta",
+            "fcm.v3.cost-company.qty-seguros-otros",
+            "fcm.v3.cost-company.pu-seguros-otros",
+            "fcm.v3.cost-company.qty-mant-otros",
+            "fcm.v3.cost-company.pu-mant-otros",
+            "fcm.v3.cost-company.qty-comb-otros",
+            "fcm.v3.cost-company.pu-comb-otros",
+            "fcm.v3.cost-company.qty-depr-otros",
+            "fcm.v3.cost-company.pu-depr-otros",
+            "fcm.v3.cost-company.qty-depr-equipos",
+            "fcm.v3.cost-company.pu-depr-equipos",
+            "fcm.v3.cost-company.qty-gestorias",
+            "fcm.v3.cost-company.pu-gestorias",
+            "fcm.v3.cost-company.qty-office-cleaning",
+            "fcm.v3.cost-company.pu-office-cleaning",
+            "fcm.v3.cost-company.qty-security",
+            "fcm.v3.cost-company.pu-security",
+            "fcm.v3.cost-company.qty-banking",
+            "fcm.v3.cost-company.pu-banking",
+            "fcm.v3.cost-company.qty-legal",
+            "fcm.v3.cost-company.pu-legal",
+            "fcm.v3.cost-company.qty-subscriptions",
+            "fcm.v3.cost-company.pu-subscriptions",
+            "fcm.v3.cost-company.qty-office-equip",
+            "fcm.v3.cost-company.pu-office-equip",
+            "fcm.v3.cost-capital.qty-tracto",
+            "fcm.v3.cost-capital.pu-tracto",
+            "fcm.v3.cost-capital.qty-rescue-tracto",
+            "fcm.v3.cost-capital.pu-rescue-tracto",
+            "fcm.v3.cost-capital.periodo-depreciacion",
+            "fcm.v3.cost-capital.ltv-asset-financing",
+            "fcm.v3.cost-capital.asset-finance-annual-rate",
+            "fcm.v3.finance.customer-collection-days",
+            "fcm.v3.finance.carrier-payment-days",
+            "fcm.v3.finance.monthly-cogs-proxy",
+            "fcm.v3.finance.cost-of-capital-mx"
+          ]
+        },
+        {
+          "key": "productiveKmPerMonth",
+          "value": 1144000,
+          "unit": "km/fleet-month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "FCM_BENCHMARK_RATES_V1:productiveKmPerMonth; canonical dependencies in requirements.productiveKmPerMonth",
+          "inputKeys": [
+            "fcm.v3.general-base.operadores",
+            "fcm.v3.general-base.kilometros-promedio-x-operador"
+          ]
+        },
+        {
+          "key": "productiveVehicleDaysPerMonth",
+          "value": 1170,
+          "unit": "vehicle-days/fleet-month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "FCM_BENCHMARK_RATES_V1:productiveVehicleDaysPerMonth; canonical dependencies in requirements.productiveVehicleDaysPerMonth",
+          "inputKeys": [
+            "fcm.v3.general-base.tamano-de-flota",
+            "fcm.v3.general-base.indice-de-operatividad",
+            "fcm.v3.general-base.periodo-de-operacion"
+          ]
+        },
+        {
+          "key": "maintenanceUsdPerKm",
+          "value": 0.17989,
+          "unit": "USD/km",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "FCM_BENCHMARK_RATES_V1:maintenanceUsdPerKm; canonical dependencies in requirements.maintenanceUsdPerKm",
+          "inputKeys": [
+            "fcm.v3.cost-maint.10k-qty-aceite-de-motor",
+            "fcm.v3.cost-maint.10k-pu-aceite-de-motor",
+            "fcm.v3.cost-maint.10k-qty-filtros-de-aceite",
+            "fcm.v3.cost-maint.10k-pu-filtros-de-aceite",
+            "fcm.v3.cost-maint.10k-qty-filtros-de-diesel",
+            "fcm.v3.cost-maint.10k-pu-filtros-de-diesel",
+            "fcm.v3.cost-maint.10k-qty-mano-de-obra",
+            "fcm.v3.cost-maint.10k-pu-mano-de-obra",
+            "fcm.v3.cost-maint.100k-qty-aceite-caja-cambios",
+            "fcm.v3.cost-maint.100k-pu-aceite-caja-cambios",
+            "fcm.v3.cost-maint.100k-qty-aceite-caja-transmision",
+            "fcm.v3.cost-maint.100k-pu-aceite-caja-transmision",
+            "fcm.v3.cost-maint.100k-qty-filtros",
+            "fcm.v3.cost-maint.100k-pu-filtros",
+            "fcm.v3.cost-maint.100k-qty-aceite-hidraulico",
+            "fcm.v3.cost-maint.100k-pu-aceite-hidraulico",
+            "fcm.v3.cost-maint.100k-qty-filtros-aire",
+            "fcm.v3.cost-maint.100k-pu-filtros-aire",
+            "fcm.v3.cost-maint.250k-qty-baterias",
+            "fcm.v3.cost-maint.250k-pu-baterias",
+            "fcm.v3.cost-maint.250k-qty-calibracion-inyectores",
+            "fcm.v3.cost-maint.250k-pu-calibracion-inyectores",
+            "fcm.v3.cost-maint.250k-qty-clutch",
+            "fcm.v3.cost-maint.250k-pu-clutch",
+            "fcm.v3.cost-maint.250k-qty-frenos",
+            "fcm.v3.cost-maint.250k-pu-frenos",
+            "fcm.v3.cost-maint.reserve-def-urea",
+            "fcm.v3.cost-maint.reserve-lubricants",
+            "fcm.v3.cost-maint.reserve-coolant",
+            "fcm.v3.cost-maint.reserve-dpf",
+            "fcm.v3.cost-maint.reserve-pm-unscheduled"
+          ]
+        },
+        {
+          "key": "tiresUsdPerKm",
+          "value": 0.02666666666666667,
+          "unit": "USD/km",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "FCM_BENCHMARK_RATES_V1:tiresUsdPerKm; canonical dependencies in requirements.tiresUsdPerKm",
+          "inputKeys": [
+            "fcm.v3.cost-tires.qty-direccion",
+            "fcm.v3.cost-tires.pu-direccion",
+            "fcm.v3.cost-tires.life-km-direccion",
+            "fcm.v3.cost-tires.qty-traccion",
+            "fcm.v3.cost-tires.pu-traccion",
+            "fcm.v3.cost-tires.life-km-traccion",
+            "fcm.v3.cost-tires.qty-recapeadas",
+            "fcm.v3.cost-tires.pu-recapeadas",
+            "fcm.v3.cost-tires.life-km-recapeadas"
+          ]
+        },
+        {
+          "key": "driverUsdPerKm",
+          "value": 0.11184709259696521,
+          "unit": "USD/km",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "FCM_BENCHMARK_RATES_V1:driverUsdPerKm; canonical dependencies in requirements.driverUsdPerKm",
+          "inputKeys": [
+            "fcm.v3.labor.tarifa-operador-mx"
+          ]
+        },
+        {
+          "key": "dieselUsdPerLiter",
+          "value": 1.6,
+          "unit": "USD/liter",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "FCM_BENCHMARK_RATES_V1:dieselUsdPerLiter; canonical dependencies in requirements.dieselUsdPerLiter",
+          "inputKeys": [
+            "fcm.v3.fuel.diesel-mx",
+            "fcm.v3.finance.tipo-de-cambio"
+          ]
+        },
+        {
+          "key": "loadedKmPerLiter",
+          "value": 2.8,
+          "unit": "km/liter",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "FCM_BENCHMARK_RATES_V1:loadedKmPerLiter; canonical dependencies in requirements.loadedKmPerLiter",
+          "inputKeys": [
+            "fcm.v3.fuel.rendimiento-cargado"
+          ]
+        },
+        {
+          "key": "emptyKmPerLiter",
+          "value": 3.2,
+          "unit": "km/liter",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "FCM_BENCHMARK_RATES_V1:emptyKmPerLiter; canonical dependencies in requirements.emptyKmPerLiter",
+          "inputKeys": [
+            "fcm.v3.fuel.rendimiento-vacio"
+          ]
+        }
+      ],
+      "trip": [
+        {
+          "key": "loadedKm",
+          "label": "loadedKm",
+          "section": "TRIP",
+          "value": 100,
+          "unit": "km",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "emptyKm",
+          "label": "emptyKm",
+          "section": "TRIP",
+          "value": 20,
+          "unit": "km",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "cycleDays",
+          "label": "cycleDays",
+          "section": "TRIP",
+          "value": 1,
+          "unit": "days",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "tollsUsd",
+          "label": "tollsUsd",
+          "section": "TRIP",
+          "value": 0,
+          "unit": "USD",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        }
+      ],
+      "evidence": [
+        {
+          "id": "test",
+          "url": "https://example.org/qa",
+          "locator": "Fixture sintético",
+          "observedAt": "2026-09-01",
+          "validFrom": "2026-09-01",
+          "validUntil": "2026-09-30",
+          "country": "MX",
+          "equipment": "TRACTOR_DRY_VAN_SINGLE",
+          "limitations": "Sin evidencia económica"
+        }
+      ],
+      "costs": {
+        "totalKm": 120,
+        "cycleDays": 1,
+        "fuelUsd": 67.14,
+        "maintenanceUsd": 21.59,
+        "tiresUsd": 3.2,
+        "driverUsd": 13.42,
+        "tollsUsd": 0,
+        "cvuUsd": 105.35,
+        "cfuByDistanceUsd": 31.24,
+        "cfuByTimeUsd": 254.57,
+        "cfuUsd": 254.57,
+        "productionCostUsd": 359.92
+      }
+    },
+    {
+      "id": "us",
+      "scope": "TRACTOR_ONLY",
+      "revision": "QA",
+      "serviceDate": "2026-09-29",
+      "inputs": [
+        {
+          "key": "fcm.v3.general-base.periodo-de-operacion",
+          "label": "Periodo de Operación",
+          "section": "GENERAL_BASE",
+          "value": 26,
+          "unit": "days/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.general-base.tamano-de-flota",
+          "label": "Tamaño de Flota",
+          "section": "GENERAL_BASE",
+          "value": 50,
+          "unit": "tractors",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.general-base.indice-de-operatividad",
+          "label": "Índice de Operatividad",
+          "section": "GENERAL_BASE",
+          "value": 0.9,
+          "unit": "ratio",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.general-base.operadores",
+          "label": "Operadores",
+          "section": "GENERAL_BASE",
+          "value": 52,
+          "unit": "operators",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.general-base.kilometros-promedio-x-operador",
+          "label": "Kilómetros promedio x operador",
+          "section": "GENERAL_BASE",
+          "value": 22000,
+          "unit": "km/month/operator",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.fuel.diesel-us-border",
+          "label": "Diesel US Border",
+          "section": "FUEL",
+          "value": 1.49,
+          "unit": "USD/L",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.fuel.rendimiento-cargado",
+          "label": "Rendimiento Cargado",
+          "section": "FUEL",
+          "value": 2.8,
+          "unit": "km/L",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.fuel.rendimiento-vacio",
+          "label": "Rendimiento Vacío",
+          "section": "FUEL",
+          "value": 3.2,
+          "unit": "km/L",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.labor.tarifa-operador-us",
+          "label": "Tarifa Operador US",
+          "section": "LABOR",
+          "value": 0.6,
+          "unit": "USD/mile",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.labor.carga-social",
+          "label": "Carga Social",
+          "section": "LABOR",
+          "value": 0.3,
+          "unit": "% payroll",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.finance.cost-of-capital-us",
+          "label": "Cost of Capital US",
+          "section": "FINANCE",
+          "value": 0.1,
+          "unit": "annual rate",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.finance.carrier-payment-days",
+          "label": "Carrier Payment Days",
+          "section": "FINANCE",
+          "value": 14,
+          "unit": "days",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.finance.customer-collection-days",
+          "label": "Customer Collection Days",
+          "section": "FINANCE",
+          "value": 30,
+          "unit": "days",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.finance.monthly-cogs-proxy",
+          "label": "Monthly COGS Proxy",
+          "section": "FINANCE",
+          "value": 239577,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.10k-qty-aceite-de-motor",
+          "label": "10k Qty Aceite de Motor",
+          "section": "COST_MAINT",
+          "value": 60,
+          "unit": "L",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.10k-pu-aceite-de-motor",
+          "label": "10k PU Aceite de Motor",
+          "section": "COST_MAINT",
+          "value": 5,
+          "unit": "USD/L",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.10k-qty-filtros-de-aceite",
+          "label": "10k Qty Filtros de Aceite",
+          "section": "COST_MAINT",
+          "value": 1,
+          "unit": "piece",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.10k-pu-filtros-de-aceite",
+          "label": "10k PU Filtros de Aceite",
+          "section": "COST_MAINT",
+          "value": 65,
+          "unit": "USD/piece",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.10k-qty-filtros-de-diesel",
+          "label": "10k Qty Filtros de Diesel",
+          "section": "COST_MAINT",
+          "value": 2,
+          "unit": "pieces",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.10k-pu-filtros-de-diesel",
+          "label": "10k PU Filtros de Diesel",
+          "section": "COST_MAINT",
+          "value": 40,
+          "unit": "USD/piece",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.10k-qty-mano-de-obra",
+          "label": "10k Qty Mano de Obra",
+          "section": "COST_MAINT",
+          "value": 1,
+          "unit": "event",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.10k-pu-mano-de-obra",
+          "label": "10k PU Mano de Obra",
+          "section": "COST_MAINT",
+          "value": 250,
+          "unit": "USD/event",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.100k-qty-aceite-caja-cambios",
+          "label": "100k Qty Aceite Caja Cambios",
+          "section": "COST_MAINT",
+          "value": 19,
+          "unit": "L",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.100k-pu-aceite-caja-cambios",
+          "label": "100k PU Aceite Caja Cambios",
+          "section": "COST_MAINT",
+          "value": 8,
+          "unit": "USD/L",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.100k-qty-aceite-caja-transmision",
+          "label": "100k Qty Aceite Caja Transmision",
+          "section": "COST_MAINT",
+          "value": 19,
+          "unit": "L",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.100k-pu-aceite-caja-transmision",
+          "label": "100k PU Aceite Caja Transmision",
+          "section": "COST_MAINT",
+          "value": 15,
+          "unit": "USD/L",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.100k-qty-filtros",
+          "label": "100k Qty Filtros",
+          "section": "COST_MAINT",
+          "value": 1,
+          "unit": "piece",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.100k-pu-filtros",
+          "label": "100k PU Filtros",
+          "section": "COST_MAINT",
+          "value": 60,
+          "unit": "USD/piece",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.100k-qty-aceite-hidraulico",
+          "label": "100k Qty Aceite Hidraulico",
+          "section": "COST_MAINT",
+          "value": 19,
+          "unit": "L",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.100k-pu-aceite-hidraulico",
+          "label": "100k PU Aceite Hidraulico",
+          "section": "COST_MAINT",
+          "value": 8,
+          "unit": "USD/L",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.100k-qty-filtros-aire",
+          "label": "100k Qty Filtros Aire",
+          "section": "COST_MAINT",
+          "value": 2,
+          "unit": "pieces",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.100k-pu-filtros-aire",
+          "label": "100k PU Filtros Aire",
+          "section": "COST_MAINT",
+          "value": 95,
+          "unit": "USD/piece",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.250k-qty-baterias",
+          "label": "250k Qty Baterias",
+          "section": "COST_MAINT",
+          "value": 4,
+          "unit": "pieces",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.250k-pu-baterias",
+          "label": "250k PU Baterias",
+          "section": "COST_MAINT",
+          "value": 175,
+          "unit": "USD/piece",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.250k-qty-calibracion-inyectores",
+          "label": "250k Qty Calibracion Inyectores",
+          "section": "COST_MAINT",
+          "value": 1,
+          "unit": "event",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.250k-pu-calibracion-inyectores",
+          "label": "250k PU Calibracion Inyectores",
+          "section": "COST_MAINT",
+          "value": 1200,
+          "unit": "USD/event",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.250k-qty-clutch",
+          "label": "250k Qty Clutch",
+          "section": "COST_MAINT",
+          "value": 1,
+          "unit": "event",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.250k-pu-clutch",
+          "label": "250k PU Clutch",
+          "section": "COST_MAINT",
+          "value": 2750,
+          "unit": "USD/event",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.250k-qty-frenos",
+          "label": "250k Qty Frenos",
+          "section": "COST_MAINT",
+          "value": 1,
+          "unit": "event",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.250k-pu-frenos",
+          "label": "250k PU Frenos",
+          "section": "COST_MAINT",
+          "value": 1800,
+          "unit": "USD/event",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.reserve-def-urea",
+          "label": "Reserve DEF Urea",
+          "section": "COST_MAINT",
+          "value": 0.025,
+          "unit": "USD/km",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.reserve-lubricants",
+          "label": "Reserve Lubricants",
+          "section": "COST_MAINT",
+          "value": 0.005,
+          "unit": "USD/km",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.reserve-coolant",
+          "label": "Reserve Coolant",
+          "section": "COST_MAINT",
+          "value": 120,
+          "unit": "USD/100000km",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.reserve-dpf",
+          "label": "Reserve DPF",
+          "section": "COST_MAINT",
+          "value": 0.015,
+          "unit": "USD/km",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-maint.reserve-pm-unscheduled",
+          "label": "Reserve PM Unscheduled",
+          "section": "COST_MAINT",
+          "value": 0.03,
+          "unit": "USD/km",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-tires.qty-direccion",
+          "label": "Qty Direccion",
+          "section": "COST_TIRES",
+          "value": 2,
+          "unit": "pieces",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-tires.pu-direccion",
+          "label": "PU Direccion",
+          "section": "COST_TIRES",
+          "value": 600,
+          "unit": "USD/piece",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-tires.life-km-direccion",
+          "label": "Life KM Direccion",
+          "section": "COST_TIRES",
+          "value": 180000,
+          "unit": "km",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-tires.qty-traccion",
+          "label": "Qty Traccion",
+          "section": "COST_TIRES",
+          "value": 8,
+          "unit": "pieces",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-tires.pu-traccion",
+          "label": "PU Traccion",
+          "section": "COST_TIRES",
+          "value": 550,
+          "unit": "USD/piece",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-tires.life-km-traccion",
+          "label": "Life KM Traccion",
+          "section": "COST_TIRES",
+          "value": 220000,
+          "unit": "km",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-tires.qty-recapeadas",
+          "label": "Qty Recapeadas",
+          "section": "COST_TIRES",
+          "value": 0,
+          "unit": "pieces",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética: sin recapeadas independientes; no adoptar ni calibrar"
+        },
+        {
+          "key": "fcm.v3.cost-tires.pu-recapeadas",
+          "label": "PU Recapeadas",
+          "section": "COST_TIRES",
+          "value": 225,
+          "unit": "USD/piece",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-tires.life-km-recapeadas",
+          "label": "Life KM Recapeadas",
+          "section": "COST_TIRES",
+          "value": 160000,
+          "unit": "km",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-insurance.prima-anual-por-vehiculo",
+          "label": "Prima Anual por Vehiculo",
+          "section": "COST_INSURANCE",
+          "value": 1,
+          "unit": "policy/vehicle",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-insurance.poliza-x-vehiculo",
+          "label": "Poliza x Vehiculo",
+          "section": "COST_INSURANCE",
+          "value": 12000,
+          "unit": "USD/year/tractor",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-insurance.periodo-de-poliza",
+          "label": "Periodo de Poliza",
+          "section": "COST_INSURANCE",
+          "value": 12,
+          "unit": "months",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-payroll.qty-despachador",
+          "label": "Qty Despachador",
+          "section": "COST_PAYROLL",
+          "value": 2,
+          "unit": "FTE",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-payroll.pu-despachador",
+          "label": "PU Despachador",
+          "section": "COST_PAYROLL",
+          "value": 2200,
+          "unit": "USD/month/FTE",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-payroll.qty-jefe-trafico",
+          "label": "Qty Jefe Trafico",
+          "section": "COST_PAYROLL",
+          "value": 2,
+          "unit": "FTE",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-payroll.pu-jefe-trafico",
+          "label": "PU Jefe Trafico",
+          "section": "COST_PAYROLL",
+          "value": 2750,
+          "unit": "USD/month/FTE",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-payroll.qty-gerente-operaciones",
+          "label": "Qty Gerente Operaciones",
+          "section": "COST_PAYROLL",
+          "value": 1,
+          "unit": "FTE",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-payroll.pu-gerente-operaciones",
+          "label": "PU Gerente Operaciones",
+          "section": "COST_PAYROLL",
+          "value": 5500,
+          "unit": "USD/month/FTE",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-payroll.qty-gerente-comercial",
+          "label": "Qty Gerente Comercial",
+          "section": "COST_PAYROLL",
+          "value": 0.5,
+          "unit": "FTE",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-payroll.pu-gerente-comercial",
+          "label": "PU Gerente Comercial",
+          "section": "COST_PAYROLL",
+          "value": 4500,
+          "unit": "USD/month/FTE",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-payroll.qty-safety-manager",
+          "label": "Qty Safety Manager",
+          "section": "COST_PAYROLL",
+          "value": 0.5,
+          "unit": "FTE",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-payroll.pu-safety-manager",
+          "label": "PU Safety Manager",
+          "section": "COST_PAYROLL",
+          "value": 4500,
+          "unit": "USD/month/FTE",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-payroll.qty-tracking-cs",
+          "label": "Qty Tracking CS",
+          "section": "COST_PAYROLL",
+          "value": 2,
+          "unit": "FTE",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-payroll.pu-tracking-cs",
+          "label": "PU Tracking CS",
+          "section": "COST_PAYROLL",
+          "value": 1800,
+          "unit": "USD/month/FTE",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-payroll.qty-billing-admin",
+          "label": "Qty Billing Admin",
+          "section": "COST_PAYROLL",
+          "value": 1,
+          "unit": "FTE",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-payroll.pu-billing-admin",
+          "label": "PU Billing Admin",
+          "section": "COST_PAYROLL",
+          "value": 2200,
+          "unit": "USD/month/FTE",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-agua",
+          "label": "Qty Agua",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "account",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-agua",
+          "label": "PU Agua",
+          "section": "COST_COMPANY",
+          "value": 250,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-luz",
+          "label": "Qty Luz",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "account",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-luz",
+          "label": "PU Luz",
+          "section": "COST_COMPANY",
+          "value": 900,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-telefonia-fija",
+          "label": "Qty Telefonia Fija",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "account",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-telefonia-fija",
+          "label": "PU Telefonia Fija",
+          "section": "COST_COMPANY",
+          "value": 50,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-telefonia-celular",
+          "label": "Qty Telefonia Celular",
+          "section": "COST_COMPANY",
+          "value": 60,
+          "unit": "lines",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-telefonia-celular",
+          "label": "PU Telefonia Celular",
+          "section": "COST_COMPANY",
+          "value": 30,
+          "unit": "USD/line/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-internet",
+          "label": "Qty Internet",
+          "section": "COST_COMPANY",
+          "value": 2,
+          "unit": "connections",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-internet",
+          "label": "PU Internet",
+          "section": "COST_COMPANY",
+          "value": 250,
+          "unit": "USD/connection/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-renta-patio",
+          "label": "Qty Renta Patio",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "facility",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-renta-patio",
+          "label": "PU Renta Patio",
+          "section": "COST_COMPANY",
+          "value": 3000,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-software",
+          "label": "Qty Software",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "bundle",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-software",
+          "label": "PU Software",
+          "section": "COST_COMPANY",
+          "value": 1250,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-capacitaciones",
+          "label": "Qty Capacitaciones",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-capacitaciones",
+          "label": "PU Capacitaciones",
+          "section": "COST_COMPANY",
+          "value": 2000,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-representacion",
+          "label": "Qty Representacion",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-representacion",
+          "label": "PU Representacion",
+          "section": "COST_COMPANY",
+          "value": 500,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-utiles",
+          "label": "Qty Utiles",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-utiles",
+          "label": "PU Utiles",
+          "section": "COST_COMPANY",
+          "value": 150,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-imprenta",
+          "label": "Qty Imprenta",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-imprenta",
+          "label": "PU Imprenta",
+          "section": "COST_COMPANY",
+          "value": 200,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-seguros-otros",
+          "label": "Qty Seguros Otros",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-seguros-otros",
+          "label": "PU Seguros Otros",
+          "section": "COST_COMPANY",
+          "value": 400,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-mant-otros",
+          "label": "Qty Mant Otros",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-mant-otros",
+          "label": "PU Mant Otros",
+          "section": "COST_COMPANY",
+          "value": 250,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-comb-otros",
+          "label": "Qty Comb Otros",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-comb-otros",
+          "label": "PU Comb Otros",
+          "section": "COST_COMPANY",
+          "value": 500,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-depr-otros",
+          "label": "Qty Depr Otros",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-depr-otros",
+          "label": "PU Depr Otros",
+          "section": "COST_COMPANY",
+          "value": 300,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-depr-equipos",
+          "label": "Qty Depr Equipos",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-depr-equipos",
+          "label": "PU Depr Equipos",
+          "section": "COST_COMPANY",
+          "value": 250,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-gestorias",
+          "label": "Qty Gestorias",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-gestorias",
+          "label": "PU Gestorias",
+          "section": "COST_COMPANY",
+          "value": 300,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-office-cleaning",
+          "label": "Qty Office Cleaning",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-office-cleaning",
+          "label": "PU Office Cleaning",
+          "section": "COST_COMPANY",
+          "value": 300,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-security",
+          "label": "Qty Security",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-security",
+          "label": "PU Security",
+          "section": "COST_COMPANY",
+          "value": 800,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-banking",
+          "label": "Qty Banking",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-banking",
+          "label": "PU Banking",
+          "section": "COST_COMPANY",
+          "value": 250,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-legal",
+          "label": "Qty Legal",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-legal",
+          "label": "PU Legal",
+          "section": "COST_COMPANY",
+          "value": 500,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-subscriptions",
+          "label": "Qty Subscriptions",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-subscriptions",
+          "label": "PU Subscriptions",
+          "section": "COST_COMPANY",
+          "value": 750,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.qty-office-equip",
+          "label": "Qty Office Equip",
+          "section": "COST_COMPANY",
+          "value": 1,
+          "unit": "reserve",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-company.pu-office-equip",
+          "label": "PU Office Equip",
+          "section": "COST_COMPANY",
+          "value": 250,
+          "unit": "USD/month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-capital.qty-tracto",
+          "label": "Qty Tracto",
+          "section": "COST_CAPITAL",
+          "value": 1,
+          "unit": "unit",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-capital.pu-tracto",
+          "label": "PU Tracto",
+          "section": "COST_CAPITAL",
+          "value": 220000,
+          "unit": "USD/unit",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-capital.qty-rescue-tracto",
+          "label": "Qty Rescue Tracto",
+          "section": "COST_CAPITAL",
+          "value": 1,
+          "unit": "unit",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-capital.pu-rescue-tracto",
+          "label": "PU Rescue Tracto",
+          "section": "COST_CAPITAL",
+          "value": 60000,
+          "unit": "USD/unit",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-capital.periodo-depreciacion",
+          "label": "Periodo Depreciacion",
+          "section": "COST_CAPITAL",
+          "value": 60,
+          "unit": "months",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-capital.ltv-asset-financing",
+          "label": "LTV Asset Financing",
+          "section": "COST_CAPITAL",
+          "value": 0.7,
+          "unit": "ratio",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "fcm.v3.cost-capital.asset-finance-annual-rate",
+          "label": "Asset Finance Annual Rate",
+          "section": "COST_CAPITAL",
+          "value": 0.1,
+          "unit": "annual rate",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        }
+      ],
+      "rates": [
+        {
+          "key": "monthlyFixedUsd",
+          "value": 297424.7866666667,
+          "unit": "USD/fleet-month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "FCM_BENCHMARK_RATES_V1:monthlyFixedUsd; canonical dependencies in requirements.monthlyFixedUsd",
+          "inputKeys": [
+            "fcm.v3.general-base.tamano-de-flota",
+            "fcm.v3.labor.carga-social",
+            "fcm.v3.cost-insurance.prima-anual-por-vehiculo",
+            "fcm.v3.cost-insurance.poliza-x-vehiculo",
+            "fcm.v3.cost-insurance.periodo-de-poliza",
+            "fcm.v3.cost-payroll.qty-despachador",
+            "fcm.v3.cost-payroll.pu-despachador",
+            "fcm.v3.cost-payroll.qty-jefe-trafico",
+            "fcm.v3.cost-payroll.pu-jefe-trafico",
+            "fcm.v3.cost-payroll.qty-gerente-operaciones",
+            "fcm.v3.cost-payroll.pu-gerente-operaciones",
+            "fcm.v3.cost-payroll.qty-gerente-comercial",
+            "fcm.v3.cost-payroll.pu-gerente-comercial",
+            "fcm.v3.cost-payroll.qty-safety-manager",
+            "fcm.v3.cost-payroll.pu-safety-manager",
+            "fcm.v3.cost-payroll.qty-tracking-cs",
+            "fcm.v3.cost-payroll.pu-tracking-cs",
+            "fcm.v3.cost-payroll.qty-billing-admin",
+            "fcm.v3.cost-payroll.pu-billing-admin",
+            "fcm.v3.cost-company.qty-agua",
+            "fcm.v3.cost-company.pu-agua",
+            "fcm.v3.cost-company.qty-luz",
+            "fcm.v3.cost-company.pu-luz",
+            "fcm.v3.cost-company.qty-telefonia-fija",
+            "fcm.v3.cost-company.pu-telefonia-fija",
+            "fcm.v3.cost-company.qty-telefonia-celular",
+            "fcm.v3.cost-company.pu-telefonia-celular",
+            "fcm.v3.cost-company.qty-internet",
+            "fcm.v3.cost-company.pu-internet",
+            "fcm.v3.cost-company.qty-renta-patio",
+            "fcm.v3.cost-company.pu-renta-patio",
+            "fcm.v3.cost-company.qty-software",
+            "fcm.v3.cost-company.pu-software",
+            "fcm.v3.cost-company.qty-capacitaciones",
+            "fcm.v3.cost-company.pu-capacitaciones",
+            "fcm.v3.cost-company.qty-representacion",
+            "fcm.v3.cost-company.pu-representacion",
+            "fcm.v3.cost-company.qty-utiles",
+            "fcm.v3.cost-company.pu-utiles",
+            "fcm.v3.cost-company.qty-imprenta",
+            "fcm.v3.cost-company.pu-imprenta",
+            "fcm.v3.cost-company.qty-seguros-otros",
+            "fcm.v3.cost-company.pu-seguros-otros",
+            "fcm.v3.cost-company.qty-mant-otros",
+            "fcm.v3.cost-company.pu-mant-otros",
+            "fcm.v3.cost-company.qty-comb-otros",
+            "fcm.v3.cost-company.pu-comb-otros",
+            "fcm.v3.cost-company.qty-depr-otros",
+            "fcm.v3.cost-company.pu-depr-otros",
+            "fcm.v3.cost-company.qty-depr-equipos",
+            "fcm.v3.cost-company.pu-depr-equipos",
+            "fcm.v3.cost-company.qty-gestorias",
+            "fcm.v3.cost-company.pu-gestorias",
+            "fcm.v3.cost-company.qty-office-cleaning",
+            "fcm.v3.cost-company.pu-office-cleaning",
+            "fcm.v3.cost-company.qty-security",
+            "fcm.v3.cost-company.pu-security",
+            "fcm.v3.cost-company.qty-banking",
+            "fcm.v3.cost-company.pu-banking",
+            "fcm.v3.cost-company.qty-legal",
+            "fcm.v3.cost-company.pu-legal",
+            "fcm.v3.cost-company.qty-subscriptions",
+            "fcm.v3.cost-company.pu-subscriptions",
+            "fcm.v3.cost-company.qty-office-equip",
+            "fcm.v3.cost-company.pu-office-equip",
+            "fcm.v3.cost-capital.qty-tracto",
+            "fcm.v3.cost-capital.pu-tracto",
+            "fcm.v3.cost-capital.qty-rescue-tracto",
+            "fcm.v3.cost-capital.pu-rescue-tracto",
+            "fcm.v3.cost-capital.periodo-depreciacion",
+            "fcm.v3.cost-capital.ltv-asset-financing",
+            "fcm.v3.cost-capital.asset-finance-annual-rate",
+            "fcm.v3.finance.customer-collection-days",
+            "fcm.v3.finance.carrier-payment-days",
+            "fcm.v3.finance.monthly-cogs-proxy",
+            "fcm.v3.finance.cost-of-capital-us"
+          ]
+        },
+        {
+          "key": "productiveKmPerMonth",
+          "value": 1144000,
+          "unit": "km/fleet-month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "FCM_BENCHMARK_RATES_V1:productiveKmPerMonth; canonical dependencies in requirements.productiveKmPerMonth",
+          "inputKeys": [
+            "fcm.v3.general-base.operadores",
+            "fcm.v3.general-base.kilometros-promedio-x-operador"
+          ]
+        },
+        {
+          "key": "productiveVehicleDaysPerMonth",
+          "value": 1170,
+          "unit": "vehicle-days/fleet-month",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "FCM_BENCHMARK_RATES_V1:productiveVehicleDaysPerMonth; canonical dependencies in requirements.productiveVehicleDaysPerMonth",
+          "inputKeys": [
+            "fcm.v3.general-base.tamano-de-flota",
+            "fcm.v3.general-base.indice-de-operatividad",
+            "fcm.v3.general-base.periodo-de-operacion"
+          ]
+        },
+        {
+          "key": "maintenanceUsdPerKm",
+          "value": 0.17989,
+          "unit": "USD/km",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "FCM_BENCHMARK_RATES_V1:maintenanceUsdPerKm; canonical dependencies in requirements.maintenanceUsdPerKm",
+          "inputKeys": [
+            "fcm.v3.cost-maint.10k-qty-aceite-de-motor",
+            "fcm.v3.cost-maint.10k-pu-aceite-de-motor",
+            "fcm.v3.cost-maint.10k-qty-filtros-de-aceite",
+            "fcm.v3.cost-maint.10k-pu-filtros-de-aceite",
+            "fcm.v3.cost-maint.10k-qty-filtros-de-diesel",
+            "fcm.v3.cost-maint.10k-pu-filtros-de-diesel",
+            "fcm.v3.cost-maint.10k-qty-mano-de-obra",
+            "fcm.v3.cost-maint.10k-pu-mano-de-obra",
+            "fcm.v3.cost-maint.100k-qty-aceite-caja-cambios",
+            "fcm.v3.cost-maint.100k-pu-aceite-caja-cambios",
+            "fcm.v3.cost-maint.100k-qty-aceite-caja-transmision",
+            "fcm.v3.cost-maint.100k-pu-aceite-caja-transmision",
+            "fcm.v3.cost-maint.100k-qty-filtros",
+            "fcm.v3.cost-maint.100k-pu-filtros",
+            "fcm.v3.cost-maint.100k-qty-aceite-hidraulico",
+            "fcm.v3.cost-maint.100k-pu-aceite-hidraulico",
+            "fcm.v3.cost-maint.100k-qty-filtros-aire",
+            "fcm.v3.cost-maint.100k-pu-filtros-aire",
+            "fcm.v3.cost-maint.250k-qty-baterias",
+            "fcm.v3.cost-maint.250k-pu-baterias",
+            "fcm.v3.cost-maint.250k-qty-calibracion-inyectores",
+            "fcm.v3.cost-maint.250k-pu-calibracion-inyectores",
+            "fcm.v3.cost-maint.250k-qty-clutch",
+            "fcm.v3.cost-maint.250k-pu-clutch",
+            "fcm.v3.cost-maint.250k-qty-frenos",
+            "fcm.v3.cost-maint.250k-pu-frenos",
+            "fcm.v3.cost-maint.reserve-def-urea",
+            "fcm.v3.cost-maint.reserve-lubricants",
+            "fcm.v3.cost-maint.reserve-coolant",
+            "fcm.v3.cost-maint.reserve-dpf",
+            "fcm.v3.cost-maint.reserve-pm-unscheduled"
+          ]
+        },
+        {
+          "key": "tiresUsdPerKm",
+          "value": 0.02666666666666667,
+          "unit": "USD/km",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "FCM_BENCHMARK_RATES_V1:tiresUsdPerKm; canonical dependencies in requirements.tiresUsdPerKm",
+          "inputKeys": [
+            "fcm.v3.cost-tires.qty-direccion",
+            "fcm.v3.cost-tires.pu-direccion",
+            "fcm.v3.cost-tires.life-km-direccion",
+            "fcm.v3.cost-tires.qty-traccion",
+            "fcm.v3.cost-tires.pu-traccion",
+            "fcm.v3.cost-tires.life-km-traccion",
+            "fcm.v3.cost-tires.qty-recapeadas",
+            "fcm.v3.cost-tires.pu-recapeadas",
+            "fcm.v3.cost-tires.life-km-recapeadas"
+          ]
+        },
+        {
+          "key": "driverUsdPerKm",
+          "value": 0.37282364198988405,
+          "unit": "USD/km",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "FCM_BENCHMARK_RATES_V1:driverUsdPerKm; canonical dependencies in requirements.driverUsdPerKm",
+          "inputKeys": [
+            "fcm.v3.labor.tarifa-operador-us"
+          ]
+        },
+        {
+          "key": "dieselUsdPerLiter",
+          "value": 1.49,
+          "unit": "USD/liter",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "FCM_BENCHMARK_RATES_V1:dieselUsdPerLiter; canonical dependencies in requirements.dieselUsdPerLiter",
+          "inputKeys": [
+            "fcm.v3.fuel.diesel-us-border"
+          ]
+        },
+        {
+          "key": "loadedKmPerLiter",
+          "value": 2.8,
+          "unit": "km/liter",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "FCM_BENCHMARK_RATES_V1:loadedKmPerLiter; canonical dependencies in requirements.loadedKmPerLiter",
+          "inputKeys": [
+            "fcm.v3.fuel.rendimiento-cargado"
+          ]
+        },
+        {
+          "key": "emptyKmPerLiter",
+          "value": 3.2,
+          "unit": "km/liter",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "FCM_BENCHMARK_RATES_V1:emptyKmPerLiter; canonical dependencies in requirements.emptyKmPerLiter",
+          "inputKeys": [
+            "fcm.v3.fuel.rendimiento-vacio"
+          ]
+        }
+      ],
+      "trip": [
+        {
+          "key": "loadedKm",
+          "label": "loadedKm",
+          "section": "TRIP",
+          "value": 100,
+          "unit": "km",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "emptyKm",
+          "label": "emptyKm",
+          "section": "TRIP",
+          "value": 20,
+          "unit": "km",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "cycleDays",
+          "label": "cycleDays",
+          "section": "TRIP",
+          "value": 1,
+          "unit": "days",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        },
+        {
+          "key": "tollsUsd",
+          "label": "tollsUsd",
+          "section": "TRIP",
+          "value": 0,
+          "unit": "USD",
+          "evidenceIds": [
+            "test"
+          ],
+          "derivation": "QA sintética, no adoptar"
+        }
+      ],
+      "evidence": [
+        {
+          "id": "test",
+          "url": "https://example.org/qa",
+          "locator": "Fixture sintético",
+          "observedAt": "2026-09-01",
+          "validFrom": "2026-09-01",
+          "validUntil": "2026-09-30",
+          "country": "US",
+          "equipment": "TRACTOR_DRY_VAN_SINGLE",
+          "limitations": "Sin evidencia económica"
+        }
+      ],
+      "costs": {
+        "totalKm": 120,
+        "cycleDays": 1,
+        "fuelUsd": 62.53,
+        "maintenanceUsd": 21.59,
+        "tiresUsd": 3.2,
+        "driverUsd": 44.74,
+        "tollsUsd": 0,
+        "cvuUsd": 132.06,
+        "cfuByDistanceUsd": 31.2,
+        "cfuByTimeUsd": 254.21,
+        "cfuUsd": 254.21,
+        "productionCostUsd": 386.27
+      }
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "QA-1",
+      "result": {
+        "calibrated": false,
+        "costs": {
+          "cfuUsd": 541.78,
+          "cvuUsd": 273.41,
+          "borderServicesUsd": 150,
+          "productionCostUsd": 965.19
+        },
+        "sharedTrailer": {
+          "lineage": {
+            "evidence": [
+              {
+                "id": "trip:test",
+                "url": "https://example.org/qa",
+                "locator": "Fixture sintético"
+              },
+              {
+                "id": "fixed:test",
+                "url": "https://example.org/qa",
+                "locator": "Fixture sintético"
+              },
+              {
+                "id": "capital:test",
+                "url": "https://example.org/qa",
+                "locator": "Fixture sintético"
+              }
+            ]
+          }
+        },
+        "trace": {
+          "version": "FCM_ECONOMIC_TRACE_V1",
+          "resources": [
+            {
+              "id": "trailer",
+              "scope": "SHARED_TRAILER_ONCE",
+              "revision": "QA-TRAILER",
+              "serviceDate": "2026-09-29",
+              "inputs": [
+                {
+                  "key": "acquisitionCost",
+                  "label": "Adquisición",
+                  "section": "CAPITAL_SCENARIO",
+                  "value": 40000,
+                  "unit": "USD",
+                  "evidenceIds": [
+                    "capital:test"
+                  ],
+                  "derivation": "QA sintética, no adoptar"
+                },
+                {
+                  "key": "horizon",
+                  "label": "Horizonte · FROM_NEW",
+                  "section": "CAPITAL_SCENARIO",
+                  "value": 120,
+                  "unit": "months",
+                  "evidenceIds": [
+                    "capital:test"
+                  ],
+                  "derivation": "QA sintética, no adoptar"
+                },
+                {
+                  "key": "residual",
+                  "label": "Residual",
+                  "section": "CAPITAL_SCENARIO",
+                  "value": 10000,
+                  "unit": "USD",
+                  "evidenceIds": [
+                    "capital:test"
+                  ],
+                  "derivation": "QA sintética, no adoptar"
+                },
+                {
+                  "key": "interest",
+                  "label": "Interés mensual (no principal)",
+                  "section": "FIXED_SCENARIO",
+                  "value": 50,
+                  "unit": "USD/trailer-month",
+                  "evidenceIds": [
+                    "fixed:test"
+                  ],
+                  "derivation": "QA sintética, no adoptar"
+                },
+                {
+                  "key": "INSURANCE",
+                  "label": "INSURANCE",
+                  "section": "FIXED_SCENARIO",
+                  "value": 10,
+                  "unit": "USD/trailer-month",
+                  "evidenceIds": [
+                    "fixed:test"
+                  ],
+                  "derivation": "QA sintética, no adoptar"
+                },
+                {
+                  "key": "PERMITS",
+                  "label": "PERMITS",
+                  "section": "FIXED_SCENARIO",
+                  "value": 10,
+                  "unit": "USD/trailer-month",
+                  "evidenceIds": [
+                    "fixed:test"
+                  ],
+                  "derivation": "QA sintética, no adoptar"
+                },
+                {
+                  "key": "OVERHEAD",
+                  "label": "OVERHEAD",
+                  "section": "FIXED_SCENARIO",
+                  "value": 10,
+                  "unit": "USD/trailer-month",
+                  "evidenceIds": [
+                    "fixed:test"
+                  ],
+                  "derivation": "QA sintética, no adoptar"
+                },
+                {
+                  "key": "productiveKmPerMonth",
+                  "label": "productiveKmPerMonth",
+                  "section": "TRAILER",
+                  "value": 10000,
+                  "unit": "km/trailer-month",
+                  "derivation": "QA sintética, no adoptar",
+                  "evidenceIds": [
+                    "trip:test"
+                  ]
+                },
+                {
+                  "key": "productiveDaysPerMonth",
+                  "label": "productiveDaysPerMonth",
+                  "section": "TRAILER",
+                  "value": 20,
+                  "unit": "days/trailer-month",
+                  "derivation": "QA sintética, no adoptar",
+                  "evidenceIds": [
+                    "trip:test"
+                  ]
+                },
+                {
+                  "key": "maintenanceUsdPerKm",
+                  "label": "maintenanceUsdPerKm",
+                  "section": "TRAILER",
+                  "value": 0.1,
+                  "unit": "USD/km",
+                  "derivation": "QA sintética, no adoptar",
+                  "evidenceIds": [
+                    "trip:test"
+                  ]
+                },
+                {
+                  "key": "tiresUsdPerKm",
+                  "label": "tiresUsdPerKm",
+                  "section": "TRAILER",
+                  "value": 0.05,
+                  "unit": "USD/km",
+                  "derivation": "QA sintética, no adoptar",
+                  "evidenceIds": [
+                    "trip:test"
+                  ]
+                }
+              ],
+              "rates": [
+                {
+                  "key": "monthlyFixedUsd",
+                  "value": 330,
+                  "unit": "USD/trailer-month",
+                  "derivation": "Recomputed owned fixed scenario QA-1; original lineage retained in fixed",
+                  "evidenceIds": [
+                    "capital:test",
+                    "fixed:test"
+                  ],
+                  "inputKeys": [
+                    "acquisitionCost",
+                    "horizon",
+                    "residual",
+                    "interest",
+                    "INSURANCE",
+                    "PERMITS",
+                    "OVERHEAD"
+                  ]
+                },
+                {
+                  "key": "productiveKmPerMonth",
+                  "value": 10000,
+                  "unit": "km/trailer-month",
+                  "derivation": "QA sintética, no adoptar",
+                  "evidenceIds": [
+                    "trip:test"
+                  ],
+                  "inputKeys": [
+                    "productiveKmPerMonth"
+                  ]
+                },
+                {
+                  "key": "productiveDaysPerMonth",
+                  "value": 20,
+                  "unit": "days/trailer-month",
+                  "derivation": "QA sintética, no adoptar",
+                  "evidenceIds": [
+                    "trip:test"
+                  ],
+                  "inputKeys": [
+                    "productiveDaysPerMonth"
+                  ]
+                },
+                {
+                  "key": "maintenanceUsdPerKm",
+                  "value": 0.1,
+                  "unit": "USD/km",
+                  "derivation": "QA sintética, no adoptar",
+                  "evidenceIds": [
+                    "trip:test"
+                  ],
+                  "inputKeys": [
+                    "maintenanceUsdPerKm"
+                  ]
+                },
+                {
+                  "key": "tiresUsdPerKm",
+                  "value": 0.05,
+                  "unit": "USD/km",
+                  "derivation": "QA sintética, no adoptar",
+                  "evidenceIds": [
+                    "trip:test"
+                  ],
+                  "inputKeys": [
+                    "tiresUsdPerKm"
+                  ]
+                }
+              ],
+              "trip": [
+                {
+                  "key": "totalKm",
+                  "label": "totalKm",
+                  "section": "TRIP",
+                  "value": 240,
+                  "unit": "km",
+                  "derivation": "QA sintética, no adoptar",
+                  "evidenceIds": [
+                    "trip:test"
+                  ]
+                },
+                {
+                  "key": "cycleDays",
+                  "label": "cycleDays",
+                  "section": "TRIP",
+                  "value": 2,
+                  "unit": "days",
+                  "derivation": "QA sintética, no adoptar",
+                  "evidenceIds": [
+                    "trip:test"
+                  ]
+                }
+              ],
+              "evidence": [
+                {
+                  "id": "trip:test",
+                  "url": "https://example.org/qa",
+                  "locator": "Fixture sintético",
+                  "observedAt": "2026-09-01",
+                  "validFrom": "2026-09-01",
+                  "validUntil": "2026-09-30",
+                  "country": "MX",
+                  "equipment": "TRACTOR_DRY_VAN_SINGLE",
+                  "limitations": "Sin evidencia económica"
+                },
+                {
+                  "id": "fixed:test",
+                  "url": "https://example.org/qa",
+                  "locator": "Fixture sintético",
+                  "observedAt": "2026-09-01",
+                  "validFrom": "2026-09-01",
+                  "validUntil": "2026-09-30",
+                  "country": "MX",
+                  "equipment": "TRACTOR_DRY_VAN_SINGLE",
+                  "limitations": "Sin evidencia económica"
+                },
+                {
+                  "id": "capital:test",
+                  "url": "https://example.org/qa",
+                  "locator": "Fixture sintético",
+                  "observedAt": "2026-09-01",
+                  "validFrom": "2026-09-01",
+                  "validUntil": "2026-09-30",
+                  "country": "MX",
+                  "equipment": "TRACTOR_DRY_VAN_SINGLE",
+                  "limitations": "Sin evidencia económica"
+                }
+              ],
+              "costs": {
+                "cfuUsd": 33,
+                "cvuUsd": 36,
+                "maintenanceUsd": 24,
+                "tiresUsd": 12,
+                "cfuByDistanceUsd": 7.92,
+                "cfuByTimeUsd": 33,
+                "productionCostUsd": 69
+              }
+            }
+          ],
+          "borderCharges": [
+            {
+              "id": "QA",
+              "covers": [
+                "CROSSING",
+                "INTERCHANGE"
+              ],
+              "amountUsd": 150,
+              "provider": "QA",
+              "derivation": "QA",
+              "sourceUrl": "https://example.org/qa",
+              "locator": "QA",
+              "observedAt": "2026-09-01",
+              "validFrom": "2026-09-01",
+              "validUntil": "2026-09-30"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "QA-2",
+      "result": {
+        "calibrated": false,
+        "costs": {
+          "cfuUsd": 537.61,
+          "cvuUsd": 273.41,
+          "borderServicesUsd": 150,
+          "productionCostUsd": 961.02
+        },
+        "sharedTrailer": {
+          "lineage": {
+            "evidence": [
+              {
+                "id": "trip:test",
+                "url": "https://example.org/qa",
+                "locator": "Fixture sintético"
+              },
+              {
+                "id": "fixed:test",
+                "url": "https://example.org/qa",
+                "locator": "Fixture sintético"
+              },
+              {
+                "id": "capital:test",
+                "url": "https://example.org/qa",
+                "locator": "Fixture sintético"
+              }
+            ]
+          }
+        },
+        "trace": {
+          "version": "FCM_ECONOMIC_TRACE_V1",
+          "resources": [
+            {
+              "id": "trailer",
+              "scope": "SHARED_TRAILER_ONCE",
+              "revision": "QA-TRAILER",
+              "serviceDate": "2026-09-29",
+              "inputs": [
+                {
+                  "key": "acquisitionCost",
+                  "label": "Adquisición",
+                  "section": "CAPITAL_SCENARIO",
+                  "value": 40000,
+                  "unit": "USD",
+                  "evidenceIds": [
+                    "capital:test"
+                  ],
+                  "derivation": "QA sintética, no adoptar"
+                },
+                {
+                  "key": "horizon",
+                  "label": "Horizonte · FROM_NEW",
+                  "section": "CAPITAL_SCENARIO",
+                  "value": 144,
+                  "unit": "months",
+                  "evidenceIds": [
+                    "capital:test"
+                  ],
+                  "derivation": "QA sintética, no adoptar"
+                },
+                {
+                  "key": "residual",
+                  "label": "Residual",
+                  "section": "CAPITAL_SCENARIO",
+                  "value": 10000,
+                  "unit": "USD",
+                  "evidenceIds": [
+                    "capital:test"
+                  ],
+                  "derivation": "QA sintética, no adoptar"
+                },
+                {
+                  "key": "interest",
+                  "label": "Interés mensual (no principal)",
+                  "section": "FIXED_SCENARIO",
+                  "value": 50,
+                  "unit": "USD/trailer-month",
+                  "evidenceIds": [
+                    "fixed:test"
+                  ],
+                  "derivation": "QA sintética, no adoptar"
+                },
+                {
+                  "key": "INSURANCE",
+                  "label": "INSURANCE",
+                  "section": "FIXED_SCENARIO",
+                  "value": 10,
+                  "unit": "USD/trailer-month",
+                  "evidenceIds": [
+                    "fixed:test"
+                  ],
+                  "derivation": "QA sintética, no adoptar"
+                },
+                {
+                  "key": "PERMITS",
+                  "label": "PERMITS",
+                  "section": "FIXED_SCENARIO",
+                  "value": 10,
+                  "unit": "USD/trailer-month",
+                  "evidenceIds": [
+                    "fixed:test"
+                  ],
+                  "derivation": "QA sintética, no adoptar"
+                },
+                {
+                  "key": "OVERHEAD",
+                  "label": "OVERHEAD",
+                  "section": "FIXED_SCENARIO",
+                  "value": 10,
+                  "unit": "USD/trailer-month",
+                  "evidenceIds": [
+                    "fixed:test"
+                  ],
+                  "derivation": "QA sintética, no adoptar"
+                },
+                {
+                  "key": "productiveKmPerMonth",
+                  "label": "productiveKmPerMonth",
+                  "section": "TRAILER",
+                  "value": 10000,
+                  "unit": "km/trailer-month",
+                  "derivation": "QA sintética, no adoptar",
+                  "evidenceIds": [
+                    "trip:test"
+                  ]
+                },
+                {
+                  "key": "productiveDaysPerMonth",
+                  "label": "productiveDaysPerMonth",
+                  "section": "TRAILER",
+                  "value": 20,
+                  "unit": "days/trailer-month",
+                  "derivation": "QA sintética, no adoptar",
+                  "evidenceIds": [
+                    "trip:test"
+                  ]
+                },
+                {
+                  "key": "maintenanceUsdPerKm",
+                  "label": "maintenanceUsdPerKm",
+                  "section": "TRAILER",
+                  "value": 0.1,
+                  "unit": "USD/km",
+                  "derivation": "QA sintética, no adoptar",
+                  "evidenceIds": [
+                    "trip:test"
+                  ]
+                },
+                {
+                  "key": "tiresUsdPerKm",
+                  "label": "tiresUsdPerKm",
+                  "section": "TRAILER",
+                  "value": 0.05,
+                  "unit": "USD/km",
+                  "derivation": "QA sintética, no adoptar",
+                  "evidenceIds": [
+                    "trip:test"
+                  ]
+                }
+              ],
+              "rates": [
+                {
+                  "key": "monthlyFixedUsd",
+                  "value": 288.33,
+                  "unit": "USD/trailer-month",
+                  "derivation": "Recomputed owned fixed scenario QA-2; original lineage retained in fixed",
+                  "evidenceIds": [
+                    "capital:test",
+                    "fixed:test"
+                  ],
+                  "inputKeys": [
+                    "acquisitionCost",
+                    "horizon",
+                    "residual",
+                    "interest",
+                    "INSURANCE",
+                    "PERMITS",
+                    "OVERHEAD"
+                  ]
+                },
+                {
+                  "key": "productiveKmPerMonth",
+                  "value": 10000,
+                  "unit": "km/trailer-month",
+                  "derivation": "QA sintética, no adoptar",
+                  "evidenceIds": [
+                    "trip:test"
+                  ],
+                  "inputKeys": [
+                    "productiveKmPerMonth"
+                  ]
+                },
+                {
+                  "key": "productiveDaysPerMonth",
+                  "value": 20,
+                  "unit": "days/trailer-month",
+                  "derivation": "QA sintética, no adoptar",
+                  "evidenceIds": [
+                    "trip:test"
+                  ],
+                  "inputKeys": [
+                    "productiveDaysPerMonth"
+                  ]
+                },
+                {
+                  "key": "maintenanceUsdPerKm",
+                  "value": 0.1,
+                  "unit": "USD/km",
+                  "derivation": "QA sintética, no adoptar",
+                  "evidenceIds": [
+                    "trip:test"
+                  ],
+                  "inputKeys": [
+                    "maintenanceUsdPerKm"
+                  ]
+                },
+                {
+                  "key": "tiresUsdPerKm",
+                  "value": 0.05,
+                  "unit": "USD/km",
+                  "derivation": "QA sintética, no adoptar",
+                  "evidenceIds": [
+                    "trip:test"
+                  ],
+                  "inputKeys": [
+                    "tiresUsdPerKm"
+                  ]
+                }
+              ],
+              "trip": [
+                {
+                  "key": "totalKm",
+                  "label": "totalKm",
+                  "section": "TRIP",
+                  "value": 240,
+                  "unit": "km",
+                  "derivation": "QA sintética, no adoptar",
+                  "evidenceIds": [
+                    "trip:test"
+                  ]
+                },
+                {
+                  "key": "cycleDays",
+                  "label": "cycleDays",
+                  "section": "TRIP",
+                  "value": 2,
+                  "unit": "days",
+                  "derivation": "QA sintética, no adoptar",
+                  "evidenceIds": [
+                    "trip:test"
+                  ]
+                }
+              ],
+              "evidence": [
+                {
+                  "id": "trip:test",
+                  "url": "https://example.org/qa",
+                  "locator": "Fixture sintético",
+                  "observedAt": "2026-09-01",
+                  "validFrom": "2026-09-01",
+                  "validUntil": "2026-09-30",
+                  "country": "MX",
+                  "equipment": "TRACTOR_DRY_VAN_SINGLE",
+                  "limitations": "Sin evidencia económica"
+                },
+                {
+                  "id": "fixed:test",
+                  "url": "https://example.org/qa",
+                  "locator": "Fixture sintético",
+                  "observedAt": "2026-09-01",
+                  "validFrom": "2026-09-01",
+                  "validUntil": "2026-09-30",
+                  "country": "MX",
+                  "equipment": "TRACTOR_DRY_VAN_SINGLE",
+                  "limitations": "Sin evidencia económica"
+                },
+                {
+                  "id": "capital:test",
+                  "url": "https://example.org/qa",
+                  "locator": "Fixture sintético",
+                  "observedAt": "2026-09-01",
+                  "validFrom": "2026-09-01",
+                  "validUntil": "2026-09-30",
+                  "country": "MX",
+                  "equipment": "TRACTOR_DRY_VAN_SINGLE",
+                  "limitations": "Sin evidencia económica"
+                }
+              ],
+              "costs": {
+                "cfuUsd": 28.83,
+                "cvuUsd": 36,
+                "maintenanceUsd": 24,
+                "tiresUsd": 12,
+                "cfuByDistanceUsd": 6.92,
+                "cfuByTimeUsd": 28.83,
+                "productionCostUsd": 64.83
+              }
+            }
+          ],
+          "borderCharges": [
+            {
+              "id": "QA",
+              "covers": [
+                "CROSSING",
+                "INTERCHANGE"
+              ],
+              "amountUsd": 150,
+              "provider": "QA",
+              "derivation": "QA",
+              "sourceUrl": "https://example.org/qa",
+              "locator": "QA",
+              "observedAt": "2026-09-01",
+              "validFrom": "2026-09-01",
+              "validUntil": "2026-09-30"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

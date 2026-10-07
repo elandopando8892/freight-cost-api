@@ -1,0 +1,113 @@
+{
+  "artifact": "FCM_B1_PUBLIC_FIXED_PRODUCTIVITY_RESEARCH_V1",
+  "retrievedDate": "2026-09-29",
+  "use": "HISTORICAL_PUBLIC_RESEARCH_ONLY",
+  "adopted": false,
+  "currentQuoteReady": false,
+  "sources": [
+    {
+      "id": "ATRI_REPORT_2025",
+      "url": "https://truckingresearch.org/wp-content/uploads/2025/07/ATRI-Operational-Costs-of-Trucking-07-2025.pdf",
+      "sha256": "581b91b68a76f232102a63f543eff92bb59c9478556b164d84d2be85118902f8",
+      "bytes": 3268010,
+      "pages": 67,
+      "observationYear": 2024,
+      "country": "US",
+      "limitations": "Aggregate Class 8 for-hire operations; regional, national and sector populations are not interchangeable. Marginal payment costs are not a full economic fixed-cost ledger."
+    },
+    {
+      "id": "INEGI_EAT_2024",
+      "url": "https://www.inegi.org.mx/contenidos/saladeprensa/boletines/2025/eat/EAT2024_RR.pdf",
+      "sha256": "8ba2c974c06ce3acbe768600a9cb0faa896734706770782b98cfc0738420e751",
+      "bytes": 607495,
+      "pages": 22,
+      "observationYear": 2024,
+      "country": "MX",
+      "limitations": "Preliminary national branch statistics. Goods/services spending is not total cost or pure corporate overhead; no route or dry-van cost-bearing denominator is identified in this report."
+    },
+    {
+      "id": "INEGI_CEAT_2025",
+      "url": "https://www.inegi.org.mx/contenidos/programas/eat/2018/doc/CEAT2025.pdf",
+      "sha256": "fa21b2860d78082fba8476011e36722cba85d6fc4c5283f62b9e0f52e3a42ed8",
+      "pages": 24,
+      "observationYear": 2024,
+      "country": "MX",
+      "limitations": "Blank sample collection instrument defining variables, not carrier answers or measured amounts."
+    },
+    {
+      "id": "CENSUS_VIUS_211E_2021",
+      "url": "https://www2.census.gov/programs-surveys/vius/data/2021/VIUS211E.zip",
+      "sha256": "ec552a8b221e9157ae4071d29a1da58b9c0deedfae80caf79dd243b2463903c7",
+      "bytes": 188933,
+      "entry": "VIUS211E.dat",
+      "observationYear": 2021,
+      "country": "US",
+      "limitations": "Excludes New Hampshire. Business use, for-hire goods/people, truck tractor with one trailer; not specifically cross-border dry van or a 2024/2026 fleet. Preserve estimate flags and coefficients of variation."
+    },
+    {
+      "id": "ATRI_SAMPLE_REPORT",
+      "url": "https://truckingresearch.org/wp-content/uploads/2026/02/sample_customized_yoy_report.pdf",
+      "sha256": "ba67a3b989111c50ef5894afca0922a2c8493ed0a666ccf834669d596e1466d6",
+      "bytes": 559723,
+      "pages": 10,
+      "country": "US",
+      "use": "FORMAT_EXAMPLE_ONLY",
+      "limitations": "Published sample customized report, not an identified observed carrier. No values extracted into the benchmark observations."
+    }
+  ],
+  "observations": [
+    {
+      "id": "ATRI_2024_SOUTH_CENTRAL_MARGINAL",
+      "sourceId": "ATRI_REPORT_2025",
+      "locator": "Table 13, printed p.18, PDF p.21; regional column South Central",
+      "cohort": "REGIONAL_MILEAGE_WEIGHTED_ALL_SECTORS",
+      "unit": "USD/mile",
+      "values": {
+        "fuel": 0.454,
+        "truckTrailerPayments": 0.344,
+        "repairMaintenance": 0.188,
+        "truckInsurancePremiums": 0.104,
+        "permitsLicenses": 0.008,
+        "tires": 0.050,
+        "tolls": 0.032,
+        "driverWages": 0.755,
+        "driverBenefits": 0.173,
+        "reportedTotal": 2.107,
+        "reportedTotalExcludingFuel": 1.653
+      },
+      "limitation": "Rounded rows sum to 2.108, a 0.001 difference from reported total; preserve both. This is not a Texas-only or dry-van-only cohort. Do not add route tolls or fuel to the unadjusted total."
+    },
+    {
+      "id": "ATRI_2024_NATIONAL_UTILIZATION",
+      "sourceId": "ATRI_REPORT_2025",
+      "locator": "Equipment, printed p.12, PDF p.15",
+      "cohort": "REPORT_NATIONAL_RESPONDENTS",
+      "values": {
+        "annualMilesPerTruck": { "value": 82677, "unit": "mile/truck-year" },
+        "annualOperatingDaysPerTruck": { "value": 268, "unit": "operating-days/truck-year" }
+      },
+      "limitation": "Not the regional cohort of Table 13. Monthly division is a historical arithmetic normalization, not seasonality, loaded miles, or demonstrated joint cost/exposure for a carrier."
+    },
+    {
+      "id": "INEGI_EAT_2024_4841_SPENDING_COMPOSITION",
+      "sourceId": "INEGI_EAT_2024",
+      "locator": "Table 17, p.14, branch Autotransporte de carga general, year 2024",
+      "cohort": "MX_NATIONAL_BRANCH_4841",
+      "unit": "percent-of-goods-and-services-spending",
+      "values": { "fuelAndLubricants": 42.6, "partsAndThirdPartyMaintenance": 13.0, "otherGoodsAndServices": 44.4 },
+      "limitation": "Other spending is not a fixed-cost percentage. The spending denominator excludes other cost families defined separately in the questionnaire."
+    },
+    {
+      "id": "VIUS_2021_FOR_HIRE_SINGLE_TRAILER",
+      "sourceId": "CENSUS_VIUS_211E_2021",
+      "locator": "VIUS211E.dat row GEO_ID=0100000US, VEHTYPE=TT, TCONFIG=Y1, PRICHAR=28, PRIVALUE=28_18",
+      "cohort": "US_EXCLUDING_NH_FOR_HIRE_GOODS_OR_PEOPLE_SINGLE_TRAILER",
+      "values": {
+        "VCOUNT": { "value": 732.2, "unit": "thousand-vehicles", "flag": "", "cvPercent": 2.2 },
+        "VMILE": { "value": 56887.7, "unit": "million-vehicle-miles", "flag": "", "cvPercent": 2.7 },
+        "AMILE": { "value": 77.7, "unit": "thousand-miles/vehicle-year", "flag": "", "cvPercent": 1.6 }
+      },
+      "limitation": "Use published AMILE with its rounding/CV. This denominator cannot be combined with ATRI 2024 costs as if both came from one cohort."
+    }
+  ]
+}

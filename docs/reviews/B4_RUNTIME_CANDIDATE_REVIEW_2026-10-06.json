@@ -1,0 +1,656 @@
+{
+  "schemaVersion": "fcm.runtime-candidate-review.v1",
+  "generatedAt": "2026-10-07T02:17:58.578Z",
+  "branch": "codex/cost-tires-release-s14",
+  "baseCommit": "4f5fc2de0c3d178dace917231e1092040dec21fd",
+  "gitCandidateCommit": null,
+  "contentSha256": "1628b303b324a0ab137cd41df7cb5a402fc063cdb531bef0d915e3c10eca6fc9",
+  "fingerprintMeaning": "BASE_HEAD_PLUS_SELECTED_WORKING_BYTES_NOT_A_GIT_COMMIT_OR_CLEAN_EXPORT",
+  "dirtyExpandedAtReview": 912,
+  "selectedDeltaCount": 96,
+  "changes": [
+    {
+      "status": " M",
+      "path": ".gitignore",
+      "bytes": 538,
+      "sha256": "6278a8763dc41d1504ad72955a799f741e46170c7d0c23de1b4295b8c10de351"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/package.json",
+      "bytes": 1968,
+      "sha256": "cd425e3452e7eb4cce1a8278b5a1ed1abcee006c0d70ade3c02575107f787f8b"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/app.ts",
+      "bytes": 6691,
+      "sha256": "2a55ce7e1342db0cc3cca88aab3ea5288e1fe10981065f04a6d87d0dea950f64"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/config/local-read-review.ts",
+      "bytes": 3591,
+      "sha256": "946d9f8d35767c80b773f43dbec2e3fe8e4d195fca1c8d014f804869790de6ec"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/config/prisma.ts",
+      "bytes": 608,
+      "sha256": "d94ec6c662902cf97fe01fda13eae9e47df4a9f6b639d5d599a55ff6eee9c0d5"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/config/w2-local-gate.ts",
+      "bytes": 2602,
+      "sha256": "d74566a79b8388fca440c7e33efa06e80e6c8b0cae757bc5c566dbe7f54aa7aa"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/cost-bases/b2-family-source.pack.json",
+      "bytes": 1605590,
+      "sha256": "d1235ca788312cb5f0dd7b82a8354809ab93756e57bf5385483e52f0026d7df0"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/cost-bases/cost-base-wizard-draft.ts",
+      "bytes": 15068,
+      "sha256": "984b55181a91b04143cb804f4b1df3782210b9187583965268e5dcd2f9605046"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/cost-bases/cost-base-wizard-review-context.ts",
+      "bytes": 4677,
+      "sha256": "88443de86b9d47a188a2c57d21b99a961226fe446677c8b1d1777f4e34075680"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/cost-bases/cost-base-wizard-transaction.ts",
+      "bytes": 340,
+      "sha256": "317a8d101264b9a28d5c6a082de9e620d070c79c716a99baffaefef1af010d5c"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/cost-bases/cost-base-wizard-version.service.ts",
+      "bytes": 800,
+      "sha256": "08a738b68d43762e0ee22d5012bd6581400ce0bdd690e50f657df4e7fc37b87e"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/cost-bases/cost-base-wizard-version.ts",
+      "bytes": 9143,
+      "sha256": "a9363864f4b8a134a87bda59b0bd0beee7a1fcc028f841810b5eed3b71fdf146"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/cost-bases/cost-base-wizard.catalog.json",
+      "bytes": 9622,
+      "sha256": "521a7f9b2ff0f6d719e76f6bdc3e8e60baa5305883164d2539e40a25dada0e70"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/modules/cost-bases/cost-bases.routes.ts",
+      "bytes": 8729,
+      "sha256": "3781d43a076a353dfa7360339ffaba957a027dc5fff2cd630298e98bab908d20"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/cost-bases/family-base-contract.ts",
+      "bytes": 1334,
+      "sha256": "00e7458fc64f93e9cc814b84da63c1bbee4f2cfe91f00ac4d790b3c6674e0c86"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/cost-bases/family-base-source.ts",
+      "bytes": 1332,
+      "sha256": "ea7cc8f0aa827524590ebf36d1c4935e5b2d0b99a06cc64ff29a9c5733e9c073"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/cost-bases/family-base-store.ts",
+      "bytes": 7631,
+      "sha256": "dd8a1596f6a165d0a4b5580e752e50ed70d816c46f4ee150ce05c09f2080f67a"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/cost-bases/family-base.routes.ts",
+      "bytes": 2303,
+      "sha256": "b17abaff0ddbc39591089fdf4bfd78d9db5baa1e99eb51dc609709ae9f99c98b"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/cost-bases/family-base.service.ts",
+      "bytes": 606,
+      "sha256": "06bc91287fee12434ca8d689ac4b23724142ad0fecd74e758732c3b38407c0f6"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/cost-bases/own-relay-family-base.ts",
+      "bytes": 8259,
+      "sha256": "6b7fb6639f5f6b591f7b370c3dfffca5735812cb0a5dccb02c0e68294f1c229f"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/cost-bases/planning-calculation-recovery.ts",
+      "bytes": 2009,
+      "sha256": "2f2db7e7a94e4bc3eeea6cfba8a88e54444cad57e845be4e4e89b0c3e3cc4f2e"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/cost-bases/planning-transaction-trace.ts",
+      "bytes": 2620,
+      "sha256": "79e28bd94cb7191782c84b8795abcc7d01192a134442d8285ed23febe4f520bc"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/cost-bases/version-planning-contract.ts",
+      "bytes": 1728,
+      "sha256": "73a2a05864d041bbe3ad6f46b580c877f5966e693fb1526dbbc820545fb10836"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/cost-bases/version-planning.routes.ts",
+      "bytes": 993,
+      "sha256": "7f7f3898c893543a6f5cece6b1a1ddf2989ffa2dc2adde4bcb419cbf08ecd633"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/cost-bases/version-planning.service.ts",
+      "bytes": 446,
+      "sha256": "a69ad6806c43e9afc2bed8eb5f15a2b0be103c0e33ff6bf60c216ba15a3602fc"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/cost-bases/version-planning.ts",
+      "bytes": 6850,
+      "sha256": "cd172f3e99d1806fc16dd4ca5a8a5459a5df6125642dd7611cb569741d5ef89a"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/engine/b2-evidence-contract.ts",
+      "bytes": 3588,
+      "sha256": "5d91036d5d4e875b0dfd73f73700607b3634d9648d22c034c771f2ec1823ce1d"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/engine/b2-evidence.snapshot.json",
+      "bytes": 43249,
+      "sha256": "5a94f5ad1ba353edc2b7a84cfc56a70d6947f14b27927f2efab3da56f580afea"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/engine/b2-evidence.ts",
+      "bytes": 1508,
+      "sha256": "24628e3976372ec16184350ba22ef1a9b72de04a1079469eaf597db1c994ba05"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/engine/b2-own-relay-contract.ts",
+      "bytes": 5392,
+      "sha256": "fa9ffa03b07afb7ee8bf44f6a507233832d319e2b8b834115b83fd12bc8103a6"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/engine/b2-own-relay-review.ts",
+      "bytes": 1545,
+      "sha256": "f19f3b7efe81f77979c854fe5f4169609549f52beaf2ceab37de8e2a72915661"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/engine/b2-own-relay.snapshot.json",
+      "bytes": 683853,
+      "sha256": "c174750445a619a04e25b2fc5dadf64eafbb4c68097889300578a9986ffc63dd"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/engine/benchmark-binational-budget.ts",
+      "bytes": 9121,
+      "sha256": "417b8dae0050f2c23119415f9c3d833e03d78919d1d3e96b8cd23be010391022"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/engine/benchmark-binational-cost-projection.ts",
+      "bytes": 9524,
+      "sha256": "4e93fcfba6c0da647006b077cc95895eefebab515a84eb11b27f9f8844444776"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/engine/benchmark-d2d-readiness.ts",
+      "bytes": 5693,
+      "sha256": "cd56ef4ee326c5ede33a0c4bbbad5d7182fc03491c29145213575a03cf117a28"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/modules/engine/benchmark-d2d.ts",
+      "bytes": 6177,
+      "sha256": "223c9d43132ee944596ceaf691cc0bead4376fab25bf290b48bcfa7519eeaed2"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/engine/benchmark-evidence-inventory.ts",
+      "bytes": 7142,
+      "sha256": "8e52735a871740f1cb4fb7d2193ae9af27abdf4d64f1da4ba1e29c04ea0a83ac"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/modules/engine/benchmark-owned-d2d.ts",
+      "bytes": 4836,
+      "sha256": "60ee1b3f2c4a617e7346269ec1ce44bf25d4557a824f18a1bd6e747f9de45900"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/engine/benchmark-payroll-capital-contract.ts",
+      "bytes": 13364,
+      "sha256": "edfb1ba10e25f235feb149bece867264150f8ae8dd2665a9267531be3ccc5c83"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/engine/benchmark-public-reference-components.ts",
+      "bytes": 11380,
+      "sha256": "9d69c5c4c8e933b2e3fc294aaaf3e4635ecbd8419e939be0c870ff67c50d1840"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/modules/engine/benchmark-rates.ts",
+      "bytes": 10550,
+      "sha256": "12a383ecd944b0a3079278f7c81c3e371eee8a839812520423b6925df6909b2f"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/engine/benchmark-review-projection.ts",
+      "bytes": 4230,
+      "sha256": "28f180adba4cb1ee0ea0134ccda816117d37aee76ca011b85d54cb9d7585f4bc"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/engine/benchmark-trailer-attachment.ts",
+      "bytes": 2982,
+      "sha256": "6e1b0be4644522e261f3b5e5d6342ec943e3ad7ecea382c8724ef670924ff9db"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/modules/engine/benchmark.routes.ts",
+      "bytes": 1765,
+      "sha256": "83ffd43023845dab9bf57bff57cd5ddb5933048cd21ed2ac7ae6f787d3062039"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/modules/engine/engine.outputs.ts",
+      "bytes": 12160,
+      "sha256": "3640a05d4cc10820f84de5f295f8d7e0413ad48a87a3921be8981336b6ef5d8b"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/modules/engine/engine.routes.ts",
+      "bytes": 14917,
+      "sha256": "aafeb2bcfa3bf09f3a8951673418b6fd3d97e9c0077489fa2cd2a099e1c61fbb"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/modules/engine/engine.types.ts",
+      "bytes": 9834,
+      "sha256": "3a9a34d517c75d3e8a7453dae74cb5361addb5909afc09a10bbfbb41bbfe4eb1"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/modules/engine/lane-resolver.service.ts",
+      "bytes": 12433,
+      "sha256": "b39e832557c0ce0e294813f1d5124e678795f3e8fd1d0631f0a535b7c0694fff"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/engine/trip-fuel-review.ts",
+      "bytes": 4811,
+      "sha256": "666b41abd72fecf8b0f2faa019375c64cbfaf50153d8c33cc9b18d84bf07d8b6"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/modules/quotes/quote-preview.ts",
+      "bytes": 2910,
+      "sha256": "756b0f6fd860972a9f6a679149df37d9df7fdb01bc39a8d9259272feea4d8370"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/routing/d2d-route-evidence-link.ts",
+      "bytes": 10251,
+      "sha256": "37daec9d30498e8f60edec81bf6897620b739d2412a33ce76234630047edf0ac"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/routing/google-basic-route.client.ts",
+      "bytes": 7368,
+      "sha256": "f07bddadcd6b7335ebe3c4e7253ab5d61e49dc4a23b7768aa139caf145853566"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/routing/google-route-review.routes.ts",
+      "bytes": 5066,
+      "sha256": "6127c0bde5d84b251c71e2231198075d38968d0bcdee61c48fd408cc1a754414"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/routing/mx-toll-reconciliation.ts",
+      "bytes": 6776,
+      "sha256": "b177cca3fb9ea1f6ae77be724474c7b58f0d15932a7a5767556ba494d84eb626"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/modules/routing/sakbe.client.ts",
+      "bytes": 14621,
+      "sha256": "83cff962f5ee062dfb958311fa343a76a490a0ddce076f4f357b10c8a9615539"
+    },
+    {
+      "status": " M",
+      "path": "apps/web/app/(app)/assumptions/[setId]/page.tsx",
+      "bytes": 7004,
+      "sha256": "0146b0d5620ea9d85d05c4b7e50e3173feee4c1538c8675789153f6918815a14"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/app/(app)/cost-bases/[baseId]/versions/[versionId]/build/page.tsx",
+      "bytes": 1785,
+      "sha256": "3e3c879feccd216882fa4db69362542f9b088cb35cf6d69b66529e1258ef59f8"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/app/(app)/cost-bases/[baseId]/versions/[versionId]/planning/page.tsx",
+      "bytes": 1905,
+      "sha256": "0bf23fb11321eee2480d9d534488db8afe67ee207053437ea7caf3647712bc53"
+    },
+    {
+      "status": " M",
+      "path": "apps/web/app/(app)/cost-bases/cost-bases-board.tsx",
+      "bytes": 49284,
+      "sha256": "d251e60d1c14676c8e17ace321db0b906790d759929b8e2827fe9b7b5bb7dd3c"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/app/(app)/cost-bases/family-proposal-panel.tsx",
+      "bytes": 6104,
+      "sha256": "d46d828136be64c4b18aeb02714685eac91f675a407c8f9ab4239c47a5d667a7"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/app/(app)/cost-bases/own-relay-review.module.css",
+      "bytes": 1507,
+      "sha256": "2f2a2b83dfe45215fd5d2a5f09998d78f2b59c12f9fff6d7451204e83c8687af"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/app/(app)/cost-bases/own-relay-review.tsx",
+      "bytes": 15435,
+      "sha256": "e472075f6642c4ade332403fccf66dc2c3c14da0f8307fd7cdf1ee187426851a"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/app/(app)/cost-bases/version-wizard.module.css",
+      "bytes": 1449,
+      "sha256": "95337903cf986b8cb26766ecf48ceabd08479d6da1146bd068d5c3cccd3ff1ac"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/app/(app)/cost-bases/version-wizard.tsx",
+      "bytes": 17822,
+      "sha256": "12fe5de62f4a8c3be29b55b6f76820a7534eeb39d66930abec9bb74563617ebe"
+    },
+    {
+      "status": " M",
+      "path": "apps/web/app/(app)/page.tsx",
+      "bytes": 17344,
+      "sha256": "c5e898e99d8db3823292a587cc44128c651e60abea13383d518b9b115c8f7850"
+    },
+    {
+      "status": " M",
+      "path": "apps/web/app/(app)/quote/quote-form.tsx",
+      "bytes": 16082,
+      "sha256": "b9f3487f7769c8d37b68a0ca5a90b37cb75c6b9e69429c3d0de81d1d5bfa2392"
+    },
+    {
+      "status": " M",
+      "path": "apps/web/app/(app)/quote/quote-shared.tsx",
+      "bytes": 37833,
+      "sha256": "373f816e5b41462dd229e896fad9b95be41f9f7349fc97e649b3f3c7271a7e0c"
+    },
+    {
+      "status": " M",
+      "path": "apps/web/app/(app)/quote/quote-wizard.tsx",
+      "bytes": 18046,
+      "sha256": "ad5b8be39a243a3a4e1b764ba0c3808a3d5771fff5aa93d76ca6c190a2b4cb8d"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/app/(app)/quote/trip-fuel-panel.tsx",
+      "bytes": 5047,
+      "sha256": "404af575462c746ed164a9cf2933d0b0d520632fa7c42842e8fdecf17243398f"
+    },
+    {
+      "status": " M",
+      "path": "apps/web/app/(app)/quote/use-quote-draft.ts",
+      "bytes": 7119,
+      "sha256": "0fa4b6dd5e5aabbe8d9028598c48a533c1ddddaf63efd77979d6cfae80f81ed0"
+    },
+    {
+      "status": " M",
+      "path": "apps/web/app/(app)/scenarios/benchmark/benchmark-calculator.tsx",
+      "bytes": 11386,
+      "sha256": "9102347affdb2f7cacf155394dfbcb746c2461039bcb92a4eb3eb3d05656f87f"
+    },
+    {
+      "status": " M",
+      "path": "apps/web/app/(app)/scenarios/benchmark/benchmark-form.tsx",
+      "bytes": 14438,
+      "sha256": "bd85dd6b6f217d4c4117df2c391b3050b665e8f9985bae4e1a6619285972219a"
+    },
+    {
+      "status": " M",
+      "path": "apps/web/app/(app)/scenarios/benchmark/benchmark-review.tsx",
+      "bytes": 4388,
+      "sha256": "1e2a2ebaaf8bf7a4a41f4c4a49123843f46c07016ae6a196fc639eca1a00eb3c"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/app/(app)/scenarios/benchmark/economic-trace-contract.ts",
+      "bytes": 4751,
+      "sha256": "54b95d641165849d8988ecc52daa18c6d2976d1f9112aab2699741694a543620"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/app/(app)/scenarios/benchmark/economic-trace.tsx",
+      "bytes": 5612,
+      "sha256": "b8dfd89f6a39dad59ae77304794b24c4b2f0d49c9d954987969e3344dadf1073"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/app/(app)/scenarios/benchmark/evidence/b2-evidence.tsx",
+      "bytes": 8397,
+      "sha256": "766f876353b66ca158000290c9db3145e5ca58849f3450db0f4bdf7ac93f92d8"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/app/(app)/scenarios/benchmark/evidence/evidence.module.css",
+      "bytes": 2095,
+      "sha256": "f4ec3a51f4398ae3949a791f90a8c5725ec8722a93916b321768469c7836d087"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/app/(app)/scenarios/benchmark/evidence/page.tsx",
+      "bytes": 416,
+      "sha256": "5f2461e719a64cb4584e886127c8c90d0aed4bb70c7595424469c8b737a30017"
+    },
+    {
+      "status": " M",
+      "path": "apps/web/app/(app)/scenarios/benchmark/page.tsx",
+      "bytes": 579,
+      "sha256": "efb622ad407a9faec22fba453c13e7e85405c18cdd97be94466918d1341fdeaa"
+    },
+    {
+      "status": " M",
+      "path": "apps/web/app/(app)/scenarios/benchmark/review-contract.ts",
+      "bytes": 3353,
+      "sha256": "5218abbe2d642305b684b60a3860af4d9411516c07ae5af7e8911510b8871454"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/app/(app)/scenarios/benchmark/route-review/page.tsx",
+      "bytes": 639,
+      "sha256": "f7ce4898505dd82bf514a15e280ad21e26ff35f2a4f6a5580468d15dbde880bf"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/app/(app)/scenarios/benchmark/route-review/route-review.tsx",
+      "bytes": 10308,
+      "sha256": "3e950c0775f6c5bd6bf47ee025c279438c88e9650115298fdfb800c1f7c3a3d0"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/lib/b2-evidence.ts",
+      "bytes": 3320,
+      "sha256": "7cda813c33cb7f69ab97fd7d7d2cb4688323a54c04c2978a7affb671abecd1df"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/lib/benchmark-case-capture.ts",
+      "bytes": 1151,
+      "sha256": "40edd3a968221c20eba72ae0d7c09e9ca10e64bc5a015bbd42ce1ea1aaa3a572"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/lib/benchmark-dossier.ts",
+      "bytes": 4518,
+      "sha256": "628c6e94f236c18e2237aafbfabaedd1712120086c8bd9a710d3ebcf8bcd286e"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/lib/cost-base-navigation.ts",
+      "bytes": 802,
+      "sha256": "5601c1b7d777bc353fb5a4a1e218d4f23678b28578475cde6763f49e6d78e77f"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/lib/cost-base-wizard-contract.ts",
+      "bytes": 1144,
+      "sha256": "1e6448cf48028271c395103d6829c3435bd5d8530ef7b49ecfaeef3560ea75ad"
+    },
+    {
+      "status": " M",
+      "path": "apps/web/lib/dashboard-state.ts",
+      "bytes": 2565,
+      "sha256": "567aca22ec1861e18834b802df489c0c3d3df519beee0d6b8f39fe0848cf2c55"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/lib/family-proposal.ts",
+      "bytes": 1780,
+      "sha256": "4e06402cd09544ff089806cc0a71131e3e457cd800d202301e4f6c97d9b6fe4b"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/lib/google-review-map.ts",
+      "bytes": 4265,
+      "sha256": "da9f97f26a23aec9d8e69a9403a4b177aeb4bfc17ecc30c8b2b693b0c47dd21f"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/lib/google-route-review.ts",
+      "bytes": 2466,
+      "sha256": "c9ed212eb073397cdc2604465212b756debc6db8c364c98e52f3012e5c7102bf"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/lib/own-relay-review.ts",
+      "bytes": 1127,
+      "sha256": "e4c2ba5baeb0199fadbda4004abeb764fe933edfa2126621f1787e0479f471f7"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/lib/trip-fuel-contract.ts",
+      "bytes": 185,
+      "sha256": "fef5cee0d0d753aa7f1d86372171b055ace49042ac5fe2b3f68a0fcb864b7deb"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/lib/version-planning.ts",
+      "bytes": 1241,
+      "sha256": "828b779c1bec24d95fb4defd2c447d703e60f56b6ff51598ebcd6a01a41e603b"
+    },
+    {
+      "status": "??",
+      "path": "docs/prototypes/cost-base-wizard-w1/scale.mjs",
+      "bytes": 1921,
+      "sha256": "c6372b763ef8b8997a3e219fd38045a9d002471a6337c3c6f6a273232b93df34"
+    },
+    {
+      "status": "??",
+      "path": "docs/research/B2_CONFIRMED_OPERATING_PROFILE_2026-10-03.json",
+      "bytes": 4999,
+      "sha256": "161d071f3038f5fe8fc0a8fac09b78bb00e4c480f2e79744164e9e00f9cb9d39"
+    }
+  ],
+  "unchangedDependencyDocs": [
+    {
+      "path": "docs/FCM_TIRE_COHORT_SEGMENT_CONTRACT_2026-09-28.json",
+      "bytes": 2805,
+      "sha256": "5d0b6955ac2c8f4dd08dbc2df3f24af4810263afaf30a626703928340e6bdaf9"
+    },
+    {
+      "path": "docs/FCM_TIRE_EXCLUDED_SEGMENT_SOURCES_2026-09-28.json",
+      "bytes": 4292,
+      "sha256": "4cdcab167d7d64cccd6499d4b01429f035b863e55945d27d4966e43711071184"
+    },
+    {
+      "path": "docs/FCM_TIRE_IMT_PT881_2025.json",
+      "bytes": 2184,
+      "sha256": "f00c12019d64c43de973e30b2e670e47aa503bc68d4967fae176e780b0a92222"
+    },
+    {
+      "path": "docs/FCM_TIRE_IMT_SEGMENT_MAPPING_2026-09-28.json",
+      "bytes": 3798,
+      "sha256": "7104270991eb460f8738d537d9d4bffbe32c160bdd46e716209d05829bcc8a1c"
+    },
+    {
+      "path": "docs/FCM_TIRE_LIFECYCLE_SOURCES_2026-09-27.json",
+      "bytes": 5328,
+      "sha256": "016e5799056a5744720d20409bdc1bf846ee9e19787398595f53517170edd528"
+    },
+    {
+      "path": "docs/FCM_TIRE_TTI_US_REFERENCE_2026-09-28.json",
+      "bytes": 1426,
+      "sha256": "f4f10ff0c08f3dd6bc3f3fc89d1f21e46500482f6b5272a5f6304d4a3e1fe296"
+    }
+  ],
+  "excludedSupportCount": 296,
+  "excludedResearchSourceCount": 106,
+  "globalSecretScan": {
+    "passed": false,
+    "implementationSha256": "355de5bcdfe2f451cf10231b520d6b08299b40ac6ed26e53b221526e974f28aa",
+    "potentialGoogleKeyArchives": [
+      "docs/research/sources/ANKER_CHARGER_BUNDLE_20261002.html",
+      "docs/research/sources/GOOGLE_LVR_ACCESS_20260930.html",
+      "docs/research/sources/GOOGLE_ROUTES_BILLING_20260930.html",
+      "docs/research/sources/GOOGLE_TOLL_SCOPE_20260930.html",
+      "docs/research/sources/MRO_TARIFFS_REVIEW_20260930.html",
+      "docs/research/sources/OUTPOST_LAREDO_YARD_20261001.html",
+      "docs/research/sources/RYDER_BIRMINGHAM_REVIEW_20261001.html",
+      "docs/research/sources/SIMACO_YARD_20261002.html",
+      "docs/research/sources/WALMART_SUPERTECH_DEF_20261002.html"
+    ],
+    "selectedFileFindings": [],
+    "valuesPrinted": false,
+    "sourceOwnershipAndRestrictionsVerified": false
+  },
+  "gates": {
+    "runtimeSelectionPrepared": true,
+    "fullSupportBundlePrepared": false,
+    "cleanExportVerified": false,
+    "gitCommitPrepared": false,
+    "productionAuthorized": false,
+    "readyForProduction": false
+  },
+  "preservation": {
+    "sourceArchivesModified": false,
+    "indexModified": false,
+    "branchModified": false,
+    "authModified": false,
+    "databaseModified": false
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "artifact":"FCM_B2_CAPITAL_INSURANCE_REFERENCE_COMPONENTS",
+  "observedAt":"2026-10-01",
+  "status":"PARTIAL_PUBLIC_REFERENCE_NOT_CALIBRATION",
+  "pins":[
+    {"file":"docs/research/B2_BINATIONAL_OWN_RELAY_SELECTED.json","sha256":"9e169339515fb467f5207748d3c0676bed1dbb6cfb30b01f0696b56ccfd4a775"},
+    {"file":"docs/research/B2_BINATIONAL_FIXED_BUDGET_WORKSHEET_2026-10-01.json","sha256":"63629b174897277ce5501f833e9c24a40fdd24e4c2e323e8663366e2a1a24b80"},
+    {"file":"docs/research/B2_USED_RESIDUAL_SHARED_CYCLE_2026-09-29.json","sha256":"678bf40a4058577e8b7aca738781af7b61f5100f8eacc68257701dda387bd40e"},
+    {"file":"docs/research/B1_INSURANCE_COVERAGE_COST_BRIDGE_2026-09-29.json","sha256":"4222bf02e7e82e594d13ebb658050ec9f90d7c81cb51115a55ed1096843b4854"}
+  ],
+  "sources":[
+    {"id":"RODAL_MX_2021","url":"https://rodaltruckfinancials.com/catalogo/freightliner-cascadia-2021--vhc-f8668c8f02","kind":"SELLER_ASKING_PRICE","locator":"Vehicle details and cash price description","archive":{"file":"docs/research/sources/RODAL_CASCADIA2021_REVIEW_20261001.html","sha256":"2886f1a8b46d2ad65b64b4750158f634f890f82cfd14c8d0d5faf52bd8865878"}},
+    {"id":"RYDER_US_SLEEPER_526505","url":"https://www.ryder.com/en-us/used-trucks/inventory/oklahoma/oklahoma-city/tractor/tandem-axle-sleeper-tractor/2021/freightliner-mercedes/new-cascadia-px12664/526505","kind":"SELLER_ASKING_PRICE","locator":"VEH-526505 price, specifications, price disclaimer and maintenance table","archive":{"file":"docs/research/sources/RYDER_SLEEPER526505_REVIEW_20261001.html","sha256":"99708b73688f59d6d3d25fd1dbf9e0cb9ff2d703c32eee1e8946e05d529b7070"}},
+    {"id":"UTILITY_MX_2021","url":"https://www.remolquesythermos.mx/product-page/2021-utility-4000-d-x-68-000-lbs-53-x102-caja-seca","kind":"SELLER_ASKING_PRICE","locator":"2021 Utility 4000 D-X 53 feet, description and price table","archive":{"file":"docs/research/sources/UTILITY_DRYVAN2021_REVIEW_20261001.html","sha256":"dfb1a8c3751ac104b732dcf0942229fb62c32a5b5fcee659b29c183d55b7d0ec"}},
+    {"id":"TIMI_MX_PUBLISHED_EXAMPLES","url":"https://timi.mx/seguro-tractocamion","kind":"BROKER_PUBLISHED_EXAMPLES_NOT_INSURER_VERIFIED_QUOTE","locator":"Direct HTML section #timi-geo: #tractos and #que-cubre; visible tables and captions","measurementDate":"2026-09-26","archive":{"file":"docs/research/sources/TIMI_TRACTOR_RC_REVIEW_20261001.html","sha256":"e58f3075aa521e4aeed5609a09a53cf74558036ce1ab8faf325cc597fa743aa5"},"captureLimitation":"Web text reader returned an older shorter page; direct downloaded HTML contains the dated tables. Source is the agent's publication, not a policy verified with the insurer. No chat or quote submitted."},
+    {"id":"PROGRESSIVE_US_2025","url":"https://www.progressivecommercial.com/commercial-auto-insurance/truck-insurance/commercial-truck-insurance-cost/","kind":"INSURER_PUBLISHED_NATIONAL_AVERAGE","locator":"How much is commercial truck insurance? and double-dagger footnote","observationYear":2025,"archive":{"file":"docs/research/sources/PROGRESSIVE_TRUCK_COST_REVIEW_20261001.html","sha256":"90a00898ed49045ebffcc4a5daf103110bf6dfac1cb2100d49b2f36d744a010c"}},
+    {"id":"PROGRESSIVE_INTERCHANGE","url":"https://www.progressivecommercial.com/coverages/trailer-interchange/","kind":"INSURER_COVERAGE_DESCRIPTION_NOT_PREMIUM","locator":"Who needs Trailer Interchange; exceptions and restrictions","archive":{"file":"docs/research/sources/PROGRESSIVE_INTERCHANGE_REVIEW_20261001.html","sha256":"a98be25aec9014be85f1e59a2ada713a036630dc02ddc717b97e5593be40af8b"}},
+    {"id":"RYDER_DAYCAB_REJECTED","url":"https://www.ryder.com/en-us/locations/us/alabama/birmingham/3280/used-trucks","kind":"SELLER_CONTRAST_EXCLUDED_FROM_SLEEPER_MODEL","locator":"VEH-298323, link classified as tandem-axle-daycab-tractor","archive":{"file":"docs/research/sources/RYDER_BIRMINGHAM_REVIEW_20261001.html","sha256":"d300ff11dd4ba724ba46d09cb31e3e559022d6663ec9c7ea4a84877cc4d7e709"}}
+  ],
+  "assetReferences":[
+    {"resourceId":"MX_TRACTOR","sourceId":"RODAL_MX_2021","model":"Freightliner Cascadia 2021, DD15 450 HP, manual 18","condition":"USED","asking":{"value":1198275.86,"currency":"MXN","tax":"PLUS_IVA"},"odometer":{"value":694920,"unit":"km"},"horizonMonths":null,"netResidual":null,"capitalizableAcquisition":null,"monthlyInterest":null,"monthlyCapitalUsd":null,"selectedForBudget":false},
+    {"resourceId":"US_TRACTOR","sourceId":"RYDER_US_SLEEPER_526505","stock":"526505","vin":"3AKJHHDR6MSNB0628","model":"Freightliner New Cascadia PX12664 2021, DD15 455 HP, 72-inch sleeper, tandem axle","condition":"USED","asking":{"value":40495,"currency":"USD","tax":"TAXES_AND_FEES_EXCLUDED"},"odometer":{"value":859469,"unit":"mile"},"laterPublishedMaintenanceOdometer":{"date":"2026-03-30","value":868507,"unit":"mile"},"currentActualOdometer":null,"horizonMonths":null,"netResidual":null,"capitalizableAcquisition":null,"monthlyInterest":null,"monthlyCapitalUsd":null,"selectedForBudget":false,"limitations":"Published maintenance mileage exceeds listing mileage by 9038 miles. Do not certify current odometer, availability, remaining service life or inspection. NEW CASCADIA is the model name, not new asset condition."},
+    {"resourceId":"SHARED_TRAILER","sourceId":"UTILITY_MX_2021","model":"Utility 4000 D-X 2021, 53 feet by 102 inches, pneumatic suspension","condition":"USED_REFERENCE","asking":{"value":630000,"currency":"MXN","tax":"PLUS_IVA"},"listBeforeOfferMxn":680000,"horizonMonths":null,"netResidual":null,"capitalizableAcquisition":null,"monthlyInterest":null,"monthlyCapitalUsd":null,"selectedForBudget":false,"limitations":"Product-level offer, no unique VIN/condition selected. One physical reference box, not two assets or an adopted owner/country of registration."}
+  ],
+  "capitalMethod": {
+    "formula":"monthlyCapital = (capitalizableAcquisition - netResidual) / remainingMonths + monthlyInterest",
+    "principalRepaymentIncluded":false,
+    "transferNewAssetLifeToUsed":false,
+    "cashOwnedOrFinancedSelected":null,
+    "fxConversionPerformed":false,
+    "limitations":"Asking price is not acquisition total. Taxes recoverability, delivery/preparation, disposal costs, financing and remaining horizon are unresolved, not zero. MX and trailer have no matched used residual model."
+  },
+  "usConditionalValueLoss": {
+    "basis":"REUSED_HISTORICAL_ANL_MODEL_PLUS_NEW_USD_ASKING_ANCHOR_NOT_CARRIER_CALIBRATION",
+    "methodPin":"docs/research/B2_USED_RESIDUAL_SHARED_CYCLE_2026-09-29.json",
+    "askingSourceId":"RYDER_US_SLEEPER_526505",
+    "ageRetentionPerYear":0.9071,
+    "retentionPerThousandAdditionalMiles":0.999,
+    "historicalAnnualMiles":82677,
+    "windowMonths":36,
+    "retentionFormula":"q = 0.9071^(36/12) * 0.999^(additionalMiles/1000)",
+    "valueLossFormula":"askingValueLossMonthlyUsd = 40495 * (1-q) / 36",
+    "completeCapitalFormula":"askingValueLossMonthlyUsd + (capitalizableAcquisitionUsd - 40495 + disposalCostUsd)/36 + monthlyInterestUsd",
+    "scenarios":[
+      {"id":"LESS_USE_STRESS","useMultiplier":0.8,"annualMiles":66141.6,"additionalMiles":198424.8,"retention":0.6119945983862856,"grossValueReferenceUsd":24782.721261652634,"askingValueLossMonthlyUsd":436.4521871763157},
+      {"id":"HISTORICAL_EXPOSURE_CONDITIONAL","useMultiplier":1,"annualMiles":82677,"additionalMiles":248031,"retention":0.5823621101586334,"grossValueReferenceUsd":23582.75365087386,"askingValueLossMonthlyUsd":469.78462080905945},
+      {"id":"MORE_USE_STRESS","useMultiplier":1.2,"annualMiles":99212.4,"additionalMiles":297637.2,"retention":0.5541644129583486,"grossValueReferenceUsd":22440.887902748327,"askingValueLossMonthlyUsd":501.5031138125465}
+    ],
+    "netResidualUsd":null,"monthlyCompleteCapitalUsd":null,"selectedScenarioId":null,
+    "limitations":"2019 US sleeper listing regression and 2024 all-sectors exposure remain historical contrasts. 36 months is a conditional planning window, not validated remaining life or survival of this high-mileage unit. +/-20% is analytical stress, not a published confidence interval. No use of current odometer in the additional-mile exponent; no transfer to MX or box."
+  },
+  "mxInsurance": {
+    "sourceId":"TIMI_MX_PUBLISHED_EXAMPLES",
+    "currency":"MXN",
+    "measurementDate":"2026-09-26",
+    "coverageTableReference":{"model":"Freightliner Cascadia 2022","insuredValueMxn":2018000,"territory":"MX_DOMESTIC_REFERENCE_NOT_US_COVERAGE"},
+    "pricesInclude":{"vat":true,"policyFee":true,"publishedDiscountAlreadyApplied":true},
+    "packagesAreAlternatives":true,
+    "packages":[
+      {"id":"RC","annualGrossMxn":22771.95,"monthlyGrossEquivalentMxn":1897.6625,"liabilityLimitMxn":3000000,"ownTheft":false,"ownMaterialDamage":false},
+      {"id":"LIMITADA","annualGrossMxn":70218.91,"monthlyGrossEquivalentMxn":5851.575833333333,"liabilityLimitMxn":3000000,"ownTheft":true,"ownMaterialDamage":false},
+      {"id":"AMPLIA","annualGrossMxn":130784.01,"monthlyGrossEquivalentMxn":10898.6675,"liabilityLimitMxn":3000000,"ownTheft":true,"ownMaterialDamage":true}
+    ],
+    "distinctBrandTableReference":{"model":"Freightliner Cascadia 58K 48 XT CUM 2022","commercialValueMxn":1835000,"annualAmpliaGrossMxn":121693.05,"monthlyGrossEquivalentMxn":10141.0875,"location":"Guadalajara postal-code context in table caption"},
+    "numericDeductibles":{"liability":"50 UMA","theftPercent":20,"materialDamagePercent":7},
+    "confirmedCargoPremium":null,"confirmedTrailerPremium":null,
+    "recoverableVatMxn":null,"monthlyEconomicInsuranceUsd":null,"selectedPackage":null,
+    "limitations":"Two different insured-value examples must remain separate. Broker report, not insurer-confirmed policy. Do not sum alternatives, reapply discount, add policy fee again, transfer to 2021 offer, scale premium linearly with asset price, or infer cross-border cover. Gross equivalent is not a billing plan or VAT-net economic cost."
+  },
+  "usInsurance": {
+    "sourceId":"PROGRESSIVE_US_2025",
+    "observationYear":2025,"currency":"USD",
+    "transportMonthlyPerPowerUnit":926,"annualArithmeticEquivalentUsd":11112,
+    "knownIncluded":["LIABILITY","PHYSICAL_DAMAGE"],
+    "driverCondition":"NO_DRIVER_VIOLATIONS",
+    "cargoEstablishedByAverage":false,"trailerEstablishedByAverage":false,
+    "matchedTerritory":null,"limits":null,"deductibles":null,"termMonths":null,
+    "completeMonthlyInsuranceUsd":null,
+    "limitations":"US new-policy national average, not dry-van binational or the Ryder asset's premium. Do not add another whole physical-damage package or ATRI aggregate on top."
+  },
+  "sharedTrailerInsurance": {
+    "sourceId":"PROGRESSIVE_INTERCHANGE",
+    "coverageDecision":"OWNED_ASSET_PHYSICAL_DAMAGE_VS_NONOWNED_WRITTEN_INTERCHANGE_PENDING_LEGAL_OWNER_INSURED_AND_TERRITORY",
+    "premium":null,"ownerLegalEntity":null,"custodianLegalEntity":null,"territorialContinuity":null,
+    "writtenInterchangeAgreementVerified":false,
+    "chargeFullPremiumPerLeg":false,
+    "limitations":"Same group does not prove same insured legal owner. Written interchange coverage describes non-owned trailers; do not buy/add it automatically for own-group relay. Distinct risks can coexist but any premiums and overlaps require evidence. No published matched box premium."
+  },
+  "outcome": {
+    "capitalReferencesWithExplicitCurrency":3,
+    "mxPackageAnnualObservations":3,
+    "completeBudgetRowsFilled":0,
+    "budgetUsd":null,"cfuUsd":null,"cvuUsd":null,
+    "calibrated":false,"quoteReady":false,"adoptedValues":0,"businessGatesClosed":0,
+    "next":"Consolidate a finite public-reference budget/exposure scenario and explicit unresolved terms; do not reopen generic offer/FX/Auth research. Governed adoption and operational quote remain separate."
+  }
+}

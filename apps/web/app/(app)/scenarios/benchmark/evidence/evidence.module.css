@@ -1,0 +1,24 @@
+.root { --evidence-orange: #ea5e27; color: inherit; display: grid; gap: 1.1rem; min-width: 0; }
+.root h1 { font-size: clamp(1.6rem, 3vw, 2rem); font-weight: 600; }
+.root h2 { font-size: 1.3rem; font-weight: 600; }
+.root h3 { margin-top: 1rem; font-weight: 600; }
+.root p, .root li { line-height: 1.6; overflow-wrap: anywhere; }
+.root ul { padding-left: 1.2rem; list-style: disc; }
+.eyebrow { color: var(--evidence-orange); letter-spacing: .1em; font-size: .75rem; text-transform: uppercase; }
+.controls { display: flex; gap: 1rem; flex-wrap: wrap; align-items: end; }
+.root label { display: grid; gap: .4rem; font-size: .875rem; }
+.root select { min-height: 44px; max-width: 100%; border: 1px solid #484848; border-radius: 4px; background: #1e1e1e; color: #efefef; padding: .5rem; }
+.notice { border-left: 2px solid var(--evidence-orange); padding: .7rem 1rem; background: color-mix(in srgb, #484848 20%, transparent); font-size: .875rem; }
+.grid { display: grid; grid-template-columns: minmax(230px, .75fr) minmax(0, 2fr); gap: 1rem; }
+.panel { border: 1px solid #484848; border-radius: 5px; padding: 1rem; min-width: 0; }
+.panel label { margin-bottom: 1rem; }
+.row { display: block; width: 100%; text-align: left; color: #efefef; background: #1e1e1e; padding: .9rem; border: 1px solid #484848; border-radius: 4px; margin-top: .6rem; min-height: 44px; }
+.row[aria-pressed=true] { border-color: var(--evidence-orange); background: color-mix(in srgb, #ea5e27 10%, transparent); }
+.row small { display: block; margin-top: .4rem; }
+.root :focus-visible { outline: 2px solid var(--evidence-orange); outline-offset: 3px; }
+.source { border-bottom: 1px solid #484848; padding: 1rem 0; }
+.source h4 { font-weight: 600; }
+.source a { display: block; color: var(--evidence-orange); min-height: 44px; padding-top: .5rem; overflow-wrap: anywhere; }
+.root code { overflow-wrap: anywhere; font-size: .8rem; }
+.root summary { cursor: pointer; min-height: 44px; }
+@media(max-width: 700px) { .grid { grid-template-columns: minmax(0, 1fr); } .controls { display: grid; grid-template-columns: minmax(0, 1fr); } }

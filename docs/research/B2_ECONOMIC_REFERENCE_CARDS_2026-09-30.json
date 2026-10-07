@@ -1,0 +1,974 @@
+{
+  "artifact": "FCM_B2_ECONOMIC_REFERENCE_CARDS_ASSEMBLY",
+  "cutDate": "2026-09-30",
+  "baseHead": "4f5fc2de0c3d178dace917231e1092040dec21fd",
+  "mode": "RESEARCH_ASSEMBLY_ONLY",
+  "calibrated": false,
+  "quoteReady": false,
+  "adoptedValues": 0,
+  "sources": [
+    {
+      "id": "profile",
+      "file": "docs/research/B2_REFERENCE_PROFILE_EXPOSURE_2026-09-29.json",
+      "sha256": "336c00c88d3e13f64ce6706905cf926142885bc591c7355b3f7a666508bb7857",
+      "evidenceDate": "2026-09-29",
+      "refreshedExternallyThisCut": false
+    },
+    {
+      "id": "acquisition",
+      "file": "docs/research/B2_CAPITAL_ACQUISITION_BRIDGE_2026-09-29.json",
+      "sha256": "c8247644791d663c841cdbce7bee28c89be03c3c1a4bb3932d566a8ebb9381c3",
+      "evidenceDate": "2026-09-29",
+      "refreshedExternallyThisCut": false
+    },
+    {
+      "id": "residual",
+      "file": "docs/research/B2_USED_RESIDUAL_SHARED_CYCLE_2026-09-29.json",
+      "sha256": "678bf40a4058577e8b7aca738781af7b61f5100f8eacc68257701dda387bd40e",
+      "evidenceDate": "2026-09-29",
+      "refreshedExternallyThisCut": false
+    },
+    {
+      "id": "labor",
+      "file": "docs/research/B2_LABOR_COMPENSATION_BRIDGE_2026-09-29.json",
+      "sha256": "321c07a2b208b41b8f6be256cafed9ff521ef083ad3751ba56402b081f4f00aa",
+      "evidenceDate": "2026-09-29",
+      "refreshedExternallyThisCut": false
+    },
+    {
+      "id": "insurance",
+      "file": "docs/research/B1_INSURANCE_COVERAGE_COST_BRIDGE_2026-09-29.json",
+      "sha256": "4222bf02e7e82e594d13ebb658050ec9f90d7c81cb51115a55ed1096843b4854",
+      "evidenceDate": "2026-09-29",
+      "refreshedExternallyThisCut": false
+    },
+    {
+      "id": "overhead",
+      "file": "docs/research/B1_OVERHEAD_EXPOSURE_BRIDGE_2026-09-29.json",
+      "sha256": "587cc5ecb2aaaceaf3de1dd86c56599b3f188eca727a3b536f0e2bc63719eb47",
+      "evidenceDate": "2026-09-29",
+      "refreshedExternallyThisCut": false
+    },
+    {
+      "id": "ledger",
+      "file": "docs/research/B2_PUBLIC_REFERENCE_COMPONENTS_LEDGER_2026-09-29.json",
+      "sha256": "e57cdd449f0a285f9758ded2ac438838d38edc6eef6e06ccb082d9238a8a6d60",
+      "evidenceDate": "2026-09-29",
+      "refreshedExternallyThisCut": false
+    },
+    {
+      "id": "core",
+      "file": "docs/research/B2_PAYROLL_CAPITAL_CONTRACT_TEMPLATE_2026-09-29.json",
+      "sha256": "cabfda00873356406d838306bfa87b912eccd9a6026449c0ebb26046acd8bd85",
+      "evidenceDate": "2026-09-29",
+      "refreshedExternallyThisCut": false
+    },
+    {
+      "id": "fuel",
+      "file": "docs/C1_B1_FUEL_SOURCE_FRESHNESS_2026-09-29.md",
+      "sha256": "9222815051a3ffed823392d12bcdd3e620fe5bc2d2134c7ef63a606cd1deeaf1",
+      "evidenceDate": "2026-09-29",
+      "refreshedExternallyThisCut": false
+    },
+    {
+      "id": "method",
+      "file": "docs/C1_B1_PUBLIC_METHOD_CROSSWALK_2026-09-29.md",
+      "sha256": "67209188c27b2c91630fa7bd0faac64c302711a84575d0e49df75b26cbca7204",
+      "evidenceDate": "2026-09-29",
+      "refreshedExternallyThisCut": false
+    },
+    {
+      "id": "route",
+      "file": "docs/C1_B1_D2D_ROUTE_EVIDENCE_BRIDGE_2026-09-29.md",
+      "sha256": "d50a5282faea0710ba8c08c3a32261c7340e4eeaefb804f8148e7ea009c39bb7",
+      "evidenceDate": "2026-09-29",
+      "refreshedExternallyThisCut": false
+    },
+    {
+      "id": "inventory",
+      "file": "docs/C1_B1_PARAMETER_SOURCE_REGISTER_2026-09-29.md",
+      "sha256": "a31864f52ce5cd3d9f111056ec4dc58181587e99258614f1e2636e61ff992f0a",
+      "evidenceDate": "2026-09-29",
+      "refreshedExternallyThisCut": false
+    }
+  ],
+  "cards": [
+    {
+      "country": "MX",
+      "profileRef": {
+        "sourceId": "profile",
+        "pointer": "/profiles/0"
+      },
+      "profileStatus": "PROPOSED_NOT_OBSERVED_OR_ADOPTED",
+      "sectionRows": [
+        {
+          "section": "GENERAL_BASE",
+          "destination": "EXPOSURE",
+          "refs": [
+            {
+              "sourceId": "profile",
+              "pointer": "/profiles/0"
+            }
+          ],
+          "referenceSummary": "Perfil propuesto de tracto usado propio; exposición IMT histórica MX / ATRI nacional histórica US, no flota observada.",
+          "assumptions": [
+            "Perfil de referencia explícito por país, equipo, escala y periodo; planificación pública, no clasificación real del carrier."
+          ],
+          "exclusions": [
+            "No dividir EAT entre parque SICT ni convertir capacidad en proporción de km cargados."
+          ],
+          "missing": [
+            "Flota modelada sustentada y exposición del mismo alcance/periodo; kilometraje total y días-vehículo productivos."
+          ],
+          "formula": "Km_flota_mes y dias_vehiculo_flota_mes: denominadores, no importes.",
+          "status": "PARTIAL",
+          "economicAmount": null,
+          "subtotalEligible": false,
+          "countryReading": "IMT 2004: caso T3-S2 modelado histórico; caja seca y operación D2D no confirmadas. Escala de flota actual sin fijar."
+        },
+        {
+          "section": "COST_CAPITAL",
+          "destination": "CFU",
+          "refs": [
+            {
+              "sourceId": "acquisition",
+              "pointer": "/acquisitionCards/0"
+            },
+            {
+              "sourceId": "residual",
+              "pointer": "/mxTractor"
+            },
+            {
+              "sourceId": "residual",
+              "pointer": "/method"
+            }
+          ],
+          "referenceSummary": "Ofertas individuales de usados; escenarios US edad/millas y vida contable/fiscal sólo como contraste.",
+          "assumptions": [
+            "Propiedad de usado es rama propuesta, no tenencia confirmada. Horizonte de planificación distinto de vida observada."
+          ],
+          "exclusions": [
+            "No sumar principal a depreciación, ni cuota TRAC a capital propio; no transferir residual US a MX o remolque."
+          ],
+          "missing": [
+            "A capitalizable, R neto, horizonte restante, interés/tenencia; costo puesto en servicio y moneda."
+          ],
+          "formula": "Capital_mes = (A_capitalizable - R_neto) / N_meses + interes_mes; renta es rama alternativa revisada, no adición.",
+          "status": "PARTIAL",
+          "economicAmount": null,
+          "subtotalEligible": false,
+          "countryReading": "Rodal 2021 en NL: precio de contado MXN más IVA, no costo capitalizable. Sin residual/vida restante MX compatible."
+        },
+        {
+          "section": "COST_INSURANCE",
+          "destination": "CFU",
+          "refs": [
+            {
+              "sourceId": "insurance",
+              "pointer": "/coverageMapping"
+            },
+            {
+              "sourceId": "insurance",
+              "pointer": "/pilotCards/0"
+            },
+            {
+              "sourceId": "insurance",
+              "pointer": "/observations/imt"
+            }
+          ],
+          "referenceSummary": "Canastas IMT históricas, Progressive promedio y ATRI tienen coberturas distintas; filing legal no es prima.",
+          "assumptions": [
+            "Prima del plazo y cobertura compatible con territorio, activo, custodia y exposición."
+          ],
+          "exclusions": [
+            "No sumar Progressive y ATRI; deducible no es gasto mensual ni filing cero una prima comercial cero."
+          ],
+          "missing": [
+            "Prima/plazo por canasta, responsabilidad remolque/intercambio, inclusiones y límites."
+          ],
+          "formula": "Seguro_mes = cantidad_polizas * prima_del_plazo / meses_del_plazo; anualizar una sola vez.",
+          "status": "PARTIAL",
+          "economicAmount": null,
+          "subtotalEligible": false,
+          "countryReading": "IMT 2021: ejemplo histórico T3-S2; prima/km impresa no reconcilia. Canasta MX/intercambio todavía no sustentada."
+        },
+        {
+          "section": "COST_PAYROLL",
+          "destination": "CFU",
+          "refs": [
+            {
+              "sourceId": "labor",
+              "pointer": "/administration"
+            }
+          ],
+          "referenceSummary": "Siete roles / 14 claves canónicas administrativos; proxies salariales, sin dotación ni costo patronal del perfil.",
+          "assumptions": [
+            "FTE y paquete patronal por país y mismo periodo; elegir detalle o bloque conjunto con corporativo."
+          ],
+          "exclusions": [
+            "No aplicar ECEC universal ni sumar administración detallada a overhead que la incluye."
+          ],
+          "missing": [
+            "FTE/costo patronal por rol o bloque combinado sustentado; beneficios incluidos/excluidos."
+          ],
+          "formula": "Nomina_admin_mes = sum(FTE_rol * costo_patronal_mes_rol); alternativa bloque ADMIN+COMPANY excluyente.",
+          "status": "PARTIAL",
+          "economicAmount": null,
+          "subtotalEligible": false,
+          "countryReading": "FTE y costo patronal administrativo MX sin fijar. No se transfiere costo del operador por km a administración."
+        },
+        {
+          "section": "COST_COMPANY",
+          "destination": "CFU",
+          "refs": [
+            {
+              "sourceId": "overhead",
+              "pointer": "/companyPairs"
+            },
+            {
+              "sourceId": "overhead",
+              "pointer": "/observations"
+            }
+          ],
+          "referenceSummary": "23 pares / 46 claves; agregados públicos parciales y definiciones de frontera, no overhead mensual compatible.",
+          "assumptions": [
+            "Importe por familias o bloque conjunto con administración y exposición compatibles."
+          ],
+          "exclusions": [
+            "No repartir Otros en 46 claves ni anualizar Other costs dry van con exposición nacional distinta."
+          ],
+          "missing": [
+            "Bloque corporativo del perfil MX/US y frontera, periodo, flota y exposición compatibles."
+          ],
+          "formula": "Corporativo_mes = bloque o sum(cantidad * precio_mes), excluyendo partidas ya incluidas en otras familias.",
+          "status": "PARTIAL",
+          "economicAmount": null,
+          "subtotalEligible": false,
+          "countryReading": "EAT 4841/2024 es agregado nacional de empresa: electricidad/renta/comunicaciones no son oficina fija del perfil."
+        },
+        {
+          "section": "UTILIZATION",
+          "destination": "EXPOSURE",
+          "refs": [
+            {
+              "sourceId": "profile",
+              "pointer": "/method"
+            },
+            {
+              "sourceId": "profile",
+              "pointer": "/profiles/0"
+            }
+          ],
+          "referenceSummary": "Exposición histórica y sensibilidad analítica; ni km vacíos observados ni días del ciclo del piloto.",
+          "assumptions": [
+            "Mapear días operativos a productivos; cargado/vacío por distancia y ciclo físico."
+          ],
+          "exclusions": [
+            "No contar vacío dos veces ni tratar empleado-días como tractor-días; media anual/12 no es mes observado."
+          ],
+          "missing": [
+            "Exposición y calendario/ciclo coherentes; reparto cargado/vacío y disponibilidad sustentados."
+          ],
+          "formula": "Asignacion_fija_candidata = C_mes * max(km_ciclo / km_mes, dias_ciclo / dias_vehiculo_mes); mismo alcance.",
+          "status": "PARTIAL",
+          "economicAmount": null,
+          "subtotalEligible": false,
+          "countryReading": "120,000 km y 300 días anuales son escenario IMT histórico, no exposición del piloto; 55% capacidad no es km cargado."
+        },
+        {
+          "section": "LABOR",
+          "destination": "CVU",
+          "refs": [
+            {
+              "sourceId": "labor",
+              "pointer": "/engineBridge"
+            },
+            {
+              "sourceId": "labor",
+              "pointer": "/mxDriver"
+            }
+          ],
+          "referenceSummary": "MX anuncio por km/vales y reglas patronales; US ATRI histórico, BLS salarios/ECEC y reglas fiscales son ramas distintas.",
+          "assumptions": [
+            "Rama empleado propuesta; remuneración total atribuible y km pagados vs km vehículo, mismo periodo."
+          ],
+          "exclusions": [
+            "Sin 30% heredado para operador; no sumar cargas ya en employer-total; owner-operator no se asume cero."
+          ],
+          "missing": [
+            "Paquete patronal aplicable, asignación/exposición y FX; no adoptar salario solo como costo total."
+          ],
+          "formula": "Operador_USD_km = costo_patronal_atribuible_periodo / km_vehiculo_mismo_periodo / FX_MXN_por_USD_si_MX.",
+          "status": "PARTIAL",
+          "economicAmount": null,
+          "subtotalEligible": false,
+          "countryReading": "Trayecto: 2.10 por km pagado cargado/vacío y vales 3,430/mes, moneda MXN inferida y fecha absoluta no verificada. Header ANNUAL conflictivo excluido; falta costo patronal."
+        },
+        {
+          "section": "FUEL",
+          "destination": "CVU",
+          "refs": [
+            {
+              "sourceId": "fuel",
+              "pointer": null
+            },
+            {
+              "sourceId": "method",
+              "pointer": null
+            },
+            {
+              "sourceId": "route",
+              "pointer": null
+            }
+          ],
+          "referenceSummary": "CNE estación hasta febrero en expediente; EIA PADD3 semana 28 sep en corte del 29; PT881 consumo técnico sin cargado/vacío.",
+          "assumptions": [
+            "Precio fecha/producto/región y dos rendimientos de perfil sustentados; precio público modelado rotulado, no compra carrier."
+          ],
+          "exclusions": [
+            "No llamar fresco a captura antigua; no combinar países ni repetir fuel/surcharge incluido en otro bloque."
+          ],
+          "missing": [
+            "Precio MX vigente público o escenario histórico explícito; consumo cargado/vacío por equipo y ciclo, impuestos/FX."
+          ],
+          "formula": "Fuel_viaje_candidato = precio_USD_L * (km_cargados / km_L_cargado + km_vacios / km_L_vacio); ralentí/auxiliar requiere frontera explícita.",
+          "status": "PARTIAL",
+          "economicAmount": null,
+          "subtotalEligible": false,
+          "countryReading": "Recurso CNE revisado el 29 sep: máxima observación febrero 2026. No se usa como precio actual; falta pareja rendimiento cargado/vacío compatible."
+        },
+        {
+          "section": "COST_MAINT",
+          "destination": "CVU",
+          "refs": [
+            {
+              "sourceId": "method",
+              "pointer": null
+            },
+            {
+              "sourceId": "inventory",
+              "pointer": null
+            }
+          ],
+          "referenceSummary": "31 contrastes canónicos; IMT/ATRI permiten revisar partes, labor y lubricantes, no tasa compatible del piloto.",
+          "assumptions": [
+            "Edad/equipo/ciclo/país alineados y costo de reparación consumido, no aporte a reserva."
+          ],
+          "exclusions": [
+            "Llantas separadas; lubricantes/labor/refacciones una vez; reserva de mantenimiento no se suma al gasto pagado con ella."
+          ],
+          "missing": [
+            "Tasa por km o insumos detallados sustentados para tracto/remolque y frontera compatible."
+          ],
+          "formula": "Mantenimiento_viaje = tasa_USD_km_exclusiva * km_costeados; detalle y bloque no se suman.",
+          "status": "PARTIAL",
+          "economicAmount": null,
+          "subtotalEligible": false,
+          "countryReading": "PT881 2025 T3-S2 representativo y condiciones viales de base: contraste técnico, no historial ni tasa de reparación del perfil."
+        },
+        {
+          "section": "COST_TIRES",
+          "destination": "CVU",
+          "refs": [
+            {
+              "sourceId": "method",
+              "pointer": null
+            },
+            {
+              "sourceId": "inventory",
+              "pointer": null
+            }
+          ],
+          "referenceSummary": "12 contrastes; consumo técnico/histórico no equivale a costo instalado/vida por posición del perfil.",
+          "assumptions": [
+            "Configuración, posición, costo instalado, vida, casco y recape sustentados por ciclo."
+          ],
+          "exclusions": [
+            "Excluir de mantenimiento si llantas van separadas; precio histórico solo no produce costo/km."
+          ],
+          "missing": [
+            "Costo del ciclo/vida del perfil y política de carcasa/recape; compatibilidad país/equipo."
+          ],
+          "formula": "Llantas_viaje = tasa_USD_km_del_ciclo * km_costeados; misma frontera de costo y exposición.",
+          "status": "PARTIAL",
+          "economicAmount": null,
+          "subtotalEligible": false,
+          "countryReading": "IMT y expediente histórico dan definiciones/contrastes; no vida/costo instalado por posición del perfil MX."
+        },
+        {
+          "section": "FINANCE",
+          "destination": "FINANCE",
+          "refs": [
+            {
+              "sourceId": "ledger",
+              "pointer": "/profiles"
+            },
+            {
+              "sourceId": "acquisition",
+              "pointer": "/method"
+            },
+            {
+              "sourceId": "inventory",
+              "pointer": null
+            }
+          ],
+          "referenceSummary": "FX candidato; interés del activo, capital de trabajo carrier y financiación XBF deben permanecer independientes.",
+          "assumptions": [
+            "Identificar pagador y plazo del costo productivo; exclusión XBF explícita no equivale a cero observado."
+          ],
+          "exclusions": [
+            "No sumar interés de activo otra vez, ni comisiones ya corporativas; sin coste financiero XBF oculto en carrier."
+          ],
+          "missing": [
+            "Plazos/base/tasa pública sustentada para carrier o exclusión justificada por alcance; FX vigente para conversión."
+          ],
+          "formula": "Capital_trabajo_carrier = base_financiable * tasa_del_periodo * fraccion_del_periodo; no tasa elegida en este corte.",
+          "status": "PARTIAL",
+          "economicAmount": null,
+          "subtotalEligible": false,
+          "countryReading": "FX se tratará por fecha; no se asume interés/ISN/capital de trabajo cero ni se imputa financiación XBF."
+        },
+        {
+          "section": "RISK",
+          "destination": "RISK_SEPARATE",
+          "refs": [
+            {
+              "sourceId": "insurance",
+              "pointer": "/coverageMapping"
+            },
+            {
+              "sourceId": "ledger",
+              "pointer": "/profiles"
+            }
+          ],
+          "referenceSummary": "Póliza/deducible y pérdida retenida tienen fronteras distintas; no hay reserva del piloto.",
+          "assumptions": [
+            "Política y responsable explícitos, separada del costo productivo."
+          ],
+          "exclusions": [
+            "No porcentaje automático ni deducible/12; no duplicar primas ni pagos de siniestro."
+          ],
+          "missing": [
+            "Decisión de tratamiento y exclusiones/cargos con evidencia; sin importe modelado por defecto."
+          ],
+          "formula": "Riesgo: línea separada documentada, sin importe hasta frecuencia/severidad/pagador o exclusión sustentados.",
+          "status": "PARTIAL",
+          "economicAmount": null,
+          "subtotalEligible": false,
+          "countryReading": "No se interpreta un requisito/póliza como reserva económica MX; retención y responsabilidad por intercambio pendientes."
+        },
+        {
+          "section": "TECHNICAL_MARGIN",
+          "destination": "OUTSIDE_PRODUCTIVE_COST",
+          "refs": [
+            {
+              "sourceId": "inventory",
+              "pointer": null
+            },
+            {
+              "sourceId": "route",
+              "pointer": null
+            }
+          ],
+          "referenceSummary": "Costo productivo, compra carrier y venta XBF son tres resultados; no se ha investigado aquí tarifa comercial.",
+          "assumptions": [
+            "Mantener el margen comercial fuera de CFU/CVU."
+          ],
+          "exclusions": [
+            "No fabricar compra/venta desde costo más porcentaje ni introducir utilidad como costo del carrier."
+          ],
+          "missing": [
+            "Revisar política de presentación; compra/venta sólo si se solicitan con evidencia comercial propia."
+          ],
+          "formula": "Sin término de margen en CFU/CVU; compra y venta permanecen null.",
+          "status": "EXCLUDED_FROM_PRODUCTIVE_COST_PENDING_POLICY",
+          "economicAmount": null,
+          "subtotalEligible": false,
+          "countryReading": "Costo productivo MX no contiene utilidad ni equivale a tarifa ofrecida por la línea mexicana."
+        }
+      ],
+      "outputs": {
+        "monthlyFixedUsd": null,
+        "cfuUsd": null,
+        "cvuUsd": null,
+        "productiveCostUsd": null,
+        "purchaseCostUsd": null,
+        "sellPriceUsd": null
+      }
+    },
+    {
+      "country": "US",
+      "profileRef": {
+        "sourceId": "profile",
+        "pointer": "/profiles/1"
+      },
+      "profileStatus": "PROPOSED_NOT_OBSERVED_OR_ADOPTED",
+      "sectionRows": [
+        {
+          "section": "GENERAL_BASE",
+          "destination": "EXPOSURE",
+          "refs": [
+            {
+              "sourceId": "profile",
+              "pointer": "/profiles/1"
+            }
+          ],
+          "referenceSummary": "Perfil propuesto de tracto usado propio; exposición IMT histórica MX / ATRI nacional histórica US, no flota observada.",
+          "assumptions": [
+            "Perfil de referencia explícito por país, equipo, escala y periodo; planificación pública, no clasificación real del carrier."
+          ],
+          "exclusions": [
+            "No dividir EAT entre parque SICT ni convertir capacidad en proporción de km cargados."
+          ],
+          "missing": [
+            "Flota modelada sustentada y exposición del mismo alcance/periodo; kilometraje total y días-vehículo productivos."
+          ],
+          "formula": "Km_flota_mes y dias_vehiculo_flota_mes: denominadores, no importes.",
+          "status": "PARTIAL",
+          "economicAmount": null,
+          "subtotalEligible": false,
+          "countryReading": "ATRI 2025/operaciones 2024: muestra nacional todos los sectores, no subcohorte dry van/South Central/D2D."
+        },
+        {
+          "section": "COST_CAPITAL",
+          "destination": "CFU",
+          "refs": [
+            {
+              "sourceId": "acquisition",
+              "pointer": "/acquisitionCards/1"
+            },
+            {
+              "sourceId": "residual",
+              "pointer": "/usTractor"
+            },
+            {
+              "sourceId": "residual",
+              "pointer": "/method"
+            }
+          ],
+          "referenceSummary": "Ofertas individuales de usados; escenarios US edad/millas y vida contable/fiscal sólo como contraste.",
+          "assumptions": [
+            "Propiedad de usado es rama propuesta, no tenencia confirmada. Horizonte de planificación distinto de vida observada."
+          ],
+          "exclusions": [
+            "No sumar principal a depreciación, ni cuota TRAC a capital propio; no transferir residual US a MX o remolque."
+          ],
+          "missing": [
+            "A capitalizable, R neto, horizonte restante, interés/tenencia; costo puesto en servicio y moneda."
+          ],
+          "formula": "Capital_mes = (A_capitalizable - R_neto) / N_meses + interes_mes; renta es rama alternativa revisada, no adición.",
+          "status": "PARTIAL",
+          "economicAmount": null,
+          "subtotalEligible": false,
+          "countryReading": "Schneider stock 20753 PA: $45,000 con ISO no certificada. Residual US usado: escenario histórico condicionado, no R neto/vida restante."
+        },
+        {
+          "section": "COST_INSURANCE",
+          "destination": "CFU",
+          "refs": [
+            {
+              "sourceId": "insurance",
+              "pointer": "/coverageMapping"
+            },
+            {
+              "sourceId": "insurance",
+              "pointer": "/pilotCards/1"
+            },
+            {
+              "sourceId": "insurance",
+              "pointer": "/observations/progressive"
+            }
+          ],
+          "referenceSummary": "Canastas IMT históricas, Progressive promedio y ATRI tienen coberturas distintas; filing legal no es prima.",
+          "assumptions": [
+            "Prima del plazo y cobertura compatible con territorio, activo, custodia y exposición."
+          ],
+          "exclusions": [
+            "No sumar Progressive y ATRI; deducible no es gasto mensual ni filing cero una prima comercial cero."
+          ],
+          "missing": [
+            "Prima/plazo por canasta, responsabilidad remolque/intercambio, inclusiones y límites."
+          ],
+          "formula": "Seguro_mes = cantidad_polizas * prima_del_plazo / meses_del_plazo; anualizar una sola vez.",
+          "status": "PARTIAL",
+          "economicAmount": null,
+          "subtotalEligible": false,
+          "countryReading": "Progressive nuevo negocio 2025 y ATRI 2024 incluyen/excluyen riesgos diferentes; no se combinan para prima US."
+        },
+        {
+          "section": "COST_PAYROLL",
+          "destination": "CFU",
+          "refs": [
+            {
+              "sourceId": "labor",
+              "pointer": "/administration"
+            }
+          ],
+          "referenceSummary": "Siete roles / 14 claves canónicas administrativos; proxies salariales, sin dotación ni costo patronal del perfil.",
+          "assumptions": [
+            "FTE y paquete patronal por país y mismo periodo; elegir detalle o bloque conjunto con corporativo."
+          ],
+          "exclusions": [
+            "No aplicar ECEC universal ni sumar administración detallada a overhead que la incluye."
+          ],
+          "missing": [
+            "FTE/costo patronal por rol o bloque combinado sustentado; beneficios incluidos/excluidos."
+          ],
+          "formula": "Nomina_admin_mes = sum(FTE_rol * costo_patronal_mes_rol); alternativa bloque ADMIN+COMPANY excluyente.",
+          "status": "PARTIAL",
+          "economicAmount": null,
+          "subtotalEligible": false,
+          "countryReading": "Proxies BLS nacionales para siete roles; ECEC de todas ocupaciones transporte/almacén no es uplift patronal universal del perfil."
+        },
+        {
+          "section": "COST_COMPANY",
+          "destination": "CFU",
+          "refs": [
+            {
+              "sourceId": "overhead",
+              "pointer": "/companyPairs"
+            },
+            {
+              "sourceId": "overhead",
+              "pointer": "/observations"
+            }
+          ],
+          "referenceSummary": "23 pares / 46 claves; agregados públicos parciales y definiciones de frontera, no overhead mensual compatible.",
+          "assumptions": [
+            "Importe por familias o bloque conjunto con administración y exposición compatibles."
+          ],
+          "exclusions": [
+            "No repartir Otros en 46 claves ni anualizar Other costs dry van con exposición nacional distinta."
+          ],
+          "missing": [
+            "Bloque corporativo del perfil MX/US y frontera, periodo, flota y exposición compatibles."
+          ],
+          "formula": "Corporativo_mes = bloque o sum(cantidad * precio_mes), excluyendo partidas ya incluidas en otras familias.",
+          "status": "PARTIAL",
+          "economicAmount": null,
+          "subtotalEligible": false,
+          "countryReading": "ATRI dry van Other costs no es overhead CFU; Heartland consolidado mezcla personal/taller/operador y no da exposición coincidente."
+        },
+        {
+          "section": "UTILIZATION",
+          "destination": "EXPOSURE",
+          "refs": [
+            {
+              "sourceId": "profile",
+              "pointer": "/method"
+            },
+            {
+              "sourceId": "profile",
+              "pointer": "/profiles/1"
+            }
+          ],
+          "referenceSummary": "Exposición histórica y sensibilidad analítica; ni km vacíos observados ni días del ciclo del piloto.",
+          "assumptions": [
+            "Mapear días operativos a productivos; cargado/vacío por distancia y ciclo físico."
+          ],
+          "exclusions": [
+            "No contar vacío dos veces ni tratar empleado-días como tractor-días; media anual/12 no es mes observado."
+          ],
+          "missing": [
+            "Exposición y calendario/ciclo coherentes; reparto cargado/vacío y disponibilidad sustentados."
+          ],
+          "formula": "Asignacion_fija_candidata = C_mes * max(km_ciclo / km_mes, dias_ciclo / dias_vehiculo_mes); mismo alcance.",
+          "status": "PARTIAL",
+          "economicAmount": null,
+          "subtotalEligible": false,
+          "countryReading": "82,677 millas y 268 días anuales ATRI tienen alcance amplio; no anualizan costos de otra subcohorte ni determinan empty km."
+        },
+        {
+          "section": "LABOR",
+          "destination": "CVU",
+          "refs": [
+            {
+              "sourceId": "labor",
+              "pointer": "/engineBridge"
+            },
+            {
+              "sourceId": "labor",
+              "pointer": "/usDriver"
+            }
+          ],
+          "referenceSummary": "MX anuncio por km/vales y reglas patronales; US ATRI histórico, BLS salarios/ECEC y reglas fiscales son ramas distintas.",
+          "assumptions": [
+            "Rama empleado propuesta; remuneración total atribuible y km pagados vs km vehículo, mismo periodo."
+          ],
+          "exclusions": [
+            "Sin 30% heredado para operador; no sumar cargas ya en employer-total; owner-operator no se asume cero."
+          ],
+          "missing": [
+            "Paquete patronal aplicable, asignación/exposición y FX; no adoptar salario solo como costo total."
+          ],
+          "formula": "Operador_USD_km = costo_patronal_atribuible_periodo / km_vehiculo_mismo_periodo / FX_MXN_por_USD_si_MX.",
+          "status": "PARTIAL",
+          "economicAmount": null,
+          "subtotalEligible": false,
+          "countryReading": "ATRI truckload 2024: cinco grupos por tamaño sin grupo elegido; benefits no certificados como total patronal. No añadir ECEC/IRS automáticamente."
+        },
+        {
+          "section": "FUEL",
+          "destination": "CVU",
+          "refs": [
+            {
+              "sourceId": "fuel",
+              "pointer": null
+            },
+            {
+              "sourceId": "method",
+              "pointer": null
+            },
+            {
+              "sourceId": "route",
+              "pointer": null
+            }
+          ],
+          "referenceSummary": "CNE estación hasta febrero en expediente; EIA PADD3 semana 28 sep en corte del 29; PT881 consumo técnico sin cargado/vacío.",
+          "assumptions": [
+            "Precio fecha/producto/región y dos rendimientos de perfil sustentados; precio público modelado rotulado, no compra carrier."
+          ],
+          "exclusions": [
+            "No llamar fresco a captura antigua; no combinar países ni repetir fuel/surcharge incluido en otro bloque."
+          ],
+          "missing": [
+            "Precio MX vigente público o escenario histórico explícito; consumo cargado/vacío por equipo y ciclo, impuestos/FX."
+          ],
+          "formula": "Fuel_viaje_candidato = precio_USD_L * (km_cargados / km_L_cargado + km_vacios / km_L_vacio); ralentí/auxiliar requiere frontera explícita.",
+          "status": "PARTIAL",
+          "economicAmount": null,
+          "subtotalEligible": false,
+          "countryReading": "EIA PADD3 semana 28 sep, publicada 29 sep en expediente: contraste regional retail con impuestos, no precio carrier ni rendimiento."
+        },
+        {
+          "section": "COST_MAINT",
+          "destination": "CVU",
+          "refs": [
+            {
+              "sourceId": "method",
+              "pointer": null
+            },
+            {
+              "sourceId": "inventory",
+              "pointer": null
+            }
+          ],
+          "referenceSummary": "31 contrastes canónicos; IMT/ATRI permiten revisar partes, labor y lubricantes, no tasa compatible del piloto.",
+          "assumptions": [
+            "Edad/equipo/ciclo/país alineados y costo de reparación consumido, no aporte a reserva."
+          ],
+          "exclusions": [
+            "Llantas separadas; lubricantes/labor/refacciones una vez; reserva de mantenimiento no se suma al gasto pagado con ella."
+          ],
+          "missing": [
+            "Tasa por km o insumos detallados sustentados para tracto/remolque y frontera compatible."
+          ],
+          "formula": "Mantenimiento_viaje = tasa_USD_km_exclusiva * km_costeados; detalle y bloque no se suman.",
+          "status": "PARTIAL",
+          "economicAmount": null,
+          "subtotalEligible": false,
+          "countryReading": "ATRI definición repair/maintenance contempla labor y excluye tires/tows; agregado nacional no calibra usado dry van del piloto."
+        },
+        {
+          "section": "COST_TIRES",
+          "destination": "CVU",
+          "refs": [
+            {
+              "sourceId": "method",
+              "pointer": null
+            },
+            {
+              "sourceId": "inventory",
+              "pointer": null
+            }
+          ],
+          "referenceSummary": "12 contrastes; consumo técnico/histórico no equivale a costo instalado/vida por posición del perfil.",
+          "assumptions": [
+            "Configuración, posición, costo instalado, vida, casco y recape sustentados por ciclo."
+          ],
+          "exclusions": [
+            "Excluir de mantenimiento si llantas van separadas; precio histórico solo no produce costo/km."
+          ],
+          "missing": [
+            "Costo del ciclo/vida del perfil y política de carcasa/recape; compatibilidad país/equipo."
+          ],
+          "formula": "Llantas_viaje = tasa_USD_km_del_ciclo * km_costeados; misma frontera de costo y exposición.",
+          "status": "PARTIAL",
+          "economicAmount": null,
+          "subtotalEligible": false,
+          "countryReading": "Contrastes ATRI/históricos no certifican configuración, costo instalado, casco/recape y vida en el ciclo US seleccionado."
+        },
+        {
+          "section": "FINANCE",
+          "destination": "FINANCE",
+          "refs": [
+            {
+              "sourceId": "ledger",
+              "pointer": "/profiles"
+            },
+            {
+              "sourceId": "acquisition",
+              "pointer": "/method"
+            },
+            {
+              "sourceId": "inventory",
+              "pointer": null
+            }
+          ],
+          "referenceSummary": "FX candidato; interés del activo, capital de trabajo carrier y financiación XBF deben permanecer independientes.",
+          "assumptions": [
+            "Identificar pagador y plazo del costo productivo; exclusión XBF explícita no equivale a cero observado."
+          ],
+          "exclusions": [
+            "No sumar interés de activo otra vez, ni comisiones ya corporativas; sin coste financiero XBF oculto en carrier."
+          ],
+          "missing": [
+            "Plazos/base/tasa pública sustentada para carrier o exclusión justificada por alcance; FX vigente para conversión."
+          ],
+          "formula": "Capital_trabajo_carrier = base_financiable * tasa_del_periodo * fraccion_del_periodo; no tasa elegida en este corte.",
+          "status": "PARTIAL",
+          "economicAmount": null,
+          "subtotalEligible": false,
+          "countryReading": "TRAC no es renta operativa pura; interés del activo y capital de trabajo del carrier requieren evidencia independiente."
+        },
+        {
+          "section": "RISK",
+          "destination": "RISK_SEPARATE",
+          "refs": [
+            {
+              "sourceId": "insurance",
+              "pointer": "/coverageMapping"
+            },
+            {
+              "sourceId": "ledger",
+              "pointer": "/profiles"
+            }
+          ],
+          "referenceSummary": "Póliza/deducible y pérdida retenida tienen fronteras distintas; no hay reserva del piloto.",
+          "assumptions": [
+            "Política y responsable explícitos, separada del costo productivo."
+          ],
+          "exclusions": [
+            "No porcentaje automático ni deducible/12; no duplicar primas ni pagos de siniestro."
+          ],
+          "missing": [
+            "Decisión de tratamiento y exclusiones/cargos con evidencia; sin importe modelado por defecto."
+          ],
+          "formula": "Riesgo: línea separada documentada, sin importe hasta frecuencia/severidad/pagador o exclusión sustentados.",
+          "status": "PARTIAL",
+          "economicAmount": null,
+          "subtotalEligible": false,
+          "countryReading": "Retained crash costs ATRI separados de seguros no son prima ni reserva del perfil. Sin porcentaje por defecto."
+        },
+        {
+          "section": "TECHNICAL_MARGIN",
+          "destination": "OUTSIDE_PRODUCTIVE_COST",
+          "refs": [
+            {
+              "sourceId": "inventory",
+              "pointer": null
+            },
+            {
+              "sourceId": "route",
+              "pointer": null
+            }
+          ],
+          "referenceSummary": "Costo productivo, compra carrier y venta XBF son tres resultados; no se ha investigado aquí tarifa comercial.",
+          "assumptions": [
+            "Mantener el margen comercial fuera de CFU/CVU."
+          ],
+          "exclusions": [
+            "No fabricar compra/venta desde costo más porcentaje ni introducir utilidad como costo del carrier."
+          ],
+          "missing": [
+            "Revisar política de presentación; compra/venta sólo si se solicitan con evidencia comercial propia."
+          ],
+          "formula": "Sin término de margen en CFU/CVU; compra y venta permanecen null.",
+          "status": "EXCLUDED_FROM_PRODUCTIVE_COST_PENDING_POLICY",
+          "economicAmount": null,
+          "subtotalEligible": false,
+          "countryReading": "Costo productivo US no contiene utilidad ni equivale a tarifa ofrecida por la línea americana."
+        }
+      ],
+      "outputs": {
+        "monthlyFixedUsd": null,
+        "cfuUsd": null,
+        "cvuUsd": null,
+        "productiveCostUsd": null,
+        "purchaseCostUsd": null,
+        "sellPriceUsd": null
+      }
+    }
+  ],
+  "sharedTrailer": {
+    "refs": [
+      {
+        "sourceId": "residual",
+        "pointer": "/sharedTrailer"
+      }
+    ],
+    "rule": "ONE_PHYSICAL_CYCLE_THEN_ALLOCATE",
+    "costIncludedInCountryTractorCards": false,
+    "costBearer": null,
+    "settlementShares": null,
+    "cfuUsd": null
+  },
+  "trip": {
+    "refs": [
+      {
+        "sourceId": "route",
+        "pointer": null
+      }
+    ],
+    "origin": null,
+    "destination": null,
+    "interchangePoint": null,
+    "routeSelected": false,
+    "tollsUsd": null,
+    "borderChargesUsd": null
+  },
+  "decision": {
+    "B1": "OPEN",
+    "B2": "PARTIAL",
+    "businessGatesClosed": 0,
+    "businessGatesTotal": 4,
+    "nextCut": "FUEL_PRICE_AND_LOADED_EMPTY_PERFORMANCE",
+    "nextDeliverable": "Contrato público modelado FUEL MX/US con precio y dos rendimientos por equipo/fecha/alcance, evidencia y sensibilidad; si una rama no alcanza, NO-GO específico sin cero.",
+    "completionQueue": [
+      {
+        "order": 1,
+        "id": "FUEL",
+        "acceptance": "Precio fechable y ambos rendimientos sustentados; conversión/impuestos/fuel incluido conciliados. No refresh FX genérico."
+      },
+      {
+        "order": 2,
+        "id": "MAINT_TIRES",
+        "acceptance": "Costo variable exclusivo por km/equipo/ciclo con soporte y sensibilidad; no llantas en mantenimiento."
+      },
+      {
+        "order": 3,
+        "id": "FIXED_LABOR_EXPOSURE_SHARED_TRAILER",
+        "acceptance": "Presupuesto fijo, personal y exposición del mismo perfil/periodo; capitalizable/residual/vida/interés y un remolque con responsabilidad."
+      },
+      {
+        "order": 4,
+        "id": "D2D_CASE_E1_E2",
+        "acceptance": "Viaje documentado y CFU/CVU/cargos por ambos países conciliados; adoptar/persistir sólo tras autorización puntual."
+      },
+      {
+        "order": 5,
+        "id": "SAAS_E3_RELEASE_E4",
+        "acceptance": "Wireframes MARKSMAN, cálculo/guardar/reabrir, roles/tenant y release Web/API con autorización de entorno."
+      }
+    ]
+  },
+  "externalChanges": {
+    "database": false,
+    "auth": false,
+    "users": false,
+    "infrastructure": false,
+    "deployment": false,
+    "businessOperations": false,
+    "applicationAi": false
+  }
+}

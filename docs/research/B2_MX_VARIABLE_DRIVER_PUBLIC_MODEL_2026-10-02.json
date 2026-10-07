@@ -1,0 +1,22 @@
+{
+  "model":"FCM_MX_VARIABLE_DRIVER_PUBLIC_RULES_V1","reviewedAt":"2026-10-02T18:31:00Z",
+  "restRate":0.1666,"rateMxnPerPaidKm":2.1,"rateGrossness":"UNCONFIRMED_GROSS_INTERPRETATION_HYPOTHESIS",
+  "sources":[
+    {"id":"LFT_AUTOTRANSPORT_2026","url":"https://www.diputados.gob.mx/LeyesBiblio/pdf/LFT.pdf","locator":"Current reform14May2026; physical24-25 and71-72 rendered/read:76,79,80,87,89,257,258,259,263.1","archive":{"file":"docs/research/sources/LFT_COVERAGE_REVIEW_20261001.pdf","sha256":"12f09393a1951a91c3f57f579bf611b034edf1a5f78cdbfb828e23ff3a9acbf7"}},
+    {"id":"LSS_VARIABLE_2026","url":"https://www.diputados.gob.mx/LeyesBiblio/pdf/LSS.pdf","locator":"Current reform15Jan2026; physical12 and153 rendered/read:29,30.II-III,31 and2026CEAV4.01UMA+7.513%; remaining contribution rates reuse existing reviewed mxEmployerRules","archive":{"file":"docs/research/sources/LSS_RISK_REVIEW_20261001.pdf","sha256":"8a28a16e1dce1f8e666f4cce5ed19745bc912b2ab1ca49787d5d4bef229398ed"}},
+    {"id":"TRAYECTO_DIRECT_20261002","url":"https://careers.trayecto.com/operador-sencillo-caja-seca-xI1ywOf9L4-o/","locator":"Direct primary reader2Oct2026:2.10loaded/empty; weeklyheader5500-8000vsdescription6000-8000. Superior benefits advertised, no gross/net or weekly-rest inclusion stated; archive unavailable, no employer contact","archive":null}
+  ],
+  "assumptions":[
+    "Both gross interpretations are non-selected forward hypotheses, not payroll observations or a complete employer rate.",
+    "Use published16.66percent, not rounded one-sixth. Includes-rest alternative decomposes rather than adds again.",
+    "Variable SBC uses eligible receipts in previous2months divided by salary-earned days; fixed integrated elements separately for mixed wages. No fixed salary factor transfer.",
+    "Narrow month calculator only2026Mar-Dec full covered/no absence months, CEAV4.01UMA+ and capped25UMA; previous completed calendar bimester reused for both current months, not a rolling2month payroll filing or other regimes.",
+    "Benefit calculator first-anniversary/no wage increase only: worked30day reference for vacation, separately declared aguinaldo basis; annual accrual is not cash in a bimester.",
+    "Paid vacation is not silently already included for km-only wages, nor compensation instead of enjoying leave. Driver working-day capacity cannot be inferred from tractor elapsed days.",
+    "New-classV risk hypothesis reuses existing reviewed mxWorkRisk, not actual existing premium; state tax and extra benefits not silently zero.",
+    "Trip-delay wage provision is scoped to salary fixed per trip; do not automatically turn87minute crossing or all waiting into a statutory km-rate uplift. Longhaul lodging/meals on non-worker-caused delay remain separate.",
+    "Original MX pay row replaced once in each comparison, not mutated or added twice. Public weekly salary is not added on top of km pay.",
+    "A valid public forecast can supply calculator inputs without private XBF payroll. None has yet been selected for this route; examples/tests are synthetic, not calibrated or operational."
+  ],
+  "adoptedValues":0,"quoteReady":false
+}

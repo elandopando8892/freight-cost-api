@@ -1,0 +1,33 @@
+{
+  "artifact":"FCM_B2_TRAILER_TAX_AND_OVERHEAD_UNIT_COMPONENTS",
+  "observedAt":"2026-10-01","baseHead":"4f5fc2de0c3d178dace917231e1092040dec21fd",
+  "mode":"PUBLIC_COMPONENTS_AND_EXPLICIT_TAX_SENSITIVITY_NOT_PARAMETER_ADOPTION",
+  "sources":[
+    {"id":"LIVA","url":"https://www.diputados.gob.mx/LeyesBiblio/pdf/LIVA.pdf","locator":"Article 1 page 1; Article 5 pages 9-11; Article 9 IV page 20","lastReformPrinted":"2021-11-12","textPagesReviewed":[1,9,10,11,20],"visualPagesReviewed":[1],"archive":{"file":"docs/research/sources/LIVA_TRAILER_TAX_20261001.pdf","sha256":"f2b5b1770441a6a4e48f3ade408f9ff7a3e9c81bd5d529e52484f49e4a8e91a6"}},
+    {"id":"TELMEX_COMMERCIAL_TERMS","url":"https://downloads.telmex.com/pdf/infoRelevante_Paqueteconectesnegocio.pdf","locator":"Package NI1593013 pages 1-3, version footer V1-020125","textPagesReviewed":[1,2,3,4],"visualPagesReviewed":[1],"archive":{"file":"docs/research/sources/TELMEX_COMMERCIAL_BUNDLE_TERMS_20261001.pdf","sha256":"75453cffdd20b0352c9398b4fc842fb143344b3c4402113889f474e1b520c03e"}},
+    {"id":"TELMEX_BUSINESS_PAGE","url":"https://telmex.com/web/negocios/home_sb_v","locator":"Telefonia + Internet 399/month card, footnotes and advertised validity","archive":{"file":"docs/research/sources/TELMEX_BUSINESS_OFFERS_20261001.html","sha256":"7dd224a58a568f5cf993d11f3bd566139354e53fb6473a198cc3b4f3b50af507"}},
+    {"id":"ASCENDTMS_PRICING","url":"https://www.thefreetms.com/pricing","locator":"Basic/Premium/Pro Monthly Per User Cost; load-board subscription footnote","archive":{"file":"docs/research/sources/ASCENDTMS_PRICING_20261001.html","sha256":"b5f8a2f056dce186b195a0a1fe70890c55a21f43896d41cac82000400b03bd11"}}
+  ],
+  "reusedPins":[
+    {"id":"mxUsedMarket","file":"docs/research/B2_MX_USED_MARKET_COMPARABILITY_2026-10-01.json","sha256":"96eed7e67cf7fdef8b63ec46efaea2e0b0162bbce96144d05f2672bec908ca9b"},
+    {"id":"overhead","file":"docs/research/B1_OVERHEAD_EXPOSURE_BRIDGE_2026-09-29.json","sha256":"587cc5ecb2aaaceaf3de1dd86c56599b3f188eca727a3b536f0e2bc63719eb47"}
+  ],
+  "trailerTaxSensitivity":{
+    "resourceId":"SHARED_TRAILER","newerOfferId":"UTILITY_2021","olderOfferId":"UTILITY_2019",
+    "newerQuoteBasis":"NET_PLUS_VAT_CONFIRMED_IN_PRIOR_CAPTURE","actualOlderQuoteBasis":null,
+    "genericVatRateReference":0.16,"actualApplicableVatRate":null,"actualCreditEligibility":null,
+    "olderQuoteBasisAlternatives":["NET_PLUS_VAT","GROSS_INCLUDES_VAT"],
+    "nonrecoverablePurchaseVatFractionAlternatives":[0,1],
+    "saleVatTreatment":"NET_OF_OUTPUT_VAT_FOR_TAXABLE_ENTERPRISE_SALE",
+    "analogyMonths":24,"analogyBasis":"Two model-year cross-section, not selected holding period or remaining life",
+    "assumptions":["Taxable enterprise purchase/sale at generic 16%, no border incentive, exemption or import regime inferred","Purchase input VAT fully recoverable versus wholly nonrecoverable are analytical alternatives, not taxpayer determinations","Interpret the unresolved older asking amount as before VAT versus VAT-inclusive; neither alternative is certified","Resale contrast excludes output VAT regardless of purchase credit eligibility; no retained sale tax as residual","Older asking price is a current different-unit observation; future condition/market/disposal adjustments remain unknown"],
+    "monthlyCompleteCapitalMxn":null,"netResidualMxn":null,"remainingLifeMonths":null,
+    "selected":false,"eligibleForBudget":false,"chargeFullBoxPerLeg":false
+  },
+  "overheadUnitComponents":[
+    {"economicExpenseId":"MX_OFFICE_COMMS_BUNDLE","sourceIds":["TELMEX_COMMERCIAL_TERMS","TELMEX_BUSINESS_PAGE"],"country":"MX","currency":"MXN","quantityUnit":"commercial-line-month","canonicalFieldsCovered":["Telefonia Fija","Internet"],"publishedGrossUnitPrice":399,"publishedBeforeTaxesUnitPrice":336.9,"publishedTaxBreakdown":null,"economicUnitPrice":null,"quantity":null,"monthlyPoolAmount":null,"claim":"One commercial bundle, not two full charges for phone and internet","recurrence":"MONTHLY","oneTimeInstallationGrossMxn":1600,"packageActivationFeePublishedZero":true,"newLineInstallationInferredZero":false,"promoCreditSelected":false,"advertisedPageValidUntil":"2026-09-30","advertisedPageValidityExpiredAtObservation":true,"contractIndefiniteAfterSubscriptionNotFuturePriceGuarantee":true,"limitations":["Site technology/availability, current price/terms and commercial-use eligibility not confirmed","PDF 80Mbps versus page promotional 120-200Mbps are not silently harmonized","Published before-tax/gross amounts retained; do not assume the only tax is 16% VAT","One-time installation differs from package activation; porting discounts not assumed","Included calls to mobile numbers do not mean a driver's mobile subscription or roaming is paid"],"eligibleForBudget":false},
+    {"economicExpenseId":"TMS_SHARED_POOL","sourceIds":["ASCENDTMS_PRICING"],"country":"US_REFERENCE_NOT_PILOT_LEGAL_LOCATION","currency":"USD","quantityUnit":"licensed-user-month","canonicalFieldsCovered":["Software","Subscriptions"],"planAlternatives":[{"id":"BASIC","publishedUnitPrice":69},{"id":"PREMIUM","publishedUnitPrice":119},{"id":"PRO","publishedUnitPrice":149}],"plansAreAlternativesNotSum":true,"publishedTaxTreatment":null,"economicUnitPrice":null,"quantity":null,"selectedPlan":null,"monthlyPoolAmount":null,"recurrence":"MONTHLY","chargedPerTruck":false,"trialAsRecurringZero":false,"loadBoardSubscriptionsIncluded":false,"limitations":["Pricing page supersedes broad free-start home-page marketing for ongoing price; no universal zero software assumption","User counts, tax treatment, country/functional applicability and service date are unresolved","Third-party paid load-board access can be extra; no activation or purchase performed","Same license bundle appears under Software/Subscriptions but is one expense, not both and not once per MX/US leg"],"eligibleForBudget":false}
+  ],
+  "overheadPolicy":{"method":"BOTTOM_UP_UNIT_COMPONENTS_PLUS_EXPLICIT_QUANTITIES_AND_SINGLE_GROUP_POOL","companyInventoryCount":23,"completeOverhead":false,"adminPayrollIncludedInThesePrices":false,"publicAggregateDistributedArbitrarily":false,"groupMonthlyTotalUsd":null,"shares":null,"fxConversionPerformed":false,"unknownCategoriesDefaultedToZero":false},
+  "outcome":{"calibrated":false,"quoteReady":false,"adoptedValues":0,"cfuUsd":null,"cvuUsd":null,"next":"Complete office/yard and administrative staffing quantities/cost scope with public model evidence, then group budget/exposure/cycle/variables; no generic residual or new-provider loop"}
+}

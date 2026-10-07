@@ -1,0 +1,181 @@
+{
+  "artifact": "FCM_B2_BINATIONAL_BUDGET_WORKSHEET",
+  "casePin": {
+    "file": "docs/research/B2_D2D_READINESS_CASE_2026-09-30.json",
+    "sha256": "a897778d6f907b1041895f9bcace01cd91654cd2cb51dc9abc0570369024d28b"
+  },
+  "selectionPin": {
+    "file": "docs/research/B2_BINATIONAL_OWN_RELAY_SELECTED.json",
+    "sha256": "9e169339515fb467f5207748d3c0676bed1dbb6cfb30b01f0696b56ccfd4a775"
+  },
+  "budget": {
+    "model": "FCM_BINATIONAL_FIXED_BUDGET_V1",
+    "groupReference": "PUBLIC_REFERENCE_BINATIONAL_OWN_RELAY_NOT_IDENTIFIED_CARRIER",
+    "referencePeriod": null,
+    "resources": [
+      {
+        "resourceId": "MX_TRACTOR",
+        "profileReference": null
+      },
+      {
+        "resourceId": "US_TRACTOR",
+        "profileReference": null
+      },
+      {
+        "resourceId": "SHARED_TRAILER",
+        "profileReference": null
+      }
+    ],
+    "evidence": [],
+    "expenses": [
+      {
+        "economicExpenseId": "MX_TRACTOR_CAPITAL",
+        "family": "CAPITAL",
+        "scope": "DIRECT_RESOURCE",
+        "basis": "ECONOMIC_DEPRECIATION_PLUS_INTEREST_ONLY",
+        "allocationRationale": "Direct resource budget; actual amount, inclusions and compatible public model remain pending.",
+        "amount": null,
+        "allocations": [
+          {
+            "resourceId": "MX_TRACTOR",
+            "share": 1
+          }
+        ]
+      },
+      {
+        "economicExpenseId": "MX_TRACTOR_INSURANCE",
+        "family": "INSURANCE",
+        "scope": "DIRECT_RESOURCE",
+        "basis": "PERIOD_PREMIUM_NORMALIZED_ONCE",
+        "allocationRationale": "Direct resource budget; actual amount, inclusions and compatible public model remain pending.",
+        "amount": null,
+        "allocations": [
+          {
+            "resourceId": "MX_TRACTOR",
+            "share": 1
+          }
+        ]
+      },
+      {
+        "economicExpenseId": "MX_TRACTOR_PERMITS",
+        "family": "PERMITS",
+        "scope": "DIRECT_RESOURCE",
+        "basis": "FIXED_PERMITS_EXCLUDES_TRIP_TOLLS",
+        "allocationRationale": "Direct resource budget; actual amount, inclusions and compatible public model remain pending.",
+        "amount": null,
+        "allocations": [
+          {
+            "resourceId": "MX_TRACTOR",
+            "share": 1
+          }
+        ]
+      },
+      {
+        "economicExpenseId": "US_TRACTOR_CAPITAL",
+        "family": "CAPITAL",
+        "scope": "DIRECT_RESOURCE",
+        "basis": "ECONOMIC_DEPRECIATION_PLUS_INTEREST_ONLY",
+        "allocationRationale": "Direct resource budget; actual amount, inclusions and compatible public model remain pending.",
+        "amount": null,
+        "allocations": [
+          {
+            "resourceId": "US_TRACTOR",
+            "share": 1
+          }
+        ]
+      },
+      {
+        "economicExpenseId": "US_TRACTOR_INSURANCE",
+        "family": "INSURANCE",
+        "scope": "DIRECT_RESOURCE",
+        "basis": "PERIOD_PREMIUM_NORMALIZED_ONCE",
+        "allocationRationale": "Direct resource budget; actual amount, inclusions and compatible public model remain pending.",
+        "amount": null,
+        "allocations": [
+          {
+            "resourceId": "US_TRACTOR",
+            "share": 1
+          }
+        ]
+      },
+      {
+        "economicExpenseId": "US_TRACTOR_PERMITS",
+        "family": "PERMITS",
+        "scope": "DIRECT_RESOURCE",
+        "basis": "FIXED_PERMITS_EXCLUDES_TRIP_TOLLS",
+        "allocationRationale": "Direct resource budget; actual amount, inclusions and compatible public model remain pending.",
+        "amount": null,
+        "allocations": [
+          {
+            "resourceId": "US_TRACTOR",
+            "share": 1
+          }
+        ]
+      },
+      {
+        "economicExpenseId": "SHARED_TRAILER_CAPITAL",
+        "family": "CAPITAL",
+        "scope": "DIRECT_RESOURCE",
+        "basis": "ECONOMIC_DEPRECIATION_PLUS_INTEREST_ONLY",
+        "allocationRationale": "Direct resource budget; actual amount, inclusions and compatible public model remain pending.",
+        "amount": null,
+        "allocations": [
+          {
+            "resourceId": "SHARED_TRAILER",
+            "share": 1
+          }
+        ]
+      },
+      {
+        "economicExpenseId": "SHARED_TRAILER_INSURANCE",
+        "family": "INSURANCE",
+        "scope": "DIRECT_RESOURCE",
+        "basis": "PERIOD_PREMIUM_NORMALIZED_ONCE",
+        "allocationRationale": "Direct resource budget; actual amount, inclusions and compatible public model remain pending.",
+        "amount": null,
+        "allocations": [
+          {
+            "resourceId": "SHARED_TRAILER",
+            "share": 1
+          }
+        ]
+      },
+      {
+        "economicExpenseId": "SHARED_TRAILER_PERMITS",
+        "family": "PERMITS",
+        "scope": "DIRECT_RESOURCE",
+        "basis": "FIXED_PERMITS_EXCLUDES_TRIP_TOLLS",
+        "allocationRationale": "Direct resource budget; actual amount, inclusions and compatible public model remain pending.",
+        "amount": null,
+        "allocations": [
+          {
+            "resourceId": "SHARED_TRAILER",
+            "share": 1
+          }
+        ]
+      },
+      {
+        "economicExpenseId": "GROUP_ADMIN_COMPANY_SINGLE_POOL",
+        "family": "ADMIN_AND_COMPANY",
+        "scope": "GROUP_SHARED",
+        "basis": "COMBINED_EMPLOYER_AND_COMPANY_FIXED",
+        "allocationRationale": "One group pool, excluding asset capital/insurance/permits and variable/trip costs; allocation shares need a documented driver, no default equal split.",
+        "amount": null,
+        "allocations": [
+          {
+            "resourceId": "MX_TRACTOR",
+            "share": null
+          },
+          {
+            "resourceId": "US_TRACTOR",
+            "share": null
+          },
+          {
+            "resourceId": "SHARED_TRAILER",
+            "share": null
+          }
+        ]
+      }
+    ]
+  }
+}

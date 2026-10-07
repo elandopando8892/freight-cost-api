@@ -1,0 +1,17 @@
+{
+ "model":"FCM_MX_ORDINARY_DUTY_PILOT_CONTRAST_V1","reviewedAt":"2026-10-02T19:55:22Z",
+ "ordinaryDutyHours":8,"countedBreakHours":0.5,"shiftStartLocalHour":6,"weeklyWorkedDays":6,
+ "weekPhase":"PROSPECTIVE_MONDAY_START_NOT_ACTUAL_SERVICE_DATE",
+ "waitingPolicy":"DECLARED_RELEASE_FROM_DUTY_NOT_OBSERVED_DRIVER_AVAILABILITY",
+ "sourceRefs":["https://www.diputados.gob.mx/LeyesBiblio/pdf/LFT.pdf#ART58_61_63_64_69_TRANSITORY2026","pilotCycle#/movementPolicy","pilotPhysicalCycle#/assumptions","mxDriverForecast#/assumptions"],
+ "assumptions":[
+  "Day0 is a declared Monday06:00 financial planning phase, not the selected service date. Six daytime shifts and a seventh off day, no night work or planned overtime; holidays, actual dispatch windows and full repeated roster not established.",
+  "Each used shift reserves30minutes of break counted in duty (conservative premises restriction hypothesis); task capacity7.5hours. Pause before at most4hours of tasks, so uninterrupted driving never exceeds5hours. Daily shift reset at next06:00; no final fictitious rest when work is complete.",
+  "Load/unload2h, handoff2h and each crossing87minutes reuse existing declared hypotheses. All are MX duty; ideal SAKBE driving time is not observed commercial truck time. Crossings/handling are divisible planning quantities, not executable appointment windows.",
+  "Dedicated same-box wait occurs after MX bobtail south, with explicit prospective driver release; this does not certify release, unpaid waiting entitlement, safe parking or absence of retention wages. Actual paid waiting remains null. Box can wait when the next ordinary shift cannot perform the return handoff immediately.",
+  "MX ordinary schedule changes elapsed resource exposure and compatible financial cycles. Reuse capital MAX allocation, recalculated annual public driver forecast and existing cash/finance replacement functions. US movement clock/distances stay unchanged; US tractor remains attached during return waiting for MX and attends full elapsed handoffs. Add that asset commitment once, not certified US duty compliance or additional measured US driver pay.",
+  "No new km wage, waiting price, overtime wage, minimum guarantee or second operator wage is invented. Annual income references do not prove daily professional minimum or actual fiscal payroll.",
+  "Box distance capacity is recomputed using the new minimum compatible cycle count; do not reuse the old box denominator. Admin, box and MX km compensation remain charged once.",
+  "Gate/yard approach distance and time, full company/insurance/road scope, idle/DEF and actual driver waiting terms remain unknown. This contrast is partial, not a complete cost, bound, quotation or legal certification."
+ ],"quoteReady":false,"adoptedValues":0
+}

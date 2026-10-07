@@ -1,0 +1,97 @@
+{
+  "schema": "fcm.b1.overhead-exposure-evidence.v1",
+  "cutDate": "2026-09-29",
+  "head": "4f5fc2de0c3d178dace917231e1092040dec21fd",
+  "status": "FAMILIES_RECONCILED_PILOT_OVERHEAD_EXPOSURE_INCOMPLETE",
+  "calibrated": false,
+  "quoteReady": false,
+  "adoptedValues": 0,
+  "canonicalInventory": { "documented": 135, "candidate": 3, "contrast": 47, "missingEvidence": 85, "adopted": 0 },
+  "sources": [
+    { "id": "CEAT2025", "url": "https://www.inegi.org.mx/contenidos/programas/eat/2018/doc/CEAT2025.pdf", "locator": "Sections IV/V/VII, PDF pp.4-6", "type": "BLANK_COLLECTION_INSTRUMENT_DEFINITIONS_ONLY", "country": "MX", "referenceYear": 2024, "capture": "DIRECT_PDF_TEXT; EXPENSE_PAGE_5_VISUAL", "sha256": "fa21b2860d78082fba8476011e36722cba85d6fc4c5283f62b9e0f52e3a42ed8" },
+    { "id": "EAT4841_2024_PRIOR_EXTRACTION", "url": "https://www.inegi.org.mx/app/tabulados/interactivos/?bd=EAT&px=EAT_2", "locator": "Dato / SCIAN 4841 / year 2024 / expenses", "type": "PRELIMINARY_NATIONAL_ENTERPRISE_AGGREGATE", "country": "MX", "referenceYear": 2024, "capture": "REUSE_DOCUMENTED_2026_09_29_EXTRACTION_NOT_REFRESHED_THIS_CUT", "artifact": "B1_INEGI_EAT_2024_4841_COST_OBSERVATIONS_2026-09-29.json", "sha256": null },
+    { "id": "ATRI_2025", "url": "https://truckingresearch.org/wp-content/uploads/2025/07/ATRI-Operational-Costs-of-Trucking-07-2025.pdf", "locator": "Figure 27 printed p.53 / PDF56; equipment p.12 / PDF15", "type": "SECTOR_COST_CONTEXT_AND_SEPARATE_NATIONAL_EXPOSURE", "country": "US", "referenceYear": 2024, "capture": "LOCAL_PUBLIC_PDF_TEXT_AND_FIGURE_VISUAL_REVERIFIED", "sha256": "581b91b68a76f232102a63f543eff92bb59c9478556b164d84d2be85118902f8" },
+    { "id": "HEARTLAND_2025", "url": "https://www.sec.gov/Archives/edgar/data/799233/000079923326000006/htld-20251231.htm", "locator": "Results of Operations pp.36-37; consolidated statements p.55; advertising and stock compensation notes", "type": "CARRIER_CONSOLIDATED_COST_CONTEXT", "country": "US", "referenceYear": 2025, "capture": "DIRECT_WEB_RELEVANT_SECTIONS", "sha256": null },
+    { "id": "IMT_PT630", "url": "https://www.imt.mx/archivos/Publicaciones/PublicacionTecnica/pt630.pdf", "locator": "Sections 2.2.8 / 2.2.9, printed p.18 / PDF34", "type": "HISTORICAL_ILLUSTRATIVE_METHOD_NOT_CURRENT_PRICE", "country": "MX", "referenceYear": 2021, "capture": "LOCAL_PUBLIC_PDF_TEXT_AND_VISUAL_REVERIFIED", "sha256": "96d6b5eaded68e0bbaa6bc58e90c7bbbc2dc4d234662f0fef6755a5c77145590" }
+  ],
+  "companyPairs": [
+    { "fieldSuffix": "Agua", "family": "OFFICE_UTILITIES", "sourceDefinition": "K999_UNRESOLVED", "overlap": "Office-only service; no split from unclassified national remainder" },
+    { "fieldSuffix": "Luz", "family": "OFFICE_UTILITIES", "sourceDefinition": "K412", "overlap": "Company-wide electricity includes non-office uses; not one facility price" },
+    { "fieldSuffix": "Telefonia Fija", "family": "COMMUNICATIONS", "sourceDefinition": "K820", "overlap": "Included communications bundle cannot be charged again" },
+    { "fieldSuffix": "Telefonia Celular", "family": "COMMUNICATIONS", "sourceDefinition": "K820", "overlap": "Device/line count and driver/back-office allocation required" },
+    { "fieldSuffix": "Internet", "family": "COMMUNICATIONS", "sourceDefinition": "K820", "overlap": "Same bundle as fixed/mobile services must be reconciled" },
+    { "fieldSuffix": "Renta Patio", "family": "PROPERTY_RENT", "sourceDefinition": "K590", "overlap": "Office/yard lease excluded from vehicle rent and border yard charged separately" },
+    { "fieldSuffix": "Software", "family": "SOFTWARE", "sourceDefinition": "NO_STANDALONE_PUBLIC_AMOUNT", "overlap": "TMS/GPS/subscriptions or capitalized development inclusions" },
+    { "fieldSuffix": "Capacitaciones", "family": "TRAINING", "sourceDefinition": "NO_STANDALONE_PUBLIC_AMOUNT", "overlap": "Training counts are not costs; compensation/border training may include expense" },
+    { "fieldSuffix": "Representacion", "family": "REPRESENTATION", "sourceDefinition": "NO_STANDALONE_PUBLIC_AMOUNT", "overlap": "Sales payroll/commissions and advertising are distinct" },
+    { "fieldSuffix": "Utiles", "family": "OFFICE_SUPPLIES", "sourceDefinition": "K200_PARTIAL", "overlap": "K200 also includes service materials; do not assign all to office" },
+    { "fieldSuffix": "Imprenta", "family": "PRINTING", "sourceDefinition": "K810_OR_K200_UNRESOLVED", "overlap": "Advertising versus office print; count one purpose once" },
+    { "fieldSuffix": "Seguros Otros", "family": "NON_FLEET_INSURANCE", "sourceDefinition": "K060_PARTIAL", "overlap": "Property premiums include vehicles/buildings; exclude fleet premium and payroll insurance" },
+    { "fieldSuffix": "Mant Otros", "family": "NON_VEHICLE_MAINTENANCE", "sourceDefinition": "K950_PARTIAL", "overlap": "Exclude tractor/trailer maintenance and tire blocks" },
+    { "fieldSuffix": "Comb Otros", "family": "NON_LINEHAUL_FUEL", "sourceDefinition": "K421_PARTIAL", "overlap": "Exclude route/empty fuel and lubricants already in maintenance" },
+    { "fieldSuffix": "Depr Otros", "family": "NON_VEHICLE_DEPRECIATION", "sourceDefinition": "NOT_K000", "overlap": "Exclude fleet capital, equipment depreciation and lease principal" },
+    { "fieldSuffix": "Depr Equipos", "family": "OFFICE_EQUIPMENT_DEPRECIATION", "sourceDefinition": "NOT_K000", "overlap": "Do not add asset purchase and its depreciation for the same period" },
+    { "fieldSuffix": "Gestorias", "family": "ADMIN_SERVICE", "sourceDefinition": "K620_OR_K999_UNRESOLVED", "overlap": "Legal, filing, permits and admin payroll require allocation" },
+    { "fieldSuffix": "Office Cleaning", "family": "CLEANING", "sourceDefinition": "K999_PARTIAL", "overlap": "Contracted cleaning service is not automatically supplied-personnel K610" },
+    { "fieldSuffix": "Security", "family": "SECURITY", "sourceDefinition": "K999_PARTIAL", "overlap": "Security in rent/service packages, not route risk reserve" },
+    { "fieldSuffix": "Banking", "family": "BANK_SERVICE", "sourceDefinition": "L000_SCOPE_UNRESOLVED_NOT_K999", "overlap": "Exclude loan interest, FX losses, capital finance and working-capital charges already counted" },
+    { "fieldSuffix": "Legal", "family": "LEGAL_SERVICE", "sourceDefinition": "K620_OR_K999_UNRESOLVED", "overlap": "Exclude payroll legal role and compliance service already charged" },
+    { "fieldSuffix": "Subscriptions", "family": "SUBSCRIPTIONS", "sourceDefinition": "NO_STANDALONE_PUBLIC_AMOUNT", "overlap": "Exclude software/license bundles charged elsewhere" },
+    { "fieldSuffix": "Office Equip", "family": "OFFICE_EQUIPMENT_SERVICE", "sourceDefinition": "K590_OR_NOT_K000_UNRESOLVED", "overlap": "Rental/service is not purchase, depreciation or equipment maintenance" }
+  ],
+  "observations": {
+    "eatPartialCorporateCategories": {
+      "sourceId": "EAT4841_2024_PRIOR_EXTRACTION", "unit": "thousand-MXN/national-enterprise-year",
+      "lineIds": ["electricity", "rentalOfOtherMovableAndImmovableProperty", "advertising", "communications"],
+      "values": [1734264, 1704029, 159633, 870535],
+      "sum": 4468461, "shareOfGoodsServicesExpensesPct": 3.12923675726224,
+      "isCompleteOverhead": false, "isProvenFixedOfficeExpense": false,
+      "matchedFleetKm": null, "matchedFleetVehicleDays": null, "normalizedPilotMonthlyUsd": null
+    },
+    "atriDryVanOtherCosts": {
+      "sourceId": "ATRI_2025", "revenueUsdPerMile": 3.015, "otherCostsShareOfRevenuePct": 28.5,
+      "derivedOtherCostsUsdPerMile": 0.859275, "formula": "3.015 * 28.5 / 100",
+      "unit": "USD/mile", "figureOperatingLossPct": 2.3,
+      "isCompleteAdministrationDefinition": false, "isCfu": false,
+      "matchedSectorAnnualKm": null, "matchedSectorVehicleDays": null,
+      "note": "Rounded chart labels; loss is shown separately below axis. No total-cost reverse engineering or family allocation from the chart."
+    },
+    "atriSeparateNationalExposure": {
+      "sourceId": "ATRI_2025", "annualMilesPerTruck": 82677, "operatingDaysPerTruckYear": 268,
+      "matchesDryVanFigure27Cohort": false, "usedToAnnualizeOtherCosts": false
+    },
+    "heartland": {
+      "sourceId": "HEARTLAND_2025", "unit": "thousand-USD/consolidated-year",
+      "salariesWagesBenefits": 329158, "communicationsUtilities": 8552, "otherOperatingExpenses": 45662,
+      "salarySeparatesDriversOfficeShop": false, "isCompleteAdministrationDefinition": false,
+      "advertisingIncludedInOtherOperatingExpenses": true,
+      "matchedOfficeFleetExposure": null, "normalizedPilotMonthlyUsd": null
+    },
+    "imtCommunications": {
+      "sourceId": "IMT_PT630", "currency": "MXN", "fleetVehicles": 12,
+      "monthlyPrinted": 3000, "annualPrinted": 79200, "annualReconstructed": 36000,
+      "annualTripsPrinted": 1728, "perTripPrinted": 20.83,
+      "annualPrintedMatchesMonthly": false, "isCurrentPilotInput": false
+    },
+    "imtAdministration": {
+      "sourceId": "IMT_PT630", "currency": "MXN", "fleetVehicles": 12,
+      "monthlyFleet": 4000, "annualFleet": 48000,
+      "tripCountPrinted": 1728, "tripPeriodPrinted": "MONTH", "perTripPrinted": 27.77,
+      "perTripIfAnnualTrips": 27.77777777777778,
+      "perTripIfMonthlyTrips": 2.314814814814815,
+      "isTripPeriodResolved": false, "isCurrentPilotInput": false
+    }
+  },
+  "methodDecision": {
+    "adopt": "Existing monthly payroll/capital local contract and max(distance,time) allocator; no new duplicate architecture",
+    "adapt": "Combined overhead requires matching reference period and calendar-month productive vehicle-day cap",
+    "reject": "Annual sector totals / unrelated fleet; Other costs = fixed overhead; split public aggregates into arbitrary Qty/PU",
+    "requiresPrivateXbfInvoices": false,
+    "connectedToActiveQuoteEngine": false,
+    "activeArithmeticChanged": false,
+    "localResearchAuditorChanged": true
+  },
+  "pilotOutput": { "monthlyOverheadMxUsd": null, "monthlyOverheadUsUsd": null, "productiveFleetKmMx": null, "productiveFleetKmUs": null, "productiveVehicleDaysMx": null, "productiveVehicleDaysUs": null, "cfuMxUsd": null, "cfuUsUsd": null },
+  "businessGatesComplete": 0,
+  "externalChanges": { "database": false, "auth": false, "users": false, "infrastructure": false, "deployment": false, "businessOperations": false, "applicationAi": false }
+}

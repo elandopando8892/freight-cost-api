@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MARKSMAN · Referencias y borrador local W1</title><link rel="stylesheet" href="/wizard.css">
+<style>[hidden]{display:none!important}.error:empty{display:none}.ranges .box{margin:0;padding:12px}aside .badge{margin-bottom:12px}.evidence{overflow-wrap:anywhere}.saving{opacity:.7}#unsaved{font-size:12px;color:#484848}#draftValues{overflow-wrap:anywhere}</style>
+<script type="module" src="/wizard.js"></script>
+<style>
+.calibration{margin:20px 0;padding:20px 0;border-bottom:1px solid var(--line)}
+.scale-track{position:relative;margin:0 18px;padding-top:56px;height:106px}
+.scale-rail{position:absolute;top:76px;left:0;right:0;height:4px;background:var(--gray)}
+.scale-track.incomplete .scale-rail{background:repeating-linear-gradient(to right,var(--line) 0 10px,transparent 10px 15px)}
+.scale-tick{position:absolute;top:70px;width:1px;height:16px;background:var(--gray)}
+.standard-marker{position:absolute;top:0;transform:translateX(-50%);text-align:center;max-width:155px;width:max-content;font-size:12px;font-weight:700;line-height:1.25;color:var(--ink);pointer-events:none}
+.standard-marker::after{content:'▼';display:block;color:var(--orange);font-size:20px;margin-top:5px}
+.standard-marker.edge-left{transform:none}.standard-marker.edge-right{transform:translateX(-100%)}
+.scale-control{position:relative;z-index:1;display:block;width:calc(100% + 24px);margin:0 -12px;height:44px;padding:0;appearance:none;-webkit-appearance:none;background:transparent;cursor:pointer}
+.scale-control::-webkit-slider-runnable-track{height:4px;background:transparent}
+.scale-control::-moz-range-track{height:4px;background:transparent}
+.scale-control::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:24px;height:24px;margin-top:-10px;border:3px solid var(--ink);background:var(--paper);border-radius:50%}
+.scale-control::-moz-range-thumb{width:18px;height:18px;border:3px solid var(--ink);background:var(--paper);border-radius:50%}
+.scale-control:disabled{cursor:default;opacity:1}.scale-control:disabled::-webkit-slider-thumb{border-color:var(--gray)}
+.scale-control[data-unlocated=true]::-webkit-slider-thumb{opacity:0}.scale-control[data-unlocated=true]::-moz-range-thumb{opacity:0}
+.scale-labels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.scale-labels button{border:0;background:transparent;padding:8px 0;min-width:0;display:flex;flex-direction:column;gap:3px}
+.scale-labels button:nth-child(2){text-align:center;align-items:center}.scale-labels button:last-child{text-align:right;align-items:flex-end}
+.scale-labels strong{font-size:17px}.scale-labels small{font-size:11px;line-height:1.3;color:var(--gray)}
+.selection-value{margin:18px 0;font-size:17px}.selection-value output{font-weight:700}
+.optional-value{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:12px}
+.optional-value label{margin:0}.optional-value input{margin-top:6px}.optional-value button{min-height:44px}
+@media(max-width:520px){.optional-value{grid-template-columns:1fr}.optional-value button{text-align:center}.standard-marker{font-size:11px;max-width:120px}.scale-labels strong{font-size:14px}.scale-labels small{font-size:10px}.scale-labels button{font-size:12px}.scale-track{margin:0 12px}.selection-value{font-size:15px}}
+</style></head>
+<body><header class="brand"><img src="/logo.png" alt="MARKSMAN · Precision Freight Networks"><span>FREIGHT COST MODEL</span></header>
+<div class="demo"><strong>W1 · REVISIÓN LOCAL</strong> · Referencias documentadas y guardado en archivo. Sin Auth ni base SaaS; no es una versión productiva.</div>
+<div id="notice" role="status" aria-live="polite"></div>
+<main><div class="top"><div><div class="micro">Bases de costo / Armado guiado</div><h1>De la evidencia a tu decisión</h1><p class="muted">D2D binacional · Relevo propio MX/US · Misma caja seca 53′ · Referencia septiembre 2026.</p></div>
+<button id="reloadDraft">Recuperar borrador guardado</button></div>
+<div id="error" class="error" role="alert"></div>
+<div class="workspace"><aside><div class="micro">Borrador de revisión</div><h3>Base binacional</h3><span class="badge" id="revision">Cargando…</span><nav id="cards" aria-label="Conceptos"></nav>
+<div class="section"><p id="progress"></p><p class="muted">Los cambios se guardan sólo al confirmar cada card. Las referencias provisionales conservan sus límites.</p></div></aside>
+<section class="panel" id="panel" aria-label="Concepto seleccionado"><p>Cargando referencias fijadas…</p></section></div>
+<div class="box"><h2>Lo que conserva este borrador</h2><p class="muted">Valores nativos preparados, decisiones y evidencia se guardan juntos. No se aplican al motor ni se activa una base.</p><div id="draftValues"></div>
+<p class="muted">Mantenimiento: referencia compuesta. No se reparte artificialmente entre cantidades y precios de los servicios PM.</p></div></main></body></html>

@@ -1,0 +1,33 @@
+{
+  "model": "FCM_MX_CROSSBORDER_INSURANCE_EXPOSURE_V1",
+  "reviewedAt": "2026-10-03T00:36:10Z",
+  "legalContentAsOf": "2026-10-01",
+  "resourceId": "MX_TRACTOR",
+  "minimumTemporaryCoverageHours": 24,
+  "generalNonhazardousLiabilityLimitUsd": 750000,
+  "operationHypothesis": "MEXICO_DOMICILED_PART368_COMMERCIAL_ZONE_ONLY_NONHAZARDOUS",
+  "temporaryPriceBasis": "HYPOTHETICAL_LINEAR_PRICE_PER24H_BLOCK_NOT_PUBLISHED_PRODUCT_TARIFF",
+  "annualPriceBasis": "ANNUAL_COMMERCIAL_AUTO_LIABILITY_ONLY_NO_DUPLICATE_PHYSICAL_DAMAGE",
+  "temporaryPremiumPer24hUsd": null,
+  "annualPremiumUsd": null,
+  "actualEligibilityVerified": false,
+  "sources": [
+    {"id":"CFR387_7","url":"https://www.ecfr.gov/current/title-49/subtitle-B/chapter-III/subchapter-B/part-387/subpart-A/section-387.7","locator":"(b)(3)(i)-(iii): part368 commercial-zone carrier,24h or longer, insurer387.11 and dated binder/MCS90; (f)-(g) proof on board","capture":"PRIMARY_WEB_READER_NOT_ARCHIVED"},
+    {"id":"CFR387_9","url":"https://www.ecfr.gov/current/title-49/subtitle-B/chapter-III/subchapter-B/part-387/subpart-A/section-387.9","locator":"Table1 entry1: for-hire interstate/foreign, GVWR10001lb or more, nonhazardous property,750000USD; not a premium","capture":"PRIMARY_WEB_READER_NOT_ARCHIVED"},
+    {"id":"QPI_CROSSBORDER","url":"https://www.qualitaspremier.com/Home/Products?lang=en","locator":"COMMERCIAL AUTO/Crossborder: Mexican-domiciled vehicles enteringUS, radiusup to1500mi; basic liability, optional cargo/physicaldamage. Product scope, not rate or availability acceptance","capture":"PRIMARY_WEB_READER_NOT_ARCHIVED"},
+    {"id":"PROGRESSIVE_PACKAGE_SCOPE","url":"https://www.progressivecommercial.com/commercial-auto-insurance/truck-insurance/commercial-truck-insurance-cost/","locator":"2025 transport average926USD/month per powerunit includes liabilityANDphysicaldamage for new policies with no driver violations; no isolatedMXcrossborder liability premium","capture":"PRIMARY_WEB_READER_NOT_ARCHIVED"}
+  ],
+  "assumptions": [
+    "Nonhazardous general cargo and eligible Mexico-domiciled part368 commercial-zone operation are planning hypotheses, not observed authority, shipment classification or legal approval.",
+    "Exposure starts at the beginning of each modeled northbound crossing and ends at the end of its paired southbound crossing. These are conservative task-clock envelopes, not observed US entry/exit. MX-side queues may be included; gate/yard approach is still incomplete.",
+    "Include handoff, overnight pauses and released time inside each incursion; task durations alone cannot establish continuous coverage. A border task split over two duty shifts does not create another incursion.",
+    "Minimum24h equivalent blocks ceil each incursion span/24 are a planning linear-price unit. The law does not prescribe a price,24h sale unit, renewal at midnight or a specific insurer offering. Separate incursions are separately priced for this sensitivity, not a globally optimal purchase.",
+    "Network pairs loadednorth with bobtailsouth. Dedicated additionally pairs bobtailnorth with attachedemptysouth. Do not price four certificates just because there are four bridge movements.",
+    "Annual premium uses existing resource MAX(km/monthlykm, elapsedday/24)/12 once forMXtractor; missing approach changes this conditional share. It is not a year utilization forecast or proof of final full distance.",
+    "Trip and annual are mutually exclusive cost alternatives. Temporary price belongs toCVU, annual allocation toCFU. Do not add both or chargeUStractor/sharedbox again.",
+    "Annual foreign liability excludes a second physical-damage component already modeled domestically.926USD combined domesticUS package cannot supply this price; no arbitrary subtraction or tariff scaling.",
+    "All premiums and compatible complete costs remainnull. No policy/binder purchased, quote requested, form sent, account created or coverage guaranteed."
+  ],
+  "quoteReady": false,
+  "adoptedValues": 0
+}

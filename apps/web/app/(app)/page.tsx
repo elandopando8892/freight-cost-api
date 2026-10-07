@@ -1,12 +1,12 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { ArrowUpRight, CircleDollarSign, Droplets, Layers3, Plus, Sparkles } from 'lucide-react'
-import { api, ApiError } from '@/lib/api'
+import { api } from '@/lib/api'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { RelativeTime } from '@/components/relative-time'
 import { dateKeyInTimeZone } from '@/lib/civil-date'
 import { QuotesChart } from './quotes-chart'
-import { dashboardErrorCopy, section } from '@/lib/dashboard-state'
+import { dashboardErrorCopy, section, type SectionFailure } from '@/lib/dashboard-state'
 
 export const metadata: Metadata = { title: 'Panel de control' }
 export const dynamic = 'force-dynamic'
@@ -67,9 +67,8 @@ interface CarrierOnboarding { completed: number; total: number; ready: boolean }
 const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
 const usdPerGallon = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 3 })
 
-function SectionError({ name, error }: { name: string; error: unknown }) {
-  const status = error instanceof ApiError ? error.status : null
-  const copy = dashboardErrorCopy(status)
+function SectionError({ name, error }: { name: string; error: SectionFailure }) {
+  const copy = dashboardErrorCopy(error.status, error.kind)
   return <div role="alert" className="rounded-md border border-destructive/30 bg-destructive/5 p-4 text-sm">
     <p className="font-medium">{name} no disponible</p>
     <p className="mt-1 text-muted-foreground">{copy.detail}</p>
@@ -226,7 +225,7 @@ export default async function DashboardPage() {
         <CardHeader className="flex flex-row items-baseline justify-between gap-3 border-b pb-4">
           <div>
             <CardTitle className="text-base">Actividad reciente</CardTitle>
-            <CardDescription>Las últimas {recent.length} cotizaciones, de la más reciente a la anterior.</CardDescription>
+            <CardDescription>{quotesSection.error ? 'No se pudo consultar la actividad reciente.' : <>Las últimas {recent.length} cotizaciones, de la más reciente a la anterior.</>}</CardDescription>
           </div>
           {quotes.length > recent.length && (
             <Link href="/quotes" className="text-sm font-medium text-primary hover:underline">

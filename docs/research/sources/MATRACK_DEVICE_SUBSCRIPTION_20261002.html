@@ -1,0 +1,2047 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Matrack - Fleet Tracking</title>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.css" integrity="sha512-kJlvECunwXftkPwyvHbclArO8wszgBGisiLeuDFwNM8ws+wKIw0sv1os3ClWZOcrEB2eRXULYUsm8OVRGJKwGA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+        <style>
+            .site-header{z-index: 101 !important;}
+        </style>
+
+        <!-- <link rel="stylesheet" href="css/popup.css?v=1790978570" />
+        <link rel="stylesheet" href="css/pricing.css?v=1790978570" />
+        <link rel="stylesheet" href="css/common.css?v=1790978570" /> -->
+        <link rel="stylesheet" href="css/fleetstack-ui.css?v=1790978570" />
+
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+        <!-- Google Tag Manager -->
+        <script>
+            (function(w, d, s, l, i) {
+            w[l] = w[l] || [];
+            w[l].push({
+                'gtm.start': new Date().getTime(),
+                event: 'gtm.js'
+            });
+            var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s),
+                dl = l != 'dataLayer' ? '&l=' + l : '';
+            j.async = true;
+            j.src =
+                'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+            f.parentNode.insertBefore(j, f);
+            })(window, document, 'script', 'dataLayer', 'GTM-5K2MW6F3');
+        </script>
+        <!-- End Google Tag Manager -->
+
+        <!-- ViewPulse Analytics -- added on 01/04/2026-->
+        <script>
+            window._vpq = window._vpq || [];
+            (function() {
+            var vp = document.createElement("script");
+            vp.type = "text/javascript";
+            vp.defer = true;
+            vp.src = "https://app.dealerpro.io/viewpulse/projects/6da5dfbc1ff8da2acfa7b23c2357beac.js";
+            document.getElementsByTagName("head")[0].appendChild(vp);
+            })();
+        </script>
+
+        <!-- <script>
+            !function(key) {if (window.reb2b) return;window.reb2b = {loaded: true};var s = document.createElement("script");
+            s.async = true;s.src = "https://ddwl4m2hdecbv.cloudfront.net/b/" + key + "/" + key + ".js.gz";
+            document.getElementsByTagName("script")[0].parentNode.insertBefore(s, document.getElementsByTagName("script")[0]);}("E63P0HYEZGOW");
+        </script> -->
+    </head>
+
+    <body>
+        <!-- Google Tag Manager (noscript) -->
+        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5K2MW6F3" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+        <!-- End Google Tag Manager (noscript) -->
+
+        <!-- Cookiebot CMP - geo-routed (EU/UK opt-in, rest CCPA opt-out). Added 26/08/2026 -->
+<script id="Cookiebot" src="https://consent.cookiebot.com/uc.js"
+        data-cbid="2f30f110-be33-457c-9ca2-637889c8316a"
+        data-georegions="{'region':'AT,BE,BG,HR,CY,CZ,DK,EE,FI,FR,DE,GR,HU,IE,IT,LV,LT,LU,MT,NL,PL,PT,RO,SK,SI,ES,SE,IS,LI,NO,GB','cbid':'c40e7e0c-29ba-4823-a607-24a4ae155691'}"
+        data-blockingmode="auto" type="text/javascript"></script>
+<style>
+    :root {
+        --font-display: "Inter Tight", "Inter", system-ui, sans-serif;
+        --font-body: "Inter", system-ui, sans-serif;
+        --font-mono: "JetBrains Mono", ui-monospace, monospace;
+        --bg: #FFFFFF;
+        --bg-2: #F4F7FB;
+        --bg-3: #E9EFF7;
+        --panel: #FFFFFF;
+        --line: rgba(11, 27, 54, 0.10);
+        --line-2: rgba(11, 27, 54, 0.20);
+        --fg: #0B1B36;
+        --fg-2: #2A3A56;
+        --muted: #5C6B83;
+        --muted-2: #99A4B7;
+        --accent: #0A66C2;
+        --accent-2: #084FA0;
+        --accent-ink: #FFFFFF;
+    }
+    /* Header */
+    .site-header {
+        position: sticky; top: 0; z-index: 40;backdrop-filter: blur(14px);-webkit-backdrop-filter: blur(14px);background: color-mix(in oklab, var(--bg) 78%, transparent);
+        border-bottom: 1px solid var(--line);
+    }
+    .nav-inner {display: flex;align-items: center;gap: 16px;height: 64px;max-width: 1540px;padding: 10px;}
+    .logo {display: inline-flex; align-items: center; gap: 10px;font-family: var(--font-display);font-weight: 600; font-size: 18px;letter-spacing: -0.02em;}
+    .logo-mark {
+        width: 26px; height: 26px;border-radius: 8px;background: var(--accent);display: grid; place-items: center;color: var(--accent-ink);
+        font-family: var(--font-mono);font-weight: 700;font-size: 13px;
+    }
+    .nav-links { display: flex; gap: 4px; margin-left: 12px; flex-wrap: nowrap; }
+    .nav-link {padding: 8px 12px;border-radius: 8px;font-size: 14px;color: var(--fg-2);white-space: nowrap;}
+    .nav-link:hover, .nav-link[aria-current="page"] {background: var(--bg-2);color: var(--fg);}
+    .nav-spacer { flex: 1; }
+
+    @media (max-width: 1180px) {.nav-links { display: none; }}
+    @media (max-width: 1180px) {
+        .mobile-menu-btn { display: inline-flex !important; }
+        .site-header .btn-ghost { display: none !important; }
+        .site-header .ces-badge { display: none !important; }
+        .site-header .svp-link { display: none !important; }
+    }
+    @media (max-width: 1180px) {
+        .site-header .svp-link { display: none !important; }
+    }
+    /* Desktop: pull SecureView Pro into the nav group instead of floating with the right-side CTAs */
+    @media (min-width: 1181px) {
+        .site-header .nav-inner>.nav-spacer {order: 1;}
+        .site-header .nav-inner>.ces-badge {order: 2;}
+        .site-header .nav-inner>.nav-dropdown {order: 3;}
+        .site-header .nav-inner>.header-cta-quote {order: 4;}
+        .site-header .nav-inner>.header-cta-order {order: 5;}
+        .site-header .nav-inner>.mobile-menu-btn {order: 9;}
+        .nav-dropdown {position: relative;display: inline-flex;}
+        .nav-dropdown .nav-dropdown-trigger {display: inline-flex;align-items: center;gap: 6px;cursor: pointer;}
+        .nav-dropdown .nav-dropdown-trigger > * {pointer-events: none;}
+        .nav-dropdown-caret {transition: transform 0.18s ease;}
+        .nav-dropdown.is-open .nav-dropdown-caret {transform: rotate(180deg);}
+        .nav-dropdown-menu {
+            position: absolute;top: calc(100% + 8px);right: 0;min-width: 200px;background: var(--bg, #fff);border: 1px solid var(--line);border-radius: 12px;box-shadow: 0 14px 32px rgba(0, 0, 0, 0.10), 0 2px 6px rgba(0, 0, 0, 0.04);
+            padding: 8px;display: none;flex-direction: column;gap: 2px;z-index: 1000;opacity: 0;transform: translateY(-4px);transition: opacity 0.16s ease, transform 0.16s ease;
+        }
+        .nav-dropdown-item {
+            display: block;padding: 10px 14px;font-size: 14px;color: var(--fg-2);text-decoration: none;border-radius: 8px;white-space: nowrap;
+            transition: background 0.12s ease, color 0.12s ease;
+        }
+        .nav-dropdown-item:hover,.nav-dropdown-item:focus {background: color-mix(in oklab, var(--accent) 12%, transparent);color: var(--accent);}
+        .nav-dropdown.is-open .nav-dropdown-menu {display: flex;opacity: 1;transform: translateY(0);}
+        /* Right-side header CTA spacing */
+        @media (min-width: 1181px) {
+            .site-header .nav-inner > .nav-dropdown, .site-header .nav-inner > .header-cta-quote, .site-header .nav-inner > .header-cta-order {margin-left: 4px;}
+            .site-header .nav-inner > .header-cta-order {margin-left: 6px;}
+        }
+        .site-header .nav-inner>.svp-link {order: 0;margin-left: -20px;padding: 8px 12px !important;font-size: 14px;line-height: 1;color: var(--fg-2);border-radius: 8px;}
+        .site-header .nav-inner>.svp-link:hover {background: var(--bg-2);color: var(--fg);}
+    }
+    .mobile-only-link { display: none; }
+    /* Desktop: pull SecureView Pro into the nav group instead of floating with the right-side CTAs */
+    @media (min-width: 1181px) {
+        .site-header .nav-inner > .nav-spacer { order: 1; }
+        .site-header .nav-inner > .svp-link {order: 0;margin-left: -20px;padding: 8px 12px !important;font-size: 14px;line-height: 1;color: var(--fg-2);border-radius: 8px;}
+        .site-header .nav-inner > .svp-link:hover {background: var(--bg-2);color: var(--fg);}
+    }
+    @media (max-width: 1180px) {
+        .site-header .nav-inner {position: relative;flex-wrap: wrap;}
+        .nav-links.is-open {
+            display: flex !important;flex-direction: column;align-items: stretch;gap: 2px;position: absolute;top: 100%;left: 0;right: 0;margin: 0;
+            padding: 12px;background: var(--bg, #fff);border-top: 1px solid var(--line);border-bottom: 1px solid var(--line);box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);z-index: 1000;
+        }
+        .nav-links.is-open .nav-link {padding: 12px 14px;font-size: 15px;border-radius: 10px;}
+        .nav-links.is-open .mobile-only-link {display: block;}
+        .nav-mobile-group {margin-top: 6px;padding-top: 8px;border-top: 1px solid var(--line);}details.nav-mobile-group {padding: 0;margin-top: 6px;border-top: 1px solid var(--line);}
+        .nav-mobile-label {padding: 6px 14px 4px;font-size: 11px;letter-spacing: 0.1em;color: var(--muted);}
+        summary.nav-mobile-label {
+            display: flex;align-items: center;justify-content: space-between;gap: 10px;padding: 14px 14px;cursor: pointer;
+            list-style: none;color: var(--fg);font-size: 14px;border-radius: 10px;
+        }
+        summary.nav-mobile-label::-webkit-details-marker { display: none; }
+        summary.nav-mobile-label::marker { content: ''; }
+        summary.nav-mobile-label:hover { background: var(--bg-2); }
+        .nav-mobile-caret {transition: transform 0.2s ease;color: var(--muted);}
+        details.nav-mobile-group[open] > summary.nav-mobile-label .nav-mobile-caret {transform: rotate(180deg);}
+        .nav-mobile-group-items {display: flex;flex-direction: column;gap: 2px;padding: 2px 0 6px;}
+        /* Hide desktop dropdowns on mobile; show mobile groups instead */
+        .site-header .nav-inner>.nav-dropdown {display: none;}
+        .mobile-menu-btn[aria-expanded="true"] {background: var(--bg-2) !important;}
+        body.mobile-nav-open {overflow: hidden;}
+    }
+    .foot-col a {text-decoration: none;}
+    /* Buttons */
+    .btn {
+        display: inline-flex;align-items: center;gap: 10px;padding: 14px 22px;border-radius: 999px;font-weight: 500;font-size: 15px;border: 1px solid transparent;background: transparent;
+        color: #0B1B36;transition: transform .15s ease, background .2s ease, border-color .2s ease, color .2s ease;white-space: nowrap;text-decoration: none;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary {background: #0A66C2;color: #FFFFFF;border-color: #0A66C2;}
+    .btn-primary:hover { background: #084FA0; border-color: #084FA0; }
+    .btn-ghost {border-color: rgba(11, 27, 54, 0.20);color: #0B1B36;}
+    .btn-ghost:hover { background:#F4F7FB; border-color: #2A3A56; }
+    .btn-link {padding: 0;color: #0B1B36;border-bottom: 1px solid rgba(11, 27, 54, 0.20);border-radius: 0;}
+    .btn-sm { padding: 9px 14px; font-size: 13px; }
+    .btn-lg { padding: 17px 28px; font-size: 16px; }
+
+    /* Density */
+    [data-density="compact"] section { padding: clamp(40px, 5vw, 70px) 0; }
+    [data-density="compact"] section.tight { padding: clamp(28px, 3vw, 44px) 0; }
+    [data-density="compact"] body { font-size: 15px; }
+    [data-density="compact"] h1 { font-size: clamp(34px, 5vw, 68px); }
+    [data-density="compact"] h2 { font-size: clamp(26px, 3.4vw, 44px); }
+    [data-density="comfortable"] section { padding: clamp(72px, 11vw, 144px) 0; }
+    /* ---- Single-row header: keep everything on one line, right-aligned to the CTAs ----
+           Natural row widths (measured): full 1607px, mild 1478px, strong 1298px, compact ~1150px.
+           The container caps at 1540px, so even the widest screens need the mild tier.
+           Must stay last in this stylesheet: same specificity as the rules above. */
+    @media (min-width: 1181px) {
+        .site-header .nav-inner {flex-wrap: nowrap;}
+        .site-header .nav-inner > * {flex-shrink: 0;}
+        .site-header .btn {white-space: nowrap;}
+    }
+    /* >=1489: mild tightening (full size never fits the 1540px container) */
+    @media (min-width: 1489px) {
+        .site-header .nav-inner {gap: 10px;}
+        .site-header .nav-links {margin-left: 6px;}
+        .site-header .nav-link {padding: 8px 9px;font-size: 14px;}
+        .site-header .btn-sm {padding: 9px 12px;font-size: 12.5px;}
+    }
+    /* 1318-1488: strong tightening */
+    @media (min-width: 1318px) and (max-width: 1488px) {
+        .site-header .nav-inner {gap: 6px;}
+        .site-header .nav-links {margin-left: 2px;gap: 2px;}
+        .site-header .nav-link {padding: 8px 6px;font-size: 13px;}
+        .site-header .btn-sm {padding: 8px 10px;font-size: 12px;gap: 6px;}
+        .site-header .logo img {width: 112px !important;}
+    }
+    /* 1181-1317: compact - the tightest the full row can go before the hamburger takes over */
+    @media (min-width: 1181px) and (max-width: 1317px) {
+        .site-header .nav-inner {gap: 4px;padding: 10px 8px;}
+        .site-header .nav-links {margin-left: 0;gap: 1px;}
+        .site-header .nav-link {padding: 8px 4px;font-size: 12px;}
+        .site-header .btn-sm {padding: 7px 8px;font-size: 11.5px;gap: 5px;}
+        .site-header .nav-dropdown-caret {width: 15px;height: 15px;}
+        .site-header .logo img {width: 100px !important;}
+    }
+</style>
+
+<!-- <script src="/home-page-v1/home-css/app_v_26052026.js"></script> -->
+
+<header class="site-header">
+    <div class="container nav-inner">
+        <a class="logo" href="/" aria-label="Matrack home" style="display: inline-flex; align-items: center; gap: 8px;">
+            <img src="https://d11r79utqzj4rk.cloudfront.net/matrackinc/home-page-v1/image/logo-blue.webp" alt="Matrack" style="width: 130px; height: auto; display: block;">
+        </a>
+        <nav id="primary-nav" class="nav-links" aria-label="Primary">
+            <a class="nav-link" href="/gps-fleet-tracking/">GPS Trackers</a>
+            <a class="nav-link" href="/electronic-logging-devices/">ELD</a>
+            <a class="nav-link" href="/trailer-tracker-device/">Asset Tracker</a>
+            <a class="nav-link" href="/fleet-dash-cam/">Dashcam</a>
+            <a class="nav-link" href="/gauss-video-intelligence/">Matrack Gauss</a>
+            <a class="nav-link" href="/dealerpro/">DealerPro</a>
+            <a class="nav-link" href="/industries/">Industries</a>
+            <a class="nav-link " href="/secureviewpro/">SecureView Pro</a>
+            <a class="nav-link " href="/blogs/">Blogs</a>
+            <details class="mobile-only-link nav-mobile-group">
+                <summary class="nav-mobile-label">
+                    <span>Login</span>
+                    <svg class="nav-mobile-caret" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M6 9l6 6 6-6"></path>
+                    </svg>
+                </summary>
+                <div class="nav-mobile-group-items">
+                    <a class="nav-link" href="https://eld.matrackinc.com/adminNew/view/Login.php">ELD</a>
+                    <a class="nav-link" href="https://www.matrack.io/gpstracking/">GPS Tracking</a>
+                </div>
+            </details>
+            <details class="mobile-only-link nav-mobile-group">
+                <summary class="nav-mobile-label">
+                    <span>Activation</span>
+                    <svg class="nav-mobile-caret" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M6 9l6 6 6-6"></path>
+                    </svg>
+                </summary>
+                <div class="nav-mobile-group-items">
+                    <a class="nav-link" href="https://matrackinc.com/reseller/client/gps-activation/">GPS Activation</a>
+                    <a class="nav-link" href="https://eld.matrackinc.com/Registration/">ELD Activation</a>
+                </div>
+            </details>
+            <a class="nav-link mobile-only-link" href="/quote/">Get a quote</a>
+            <!-- <a class="nav-link mobile-only-link" href="https://matrackinc.com/shopping-cart/">Order Now</a> -->
+        </nav>
+        <div class="nav-spacer"></div>
+        <!-- <a href="/secureviewpro/" class="nav-link svp-link" style="padding: 8px 10px; white-space: nowrap;">SecureView Pro</a>
+        <a href="/blogs/" class="nav-link svp-link" style="padding: 8px 10px; white-space: nowrap;">Blogs</a> -->
+        <div class="nav-dropdown">
+            <button type="button" class="btn btn-ghost btn-sm nav-dropdown-trigger" aria-haspopup="true" aria-expanded="false">
+                <span>Login</span>
+                <svg class="nav-dropdown-caret" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 9l6 6 6-6"></path>
+                </svg>
+            </button>
+            <div class="nav-dropdown-menu" role="menu">
+                <a class="nav-dropdown-item" role="menuitem" href="https://eld.matrackinc.com/adminNew/view/Login.php">ELD</a>
+                <a class="nav-dropdown-item" role="menuitem" href="https://www.matrack.io/gpstracking/">GPS Tracking</a>
+            </div>
+        </div>
+        <div class="nav-dropdown">
+            <button type="button" class="btn btn-ghost btn-sm nav-dropdown-trigger" aria-haspopup="true" aria-expanded="false">
+                <span>Activation</span>
+                <svg class="nav-dropdown-caret" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 9l6 6 6-6"></path>
+                </svg>
+            </button>
+            <div class="nav-dropdown-menu" role="menu">
+                <a class="nav-dropdown-item" role="menuitem" href="https://matrackinc.com/reseller/client/gps-activation/">GPS Activation</a>
+                <a class="nav-dropdown-item" role="menuitem" href="https://eld.matrackinc.com/Registration/">ELD Activation</a>
+                <!-- <a class="nav-dropdown-item" role="menuitem" href="#">Dashcam Activation</a> -->
+            </div>
+        </div>
+        <a class="btn btn-ghost btn-sm header-cta-quote" href="/quote/">Get a quote</a>
+        <a class="btn btn-primary btn-sm header-cta-order" href="https://matrackinc.com/shopping-cart/">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+            Order Now
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14M13 6l6 6-6 6"></path>
+            </svg>
+        </a>
+        <button type="button" id="mobile-menu-btn" aria-label="Menu" aria-controls="primary-nav"
+            aria-expanded="false" class="mobile-menu-btn"
+            style="display: none; background: transparent; border: 1px solid var(--line); border-radius: 10px; padding: 8px; color: var(--fg);">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <path d="M4 7h16M4 12h16M4 17h16"></path>
+            </svg>
+        </button>
+    </div>
+</header>
+
+<script>
+    /* ============================================================
+       Mobile menu — wrapped in DOMContentLoaded so the script
+       works whether this file is included at the top of the page
+       (before the rest of the DOM) or anywhere else in the layout.
+    ============================================================ */
+    document.addEventListener('DOMContentLoaded', function () {
+        (function () {
+            var btn = document.getElementById('mobile-menu-btn');
+            var nav = document.getElementById('primary-nav');
+            if (!btn || !nav) return;
+
+            if (window.__matrackMobileNavBound) return;
+            window.__matrackMobileNavBound = true;
+
+            function setOpen(open) {
+                nav.classList.toggle('is-open', open);
+                btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                document.body.classList.toggle('mobile-nav-open', open);
+            }
+
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                setOpen(!nav.classList.contains('is-open'));
+            });
+
+            nav.addEventListener('click', function (e) {
+                if (e.target.closest('a')) setOpen(false);
+            });
+
+            document.addEventListener('click', function (e) {
+                if (!nav.classList.contains('is-open')) return;
+                if (nav.contains(e.target) || btn.contains(e.target)) return;
+                setOpen(false);
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') setOpen(false);
+            });
+
+            window.addEventListener('resize', function () {
+                if (window.innerWidth > 1180) setOpen(false);
+            });
+        })();
+    });
+
+    /* ============================================================
+       Desktop dropdowns (Login / Activation) — same fix applied.
+       DOMContentLoaded guarantees .nav-dropdown elements exist
+       before querySelectorAll runs, even when the header is
+       PHP-included mid-document in success.php and similar pages.
+    ============================================================ */
+    document.addEventListener('DOMContentLoaded', function () {
+        (function () {
+            var dropdowns = document.querySelectorAll('.nav-dropdown');
+            if (!dropdowns.length) return;
+
+            if (window.__matrackNavDropdownBound) return;
+            window.__matrackNavDropdownBound = true;
+
+            function closeAll(except) {
+                dropdowns.forEach(function (d) {
+                    if (d === except) return;
+                    d.classList.remove('is-open');
+                    var t = d.querySelector('.nav-dropdown-trigger');
+                    if (t) t.setAttribute('aria-expanded', 'false');
+                });
+            }
+
+            dropdowns.forEach(function (d) {
+                var trigger = d.querySelector('.nav-dropdown-trigger');
+                if (!trigger) return;
+                trigger.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var open = !d.classList.contains('is-open');
+                    closeAll(d);
+                    d.classList.toggle('is-open', open);
+                    trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+                });
+            });
+
+            document.addEventListener('click', function (e) {
+                if (!e.target.closest('.nav-dropdown')) closeAll(null);
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') closeAll(null);
+            });
+        })();
+    });
+</script>
+        <div class="fs-products-region" id="fs-products">
+            <!-- ===================== FILTER TABS (full-width sticky bar) ===================== -->
+            <div class="fs-tabs-bar">
+                <div class="fs-wrap fs-tabs-row">
+                    <div class="fs-tabs">
+                        <button class="fs-tab filter-link active" data-filter="all">All Products</button>
+                        <button class="fs-tab filter-link" data-filter="eld">ELD's</button>
+                        <button class="fs-tab filter-link" data-filter="asset">Asset Trackers</button>
+                        <button class="fs-tab filter-link" data-filter="vehicle">Vehicle Trackers</button>
+                        <button class="fs-tab filter-link" data-filter="dashcam">Dashcam</button>
+                        <button class="fs-tab filter-link" data-filter="bundle">Bundles</button>
+                    </div>
+                    <span class="fs-count">Showing 9 products</span>
+                </div>
+            </div>
+
+            <div class="fs-wrap">
+                <!-- ===================== MAIN: products + order summary ===================== -->
+                <div class="fs-main">
+                    <div class="fs-products">
+
+                        <!-- ---------- ELD ---------- -->
+                        <div class="fs-divider" data-group="eld"><span class="lab"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg>ELECTRONIC LOGGING DEVICE</span><span class="ln"></span></div>
+                        <div class="fs-card product-card" data-product-type="eld" data-product-id="7">
+                            <div class="fs-card-media">
+                                <div class="fs-media-img">
+                                    <span class="fs-award-pill"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-award h-3 w-3" aria-hidden="true"><path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"></path><circle cx="12" cy="8" r="6"></circle></svg>
+                                    Forbes Best Affordable ELD 2024</span>
+                                    <a class="fs-img-link" href="https://matrackinc.com/products/matrack-eld/" target="_blank" rel="noopener"><img src="https://matrackinc.com/products/images/eld.webp" alt="Matrack ELD" /></a>
+                                </div>
+                                <div class="fs-media-cap">
+                                    <div class="fs-cats"><span class="fs-cat">Electronic Logging Device</span></div>
+                                    <span class="fs-free">✓ FREE Device with subscription</span>  
+                                    <div class="fs-rating"><span class="stars">★★★★★</span> <b>4.9</b> <span>(1,250+)</span></div>
+                                </div>
+                            </div>
+                            <div class="fs-card-body">
+                                <h3><a class="fs-title-link" href="https://matrackinc.com/products/matrack-eld/" target="_blank" rel="noopener">Matrack ELD</a></h3>
+                                <p class="fs-subhead">Stay DOT Compliant &amp; Avoid $10,000+ Fines — Starts at $0 Device Cost</p>
+                                <p class="fs-desc">MaTrack ELD is fully FMCSA Compliant Electronic Logging Device. It is engineered with Bluetooth Low Energy Technology, draws low power from the main vehicle battery. </p>
+                                <div class="fs-specs">
+                                    <span class="fs-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg></span>&lt;10 min install</span>
+                                    <span class="fs-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/><path d="M22 4v16"/></svg></span>4G LTE</span>
+                                    <span class="fs-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg></span>&lt;3m GPS</span>
+                                    <span class="fs-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>FMCSA ML2-001</span>
+                                </div>
+
+                                <div class="fs-pricewrap">
+                                    <div class="fs-plans-head"><span class="h">Hardware</span><span class="f">FREE<small>with subscription</small></span></div>
+                                    <div class="fs-plans">
+                                                                                <div class="plan-card plan-card-active">
+                                                                                        <span class="plan-card-check"><svg viewBox="0 0 24 24"><path d="M9 16.2 5.5 12.7l1.4-1.4L9 13.4l7.1-7.1 1.4 1.4z"/></svg></span>
+                                                                                        <span class="plan-name">Basic Plan</span>
+                                            <span class="plan-card-price">$19.95<small>/mo each</small></span>
+                                                                                        <ul class="plan-feats"><li>HOS logs</li><li>FMCSA compliance</li></ul>
+                                                                                    </div>
+                                                                                <div class="plan-card ">
+                                                                                        <span class="plan-card-radio"></span>
+                                                                                        <span class="plan-name">Premium Plan<span class="plan-pop">★ POPULAR</span></span>
+                                            <span class="plan-card-price">$24.95<small>/mo each</small></span>
+                                                                                        <ul class="plan-feats"><li><span style="color: #0dcaf0;">All</span> Basic features</li><li><span style="color: #0dcaf0;">Real-time</span> GPS</li><li>IFTA reports</li><li>Alerts</li><li>Highway Portal access</li></ul>
+                                                                                    </div>
+                                                                            </div>
+                                </div>
+
+                                <div class="fs-qtyrow">
+                                    <div>
+                                        <div class="fs-qty-label">Quantity</div>
+                                        <div class="quantity-box">
+                                            <button class="qty-btn decrement" type="button">−</button>
+                                            <span class="qty-value">0</span>
+                                            <button class="qty-btn increment" type="button">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="fs-line-total"><span class="price-main">0.00</span><span class="price-detail">/0 Devices</span></div>
+                                </div>
+
+                                <div class="fs-actions">
+                                    <button type="button" class="fs-addcart" onclick="fsAddToCart(this)">🛒 Add to Cart — FREE Device</button>
+                                    <a class="fs-details" href="https://matrackinc.com/products/matrack-eld/" target="_blank" rel="noopener">View Full Details →</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- ---------- ASSET TRACKERS (1, 26) ---------- -->
+                        <div class="fs-divider" data-group="asset"><span class="lab"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>ASSET TRACKERS</span><span class="ln"></span></div>
+                        <div class="fs-card product-card" data-product-type="asset" data-product-id="1">
+                            <div class="fs-card-media">
+                                <div class="fs-media-img navy">
+                                    <a class="fs-img-link" href="https://matrackinc.com/products/ma-asset-classic/" target="_blank" rel="noopener"><img src="https://matrackinc.com/products/images/asset_3.webp" alt="MA Asset Classic" /></a>
+                                </div>
+                                <div class="fs-media-cap">
+                                    <div class="fs-cats"><span class="fs-cat">Asset Trackers</span></div>
+                                    <div class="fs-rating"><span class="stars">★★★★★</span> <b>4.9</b> <span>(1,250+)</span></div>
+                                </div>
+                            </div>
+                            <div class="fs-card-body">
+                                <h3><a class="fs-title-link" href="https://matrackinc.com/products/ma-asset-classic/" target="_blank" rel="noopener">MA Asset Classic</a></h3>
+                                <p class="fs-subhead">Never Lose a Trailer Again — 10-Year Battery</p>
+                                <p class="fs-desc">The MA-Asset Classic is considered to be our standard in the world of asset tracking systems, simple sturdy and with enduring battery power, this piece of equipment practically sells itself.</p>
+                                <div class="fs-specs">
+                                    <span class="fs-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="10" x="2" y="7" rx="2" ry="2"/><line x1="22" x2="22" y1="11" y2="13"/></svg></span>Backup battery</span>
+                                    <span class="fs-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg></span>IP67 sealed</span>
+                                    <span class="fs-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg></span>Real-time GPS</span>
+                                </div>
+                                <div class="fs-pricewrap">
+                                    <div class="fs-pricebox">
+                                        <div class="col">
+                                            <div class="fs-pl">Device Price</div>
+                                            <div><span class="fs-pv price-value-once-maa">$50</span></div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="fs-pl">Monthly Plan</div>
+                                            <div><span class="fs-pv price-value-month-maa">$11.95</span><span class="fs-pu">/mo</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fs-qtyrow">
+                                    <div>
+                                        <div class="fs-qty-label">Quantity</div>
+                                        <div class="quantity-box">
+                                            <button class="qty-btn decrement-maa" type="button">−</button>
+                                            <span class="qty-value-maa">0</span>
+                                            <button class="qty-btn increment-maa" type="button">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="fs-line-total"><span class="price-main-maa">0.00</span><span class="price-details-maa">/0 Devices</span></div>
+                                </div>
+                                <div class="fs-actions">
+                                    <button type="button" class="fs-addcart" onclick="fsAddToCart(this)">🛒 Add to Cart — $50</button>
+                                    <a class="fs-details" href="https://matrackinc.com/products/ma-asset-classic/" target="_blank" rel="noopener">View Full Details →</a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <div class="fs-card product-card" data-product-type="asset" data-product-id="26">
+                            <div class="fs-card-media">
+                                <div class="fs-media-img navy">
+                                    <a class="fs-img-link" href="https://matrackinc.com/products/ma-asset-classic-3yr/" target="_blank" rel="noopener">
+                                        <img src="	https://matrackinc.com/products/images/asset_3.webp" alt="MA Asset Classic ">
+                                    </a>
+                                </div>
+                                <div class="fs-media-cap">
+                                    <div class="fs-cats"><span class="fs-cat">Asset Trackers</span></div>
+                                    <div class="fs-rating"><span class="stars">★★★★★</span> <b>4.9</b> <span>(1,250+)</span></div>
+                                </div>
+                            </div>
+                            <div class="fs-card-body">
+                                <h3><a class="fs-title-link" href="https://matrackinc.com/products/ma-asset-classic-3yr/" target="_blank" rel="noopener">MA Asset Classic </a></h3>
+                                <p class="fs-subhead">3 Years of Tracking, $0 Monthly Bills — One Flat $149</p>
+                                <p class="fs-desc">The MA-Asset Classic is considered to be our standard in the world of asset tracking systems, simple sturdy and with enduring battery power, this piece of equipment practically sells itself.</p>
+                                <div class="fs-specs">
+                                    <span class="fs-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="10" x="2" y="7" rx="2" ry="2"/><line x1="22" x2="22" y1="11" y2="13"/></svg></span>Backup battery</span>
+                                    <span class="fs-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg></span>IP67 sealed</span>
+                                    <span class="fs-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg></span>Real-time GPS</span>
+                                </div>
+                                <div class="fs-pricewrap">
+                                    <div class="fs-pricebox">
+                                        <div class="col">
+                                            <div class="fs-pl">Device Price</div>
+                                            <div><span class="fs-pv price-value-once-maa">$149</span></div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="fs-pl">3-Yr Built-in Sub</div>
+                                            <div class="fs-incl">Included with device</div>
+                                            <span class="price-value-month-maa" style="position:absolute;left:-9999px">$0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fs-qtyrow">
+                                    <div>
+                                        <div class="fs-qty-label">Quantity</div>
+                                        <div class="quantity-box">
+                                            <button class="qty-btn decrement-maa" type="button">−</button>
+                                            <span class="qty-value-maa">0</span>
+                                            <button class="qty-btn increment-maa" type="button">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="fs-line-total"><span class="price-main-maa">0.00</span><span class="price-details-maa">/0 Devices</span></div>
+                                </div>
+                                <div class="fs-actions">
+                                    <button type="button" class="fs-addcart" onclick="fsAddToCart(this)">🛒 Add to Cart — $149 All-In</button>
+                                    <a class="fs-details" href="https://matrackinc.com/products/ma-asset-classic-3yr/" target="_blank" rel="noopener">View Full Details →</a>
+                                </div>
+                            </div>
+                        </div> -->
+                        
+                        <!-- ---------- VEHICLE TRACKERS (2, 3, 4) ---------- -->
+                        <div class="fs-divider" data-group="vehicle"><span class="lab"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>VEHICLE TRACKERS</span><span class="ln"></span></div>
+                        <div class="fs-card product-card" data-product-type="vehicle" data-product-id="2">
+                            <div class="fs-card-media">
+                                <div class="fs-media-img navy">
+                                    <a class="fs-img-link" href="https://matrackinc.com/products/matrack-obd/" target="_blank" rel="noopener">
+                                        <img src="https://matrackinc.com/shopping-cart/images-shop/device4.png" alt="Matrack OBD" />
+                                    </a>
+                                </div>
+                                <div class="fs-media-cap">
+                                    <div class="fs-cats"><span class="fs-cat">Asset Trackers</span><span class="fs-cat">Vehicle Trackers</span></div>      
+                                    <div class="fs-rating"><span class="stars">★★★★★</span> <b>4.9</b> <span>(1,250+)</span></div>
+                                </div>
+                            </div>
+                            <div class="fs-card-body">
+                                <h3><a class="fs-title-link" href="https://matrackinc.com/products/matrack-obd/" target="_blank" rel="noopener">Matrack OBD</a></h3>
+                                <p class="fs-subhead">Plug-In Vehicle Tracking in Under 30 Seconds</p>
+                                <p class="fs-desc">An excellent means for tracking any vehicle. It is completely integrated with the On Board Diagnostics system so you can stay on top of Vehicle Health/Performance issues.</p>
+                                <div class="fs-specs">
+                                    <span class="fs-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/></svg></span>Hardwired / OBD</span>
+                                    <span class="fs-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/><path d="M22 4v16"/></svg></span>4G LTE</span>
+                                    <span class="fs-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg></span>Real-time GPS</span>
+                                </div>
+                                <div class="fs-pricewrap">
+                                    <div class="fs-pricebox">
+                                        <div class="col">
+                                            <div class="fs-pl">Device Price</div>
+                                            <div><span class="fs-pv price-value-once-vt">$85</span></div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="fs-pl">Monthly Plan</div>
+                                            <div><span class="fs-pv price-value-month-vt">$14.95</span><span class="fs-pu">/mo</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fs-qtyrow">
+                                    <div>
+                                        <div class="fs-qty-label">Quantity</div>
+                                        <div class="quantity-box">
+                                            <button class="qty-btn decrement-vt" type="button">−</button>
+                                            <span class="qty-value-vt">0</span>
+                                            <button class="qty-btn increment-vt" type="button">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="fs-line-total"><span class="price-main-vt">0.00</span><span class="price-details-vt">/0 Devices</span></div>
+                                </div>
+                                <div class="fs-actions">
+                                    <button type="button" class="fs-addcart" onclick="fsAddToCart(this)">🛒 Add to Cart — $85</button>
+                                    <a class="fs-details" href="https://matrackinc.com/products/matrack-obd/" target="_blank" rel="noopener">View Full Details →</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="fs-card product-card" data-product-type="vehicle" data-product-id="3">
+                            <div class="fs-card-media">
+                                <div class="fs-media-img navy">
+                                    <a class="fs-img-link" href="https://matrackinc.com/products/ma-hardwire-classic/" target="_blank" rel="noopener"><img src="https://matrackinc.com/products/images/hardwire_classic.webp" alt="MA Hardwire Classic" /></a>
+                                </div>
+                                <div class="fs-media-cap">
+                                    <div class="fs-cats"><span class="fs-cat">Asset Trackers</span><span class="fs-cat">Vehicle Trackers</span></div>      
+                                    <div class="fs-rating"><span class="stars">★★★★★</span> <b>4.9</b> <span>(1,250+)</span></div>
+                                </div>
+                            </div>
+                            <div class="fs-card-body">
+                                <h3><a class="fs-title-link" href="https://matrackinc.com/products/ma-hardwire-classic/" target="_blank" rel="noopener">MA Hardwire Classic</a></h3>
+                                <p class="fs-subhead">Tamper-Resistant Tracking Drivers Can&#039;t Disable</p>
+                                <p class="fs-desc">A discreet, tamper resistant device specialized for Fleets and Transport Services.</p>
+                                <div class="fs-specs">
+                                    <span class="fs-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/></svg></span>Hardwired / OBD</span>
+                                    <span class="fs-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/><path d="M22 4v16"/></svg></span>4G LTE</span>
+                                    <span class="fs-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg></span>Real-time GPS</span>
+                                </div>
+                                <div class="fs-pricewrap">
+                                    <div class="fs-pricebox">
+                                        <div class="col">
+                                            <div class="fs-pl">Device Price</div>
+                                            <div><span class="fs-pv price-value-once-vt">$50</span></div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="fs-pl">Monthly Plan</div>
+                                            <div><span class="fs-pv price-value-month-vt">$14.95</span><span class="fs-pu">/mo</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fs-qtyrow">
+                                    <div>
+                                        <div class="fs-qty-label">Quantity</div>
+                                        <div class="quantity-box">
+                                            <button class="qty-btn decrement-vt" type="button">−</button>
+                                            <span class="qty-value-vt">0</span>
+                                            <button class="qty-btn increment-vt" type="button">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="fs-line-total"><span class="price-main-vt">0.00</span><span class="price-details-vt">/0 Devices</span></div>
+                                </div>
+                                <div class="fs-actions">
+                                    <button type="button" class="fs-addcart" onclick="fsAddToCart(this)">🛒 Add to Cart — $50</button>
+                                    <a class="fs-details" href="https://matrackinc.com/products/ma-hardwire-classic/" target="_blank" rel="noopener">View Full Details →</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="fs-card product-card" data-product-type="vehicle" data-product-id="4">
+                            <div class="fs-card-media">
+                                <div class="fs-media-img navy">
+                                    <a class="fs-img-link" href="https://matrackinc.com/products/ma-hardwire-silver/" target="_blank" rel="noopener"><img src="https://matrackinc.com/products/images/hardwired-silver.webp" alt="MA Hardwire Silver" /></a>
+                                </div>
+                                <div class="fs-media-cap">
+                                    <div class="fs-cats"><span class="fs-cat">Asset Trackers</span><span class="fs-cat">Vehicle Trackers</span></div>      
+                                    <div class="fs-rating"><span class="stars">★★★★★</span> <b>4.9</b> <span>(1,250+)</span></div>
+                                </div>
+                            </div>
+                            <div class="fs-card-body">
+                                <h3><a class="fs-title-link" href="https://matrackinc.com/products/ma-hardwire-silver/" target="_blank" rel="noopener">MA Hardwire Silver</a></h3>
+                                <p class="fs-subhead">Weatherproof Security for High-Value Assets</p>
+                                <p class="fs-desc">Our weather-proof Hardwired Tracker is a sophisticated and convenient tool for making sure your property is safe.</p>
+                                <div class="fs-specs">
+                                    <span class="fs-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/></svg></span>Hardwired / OBD</span>
+                                    <span class="fs-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/><path d="M22 4v16"/></svg></span>4G LTE</span>
+                                    <span class="fs-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg></span>Real-time GPS</span>
+                                </div>
+                                <div class="fs-pricewrap">
+                                    <div class="fs-pricebox">
+                                        <div class="col">
+                                            <div class="fs-pl">Device Price</div>
+                                            <div><span class="fs-pv price-value-once-vt">$135</span></div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="fs-pl">Monthly Plan</div>
+                                            <div><span class="fs-pv price-value-month-vt">$14.95</span><span class="fs-pu">/mo</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fs-qtyrow">
+                                    <div>
+                                        <div class="fs-qty-label">Quantity</div>
+                                        <div class="quantity-box">
+                                            <button class="qty-btn decrement-vt" type="button">−</button>
+                                            <span class="qty-value-vt">0</span>
+                                            <button class="qty-btn increment-vt" type="button">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="fs-line-total"><span class="price-main-vt">0.00</span><span class="price-details-vt">/0 Devices</span></div>
+                                </div>
+                                <div class="fs-actions">
+                                    <button type="button" class="fs-addcart" onclick="fsAddToCart(this)">🛒 Add to Cart — $135</button>
+                                    <a class="fs-details" href="https://matrackinc.com/products/ma-hardwire-silver/" target="_blank" rel="noopener">View Full Details →</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- ---------- BUNDLES: Dashcam + ELD (21, 22) ---------- -->
+                        <div class="fs-divider" data-group="bundle"><span class="lab"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg>BUNDLES — DASHCAM + ELD</span><span class="ln"></span></div>
+                        <div class="fs-card product-card" data-product-type="dashcam-eld bundle" data-product-id="21">
+                            <div class="fs-card-media">
+                                <div class="fs-media-img navy">
+                                    <a class="fs-img-link" href="https://matrackinc.com/products/dashcam-eld-basic-combo/" target="_blank" rel="noopener"><img src="https://matrackinc.com/products/images/eld-dashcam-combo1.webp" alt="Dashcam + ELD Basic Combo" /></a>
+                                </div>
+                                <div class="fs-media-cap">
+                                    <div class="fs-cats"><span class="fs-cat">ELD</span><span class="fs-cat">Dashcam</span></div>
+                                    <div class="fs-rating"><span class="stars">★★★★★</span> <b>4.9</b> <span>(1,250+)</span></div>
+                                </div>
+                            </div>
+                            <div class="fs-card-body">
+                                <h3><a class="fs-title-link" href="https://matrackinc.com/products/dashcam-eld-basic-combo/" target="_blank" rel="noopener">Dashcam + ELD Basic Combo</a></h3>
+                                <p class="fs-subhead">HOS Compliance + Road Footage, One Box</p>
+                                <p class="fs-desc">MaTrack ELD is fully FMCSA Compliant Electronic Logging Device. It is engineered with Bluetooth Low Energy Technology, draws low power from the main vehicle battery. </p>
+                                <div class="fs-specs">
+                                    <span class="fs-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg></span>Dashcam + ELD</span>
+                                    <span class="fs-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg></span>Cloud clips</span>
+                                    <span class="fs-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>FMCSA compliant</span>
+                                </div>
+                                <div class="fs-pricewrap">
+                                    <div class="fs-pricebox">
+                                        <div class="col">
+                                            <div class="fs-pl">Device Price</div>
+                                            <div><span class="fs-pv price-value-once-dashcam-eld">$99</span></div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="fs-pl">Monthly Plan</div>
+                                            <div><span class="fs-pv price-value-month-dashcam-eld">$34.95</span><span class="fs-pu">/mo</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fs-qtyrow">
+                                    <div>
+                                        <div class="fs-qty-label">Quantity</div>
+                                        <div class="quantity-box">
+                                            <button class="qty-btn decrement-dashcam-eld" type="button">−</button>
+                                            <span class="qty-value-dashcam-eld">0</span>
+                                            <button class="qty-btn increment-dashcam-eld" type="button">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="fs-line-total"><span class="price-main-dashcam-eld">0.00</span><span class="price-details-dashcam-eld">/0 Devices</span></div>
+                                </div>
+                                <div class="fs-actions">
+                                    <button type="button" class="fs-addcart" onclick="fsAddToCart(this)">🛒 Add to Cart — $99</button>
+                                    <a class="fs-details" href="https://matrackinc.com/products/dashcam-eld-basic-combo/" target="_blank" rel="noopener">View Full Details →</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="fs-card product-card" data-product-type="dashcam-eld bundle" data-product-id="22">
+                            <div class="fs-card-media">
+                                <div class="fs-media-img navy">
+                                    <a class="fs-img-link" href="https://matrackinc.com/products/dashcam-eld-premium-combo/" target="_blank" rel="noopener"><img src="https://matrackinc.com/products/images/eld-dashcam-combo1.webp" alt="Dashcam + ELD Premium Combo" /></a>
+                                </div>
+                                <div class="fs-media-cap">
+                                    <div class="fs-cats"><span class="fs-cat">ELD</span><span class="fs-cat">Dashcam</span></div>
+                                    <div class="fs-rating"><span class="stars">★★★★★</span> <b>4.9</b> <span>(1,250+)</span></div>
+                                </div>
+                            </div>
+                            <div class="fs-card-body">
+                                <h3><a class="fs-title-link" href="https://matrackinc.com/products/dashcam-eld-premium-combo/" target="_blank" rel="noopener">Dashcam + ELD Premium Combo</a></h3>
+                                <p class="fs-subhead">Full Compliance, Full Coverage, Zero Gaps</p>
+                                <p class="fs-desc">MaTrack ELD is fully FMCSA Compliant Electronic Logging Device. It is engineered with Bluetooth Low Energy Technology, draws low power from the main vehicle battery. </p>
+                                <div class="fs-specs">
+                                    <span class="fs-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg></span>Dashcam + ELD</span>
+                                    <span class="fs-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg></span>Cloud clips</span>
+                                    <span class="fs-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>FMCSA compliant</span>
+                                </div>
+                                <div class="fs-pricewrap">
+                                    <div class="fs-pricebox">
+                                        <div class="col">
+                                            <div class="fs-pl">Device Price</div>
+                                            <div><span class="fs-pv price-value-once-dashcam-eld">$99</span></div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="fs-pl">Monthly Plan</div>
+                                            <div><span class="fs-pv price-value-month-dashcam-eld">$39.95</span><span class="fs-pu">/mo</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fs-qtyrow">
+                                    <div>
+                                        <div class="fs-qty-label">Quantity</div>
+                                        <div class="quantity-box">
+                                            <button class="qty-btn decrement-dashcam-eld" type="button">−</button>
+                                            <span class="qty-value-dashcam-eld">0</span>
+                                            <button class="qty-btn increment-dashcam-eld" type="button">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="fs-line-total"><span class="price-main-dashcam-eld">0.00</span><span class="price-details-dashcam-eld">/0 Devices</span></div>
+                                </div>
+                                <div class="fs-actions">
+                                    <button type="button" class="fs-addcart" onclick="fsAddToCart(this)">🛒 Add to Cart — $99</button>
+                                    <a class="fs-details" href="https://matrackinc.com/products/dashcam-eld-premium-combo/" target="_blank" rel="noopener">View Full Details →</a>
+                                </div>
+                            </div>
+                        </div>
+                                                
+                        <!-- ---------- DASHCAM (19) ---------- -->
+                        <div class="fs-divider" data-group="dashcam"><span class="lab"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>DASHCAM</span><span class="ln"></span></div>
+                        <div class="fs-card product-card" data-product-type="dashcam" data-product-id="19">
+                            <div class="fs-card-media">
+                                <div class="fs-media-img navy">
+                                    <a class="fs-img-link" href="https://matrackinc.com/products/ai-dashcam-m4000/" target="_blank" rel="noopener"><img src="https://matrackinc.com/shopping-cart/images-shop/dashcam-M4000.png" alt="AI Dashcam M4000" /></a>
+                                </div>
+                                <div class="fs-media-cap">
+                                    <div class="fs-cats"><span class="fs-cat">AI Dashcam</span></div>
+                                    <div class="fs-rating"><span class="stars">★★★★★</span> <b>4.9</b> <span>(1,250+)</span></div>
+                                </div>
+                            </div>
+                            <div class="fs-card-body">
+                                <h3><a class="fs-title-link" href="https://matrackinc.com/products/ai-dashcam-m4000/" target="_blank" rel="noopener">AI Dashcam M4000</a></h3>
+                                <p class="fs-subhead">Exoneration-Grade Footage on Every Trip</p>
+                                <p class="fs-desc">Matrack&#039;s AI enabled fleet dash cam for world-class safety programs - a must for your fleet management.</p>
+                                <div class="fs-specs">
+                                    <span class="fs-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg></span>AI DMS + ADAS</span>
+                                    <span class="fs-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg></span>Cloud storage</span>
+                                    <span class="fs-chip"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/><path d="M22 4v16"/></svg></span>4G LTE</span>
+                                </div>
+                                <div class="fs-pricewrap">
+                                    <div class="fs-pricebox">
+                                        <div class="col">
+                                            <div class="fs-pl">Device Price</div>
+                                            <div><span class="fs-pv price-value-once-dashcam">$99</span></div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="fs-pl">Monthly Plan</div>
+                                            <div><span class="fs-pv price-value-month-dashcam">$19.95</span><span class="fs-pu">/mo</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fs-qtyrow">
+                                    <div>
+                                        <div class="fs-qty-label">Quantity</div>
+                                        <div class="quantity-box">
+                                            <button class="qty-btn decrement-dashcam" type="button">−</button>
+                                            <span class="qty-value-dashcam">0</span>
+                                            <button class="qty-btn increment-dashcam" type="button">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="fs-line-total"><span class="price-main-dashcam">0.00</span><span class="price-details-dashcam">/0 Devices</span></div>
+                                </div>
+                                <div class="fs-actions">
+                                    <button type="button" class="fs-addcart" onclick="fsAddToCart(this)">🛒 Add to Cart — $99</button>
+                                    <a class="fs-details" href="https://matrackinc.com/products/ai-dashcam-m4000/" target="_blank" rel="noopener">View Full Details →</a>
+                                </div>
+                            </div>
+                        </div>
+                                                
+                    </div><!-- /fs-products -->
+
+                    <!-- ===================== ORDER SUMMARY ===================== -->
+                    <aside>
+                        <div class="fs-summary">
+                            <button type="button" class="fs-drawer-close" aria-label="Close cart" onclick="fsCloseCart()">×</button>
+                            <div class="fs-sum-head">
+                                <span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 3h2l2.4 12.3a1 1 0 0 0 1 .8h9.2a1 1 0 0 0 1-.8L21 7H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.6" fill="currentColor"/><circle cx="18" cy="20" r="1.6" fill="currentColor"/></svg></span>
+                                YOUR ORDER
+                            </div>
+
+                            <div id="fs-empty" class="fs-empty">
+                                <div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M3 3h2l2.4 12.3a1 1 0 0 0 1 .8h9.2a1 1 0 0 0 1-.8L21 7H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.6" fill="currentColor"/><circle cx="18" cy="20" r="1.6" fill="currentColor"/></svg></div>
+                                <div class="t">Your cart is empty.</div>
+                                <div class="s">Add a device to start building your fleet stack.</div>
+                            </div>
+
+                            <div id="fs-filled" style="display:none">
+                                <div class="cart-table">
+                                                                                                            <div data-product-id="7"><img class="fs-line-img" src="https://matrackinc.com/products/images/eld.webp" alt=""><span class="fs-line-name">Matrack ELD <span class="text-muted">x0</span></span><span class="fs-line-price">$0.00</span></div>
+                                                                        <div data-product-id="1"><img class="fs-line-img" src="https://matrackinc.com/products/images/asset_3.webp" alt=""><span class="fs-line-name">MA Asset Classic <span class="text-muted">x0</span></span><span class="fs-line-price">$0.00</span></div>
+                                                                        <div data-product-id="26"><img class="fs-line-img" src="	https://matrackinc.com/products/images/asset_3.webp" alt=""><span class="fs-line-name">MA Asset Classic  <span class="text-muted">x0</span></span><span class="fs-line-price">$0.00</span></div>
+                                                                        <div data-product-id="2"><img class="fs-line-img" src="https://matrackinc.com/shopping-cart/images-shop/device4.png" alt=""><span class="fs-line-name">Matrack OBD <span class="text-muted">x0</span></span><span class="fs-line-price">$0.00</span></div>
+                                                                        <div data-product-id="3"><img class="fs-line-img" src="https://matrackinc.com/products/images/hardwire_classic.webp" alt=""><span class="fs-line-name">MA Hardwire Classic <span class="text-muted">x0</span></span><span class="fs-line-price">$0.00</span></div>
+                                                                        <div data-product-id="4"><img class="fs-line-img" src="https://matrackinc.com/products/images/hardwired-silver.webp" alt=""><span class="fs-line-name">MA Hardwire Silver <span class="text-muted">x0</span></span><span class="fs-line-price">$0.00</span></div>
+                                                                        <div data-product-id="21"><img class="fs-line-img" src="https://matrackinc.com/products/images/eld-dashcam-combo1.webp" alt=""><span class="fs-line-name">Dashcam + ELD Basic Combo <span class="text-muted">x0</span></span><span class="fs-line-price">$0.00</span></div>
+                                                                        <div data-product-id="22"><img class="fs-line-img" src="https://matrackinc.com/products/images/eld-dashcam-combo1.webp" alt=""><span class="fs-line-name">Dashcam + ELD Premium Combo <span class="text-muted">x0</span></span><span class="fs-line-price">$0.00</span></div>
+                                                                        <div data-product-id="19"><img class="fs-line-img" src="https://matrackinc.com/shopping-cart/images-shop/dashcam-M4000.png" alt=""><span class="fs-line-name">AI Dashcam M4000 <span class="text-muted">x0</span></span><span class="fs-line-price">$0.00</span></div>
+                                    
+                                    <div><span class="fs-line-name">Shipping</span><span class="fs-line-price">$0.00</span></div>
+                                </div>
+
+                                <div class="fs-sum-rule"></div>
+                                <div class="fs-totline"><span>Hardware subtotal</span><b class="device-total">$0.00</b></div>
+                                <div class="fs-totline green"><span>Monthly total</span><b class="monthly-total">$0.00</b></div>
+                                <div class="fs-sum-rule"></div>
+                                <div class="fs-due"><span class="l">Due Today</span><span class="v total-price">$0.00</span></div>
+                                <button class="checkout-btn" type="button" onclick="proceedToCheckout()">
+                                    Proceed to Checkout <span style="font-size:18px;line-height:1">›</span>
+                                    <span class="total-price" style="display:none"></span>
+                                </button>
+                            </div>
+
+                            <ul class="fs-checklist">
+                                <li><span class="ck">✓</span> 30-day risk-free trial</li>
+                                <li><span class="ck">✓</span> No long-term contract</li>
+                                <li><span class="ck">✓</span> Ships within 48 hours</li>
+                                <li><span class="ck">✓</span> 24/7 US-based support</li>
+                            </ul>
+                        </div>
+                    </aside>
+                </div><!-- /fs-main -->
+            </div><!-- /fs-wrap -->
+        </div><!-- /fs-products-region -->
+
+        <!-- ===================== MOBILE FLOATING CART ===================== -->
+        <button type="button" class="fs-cart-fab" id="fsCartFab" aria-label="Open your order" onclick="fsOpenCart()">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M3 3h2l2.4 12.3a1 1 0 0 0 1 .8h9.2a1 1 0 0 0 1-.8L21 7H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.6" fill="currentColor"/><circle cx="18" cy="20" r="1.6" fill="currentColor"/></svg>
+            <span class="fs-fab-count" id="fsFabCount">0</span>
+        </button>
+        <div class="fs-cart-backdrop" id="fsCartBackdrop" onclick="fsCloseCart()"></div>
+
+        <!-- ===================== COMPARISON TABLE ===================== -->
+        <section class="fs-section fs-compare-section" id="fs-compare-section">
+            <div class="fs-wrap">
+                <h2 class="fs-sec-title">Not sure which device is right for you?</h2>
+                <p class="fs-sec-sub">Compare all 9 products side by side in 30 seconds.</p>
+                <div class="fs-compare-wrap">
+                    <table class="fs-compare">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>ELD</th>
+                                <th>Asset Classic</th>
+                                <!-- <th>Asset 3-Yr</th> -->
+                                <th>OBD</th>
+                                <th>HW Classic</th>
+                                <th>HW Silver</th>
+                                <th>Combo Basic</th>
+                                <th>Combo Premium</th>
+                                <th>AI Dashcam</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>Device Price</th>
+                                <td><span class="free">FREE</span></td><td class="val">$50</td><!--<td class="val">$149</td>--><td class="val">$85</td><td class="val">$50</td><td class="val">$135</td><td class="val">$99</td><td class="val">$99</td><td class="val">$99</td>
+                            </tr>
+                            <tr>
+                                <th>Monthly</th>
+                                <td class="val">$19.95–$24.95</td><td class="val">$11.95</td><!--<td class="val">$0 (3yr)</td>--><td class="val">$14.95</td><td class="val">$14.95</td><td class="val">$14.95</td><td class="val">$34.95</td><td class="val">$39.95</td><td class="val">$19.95</td>
+                            </tr>
+                            <tr>
+                                <th>FMCSA ELD</th>
+                                <td class="yes">✓</td><td class="no">—</td><!--<td class="no">—</td>--><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td><td class="no">—</td>
+                            </tr>
+                            <tr>
+                                <th>Real-Time GPS</th>
+                                <td><span class="prem">Premium</span></td><td class="no">—</td><!--<td class="no">—</td>--><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td><span class="prem">Premium</span></td><td class="yes">✓</td><td class="yes">✓</td>
+                            </tr>
+                            <tr>
+                                <th>AI Dashcam</th>
+                                <td class="no">—</td><td class="no">—</td><!--<td class="no">—</td>--><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td>
+                            </tr>
+                            <tr>
+                                <th>IFTA Reports</th>
+                                <td><span class="prem">Premium</span></td><td class="no">—</td><!--<td class="no">—</td>--><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td><td class="no">—</td>
+                            </tr>
+                            <tr>
+                                <th>Asset Tracking</th>
+                                <td class="no">—</td><td class="yes">✓</td><!--<td class="yes">✓</td>--><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="no">—</td><td class="no">—</td><td class="no">—</td>
+                            </tr>
+                            <tr>
+                                <th>Backup Battery</th>
+                                <td class="no">—</td><td class="no">—</td><!--<td class="no">—</td>--><td class="no">—</td><td class="no">—</td><td class="yes">✓</td><td class="no">—</td><td class="no">—</td><td class="no">—</td>
+                            </tr>
+                            <tr>
+                                <th>Hardwired</th>
+                                <td class="no">—</td><td class="no">—</td><!--<td class="no">—</td>--><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td><td class="no">—</td><td class="no">—</td><td class="no">—</td>
+                            </tr>
+                            <tr>
+                                <th>24/7 Phone Support</th>
+                                <td><span class="prem">Premium</span></td><td class="no">—</td><!--<td class="no">—</td>--><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td><td class="no">—</td>
+                            </tr>
+                            <tr>
+                                <th>No Contract</th>
+                                <td class="yes">✓</td><td class="yes">✓</td><!--<td class="yes">✓</td>--><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td>
+                            </tr>
+                            <tr>
+                                <th>Ships in</th>
+                                <td class="val">48 hrs</td><td class="val">48 hrs</td><!--<td class="val">48 hrs</td>--><td class="val">48 hrs</td><td class="val">48 hrs</td><td class="val">48 hrs</td><td class="val">48 hrs</td><td class="val">48 hrs</td><td class="val">48 hrs</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="text-align:center;margin-top:28px">
+                    <button type="button" class="fs-checkout" style="display:inline-flex;width:auto;padding:14px 28px" onclick="fsGoToProducts()">Choose Your Device ↑</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================== BUNDLE & SAVE (amber band) ===================== -->
+        <section class="fs-amber">
+            <div class="fs-wrap">
+                <span class="fs-bundle-eyebrow">🎁 Bundle &amp; Save</span>
+                <div class="fs-bundle-grid">
+                    <div>
+                        <h2 class="fs-dark-title">Build Your Full Fleet Stack — Bundle &amp; Save</h2>
+                        <p class="fs-dark-sub">Add ELD + Dashcam + Asset Tracker to your order and unlock the full Matrack experience.</p>
+                        <ul class="fs-bundle-list">
+                            <li><span class="ck">✓</span> Single consolidated invoice — one billing contact</li>
+                            <li><span class="ck">✓</span> Free dedicated onboarding manager for your account</li>
+                            <li><span class="ck">✓</span> Priority 24/7 support queue — skip the line</li>
+                            <li><span class="ck">✓</span> Extended 30-day trial on all products</li>
+                            <li><span class="ck">✓</span> Free API integration scoping call</li>
+                        </ul>
+                        <div class="fs-bundle-cta">
+                            <a class="fs-btn-navy" href="tel:+18556587225">Talk to Sales for Bundle Pricing →</a>
+                            <span class="fs-cta-note">or call <a href="tel:+18556587225">+1-855-658-7225</a> · Mon–Fri 24hrs</span>
+                        </div>
+                    </div>
+                    <div class="fs-bundle-imgs">
+                        <figure><img src="https://matrackinc.com/products/images/eld.webp" alt="ELD" /><figcaption>ELD</figcaption></figure>
+                        <figure><img src="https://matrackinc.com/shopping-cart/images-shop/dashcam-M4000.png" alt="Dashcam" /><figcaption>Dashcam</figcaption></figure>
+                        <figure><img src="https://matrackinc.com/products/images/asset_3.webp" alt="Asset Tracker" /><figcaption>Asset Tracker</figcaption></figure>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================== STATS + REVIEWS (navy band) ===================== -->
+        <section class="fs-dark">
+            <div class="fs-wrap">
+                <!-- stats -->
+                <div class="fs-stats">
+                    <div class="fs-stat"><div class="n">12,500+</div><div class="l">Fleets Tracking with Matrack</div></div>
+                    <div class="fs-stat"><div class="n">4.9 / 5</div><div class="l">Google · 1,250+ Reviews</div></div>
+                    <div class="fs-stat"><div class="n">$2.3M</div><div class="l">Assets Recovered in 2025</div></div>
+                    <div class="fs-stat"><div class="n">98%</div><div class="l">Renewal Rate Year over Year</div></div>
+                </div>
+
+                <!-- reviews -->
+                <div class="fs-reviews">
+                    <div class="fs-review">
+                        <span class="stars">★★★★★</span>
+                        <p class="quote">"Basically 'plug and play'. I would recommend this ELD for owner operators like me."</p>
+                        <span class="badge">✓ VERIFIED · GOOGLE</span>
+                        <div class="who">
+                            <span class="av">JS</span>
+                            <div><div class="nm">Joe S.</div><div class="ro">Owner-Operator</div></div>
+                        </div>
+                    </div>
+                    <div class="fs-review">
+                        <span class="stars">★★★★★</span>
+                        <p class="quote">"Recovered a stolen skid-steer in 90 minutes — paid for the fleet for a year."</p>
+                        <span class="badge">✓ VERIFIED · $58K RECOVERED</span>
+                        <div class="who">
+                            <span class="av">DT</span>
+                            <div><div class="nm">Derek T.</div><div class="ro">GM · 140 Assets</div></div>
+                        </div>
+                    </div>
+                    <div class="fs-review">
+                        <span class="stars">★★★★★</span>
+                        <p class="quote">"We replaced two systems with Matrack. Dispatch got an hour back every morning."</p>
+                        <span class="badge">✓ VERIFIED · 21% FEWER EMPTY MILES</span>
+                        <div class="who">
+                            <span class="av">MR</span>
+                            <div><div class="nm">Marcus R.</div><div class="ro">Operations Director</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================== FAQ ===================== -->
+        <section class="fs-section">
+            <div class="fs-wrap">
+                <h2 class="fs-sec-title">Questions before you order?</h2>
+                <p class="fs-sec-sub">Don't see yours? Call us: +1-855-658-7225</p>
+                <div class="fs-faq">
+                    <details><summary>Can I order multiple different products in one cart?<span class="pl">+</span></summary><p>Yes. Add any combination of ELD, asset trackers, vehicle trackers, and dashcams to the same order. Everything runs on one Matrack account — one map, one app, one invoice.</p></details>
+                    <details><summary>Is there a long-term contract?<span class="pl">+</span></summary><p>No. All plans are month-to-month. Cancel anytime. 30-day risk-free trial on every order.</p></details>
+                    <details><summary>How fast does hardware ship?<span class="pl">+</span></summary><p>All hardware ships within 48 hours of order confirmation. ELD and dashcam units arrive pre-paired to your account, ready to activate on arrival.</p></details>
+                    <details><summary>What does 'pre-paired' mean?<span class="pl">+</span></summary><p>Before shipping, we associate each device with your Matrack account. When it arrives, you plug it in — no manual configuration, no activation codes.</p></details>
+                    <details><summary>Do I need different devices for different vehicle types?<span class="pl">+</span></summary><p>Generally: OBD for cars/vans/pickups; Hardwire Classic or Silver for semis and heavy equipment; Asset Classic or 3-Yr Sub for unpowered trailers; ELD for HOS compliance.</p></details>
+                    <details><summary>Is there a volume discount for larger orders?<span class="pl">+</span></summary><p>Yes. Contact sales for fleet pricing on orders of 5+ devices. Most quotes return same business day.</p></details>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================== FINAL CTA (dark band) ===================== -->
+        <section class="fs-dark" style="text-align:center">
+            <div class="fs-wrap">
+                <h2 class="fs-dark-title fs-cta-title">Not sure what you need?<br><span class="g1">Tell</span> us about your <span class="g2">fleet.</span></h2>
+                <p class="fs-dark-sub" style="max-width:660px;margin:14px auto 0">We'll recommend the right device mix, send a same-day quote, and ship within 48 hours of go-ahead. No slide decks. No pressure.</p>
+                <div class="fs-cta-btns">
+                    <a class="fs-checkout" style="display:inline-flex" href="tel:+18556587225">Get a Custom Quote →</a>
+                    <a class="fs-btn-outline" href="https://matrackinc.com/schedule-guaranteed-2k-vehicle-savings-metting/">Book a 20-Min Call</a>
+                </div>
+                <div class="fs-cta-contact">📞 <a href="tel:+18556587225" style="color:#cdd8e6">+1-855-658-7225</a> · ✉ <a href="mailto:support@matrackinc.com" style="color:#cdd8e6">support@matrackinc.com</a></div>
+                <div class="fs-cta-hours">Mon–Fri 24 hours · Sat–Sun 9AM–5PM Pacific</div>
+            </div>
+        </section>
+
+        <style>
+    /* Footer */
+    .site-footer {border-top: 1px solid var(--line);/* background: var(--bg-2); */padding: 80px 0 40px;margin-top: 60px;}
+    .foot-grid {display: grid;grid-template-columns: 1.4fr repeat(4, 1fr);gap: 40px;}
+    @media (max-width: 880px) {.foot-grid { grid-template-columns: 1fr 1fr; }}
+    .foot-col:first-child {position: relative;bottom: 48px;}
+    .foot-col h5 {font-size: 12px;letter-spacing: 0.12em;text-transform: uppercase;color: var(--muted);margin: 0 0 14px;font-family: var(--font-mono);font-weight: 500;}
+    .foot-col ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+    .foot-col a { color: var(--fg-2); font-size: 14px; }
+    .foot-col a:hover { color: var(--fg); }
+
+    .foot-col .foot-sub {font-size: 11px;letter-spacing: 0.12em;text-transform: uppercase;color: var(--muted);font-family: var(--font-mono);font-weight: 500;margin-top: 8px;}
+    .foot-col .foot-sub:first-child { margin-top: 0; }
+
+    .foot-app-row {display: flex;align-items: center;gap: 8px;flex-wrap: wrap;}
+    .foot-app-name {color: var(--fg-2);font-size: 14px;min-width: 32px;}
+    .foot-col a.foot-app-badge {
+    font-size: 11px;letter-spacing: 0.04em;padding: 3px 10px;border: 1px solid var(--line);border-radius: 999px;color: var(--fg-2);
+    line-height: 1.6;transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    }
+    .foot-col a.foot-app-badge:hover {color: var(--fg);border-color: var(--fg-2);background: rgba(0, 0, 0, 0.03);}
+    .mono{display: flex;font-family: var(--font-mono);font-feature-settings: "ss01";letter-spacing: 0;}
+    .mono a {color: #5C6B83;text-decoration: none;}
+    .foot-bottom {margin-top: 60px;padding-top: 24px;border-top: 1px solid var(--line);display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;font-size: 13px; color: var(--muted);}
+    .ask-sales-modal {position: fixed;inset: 0;z-index: 9999;display: none;align-items: center;justify-content: center;padding: 20px;}
+    .ask-sales-modal.is-open {display: flex;}
+    .ask-sales-overlay {position: absolute;inset: 0;background: rgba(8, 12, 24, 0.55);backdrop-filter: blur(4px);}
+    .ask-sales-dialog {
+        position: relative;width: 100%;max-width: 460px;background: var(--bg, #fff);color: var(--fg, #0b1220);border: 1px solid var(--line, rgba(0, 0, 0, 0.08));
+        border-radius: 14px;padding: 32px 28px 28px;box-shadow: 0 30px 80px rgba(8, 12, 24, 0.35);max-height: calc(100vh - 40px);overflow-y: auto;
+    }
+    .ask-sales-close {
+        position: absolute;top: 14px;right: 14px;width: 34px;height: 34px;border-radius: 999px;border: 1px solid var(--line, rgba(0, 0, 0, 0.08));
+        background: transparent;color: var(--fg-2, #4b5563);cursor: pointer;display: inline-flex;align-items: center;justify-content: center;
+    }
+    .ask-sales-close:hover {background: var(--bg-2, rgba(0, 0, 0, 0.04));}
+    .ask-sales-form {display: grid;gap: 14px;}
+    .ask-sales-field {display: grid;gap: 6px;}
+    .ask-sales-field label {font-size: 12px;letter-spacing: 0.04em;text-transform: uppercase;color: var(--muted, #6b7280);}
+    .ask-sales-field input, .ask-sales-field select {
+        width: 100%;padding: 12px 14px;font: inherit;color: var(--fg, #0b1220);background: var(--bg, #fff);border: 1px solid var(--line, rgba(0, 0, 0, 0.14));
+        border-radius: 10px;outline: none;transition: border-color 0.15s, box-shadow 0.15s;box-sizing: border-box;
+    }
+    .ask-sales-field input:focus, .ask-sales-field select:focus {
+        border-color: var(--accent, #0A66C2);box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent, #0A66C2) 18%, transparent);
+    }
+    .ask-sales-field.has-error input, .ask-sales-field.has-error select {border-color: #d23f3f;}
+    .ask-sales-error {font-size: 12px;color: #d23f3f;min-height: 1em;}
+    /* Robot check stays hidden until "Send to sales" is pressed and the rest of the form is valid. */
+    .ask-sales-captcha-field {display: none;}
+    .ask-sales-captcha-field.is-visible {display: grid;}
+    .ask-sales-captcha-prompt {font-size: 13px;color: var(--muted, #6b7280);}
+    .ask-sales-captcha-field .g-recaptcha {transform-origin: 0 0;}
+    .ask-sales-feedback {font-size: 13px;min-height: 1em;}
+    .ask-sales-feedback.is-error {color: #d23f3f;}
+    .ask-sales-feedback.is-success {color: #128a4a;}
+    .ask-sales-submit {
+        margin-top: 6px;padding: 13px 18px;background: var(--accent, #0A66C2);color: var(--accent-ink, #fff);font: inherit;font-weight: 600;letter-spacing: 0.01em;border: none;
+        border-radius: 10px;cursor: pointer;display: inline-flex;align-items: center;justify-content: center;gap: 10px;transition: background 0.15s, opacity 0.15s;
+    }
+    .ask-sales-submit:hover {background: var(--accent-2, #084FA0);}
+    .ask-sales-submit[disabled] {opacity: 0.65;cursor: not-allowed;}
+    .ask-sales-spinner {display: none;width: 16px;height: 16px;border: 2px solid currentColor;border-top-color: transparent;border-radius: 999px;animation: ask-sales-spin 0.8s linear infinite;}
+    .ask-sales-submit.is-loading .ask-sales-spinner {display: inline-block;}
+    .ask-sales-submit.is-loading .ask-sales-submit-label {opacity: 0.7;}
+    @keyframes ask-sales-spin {to {transform: rotate(360deg);}}
+    body.ask-sales-open {overflow: hidden;}
+    @media (max-width: 480px) {.ask-sales-dialog {padding: 26px 20px 22px;border-radius: 12px;}}
+</style>
+
+<footer class="site-footer">
+    <div class="container">
+        <div class="foot-grid">
+            <div class="foot-col">
+                <a class="logo" href="/" style="display: inline-flex; align-items: center; gap: 8px;">
+                    <img src="/home-page-v1/newhome-img/logo.webp" alt="Matrack" style="width: 140px; height: auto; display: block;">
+                </a>
+                <p style="color: var(--muted); font-size: 14px; max-width: 320px;">Hardware + software to track what matters — vehicles, assets, drivers, and uptime.</p>
+                <div style="display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; align-items: flex-start;">
+                    <div class="award-badge" style="display: flex; align-items: center; gap: 8px; padding: 8px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; width: 72px;">
+                            <svg viewBox="0 0 48 48" width="28" height="28" aria-label="Google">
+                                <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.3-.4-3.5z"></path>
+                                <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16 19 13 24 13c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"></path>
+                                <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 34.9 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.6 39.6 16.2 44 24 44z"></path>
+                                <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.1 5.6l6.2 5.2C41 35 44 30 44 24c0-1.3-.1-2.3-.4-3.5z"></path>
+                            </svg>
+                            <span class="mono" style="font-size: 8px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; text-align: center; line-height: 1.15; width: 100%; min-height: 2.3em; display: flex; align-items: center; justify-content: center;">Google</span>
+                        </div>
+                        <div class="mono" style="font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase;">4.9
+                            <div class="stars-lg" style="display: inline-flex; gap: 1px; color: rgb(255, 180, 0);">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="width: 14px; height: 14px;"><path d="M12 2l2.9 6.9 7.4.6-5.6 4.9 1.7 7.3L12 17.8 5.6 21.7l1.7-7.3L1.7 9.5l7.4-.6z"></path></svg>
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="width: 14px; height: 14px;"><path d="M12 2l2.9 6.9 7.4.6-5.6 4.9 1.7 7.3L12 17.8 5.6 21.7l1.7-7.3L1.7 9.5l7.4-.6z"></path></svg>
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="width: 14px; height: 14px;"><path d="M12 2l2.9 6.9 7.4.6-5.6 4.9 1.7 7.3L12 17.8 5.6 21.7l1.7-7.3L1.7 9.5l7.4-.6z"></path></svg>
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="width: 14px; height: 14px;"><path d="M12 2l2.9 6.9 7.4.6-5.6 4.9 1.7 7.3L12 17.8 5.6 21.7l1.7-7.3L1.7 9.5l7.4-.6z"></path></svg>
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="width: 14px; height: 14px;"><path d="M12 2l2.9 6.9 7.4.6-5.6 4.9 1.7 7.3L12 17.8 5.6 21.7l1.7-7.3L1.7 9.5l7.4-.6z"></path></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="award-badge" style="display: flex; align-items: center; gap: 8px; padding: 8px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; width: 72px;">
+                            <span style="display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; flex-shrink: 0;">
+                                <span role="img" aria-label="Shopper Approved" style="display: block; position: relative; width: 27px; height: 24px; overflow: hidden; flex-shrink: 0;">
+                                    <img src="https://d11r79utqzj4rk.cloudfront.net/matrackinc/home-page-v1/home-img/shopper-approved.png" alt="shopper approved logo" aria-hidden="true" loading="lazy" style="position: absolute; top: 0; left: 0; width: 79px; height: auto; max-width: none; display: block;">
+                                </span>
+                            </span>
+                            <span class="mono" style="font-size: 8px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; text-align: center; line-height: 1.15; width: 100%; min-height: 2.3em; display: flex; flex-direction: column; align-items: center; justify-content: center;">Shopper<br>Approved</span>
+                        </div>
+                        <div class="mono" style="font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase;">5.0
+                            <div class="stars-lg" style="display: inline-flex; gap: 1px; color: rgb(255, 180, 0);">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="width: 14px; height: 14px;"><path d="M12 2l2.9 6.9 7.4.6-5.6 4.9 1.7 7.3L12 17.8 5.6 21.7l1.7-7.3L1.7 9.5l7.4-.6z"></path></svg>
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="width: 14px; height: 14px;"><path d="M12 2l2.9 6.9 7.4.6-5.6 4.9 1.7 7.3L12 17.8 5.6 21.7l1.7-7.3L1.7 9.5l7.4-.6z"></path></svg>
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="width: 14px; height: 14px;"><path d="M12 2l2.9 6.9 7.4.6-5.6 4.9 1.7 7.3L12 17.8 5.6 21.7l1.7-7.3L1.7 9.5l7.4-.6z"></path></svg>
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="width: 14px; height: 14px;"><path d="M12 2l2.9 6.9 7.4.6-5.6 4.9 1.7 7.3L12 17.8 5.6 21.7l1.7-7.3L1.7 9.5l7.4-.6z"></path></svg>
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="width: 14px; height: 14px;"><path d="M12 2l2.9 6.9 7.4.6-5.6 4.9 1.7 7.3L12 17.8 5.6 21.7l1.7-7.3L1.7 9.5l7.4-.6z"></path></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="award-badge" style="display: flex; align-items: center; gap: 8px; padding: 8px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; width: 72px;">
+                            <span style="display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; flex-shrink: 0;">
+                                <span role="img" aria-label="Capterra" style="display: block; position: relative; width: 24px; height: 25px; overflow: hidden; flex-shrink: 0;">
+                                    <img src="https://d11r79utqzj4rk.cloudfront.net/matrackinc/home-page-v1/home-img/capterra.png" alt="capterra logo" aria-hidden="true" loading="lazy" style="position: absolute; top: -2px; left: 0; width: 109px; height: auto; max-width: none; display: block;">
+                                </span>
+                            </span>
+                            <span class="mono" style="font-size: 8px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; text-align: center; line-height: 1.15; width: 100%; min-height: 2.3em; display: flex; align-items: center; justify-content: center;">Capterra</span>
+                        </div>
+                        <div class="mono" style="font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase;">4.8
+                            <div class="stars-lg" style="display: inline-flex; gap: 1px; color: rgb(255, 180, 0);">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="width: 14px; height: 14px;"><path d="M12 2l2.9 6.9 7.4.6-5.6 4.9 1.7 7.3L12 17.8 5.6 21.7l1.7-7.3L1.7 9.5l7.4-.6z"></path></svg>
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="width: 14px; height: 14px;"><path d="M12 2l2.9 6.9 7.4.6-5.6 4.9 1.7 7.3L12 17.8 5.6 21.7l1.7-7.3L1.7 9.5l7.4-.6z"></path></svg>
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="width: 14px; height: 14px;"><path d="M12 2l2.9 6.9 7.4.6-5.6 4.9 1.7 7.3L12 17.8 5.6 21.7l1.7-7.3L1.7 9.5l7.4-.6z"></path></svg>
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="width: 14px; height: 14px;"><path d="M12 2l2.9 6.9 7.4.6-5.6 4.9 1.7 7.3L12 17.8 5.6 21.7l1.7-7.3L1.7 9.5l7.4-.6z"></path></svg>
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="width: 14px; height: 14px;"><path d="M12 2l2.9 6.9 7.4.6-5.6 4.9 1.7 7.3L12 17.8 5.6 21.7l1.7-7.3L1.7 9.5l7.4-.6z"></path></svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="foot-col">
+                <h5>Hardware</h5>
+                <ul>
+                    <li><a href="/gps-fleet-tracking/">GPS Trackers</a></li>
+                    <li><a href="/electronic-logging-devices/">ELD</a></li>
+                    <li><a href="/trailer-tracker-device/">Asset Tracker</a></li>
+                    <li><a href="/fleet-dash-cam/">Dashcam</a></li>
+                </ul>
+                <h5 style="margin-top: 22px;">Company</h5>
+                <ul>
+                    <li><a href="/quote/">Get a quote</a></li>
+                    <li><a href="#ask-sales" data-ask-sales-open="true">Contact sales</a></li>
+                </ul>
+            </div>
+            <div class="foot-col foot-col-software">
+                <h5>Software</h5>
+                <ul>
+                    <li class="foot-sub">Web</li>
+                    <li><a href="https://eld.matrackinc.com/adminNew/view/Login.php">ELD Admin Login</a></li>
+                    <li><a href="https://www.matrack.io/gpstracking/">GPS Tracking Login</a></li>
+                    <li class="foot-sub">Mobile apps</li>
+                    <li>
+                        <div class="foot-app-row">
+                            <span class="foot-app-name">ELD</span>
+                            <a href="https://apps.apple.com/in/app/matrack-eld/id1634745673" class="foot-app-badge" aria-label="ELD app on iOS">iOS</a>
+                            <a href="https://play.google.com/store/apps/details?id=com.matrack.eld&hl=en_IN" class="foot-app-badge" aria-label="ELD app on Android">Android</a>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="foot-app-row">
+                            <span class="foot-app-name">GPS</span>
+                            <a href="https://apps.apple.com/in/app/matrackgps-3-0/id6443507477" class="foot-app-badge" aria-label="GPS app on iOS">iOS</a>
+                            <a href="https://play.google.com/store/apps/details?id=com.matrackinc.matrackgpspro&hl=en" class="foot-app-badge" aria-label="GPS app on Android">Android</a>
+                        </div>
+                    </li>
+                    <li class="foot-sub">Partners</li>
+                    <li><a href="/dealerpro/">Dealerpro</a></li>
+                    <li><a href="/secureviewpro/">SecureView Pro</a></li>
+                </ul>
+            </div>
+            <div class="foot-col">
+                <h5>Solutions</h5>
+                <ul>
+                    <li><a href="/industries/#trucking-logistics">Trucking & logistics</a></li>
+                    <li><a href="/industries/#construction">Construction</a></li>
+                    <li><a href="/industries/#rental">Rental</a></li>
+                    <li><a href="/industries/#field-service">Field service</a></li>
+                    <li><a href="/industries/#last-mile">Last-mile</a></li>
+                    <li><a href="/industries/#government-muni">Government / Muni</a></li>
+                </ul>
+            </div>
+            <div class="foot-col">
+                <h5>Contact</h5>
+                <div style="display: flex; align-items: flex-start; gap: 8px; margin-bottom: 14px;">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 7px; color: var(--accent);"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    <div>
+                        <a href="mailto:support@matrackinc.com" style="color: var(--fg-2); font-size: 13px; text-decoration: none;">support@matrackinc.com</a>
+                        <div style="color: var(--muted); font-size: 11px; line-height: 1.4; margin-top: 2px;">We are available on email 24/7<br>Feel free to contact us anytime</div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: flex-start; gap: 8px; margin-bottom: 14px;">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 7px; color: var(--accent);"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    <div>
+                        <a href="tel:+18556587225" style="color: var(--fg-2); font-size: 13px; text-decoration: none;">+1-855-658-7225</a>
+                        <div style="color: var(--muted); font-size: 11px; line-height: 1.4; margin-top: 2px;">We are available on phone<br>Mon – Fri: 24 hours<br>Sat – Sun: 9:00 AM – 5:00 PM (Pacific Time)</div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: flex-start; gap: 8px;">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 3px; color: var(--accent);"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <div style="font-size: 13px; line-height: 1.4;">
+                        <span style="color: var(--fg-2);">Matrack Inc.</span>
+                        <div style="color: var(--muted); font-size: 11px; margin-top: 2px;">2603 Camino Ramon Suite. 575<br>San Ramon, CA 94583, United States</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="foot-bottom">
+            <span>© 2026 Matrack </span>
+            <span class="mono" style="flex-wrap: wrap; gap: 6px;">
+                <a href="https://matrackinc.com/privacy-policy/">Privacy policy</a> | 
+                <a href="https://matrackinc.com/terms-and-conditions/">Terms and Conditions</a> | 
+                <a href="javascript:Cookiebot.renew()">Do Not Sell or Share My Personal Information</a>
+            </span>
+        </div>
+    </div>
+</footer>
+
+
+
+ <!-- Ask Sales modal: reCAPTCHA bootstrap -->
+ <script>
+     // Explicit render so the widget id is known and can be reset between
+     // submissions. Dedicated Matrackinc key pair; the secret half lives in
+     // home-page-v1/home-css/ask-sales-zendesk_footer.php.
+     window.askSalesRecaptchaWidgetId = null;
+     function askSalesRecaptchaInit() {
+         var el = document.getElementById('as-recaptcha');
+         if (!el || typeof grecaptcha === 'undefined' || !grecaptcha.render) return;
+         try {
+             window.askSalesRecaptchaWidgetId = grecaptcha.render(el, {
+                 sitekey: '6LfdOasnAAAAANh4nwZ5ItoMHp7w5DD4tmtsjWcM',
+                 theme: 'light',
+                 // The normal widget is a fixed 304px and overflows small phones.
+                 size: window.matchMedia('(max-width: 400px)').matches ? 'compact' : 'normal',
+                 callback: function (token) {
+                     if (typeof window.askSalesOnCaptchaSolved === 'function') {
+                         window.askSalesOnCaptchaSolved(token);
+                     }
+                 },
+                 'expired-callback': function () {
+                     if (typeof window.askSalesOnCaptchaExpired === 'function') {
+                         window.askSalesOnCaptchaExpired();
+                     }
+                 },
+                 'error-callback': function () {
+                     if (typeof window.askSalesOnCaptchaError === 'function') {
+                         window.askSalesOnCaptchaError();
+                     }
+                 }
+             });
+         } catch (e) { /* already rendered */ }
+     }
+ </script>
+ <script src="https://www.google.com/recaptcha/api.js?onload=askSalesRecaptchaInit&render=explicit" async defer></script>
+
+ <!-- Ask Sales modal -->
+ <div id="ask-sales-modal" class="ask-sales-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="ask-sales-title">
+    <div class="ask-sales-overlay" data-ask-sales-close="true"></div>
+    <div class="ask-sales-dialog" role="document">
+        <button type="button" class="ask-sales-close" aria-label="Close" data-ask-sales-close="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 6L6 18M6 6l12 12"></path>
+            </svg>
+        </button>
+        <div class="eyebrow" style="margin-bottom: 12px;">Talk to sales</div>
+        <h2 id="ask-sales-title" style="margin: 0 0 10px; font-size: 26px;">Tell us a bit about your fleet.</h2>
+        <p style="color: var(--muted); margin: 0 0 22px; font-size: 14px;">Share a few details and our team will get back to you within one business day.</p>
+
+        <form id="ask-sales-form" class="ask-sales-form" novalidate>
+            <div class="ask-sales-field">
+                <label for="as-name">Full name</label>
+                <input type="text" id="as-name" name="name" autocomplete="name" required maxlength="100">
+                <span class="ask-sales-error" data-error-for="name"></span>
+            </div>
+
+            <div class="ask-sales-field">
+                <label for="as-email">Work email</label>
+                <input type="email" id="as-email" name="email" autocomplete="email" required maxlength="150">
+                <span class="ask-sales-error" data-error-for="email"></span>
+            </div>
+
+            <div class="ask-sales-field">
+                <label for="as-phone">Phone number</label>
+                <input type="tel" id="as-phone" name="phone" autocomplete="tel" inputmode="tel" required
+                    placeholder="(555) 555-5555">
+                <span class="ask-sales-error" data-error-for="phone"></span>
+            </div>
+
+            <div class="ask-sales-field">
+                <label for="as-device">Device of interest</label>
+                <select id="as-device" name="device" required>
+                    <option value="">Select a device…</option>
+                    <option value="GPS Trackers">GPS Trackers</option>
+                    <option value="ELD">ELD</option>
+                    <option value="Dashcam">Dashcam</option>
+                    <option value="Asset Tracker">Asset Tracker</option>
+                    <option value="SecureViewPro">SecureViewPro</option>
+                    <option value="ATV Tracking Device">ATV Tracking Device</option>
+                    <option value="Boat Tracking Device">Boat Tracking Device</option>
+                    <option value="Other">Other</option>
+                </select>
+                <span class="ask-sales-error" data-error-for="device"></span>
+            </div>
+
+            <div class="ask-sales-field ask-sales-captcha-field" id="as-captcha-field">
+                <span class="ask-sales-captcha-prompt">One last step — confirm you're not a robot.</span>
+                <div id="as-recaptcha"></div>
+                <span class="ask-sales-error" data-error-for="captcha"></span>
+            </div>
+
+            <div class="ask-sales-feedback" data-ask-sales-feedback aria-live="polite"></div>
+
+            <button type="submit" class="ask-sales-submit">
+                <span class="ask-sales-submit-label">Send to sales</span>
+                <span class="ask-sales-spinner" aria-hidden="true"></span>
+            </button>
+        </form>
+    </div>
+</div>
+
+
+<script>
+    (function () {
+        var modal = document.getElementById('ask-sales-modal');
+        var form = document.getElementById('ask-sales-form');
+        if (!modal || !form) return;
+
+        var openers = document.querySelectorAll('[data-ask-sales-open]');
+        var closers = modal.querySelectorAll('[data-ask-sales-close]');
+        var feedback = modal.querySelector('[data-ask-sales-feedback]');
+        var submitBtn = form.querySelector('.ask-sales-submit');
+        var lastFocus = null;
+
+        // Tell the shared app.js / app_v_26052026.js copies of this modal to stand
+        // down; they have no reCAPTCHA check and would post the form regardless.
+        window.askSalesEnhanced = true;
+
+        // Real assigned NANP area codes (US, Canada, US territories). A number is
+        // only accepted if its area code actually exists - structural rules alone
+        // let invented numbers like 2345678901 through.
+        var NANP_AREA_CODES = {};
+        '201,202,203,204,205,206,207,208,209,210,212,213,214,215,216,217,218,219,220,223,224,225,226,227,228,229,231,234,236,239,240,242,246,248,249,250,251,252,253,254,256,260,262,264,267,268,269,270,272,274,276,279,281,284,289,301,302,303,304,305,306,307,308,309,310,312,313,314,315,316,317,318,319,320,321,323,325,326,330,331,332,334,336,337,339,340,341,343,345,346,347,351,352,354,360,361,363,364,365,367,368,380,382,385,386,401,402,403,404,405,406,407,408,409,410,412,413,414,415,416,417,418,419,423,424,425,428,430,431,432,434,435,437,438,440,441,442,443,445,447,450,458,463,464,468,469,470,473,474,475,478,479,480,484,501,502,503,504,505,506,507,508,509,510,512,513,514,515,516,517,518,519,520,530,531,534,539,540,541,548,551,559,561,562,563,564,567,570,571,572,573,574,575,579,580,581,584,585,586,587,601,602,603,604,605,606,607,608,609,610,612,613,614,615,616,617,618,619,620,623,626,628,629,630,631,636,639,640,641,646,647,649,650,651,656,657,658,659,660,661,662,664,667,669,670,671,672,678,679,680,681,682,683,684,689,701,702,703,704,705,706,707,708,709,712,713,714,715,716,717,718,719,720,721,724,725,726,727,731,732,734,737,740,742,743,747,753,754,757,758,760,762,763,765,767,769,770,771,772,773,774,775,778,779,780,781,782,784,785,786,787,800,801,802,803,804,805,806,807,808,809,810,812,813,814,815,816,817,818,819,820,825,828,829,830,831,832,833,838,839,840,843,844,845,847,848,849,850,854,855,856,857,858,859,860,862,863,864,865,866,867,868,869,870,872,873,876,877,878,879,888,901,902,903,904,905,906,907,908,909,910,912,913,914,915,916,917,918,919,920,925,928,929,930,931,934,936,937,938,939,940,941,943,945,947,949,951,952,954,956,959,970,971,972,973,978,979,980,984,985,986,989'.split(',').forEach(function (c) { NANP_AREA_CODES[c] = 1; });
+
+        function normalisePhone(raw) {
+            var d = (raw || '').replace(/\D+/g, '');
+            if (d.length === 11 && d.charAt(0) === '1') d = d.substring(1); // drop country code
+            return d;
+        }
+
+        // Flags obviously invented input: too few distinct digits (2121212121) or a
+        // long run of consecutive digits (2345678901). Threshold of 8 keeps real
+        // numbers such as 415-234-5678 (a 7-digit run) valid.
+        function looksInvented(d) {
+            var distinct = {}, n = 0, i;
+            for (i = 0; i < d.length; i++) { if (!distinct[d[i]]) { distinct[d[i]] = 1; n++; } }
+            if (n < 3) return true;
+            var up = 1, down = 1;
+            for (i = 1; i < d.length; i++) {
+                var diff = d.charCodeAt(i) - d.charCodeAt(i - 1);
+                up = (diff === 1) ? up + 1 : 1;
+                down = (diff === -1) ? down + 1 : 1;
+                if (up >= 8 || down >= 8) return true;
+            }
+            return false;
+        }
+
+        function phoneProblem(raw) {
+            var d = normalisePhone(raw);
+            if (!d) return 'Enter your phone number.';
+            if (d.length !== 10) return 'Enter a 10-digit US or Canada phone number.';
+            if (/^(\d)\1{9}$/.test(d)) return 'Enter a real phone number.';
+            if (looksInvented(d)) return 'Enter a real phone number.';
+
+            var npa = d.substring(0, 3);
+            var nxx = d.substring(3, 6);
+
+            if (!NANP_AREA_CODES[npa]) return 'Enter a real phone number.';
+            if (nxx.charAt(0) === '0' || nxx.charAt(0) === '1') return 'Enter a real phone number.';
+            if (nxx.charAt(1) === '1' && nxx.charAt(2) === '1') return 'Enter a real phone number.'; // N11
+            if (nxx === '555') return 'Enter a real phone number.';
+            return '';
+        }
+
+        // ---- reCAPTCHA helpers (tolerate the API not having loaded) ----
+        var captchaField = document.getElementById('as-captcha-field');
+
+        function showCaptcha() {
+            if (!captchaField) return;
+            captchaField.classList.add('is-visible');
+            if (captchaField.scrollIntoView) {
+                captchaField.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            }
+        }
+
+        function hideCaptcha() {
+            if (captchaField) captchaField.classList.remove('is-visible');
+        }
+
+        function captchaToken() {
+            if (typeof grecaptcha === 'undefined' || !grecaptcha.getResponse) return '';
+            try {
+                return window.askSalesRecaptchaWidgetId !== null
+                    ? grecaptcha.getResponse(window.askSalesRecaptchaWidgetId)
+                    : grecaptcha.getResponse();
+            } catch (e) { return ''; }
+        }
+
+        function captchaReset() {
+            if (typeof grecaptcha === 'undefined' || !grecaptcha.reset) return;
+            try {
+                if (window.askSalesRecaptchaWidgetId !== null) grecaptcha.reset(window.askSalesRecaptchaWidgetId);
+                else grecaptcha.reset();
+            } catch (e) { /* not rendered yet */ }
+        }
+
+        function openModal(e) {
+            if (e) e.preventDefault();
+            lastFocus = document.activeElement;
+            clearErrors();
+            modal.classList.add('is-open');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('ask-sales-open');
+            setTimeout(function () {
+                var first = form.querySelector('input, select');
+                if (first) first.focus();
+            }, 30);
+        }
+
+        function closeModal() {
+            modal.classList.remove('is-open');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('ask-sales-open');
+            captchaReset();
+            hideCaptcha();
+            if (lastFocus && lastFocus.focus) lastFocus.focus();
+        }
+
+        openers.forEach(function (el) { el.addEventListener('click', openModal); });
+        closers.forEach(function (el) { el.addEventListener('click', closeModal); });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+        });
+
+        function setError(name, msg) {
+            var field = form.querySelector('[name="' + name + '"]');
+            var slot = form.querySelector('[data-error-for="' + name + '"]');
+            // The captcha has no [name] input of its own, so fall back to the error
+            // slot to locate its field wrapper.
+            var wrap = field ? field.closest('.ask-sales-field')
+                             : (slot ? slot.closest('.ask-sales-field') : null);
+            if (wrap) wrap.classList.toggle('has-error', !!msg);
+            if (slot) slot.textContent = msg || '';
+        }
+
+        function clearErrors() {
+            ['name', 'email', 'phone', 'device', 'captcha'].forEach(function (n) { setError(n, ''); });
+            feedback.textContent = '';
+            feedback.classList.remove('is-error', 'is-success');
+        }
+
+        function validate(values) {
+            var errs = {};
+            if (!values.name || values.name.length < 2) errs.name = 'Please enter your name.';
+            else if (values.name.length > 100) errs.name = 'Name is too long.';
+
+            var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+            if (!values.email || !emailRe.test(values.email)) errs.email = 'Enter a valid email address.';
+
+            var phoneErr = phoneProblem(values.phone);
+            if (phoneErr) errs.phone = phoneErr;
+
+            var allowed = ['GPS Trackers', 'ELD', 'Dashcam', 'Asset Tracker', 'SecureViewPro', 'ATV Tracking Device', 'Boat Tracking Device', 'Other'];
+            if (!values.device || allowed.indexOf(values.device) === -1) errs.device = 'Please choose a device.';
+
+            // The robot check is deliberately NOT validated here - it is only
+            // revealed once these fields pass, so it is handled at submit time.
+            return errs;
+        }
+
+        function readValues() {
+            return {
+                name: form.elements.name.value.trim(),
+                email: form.elements.email.value.trim(),
+                phone: form.elements.phone.value.trim(),
+                device: form.elements.device.value
+            };
+        }
+
+        // Runs only after the fields validate AND the robot check is ticked.
+        function sendForm(values, token) {
+            submitBtn.disabled = true;
+            submitBtn.classList.add('is-loading');
+
+            var body = new URLSearchParams();
+            body.append('name', values.name);
+            body.append('email', values.email);
+            // Send the normalised 10-digit number so sales always gets a
+            // consistent format regardless of how it was typed.
+            body.append('phone', normalisePhone(values.phone));
+            body.append('device', values.device);
+            body.append('g-recaptcha-response', token);
+
+            return fetch('/home-page-v1/home-css/ask-sales-zendesk_footer.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Accept': 'application/json'
+                },
+                body: body.toString()
+            }).then(function (res) {
+                return res.text().then(function (text) {
+                    try { return { ok: res.ok, data: JSON.parse(text) }; }
+                    catch (err) { return { ok: false, data: { status: false, message: 'Invalid server response.' } }; }
+                });
+            }).then(function (result) {
+                if (result.ok && result.data && result.data.status === true) {
+                    feedback.textContent = 'Thanks — our sales team will reach out shortly.';
+                    feedback.classList.add('is-success');
+                    form.reset();
+                    setTimeout(closeModal, 1800);
+                } else {
+                    feedback.textContent = (result.data && result.data.message) || 'Something went wrong. Please try again.';
+                    feedback.classList.add('is-error');
+                }
+            }).catch(function () {
+                feedback.textContent = 'Network error. Please check your connection and try again.';
+                feedback.classList.add('is-error');
+            }).then(function () {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('is-loading');
+                // The token is single-use and is consumed by the server check, so
+                // clear the checkbox and hide it again after every attempt.
+                captchaReset();
+                hideCaptcha();
+            });
+        }
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            // This inline handler is registered while the page parses, so it runs
+            // before the deferred app.js / app_v_26052026.js copies of this modal.
+            // Stopping the event here is what actually guarantees those older
+            // handlers cannot clear our errors and post the form without the robot
+            // check - it works even when a visitor still has the old JS cached.
+            e.stopImmediatePropagation();
+            clearErrors();
+
+            var values = readValues();
+            var errs = validate(values);
+            if (Object.keys(errs).length) {
+                Object.keys(errs).forEach(function (k) { setError(k, errs[k]); });
+                // Keep the robot check out of the way while fields are wrong.
+                hideCaptcha();
+                var firstBad = form.querySelector('.has-error input, .has-error select');
+                if (firstBad) firstBad.focus();
+                return;
+            }
+
+            // Fields are good. Reveal the robot check on this first press; the
+            // widget's callback finishes the send as soon as it is ticked.
+            var token = captchaToken();
+            if (!token) {
+                showCaptcha();
+                return;
+            }
+
+            sendForm(values, token);
+        });
+
+        // Called by the reCAPTCHA widget once the user ticks the box.
+        window.askSalesOnCaptchaSolved = function (token) {
+            var values = readValues();
+            var errs = validate(values);
+            if (Object.keys(errs).length) {
+                Object.keys(errs).forEach(function (k) { setError(k, errs[k]); });
+                return;
+            }
+            setError('captcha', '');
+            sendForm(values, token || captchaToken());
+        };
+
+        // Tokens expire after ~2 minutes; ask for a re-tick rather than silently
+        // posting an invalid one.
+        window.askSalesOnCaptchaExpired = function () {
+            setError('captcha', 'That confirmation expired — please tick the box again.');
+        };
+
+        window.askSalesOnCaptchaError = function () {
+            setError('captcha', 'The robot check could not load. Check your connection and try again.');
+        };
+    })();
+</script>
+        <!-- ===================== THANK YOU MODAL ===================== -->
+        <div class="modal-overlay hidden" id="modalOverlay">
+            <div class="modal-custom" id="modal">
+                <button class="close-button" onclick="hideModal()" aria-label="Close modal">×</button>
+                <div class="modal-header"><h1 class="modal-title-custom">Thank you for your order!</h1></div>
+                <div class="modal-body-custom"><p class="modal-text-custom">We're already processing it and will get in touch with you shortly. Please keep an eye on your email or phone — our team will contact you soon.</p></div>
+                <div class="modal-footer"><button class="back-home-button" onclick="goHome()">Back to Home</button></div>
+            </div>
+        </div>
+
+        <!-- Snitcher analytics code -->
+<script>
+    !function(s, n, i, t, c, h) {
+        s.SnitchObject = i;
+        s[i] || (s[i] = function() {
+            (s[i].q = s[i].q || []).push(arguments)
+        });
+        s[i].l = + new Date;
+        c = n.createElement(t);
+        h = n.getElementsByTagName(t)[0];
+        c.src = '//snid.snitcher.com/8414522.js';
+        h.parentNode.insertBefore(c, h)
+    }(window,document,'snid','script');    
+    snid('verify', '8414522');
+</script>
+<!--Event Tracking-->
+    <script>var t_code = "DS-4656-432-982";</script>
+    <script src="//ds360.co/track/script.js"></script>
+<!---ends--->
+<script type="text/javascript">
+    window._mfq = window._mfq || [];
+    (function() {
+        var mf = document.createElement("script");
+        mf.type = "text/javascript"; 
+        mf.defer = true;
+        mf.src = "//cdn.mouseflow.com/projects/ac4bb748-ea7c-4390-9de4-87edf9b26af6.js";
+        document.getElementsByTagName("head")[0].appendChild(mf);
+    })();
+</script>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-101514751-1"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-101514751-1');
+</script>
+<!-- Facebook Pixel Code -->
+<script>
+    ! function(f, b, e, v, n, t, s) {
+        if (f.fbq) return;
+        n = f.fbq = function() {
+            n.callMethod ?
+                n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+        };
+        if (!f._fbq) f._fbq = n;
+        n.push = n;
+        n.loaded = !0;
+        n.version = '2.0';
+        n.queue = [];
+        t = b.createElement(e);
+        t.async = !0;
+        t.src = v;
+        s = b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t, s)
+    }(window, document, 'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '2394356764157935');
+    fbq('init', '315029169654166');
+    fbq('track', 'PageView');
+</script>
+<noscript>
+    <img height="1" width="1" data-src="https://www.facebook.com/tr?id=2394356764157935&ev=PageView&noscript=1" class="lazyload" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" /><noscript><img height="1" width="1" src="https://www.facebook.com/tr?id=2394356764157935&ev=PageView&noscript=1" /></noscript>
+</noscript>
+<!-- End Facebook Pixel Code -->
+        <script src="../eldpayment/js/jquery_redirect.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <script>
+            // ---- FAQ accordion: opening one closes the others ----
+            document.querySelectorAll(".fs-faq details").forEach(function (d) {
+                d.addEventListener("toggle", function () {
+                    if (!d.open) return;
+                    document.querySelectorAll(".fs-faq details").forEach(function (other) {
+                        if (other !== d) other.open = false;
+                    });
+                });
+            });
+
+            // ---- thank-you modal ----
+            const modalOverlay = document.getElementById("modalOverlay");
+            const modal = document.getElementById("modal");
+            function showModal() { modalOverlay.classList.remove("hidden"); document.body.style.overflow = "hidden"; }
+            function hideModal() { modalOverlay.classList.add("hidden"); document.body.style.overflow = "auto"; }
+            function goHome() { hideModal(); }
+            modalOverlay.addEventListener("click", e => { if (e.target === modalOverlay) hideModal(); });
+            document.addEventListener("keydown", e => { if (e.key === "Escape") { if (!modalOverlay.classList.contains("hidden")) hideModal(); } });
+            modal.addEventListener("click", e => e.stopPropagation());
+
+            // ---- proceed to checkout ----
+            function proceedToCheckout() {
+                // Only products the user actually ADDED to the cart should go to
+                // checkout. Incrementing a card's quantity without clicking "Add to
+                // Cart" does NOT commit it, so read the committed quantity from
+                // data-cart-qty (the single source of truth) instead of the spinner.
+                const productCards = document.querySelectorAll('.product-card');
+                var productData = [], totalQuantity = 0, hasEldProducts = false, hasDashcamProducts = false, deviceTotal = 0, monthlyTotal = 0;
+
+                let allZero = true;
+                productCards.forEach(card => {
+                    if ((parseInt(card.dataset.cartQty || '0') || 0) > 0) allZero = false;
+                });
+                if (allZero) { Swal.fire('Please add at least one product to your cart before proceeding to checkout.'); return; }
+
+                productCards.forEach(card => {
+                    const productId = card.getAttribute('data-product-id') || 'unknown';
+                    const quantity = parseInt(card.dataset.cartQty || '0') || 0;
+                    if (quantity === 0) return;
+                    const productType = card.getAttribute('data-product-type') || '';
+                    const productName = card.querySelector('h3, h4').textContent.trim();
+                    let devicePrice = 0, monthlyPrice = 0;
+                    if (productType.includes('eld') && !productType.includes('dashcam')) {
+                        devicePrice = 0;
+                        const activePlanPrice = card.querySelector('.plan-card-active .plan-card-price');
+                        if (activePlanPrice) { monthlyPrice = parseFloat(activePlanPrice.textContent.replace(/[^0-9.]/g, "")) || 0; }
+                        else { const anyPlanPrice = card.querySelector('.plan-card .plan-card-price'); if (anyPlanPrice) monthlyPrice = parseFloat(anyPlanPrice.textContent.replace(/[^0-9.]/g, "")) || 0; }
+                        hasEldProducts = true;
+                    } else {
+                        const devicePriceEl = card.querySelector('.price-value-once-maa, .price-value-once-vt, .price-value-once-dashcam-eld, .price-value-once-dashcam');
+                        const monthlyPriceEl = card.querySelector('.price-value-month-maa, .price-value-month-vt, .price-value-month-dashcam-eld, .price-value-month-dashcam');
+                        if (devicePriceEl) devicePrice = parseFloat(devicePriceEl.textContent.replace(/[^0-9.]/g, "")) || 0;
+                        if (monthlyPriceEl) monthlyPrice = parseFloat(monthlyPriceEl.textContent.replace(/[^0-9.]/g, "")) || 0;
+                        if (productType.includes('dashcam')) hasDashcamProducts = true;
+                    }
+                    const subtotal = (quantity * devicePrice).toFixed(2);
+                    const isEld = (productType.includes('eld') && !productType.includes('dashcam')) ? 1 : 0;
+                    productData.push({ productName, quantity, subtotal, price: devicePrice.toFixed(2), plan: monthlyPrice.toFixed(2), productId, isEld });
+                    totalQuantity += quantity;
+                    deviceTotal += parseFloat(subtotal);
+                    monthlyTotal += (quantity * monthlyPrice);
+                });
+
+                const currentShipping = calculateShipping();
+                const totalPrice = deviceTotal + monthlyTotal + currentShipping;
+                if (totalQuantity > 0) {
+                    var cartId = Math.floor((Math.random() * 1000000000) + 1);
+                    $.redirect('checkout.php', {
+                        productData: productData,
+                        amount: totalPrice.toFixed(2),
+                        subscriptionTotal: monthlyTotal.toFixed(2),
+                        deviceTotal: deviceTotal.toFixed(2),
+                        activationCost: 0,
+                        shippingCost: currentShipping,
+                        countryType: 'usa',
+                        cartId: cartId,
+                        totalQuantity: totalQuantity,
+                        hasEldProducts: hasEldProducts ? 1 : 0,
+                        hasDashcamProducts: hasDashcamProducts ? 1 : 0
+                    });
+                }
+            }
+        </script>
+
+        <script src="./js/cart.js?r=20260831c"></script>
+
+        <script>
+            // ---- helpers reused by Add to Cart + Details ----
+            function fsCardQtyEl(card){ return card.querySelector('.qty-value, .qty-value-maa, .qty-value-vt, .qty-value-dashcam-eld, .qty-value-dashcam'); }
+            function fsCardIncEl(card){ return card.querySelector('.increment, .increment-maa, .increment-vt, .increment-dashcam-eld, .increment-dashcam'); }
+
+            // ---- Add to Cart: ensure qty >= 1, then live cart logic + feedback ----
+            function fsAddToCart(btn){
+                const card = btn.closest('.product-card');
+                const qtyEl = fsCardQtyEl(card), inc = fsCardIncEl(card);
+                let q = qtyEl ? (parseInt(qtyEl.textContent) || 0) : 0;
+                const alreadyInCart = (parseInt(card.dataset.cartQty || '0') || 0) > 0;
+                // A fresh card sitting at 0 means "add one of these", so bump it to 1.
+                // But a card ALREADY in the cart that the customer stepped down to 0
+                // means "remove it" - do NOT force it back to 1, because decrementing
+                // to 0 is the only remove control the order card has.
+                if (q === 0 && !alreadyInCart && inc) { inc.click(); q = qtyEl ? (parseInt(qtyEl.textContent) || 0) : 0; }
+                // + and - only move the on-card selection. THIS is the single place the
+                // selection is committed into the order card and checkout, so the order
+                // card never changes until the customer clicks this button.
+                card.dataset.cartQty = q;
+                if (typeof addData === 'function') addData();
+                if (!btn.dataset.label) btn.dataset.label = btn.innerHTML;
+                btn.classList.add('added'); btn.innerHTML = q === 0 ? '✓ Removed from Cart' : '✓ Added to Cart';
+                clearTimeout(btn._t);
+                btn._t = setTimeout(() => { btn.innerHTML = btn.dataset.label; btn.classList.remove('added'); }, 1500);
+                setTimeout(fsSyncSummary, 0);
+            }
+
+            // ---- comparison table CTA ----
+            // The compare table is read-only: it has no checkboxes, so there is
+            // nothing "selected" to add. This sends the customer back up to the
+            // product cards, where the quantity spinner and "Add to Cart" live.
+            // (It used to call proceedToCheckout(), which skipped the cart
+            // entirely or fired the "add at least one product" alert.)
+            function fsGoToProducts(){
+                const el = document.getElementById('fs-products');
+                if (!el) return;
+                // offset for the 64px sticky header so the tabs aren't hidden under it
+                const y = el.getBoundingClientRect().top + window.scrollY - 80;
+                window.scrollTo({ top: y, behavior: 'smooth' });
+            }
+
+            // ---- mobile floating cart drawer open/close ----
+            function fsOpenCart(){ document.body.classList.add('fs-cart-open'); setTimeout(fsSyncSummary, 0); }
+            function fsCloseCart(){ document.body.classList.remove('fs-cart-open'); }
+            function fsUpdateCartFab(totalCount){
+                const c = document.getElementById('fsFabCount');
+                if (!c) return;
+                c.textContent = totalCount;
+                c.style.display = totalCount > 0 ? 'flex' : 'none';
+            }
+
+            // ---- empty state + hide zero-qty rows + divider filtering ----
+            function fsSyncSummary() {
+                const rows = document.querySelectorAll('.cart-table > div');
+                let anyItem = false, shipRow = null, totalCount = 0;
+                rows.forEach(r => {
+                    const nameEl = r.querySelector('.fs-line-name'); if (!nameEl) return;
+                    const name = nameEl.childNodes[0].textContent.trim();
+                    if (name === 'Shipping') { shipRow = r; return; }
+                    const qtySpan = nameEl.querySelector('span');
+                    const q = qtySpan ? (parseInt(qtySpan.textContent.replace(/[^0-9]/g, '')) || 0) : 0;
+                    if (q > 0) { r.style.display = 'flex'; anyItem = true; totalCount += q; } else { r.style.display = 'none'; }
+                });
+                if (shipRow) shipRow.style.display = anyItem ? 'flex' : 'none';
+                const empty = document.getElementById('fs-empty');
+                const filled = document.getElementById('fs-filled');
+                if (empty) empty.style.display = anyItem ? 'none' : 'block';
+                if (filled) filled.style.display = anyItem ? 'block' : 'none';
+                fsUpdateCartFab(totalCount);
+            }
+            document.addEventListener('click', () => setTimeout(fsSyncSummary, 0));
+            document.addEventListener('keydown', e => { if (e.key === 'Escape') fsCloseCart(); });
+
+            // ---- category filter: filter cards, hide empty section dividers, update count ----
+            function fsApplyFilter(f) {
+                document.querySelectorAll('.product-card').forEach(card => {
+                    const types = (card.getAttribute('data-product-type') || '').split(/\s+/);
+                    const match = (f === 'all') || types.indexOf(f) !== -1;
+                    card.style.display = match ? '' : 'none';
+                });
+                // a divider is shown only when at least one of the cards in its section is visible
+                document.querySelectorAll('.fs-divider').forEach(d => {
+                    let visible = false;
+                    let node = d.nextElementSibling;
+                    while (node && !node.classList.contains('fs-divider')) {
+                        if (node.classList.contains('product-card') && node.style.display !== 'none') { visible = true; break; }
+                        node = node.nextElementSibling;
+                    }
+                    d.style.display = visible ? 'flex' : 'none';
+                });
+                // update the "Showing N products" count on the right of the tabs
+                const shown = document.querySelectorAll('.product-card').length
+                    ? Array.from(document.querySelectorAll('.product-card')).filter(c => c.style.display !== 'none').length
+                    : 0;
+                const countEl = document.querySelector('.fs-count');
+                if (countEl) countEl.textContent = 'Showing ' + shown + ' product' + (shown === 1 ? '' : 's');
+            }
+            document.querySelectorAll('.filter-link').forEach(l => l.addEventListener('click', () => {
+                document.querySelectorAll('.filter-link').forEach(b => b.classList.remove('active'));
+                l.classList.add('active');
+                fsApplyFilter(l.getAttribute('data-filter'));
+            }));
+
+            // ---- sticky filter tabs: plain on load, pinned "header" once products scroll under it ----
+            (function(){
+                const tabsBar = document.querySelector('.fs-tabs-bar');
+                if (!tabsBar) return;
+                const onScroll = () => {
+                    // the bar is sticky at top:64px; it is "stuck" once the page is scrolled past its origin
+                    const stuck = tabsBar.getBoundingClientRect().top <= 65 && window.scrollY > 40;
+                    tabsBar.classList.toggle('fs-stuck', stuck);
+                };
+                window.addEventListener('scroll', onScroll, { passive:true });
+                onScroll();
+            })();
+
+            window.addEventListener('DOMContentLoaded', () => { setTimeout(fsSyncSummary, 30); fsApplyFilter('all'); });
+        </script>
+    </body>
+</html>

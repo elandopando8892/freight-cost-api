@@ -1,0 +1,29 @@
+{
+  "model":"FCM_COMPANY_PUBLIC_SERVICE_POOL_V1",
+  "reviewedAt":"2026-10-02T09:51:00Z",
+  "capture":"PRIMARY_WEB_READER_EXTRACTION_NOT_ORIGINAL_HTTP",
+  "referencePeriod":"2026-10",
+  "quantityBasis":"SEVEN_NAMED_ADMIN_FUNCTIONS_NOT_3_7_FTE_OR_DRIVER_LINES",
+  "office":{"memberships":7,"monthlyUsdPerMembership":100,"includedServices":["WORKSPACE","INTERNET","PRINTING_SCANNING"],"businessAddressIncluded":false,"phoneIncluded":false,"continuousAccessIncluded":false,"taxUsd":null},
+  "mobile":{"adminLines":7,"baseMonthlyTotalUsd":175,"providerFeeMonthlyUsdPerLine":4.49,"actualSurchargeMonthlyUsd":null,"governmentTaxMonthlyUsd":null,"deviceCostUsd":null,"connectionChargeUsdPerLine":35,"connectionEventModeled":false,"autopayDiscountApplied":false},
+  "yard":{"usComboSpacesPerPair":1,"publishedMonthlyUsdPerCombo":200,"allocationCostCentre":"US_TRACTOR","sameSharedBoxIncluded":true,"mxYardMonthlyUsd":null,"taxAndPaymentFeesUsd":null,"introductoryDurationKnown":false},
+  "fleetPairs":[1,10],
+  "allocationDriver":"SHARED_OFFICE_MOBILE_EQUAL_PAIRS_THEN_TWO_TRACTORS_YARD_US_ONLY",
+  "sources":[
+    {"id":"MILEONE_SERVICES","url":"https://www.mileoneinc.com/services/","locator":"Coworking100/month; workspace, printing/scanning and fiber WiFi; weekday9am-10pm;24/7 extra25 not selected."},
+    {"id":"MILEONE_FAQ","url":"https://www.mileoneinc.com/faq/","locator":"Every worker needs membership; no phone service; business address only qualifying Incubator/Launchpad. Member parking not a truck-yard tariff."},
+    {"id":"TMOBILE_CORE_BROADBAND_FACTS","url":"https://www.t-mobile.com/business/wireless-business-plans","locator":"CoreMobile: seven lines TOTAL175/month, no AutoPay; provider fee4.49/line; actual federal/local surcharges and government taxes vary; one-time connection35/line not recurring."},
+    {"id":"OUTPOST_LAREDO_COMBO","url":"https://outpost.us/locations/laredo-metropolitan/","locator":"One combo space200/month,70x12ft; introductory rate duration unknown; credit card processing3percent, actual payment method unselected.","archive":{"file":"docs/research/sources/OUTPOST_LAREDO_YARD_20261001.html","sha256":"016a154ca9f4b526990adca3174f4a3cde90f82d1c1461e70bc1356e6f0f1afa"}}
+  ],
+  "modelAssumptions":[
+    "Prospective US/Laredo office alternative aligned with the prior US administrative proxy; seven membership/line quantities are explicit planning hypotheses, not observed employees or workload proof.",
+    "Each membership is open coworking, not a private office or a Texas principal business address. Availability, eligibility and human24/7 roster remain unproved.",
+    "Internet and administrative printing are partial included services, not free standalone services, unlimited volumes or complete canonical fields. Office utilities, cleaning, security and equipment ownership costs remain unresolved.",
+    "Seven admin mobile lines are one tariff block175, not175per line; driver phones, devices, route coverage and extended Mexico roaming eligibility are unproved. Provider fee is included once; actual tax and location surcharge are not zero.",
+    "A combo space covers one US tractor plus the same box, not the MX tractor simultaneously. Charge once to the US tractor cost centre, not a second complete trailer charge. MX yard and border storage/handling are outside the component.",
+    "Office/mobile are conserved once across the group; one US combo space per modeled pair is an explicit simultaneous parking-capacity hypothesis, not observed utilization. No parking discount or processing-fee exemption assumed.",
+    "No TMS, payroll, vehicle maintenance, fuel, toll, cargo policy or interest is added again. No generic percentage supplies other company expenses.",
+    "One- and ten-pair alternatives are not selected. Ten-pair components must not join one-registrant UCR, one-policy cargo or one-pair resource budget without rebasing."
+  ],
+  "decision":"PARTIAL_PUBLIC_SERVICE_COMPONENTS_NOT_COMPLETE_COMPANY_BUDGET"
+}

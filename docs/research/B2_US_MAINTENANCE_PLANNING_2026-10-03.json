@@ -1,0 +1,47 @@
+{
+  "model": "FCM_US_ATRI2024_MAINTENANCE_PLANNING_V1",
+  "reviewedAt": "2026-10-03",
+  "operationsYear": 2024,
+  "publicationYear": 2025,
+  "maintenanceUsdPerInternationalMile": 0.198,
+  "internationalMileKm": 1.609344,
+  "scope": "ATTACHED_TRACTOR_TRAILER_COMPOSITE",
+  "sourceBoundary": "ALL_REPAIR_MAINTENANCE_INCLUDING_LABOR_ROADSIDE_EXCLUDING_TIRES",
+  "routineLubricationTreatment": "DECLARED_ALL_MAINTENANCE_PLANNING_INFERENCE_NOT_EXPLICIT_SURVEY_MICRODATA",
+  "replacesTtiAggregate": true,
+  "extraLubricantsAdded": false,
+  "tiresOrDefIncluded": false,
+  "target53FootOrFleetSizeCalibration": false,
+  "inflationAdjustmentPerformed": false,
+  "sources": [
+    {
+      "id": "ATRI2025_MAINTENANCE_ORIGINAL",
+      "url": "https://truckingresearch.org/wp-content/uploads/2025/07/ATRI-Operational-Costs-of-Trucking-07-2025.pdf",
+      "locator": "Table8 printed15/PDF18:2024 R&M0.198USD/mile; survey Q3 printed57/PDF60 defines all truck/trailer repair and maintenance, labor/roadside included, tires separate. Routine oil/lube is not explicitly named.",
+      "archive": {
+        "file": "docs/research/sources/ATRI_OPSCOST_2025_REVIEW_20261001.pdf",
+        "sha256": "581b91b68a76f232102a63f543eff92bb59c9478556b164d84d2be85118902f8"
+      }
+    }
+  ],
+  "driverCoverageReview": {
+    "wagesBenefitsExcludeIncentivesBonuses": true,
+    "locator": "ATRI2025 Table17 printed26/PDF29 and surveyQ5-Q6 printed58/PDF61",
+    "bonusObservationYear": 2024,
+    "annualUsdPerRecipient": {"safety": 1680, "starting": 2122, "retention": 1832, "referral": 1738},
+    "bonusFiguresAreAlternativesNotJointCohortTotals": true,
+    "recipientEligibilityOrHeadcountInferred": false,
+    "employerTaxCoverageEstablished": false,
+    "bonusAmountsIntegratedIntoPilot": false
+  },
+  "limitations": [
+    "Observed historical industry aggregate, not a 2026 carrier observation or matched used Cascadia/dryvan53 small-fleet maintenance estimate.",
+    "Routine lubrication included as an explicit planning interpretation of all maintenance, not a separately measured rate or empirically confirmed survey microcategory. Do not add an oil price on top.",
+    "Different maintenance/tyre/population source alternatives remain visible; tyres retain their prior TTI rate and DEF remains an operating-fluid input. This is not one jointly observed cohort.",
+    "No homogeneous net-tax basis, VAT increment, inflation escalation or guaranteed conservative bound is inferred.",
+    "Bonus averages cover recipients, not all drivers. Neither carrier prevalence nor published average determines pilot eligibility, staffing or fixed/variable allocation.",
+    "Employer charges, workers compensation, wait compensation and other driver scope remain unresolved. Federal tax rules do not prove the ATRI benefit aggregate already includes or excludes each tax."
+  ],
+  "adoptedValues": 0,
+  "quoteReady": false
+}

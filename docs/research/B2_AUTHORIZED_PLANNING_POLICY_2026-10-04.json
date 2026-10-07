@@ -1,0 +1,85 @@
+{
+  "model": "FCM_B2_AUTHORIZED_PUBLIC_PLANNING_POLICY_V1",
+  "referencePeriod": "2026-09",
+  "recordedOn": "2026-10-04",
+  "authorization": {
+    "reference": "user-question-reply:call_vH5D4gZiXUgH7xad8FFvSK1q:0",
+    "answer": "Autorizar escenario de planeación explícito",
+    "scope": "PUBLIC_PLANNING_VALIDATION_ONLY_NOT_OPERATIONAL_CALIBRATION_OR_ADOPTION",
+    "hashAuthenticatesConsent": false
+  },
+  "mxInspections": {
+    "tractorGrossMxn": 800,
+    "emissionsGrossMxn": 403.12,
+    "boxGrossMxn": 700,
+    "tractorEventsPerYear": 1,
+    "emissionsEventsPerYear": 2,
+    "boxEventsPerYear": 1,
+    "url": "https://www.unidaddeverificacionfederal.com.mx/inspeccion-fisico-mecanica-y-verificacion-de-emisiones-contaminantes-para-autotransporte-federal.html",
+    "basis": "PUBLISHED_UNDATED_GROSS_PRICES_CALENDAR2020_TRANSFER_NOT_CURRENT_53FT_SEMITRAILER_QUOTE",
+    "otherRenewalFees": "RESERVE_ONE_TRACTOR_INSPECTION_PRICE_PER_YEAR_FOR_MX_ADMINISTRATIVE_REMAINDER_NOT_A_PUBLISHED_FEE"
+  },
+  "usPermitRemainder": {
+    "annualAdministrativeReserveUsd": 46,
+    "basis": "ONE_PUBLISHED_UCR_B1_FEE_AS_BUDGET_UNIT_FOR_IRP_MISC_REMAINDER_NOT_SECOND_UCR_CHARGE_OR_FULL_FEE_GUARANTEE"
+  },
+  "insurance": {
+    "mxForeignAnnualReserveUsd": 9000,
+    "url": "https://myfullcoverage.com/blog/primary-liability-insurance-for-truckers",
+    "basis": "DOMESTIC_US_EXPERIENCED_CLEAN_COHORT_ENDPOINT_TRANSFER_NO_ACTUAL_HISTORY_FOREIGN_PREMIUM_OR_COVERAGE_CLAIM",
+    "oneBoxMonthlyReserveTargetUsd": 150,
+    "boxBasis": "PUBLIC_GUIDE_HIGH_TOTAL_POOL_NOT_TERRITORIAL_ENDORSEMENT_QUOTE;ADD_ONLY_HIGH_MINUS_ALREADY_INCLUDED_LOW"
+  },
+  "services": {
+    "reserveRate": 0.0825,
+    "rateUrl": "https://comptroller.texas.gov/taxes/sales/faq/local.php",
+    "basis": "PUBLISHED_MAXIMUM_SALES_RATE_USED_ONLY_AS_FEE_TAX_BUDGET_RESERVE_FACTOR_NOT_ACTUAL_LOCAL_TAXABILITY_OR_INVOICE",
+    "adminConnectionBudgetUsd": 35,
+    "connectionCount": 2,
+    "replacementHoldingMonths": 24,
+    "connectionBasis": "PUBLISHED_TMOBILE_ONETIME_FEE_RESERVED_FOR_TWO_PLANNED_REPLACEMENTS_OVER_EXISTING_DEVICE_HORIZON_NOT_MONTHLY_ACTIVATION"
+  },
+  "mxExtras": {
+    "monthlyVoucherMxn": 3430,
+    "voucherEmployeeYearPolicy": "PRIMARY365_RELIEF14_PRORATED_NOT_SECOND_FULLYEAR_OR_REHIRED_WELCOME_BONUS",
+    "bonusHourlyReferenceUsd": 1.31,
+    "insuranceHourlyReferenceUsd": 3.51,
+    "savingsPensionHourlyReferenceUsd": 1.47,
+    "wageHourlyReferenceUsd": 24.97,
+    "referenceUrl": "https://www.bls.gov/news.release/archives/ecec_09092026.htm",
+    "basis": "US_JUNE2026_BROAD_OCCUPATION_RATIOS_TRANSFER_TO_MX_ROAD_WAGES_ONLY_NOT_MX_MARKET_STANDARD;US_NOT_ADDED_AGAIN",
+    "ptuReserveAnnualRoadWageFraction": 0.08333333333333333,
+    "ptuBasis": "ONE_MONTH_OF_MODELED_ROAD_WAGES_AS_CONTINGENT_BUDGET_NOT_OBSERVED_PROFIT_SHARE_OR_LEGAL_ENTITLEMENT",
+    "riskReserveRate": 0.0758875,
+    "riskBasis": "CLASS_V_INITIAL_MEAN_AS_EXPLICIT_SENSITIVITY_ONLY_NOT_NEW_COMPANY_OR_EXISTING_CARRIER_PREMIUM",
+    "taxTreatment": "FULL_REMUNERATIVE_SBC_AND_DECLARED_NL3PCT_SENSITIVITY_NOT_ACTUAL_TAX_DETERMINATION",
+    "extraStatutoryAccrualPolicy": "INCREMENT_EXISTING_WORKEDDAY_AGUINALDO_VACATION_HOLIDAY_BASE_FOR_BONUS_PROXY_ONCE_NOT_FULL_BENEFITS_AGAIN"
+  },
+  "lodging": {
+    "hotelNightsPerCountryPerCycle": 1,
+    "mxHotelNightProxyUsd": 94,
+    "usHotelNightBudgetUsd": 110,
+    "mxParkingBlock24hProxyMxn": 260,
+    "usParkingBlock24hProxyUsd": 12.5,
+    "feeReserveRate": 0.0825,
+    "quantityPolicy": "BUDGET_ONE_EXCEPTION_HOTEL_NIGHT_EACH_COUNTRY_PLUS_CEIL_EACH_CONTINUOUS_REST_OVER24H_AS_PAID_PARKING_POLICY_NOT_OBSERVED_PURCHASES_OR_UNIVERSAL_SHARE",
+    "unitTransfers": "MX_STARTING_ROOM_RATE_AS_NIGHT_PROXY;US_GSA_ALLOWANCE_AS_ROOM_BUDGET;US_PUBLISHED_DAY_AS24H_PLANNING_BLOCK_NOT_PROVIDER_BILLING_FACT",
+    "sites": "COUNTRY_PRICE_TRANSFERS_NOT_DATED_STOPS_OR_VERIFIED_SLEEPER_CUSTODY",
+    "parkingPolicy": "ONE_PLACE_PER_EQUIPMENT_MOVEMENT_NOT_TRACTOR_PLUS_BOX;ROOM_PARKING_UNBUNDLED_AND_OUTSIDE_ALREADY_RESERVED_BASE_BAYS"
+  },
+  "trip": {
+    "mxUnknownTollReservePolicy": "ONE_MEAN_OF13_KNOWN_C5_MOVEMENTS_PER_UNPRICED_POINT_PER_ATTACHED_MOVEMENT_NOT_A_CARBONERA_TARIFF_OR_SECOND_LOSCHORROS",
+    "usTollProxyPerAttachedMovementUsd": 32,
+    "usTollUrl": "https://oklahoma.gov/content/dam/ok/en/ota/documents/annual-report/2025%20ACFR_Supplemental%20Toll%20Schedules%20ONLY.pdf",
+    "usTollLocator": "Physical page6, H.E.Bailey I44 OklahomaCity-StateLine,5axle PLT32, schedule effective2024-2022",
+    "usTollBasis": "HISTORICAL_PUBLIC_AGGREGATE_AS_INLAND_RESERVE_NOT_SELECTED_ROUTE_OR_CURRENT2026_FARE",
+    "bridgePolicy": "RETAIN_EXISTING_FOUR_OR_TWO_KNOWN_DIRECTION_PRICES_AS_EXPLICIT_MODEL_TRANSFER_NO_NEW_BRIDGE_SURCHARGE",
+    "handoffPolicy": "OWN_RELAY_INCLUDED_IN_MODELED_WAGES_ADMIN_AND_RESERVED_YARD_NO_THIRDPARTY_TRANSFER_OR_CARGO_TRANSSHIPMENT",
+    "customsPolicy": "CUSTOMER_CUSTOMS_DUTIES_AND_BROKERAGE_OUTSIDE_CARRIER_COST_SCENARIO_NOT_FREE_SERVICES",
+    "additionalApproachPolicy": "REFERENCE_CYCLE_AND_LINK_DISTANCE_SCOPE_ONLY_NO_ADDITIONAL_UNMEASURED_TERMINAL_MOVEMENT_ASSUMED;ACTUAL_APPROACH_CALIBRATION_OPEN"
+  },
+  "operationalCalibrationComplete": false,
+  "quoteReady": false,
+  "adoptedValues": 0,
+  "externalWrites": false
+}

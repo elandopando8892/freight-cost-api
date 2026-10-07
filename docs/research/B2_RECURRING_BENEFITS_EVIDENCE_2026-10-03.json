@@ -1,0 +1,57 @@
+{
+  "model": "FCM_B2_RECURRING_BENEFITS_EVIDENCE_V1",
+  "observedOn": "2026-10-03",
+  "capture": "PRIMARY_WEB_READER_FACTS_NOT_ORIGINAL_SOURCE_ARCHIVE",
+  "mx": {
+    "sourceUrl": "https://careers.trayecto.com/operador-ala-u1hSQWtXJaoU/",
+    "locator": "OPERADOR ALA; Ofrecemos; conocimientos de rutas Mexico/Bajio/Laredo",
+    "monthlyVoucherMxnPerEmployee": 3430,
+    "welcomeBonusMxn": 10000,
+    "welcomeRecurring": false,
+    "employerSavingsFundMonthlyMxn": null,
+    "employerPensionMonthlyMxn": null,
+    "recruitmentClosed": true,
+    "exactPublicationDate": null,
+    "historicalSeptemberOfferVerified": false,
+    "population": "CDMX_SINGLE_DRYVAN_NOT_BINATIONAL_EMPLOYER_SAMPLE",
+    "independentEmployerCount": 1
+  },
+  "us": {
+    "sourceUrl": "https://www.bls.gov/news.release/archives/ecec_09092026.htm",
+    "locator": "Table 2; Private industry; Occupational group; Transportation and material moving occupations, NOT an industry subrow",
+    "dataPeriod": "2026-06",
+    "releaseDate": "2026-09-09",
+    "totalHourlyUsd": 36.38,
+    "wagesHourlyUsd": 24.97,
+    "benefitsHourlyUsd": 11.41,
+    "categoryHourlyUsd": {
+      "paidLeave": 2.13,
+      "supplementalPay": 1.31,
+      "insurance": 3.51,
+      "retirementSavings": 1.47,
+      "legallyRequired": 3
+    },
+    "conceptsUrl": "https://www.bls.gov/news.release/ecec.tn.htm",
+    "conceptsLocator": "Total benefit costs: five categories; supplemental pay includes premium/overtime, shift differentials and nonproduction bonuses",
+    "truckDriverOnly": false,
+    "actualCarrierCoverageVerified": false
+  },
+  "calculationContext": {
+    "lssUrl": "https://www.diputados.gob.mx/LeyesBiblio/pdf/LSS.pdf",
+    "lssLocator": "Articles 27-30; reform 2026-01-15; exclusions conditional and accounting-dependent; monthly wage /30 is NOT observed variable-pay bimester",
+    "umaUrl": "https://www.inegi.org.mx/contenidos/saladeprensa/boletines/2026/uma/uma2026.pdf",
+    "umaDailyMxn": 117.31,
+    "umaEffectiveFrom": "2026-02-01",
+    "treatment": "FULL_SBC_INTEGRATION_HYPOTHETICAL_SENSITIVITY_ONLY_NOT_TAX_DETERMINATION",
+    "actualExclusionOrIntegrationVerified": false,
+    "primaryEmployeeMonths": 1,
+    "reliefEmployeeMonths": null,
+    "employerRiskDeltaMxn": null,
+    "statePayrollTaxDeltaMxn": null,
+    "voucherVendorFeesMxn": null,
+    "additionalStatutoryAccrualDeltaMxn": null
+  },
+  "calibrated": false,
+  "quoteReady": false,
+  "adoptedValues": 0
+}

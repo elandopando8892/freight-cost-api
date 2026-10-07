@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { BenchmarkLegSchema } from './benchmark-leg.js'
 import { BenchmarkParametersSchema, calculateBenchmarkFromParameters } from './benchmark-rates.js'
 import { SharedTrailerSchema, calculateSharedTrailer } from './benchmark-shared-trailer.js'
+import { reviewTrailerAttachment } from './benchmark-trailer-attachment.js'
 
 const text = z.string().trim().min(1).max(1000)
 const leg = z.object({ parameters: BenchmarkParametersSchema, trip: BenchmarkLegSchema.shape.trip }).strict()
@@ -27,10 +28,18 @@ export const BenchmarkD2DSchema = z.object({
 }).strict()
 
 /** Recompute both legs; never accept client-provided CFU/CVU totals. */
-export function calculateBenchmarkD2D(raw: unknown) {
+export function calculateBenchmarkD2D(raw: unknown, rawTrailerAttachment?: unknown) {
   const input = BenchmarkD2DSchema.parse(raw)
   const issues: { field: string; code: string }[] = []
   const shared = input.assetAllocation === 'SHARED_TRAILER'
+  const attachment = rawTrailerAttachment === undefined ? null : reviewTrailerAttachment(rawTrailerAttachment,
+    input.sharedTrailer?.assetReference ?? '',
+    { mx:input.mx.trip.cycleDays?.value ?? null, us:input.us.trip.cycleDays?.value ?? null },
+    input.sharedTrailer?.evidence.map(row => row.id) ?? [])
+  if (attachment) {
+    if (!shared || !input.sharedTrailer) issues.push({field:'trailerAttachment',code:'SHARED_TRAILER_REQUIRED'})
+    issues.push(...attachment.issues.map(issue => ({...issue,field:`trailerAttachment.${issue.field}`})))
+  }
   if (shared !== Boolean(input.sharedTrailer)) issues.push({ field: 'sharedTrailer', code: 'TRAILER_ALLOCATION_MISMATCH' })
   for (const [key, country] of [['mx', 'MX'], ['us', 'US']] as const) {
     const expectedScope = shared ? 'TRACTOR_ONLY' : 'TRACTOR_AND_TRAILER'
@@ -63,13 +72,14 @@ export function calculateBenchmarkD2D(raw: unknown) {
   }
   const trailer = input.sharedTrailer ? calculateSharedTrailer(input.sharedTrailer, input.serviceDate,
     (input.mx.trip.loadedKm?.value ?? 0) + (input.us.trip.loadedKm?.value ?? 0),
-    (input.mx.trip.cycleDays?.value ?? 0) + (input.us.trip.cycleDays?.value ?? 0)) : null
+    attachment?.minimumTrailerDays ?? ((input.mx.trip.cycleDays?.value ?? 0) + (input.us.trip.cycleDays?.value ?? 0))) : null
   if (trailer) issues.push(...trailer.issues.map(issue => ({ ...issue, field: `sharedTrailer.${issue.field}` })))
   const envelope = { model: input.model, direction: input.direction,
     travelOrder: input.direction === 'MX_TO_US' ? ['mx', 'border', 'us'] : ['us', 'border', 'mx'],
     calibrated: false, sourceStatus: 'DOCUMENTED_UNVERIFIED', purchaseCostUsd: null, sellPriceUsd: null,
     exclusions: ['Taxes', 'Transloading', 'Risk reserves', 'Carrier margin', 'XBF margin'],
-    lineage: input, legs: { mx, us }, sharedTrailer: trailer }
+    lineage: input, legs: { mx, us }, sharedTrailer: trailer,
+    ...(attachment ? { trailerAttachment:attachment } : {}) }
   if (issues.length || !mx.leg?.costs || !us.leg?.costs || (shared && !trailer?.costs)) {
     return { ...envelope, status: 'INCOMPLETE', issues, costs: null }
   }

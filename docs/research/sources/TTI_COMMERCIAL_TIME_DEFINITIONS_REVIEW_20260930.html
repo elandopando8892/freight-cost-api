@@ -1,0 +1,121 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+    <title>Border Crossing Information System - Help and Glossary</title>
+        <link href="../../css/style.css" rel="stylesheet" type="text/css" media="screen" />
+    <link href="../../js/jQuery/development-bundle/themes/custom-theme/jquery-ui-1.8.16.custom.css" type="text/css" rel="stylesheet" />
+    <script src="../../js/jQuery/jquery-1.7.2.min.js" type="text/javascript"></script>
+    <script src="../../js/jQuery/jquery.xml2json.js" type="text/javascript"></script>
+    <script src="../../js/jQuery/development-bundle/ui/jquery-ui-1.8.19.custom.js" type="text/javascript"></script>
+    <script src="../../js/jQuery/jquery.geo-1.0b1.min.js" type="text/javascript"></script>
+    <script src="../../js/handleCookies.js" type="text/javascript"></script>
+    <script src="../../js/headerFooter.js" type="text/javascript"></script>
+    <script src="../../js/language.js" type="text/javascript"></script>
+    <script src="../../js/global.js" type="text/javascript"></script>
+	  <script src="../../js/jQuery/zrssfeed/jquery.zrssfeed.min.js" type="text/javascript"></script>
+	  <script src="../../js/jQuery/zrssfeed/jquery.vticker.js" type="text/javascript"></script>
+    
+	<script src="../../js/helpnglossary.js" type="text/javascript"></script>
+</head>
+<body>
+    <script type="text/javascript">
+        header('help', 'cv');
+    </script> 
+	<div class="container">
+	    <div style="width:100%;height:10px">&nbsp;</div>
+	    <div class="helpHeading">How RFID Based Wait and Crossing Time System Works</div>
+        <div class="content">Current Border Crossing Information System uses Radio Frequency Identification (RFID) 
+        technology to measure travel times between the RFID readers installed at major points of 
+        the border crossing process. Usually during its trip across the border at the POE, a truck 
+        passes under two or more RFID reader stations. The RFID reader station detects the truck's
+        tag identification number and makes a time stamp of the record. The tag IDs and time stamps 
+        are transmitted to the central server via communication links for further processing and 
+        archiving.  Figure 1 shows a schematic diagram of RFID readers and their locations along 
+        the flow of U.S. bound trucks.</div>
+        <div>&nbsp;</div>
+        <div align="center"><img align="center" src="../../images/HowSystemWorks.png" alt="How System Works Image"/><br /><b>Figure 1 : Schematic Diagram of RFID System to Measure Border Travel Times</b></div>
+        <div class="content">&nbsp;</div>   
+        <div class="helpHeading">Location of RFID Reader Stations</div>
+        <div class="content">Locations of RFID reader stations are carefully selected to capture the movement of the 
+            trucks from Mexican streets to the end of border crossing process. As shown in Figure 1 
+            there are three major border inspection facilities in terms of freight movement:
+            <ul class="liInsideDiv">
+                <li class="liInsideDiv">Mexican export lot: A facility operated by Mexican customs (Aduana) that is 
+                responsible for inspecting export materials leaving Mexico. Generally only a small 
+                percentage of freight is physically inspected at this facility.</li>
+                <li class="liInsideDiv">U.S. Federal inspection compound: This facility is operated by U.S. Customs and 
+                Border Protection (CBP). Its primary function is to make sure no illegal freight 
+                is enter the United States. Secondary inspections can occur here if CBP feels further 
+                examinations of the driver, freight, or conveyance are needed.</li>
+                <li class="liInsideDiv">State inspection facility: This facility is operated by the State's Department of 
+                Public Safety (DPS). Its primary function is to ensure that tractors and trailers entering 
+                the United States from Mexico are safe enough to operate on U.S. roadways. Secondary 
+                inspections of the vehicles can occur here if deficiencies are revealed through a 
+                preliminarily review by DPS.</li>
+            </ul>
+            The northbound commercial freight border crossing process begins at the Mexican export lot on 
+            the Mexican side of the border. After clearing customs on the Mexican side, a truck crosses 
+            into the United States, typically across a physical bridge structure. Immediately upon entering 
+            the United States, the truck proceeds to the U.S. CBP primary inspection booth. Final inspection 
+            is made at the State inspection facility and the truck exits the border crossing process. 
+            In most of the POEs, RFID stations are located at the three major points; Mexican street before MX Aduana, 
+            at U.S. CBP primary inspection booths, and at the exit of DPS inspection facility.</div>
+<div class="content">&nbsp;</div>      
+    <div class="helpHeading">Calculation of Wait Time and Crossing Time</div>
+    <div class="content">Border crossing travel time can be described by two different types of measures.  
+      Wait time is defined as "the time it takes, in minutes, for a vehicle to reach the CBP's Primary 
+      Inspection booth after arriving at the end of the queue." This queue length is variable and depends 
+      on traffic volumes and processing times at each of the inspections facilities.  Crossing time has 
+      the same beginning point in the flow as wait time, but its terminus is the departure point from the 
+      last compound that a vehicle transits in the border crossing process as shown in Figure 1.</div>
+      <div>Wait time is calculated from the matched RFID reads between the MX streets before Aduana 
+      and U.S. CBP.  Crossing time is calculated by adding the travel time between U.S. CBP and 
+      DPS to the wait time so that it can cover the overall border crossing process at predefined 
+      time intervals (10 minutes and 1 hour).
+      </div>
+<div class="content">&nbsp;</div>
+       <div class="helpHeading">Real-Time Information and Archived Data</div>
+        <div class="content">The main screen of Border Crossing Information System shows the real time information 
+        about wait and crossing times with brief descriptions of each travel segment. The wait and 
+        crossing time table also shows the last update time to give information about the 
+        current status of border crossing activities. When a bridge name is clicked in the table, 
+        an additional screen pops up to show the traffic conditions in color coded routes in the map. 
+        The map also shows the exact locations of RFID stations across the border.</div>
+        <div class="content">In addition to the real-time information, past border crossing data such as monthly performance 
+        indicators can be retrieved by Query Archived Data menu. Query Archive Data screen allows users to 
+        select various performance measures for each bridge at the selected date range.</div> 
+<div class="content">&nbsp;</div>        
+        <div class="helpHeading">Glossary of Terms</div>
+        <div class="content"><u>Wait Time</u>: The time it takes for a vehicle to reach the CBP's Primary Inspection 
+        booth after it arrives at the end of the queue. Currently it contains the service time of primary inspection.</div>
+        <div class="content"><u>Crossing Time</u>: The time it takes for a vehicle to exit the border crossing process 
+        after it joins the queue before CBP primary inspection booth. Crossing time has the same 
+        beginning point in the flow as wait time, but its terminus is located at the end of federal 
+        and state inspection compounds.</div>
+        <div class="content"><u>Individual Segment Travel Times</u>: The time it takes for a vehicle to travel a 
+        segment between the two RFID stations. Usually there is one RFID station (except Pharr) in Mexican 
+        street and two RFID stations in U.S. (CBP primary and the exit of DPS).</div>
+        <div class="content"><u>Tag Count</u>: Total count of transponders identified by individual RFID readers 
+        at 10- and 60-minute intervals.</div>
+        <div class="content"><u>10 Minute Average Travel Time</u>: Average Travel Time of US bound commercial vehicles, 
+        for the selected segment over the selected time period, calculated at every 10-minute interval.</div>
+        <div class="content"><u>Hourly Average Travel Time</u>: Average Travel Time of US bound commercial vehicles, 
+        for the selected segment over the selected time period, aggregated at every 1-hour interval.</div>
+        <div class="content"><u>Histogram of Raw Travel Time</u>:  Number of tag counts by travel time interval 
+        on the selected day in a bar chart. Cumulative probability line chart also shows the chance of border 
+        crossing with the given minutes or less.</div>
+        <div class="content"><u>Daily Percentage Trucks Congested</u>: Percentage of trucks that took longer travel 
+        time than the average travel time for the selected segment on a given day. </div>
+        <div class="content"><u>Monthly Percentage Trucks Congested</u>: Percentage of trucks that took longer travel 
+        time than the average travel time on a given month.</div>
+        <div class="content"><u>Monthly Performance Indicators</u>: Various performance measures about crossing times 
+        and sample size shown in a single chart. It is convenient to observe the performance changes over the months.</div>
+        
+	</div>
+	
+	
+    <script type="text/javascript">
+        footer('commercial');
+    </script>  	
+</body>
+</html>

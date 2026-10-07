@@ -1,0 +1,108 @@
+{
+  "artifact": "FCM_B1_IMT_MX_HISTORICAL_PRODUCTIVITY_V1",
+  "retrievedDate": "2026-09-29",
+  "use": "HISTORICAL_PUBLIC_RESEARCH_ONLY",
+  "adopted": false,
+  "currentQuoteReady": false,
+  "targetCohort": "MX_THIRD_PARTY_D2D_GENERAL_CARGO_T3_S2",
+  "sources": [
+    {
+      "id": "IMT_PT260_2004",
+      "url": "https://imt.mx/archivos/publicaciones/publicaciontecnica/pt260.pdf",
+      "title": "Métodos para la renovación de vehículos de autotransporte de servicio pesado",
+      "observationYear": 2004,
+      "country": "MX",
+      "type": "ENGINEERING_MODEL_CASE",
+      "limitations": "Historical modeled renewal case, not a representative carrier-year sample or current third-party D2D cohort. Nominal historical asset and cost assumptions must not be reused."
+    },
+    {
+      "id": "IMT_PT630_2021",
+      "url": "https://www.imt.mx/archivos/Publicaciones/PublicacionTecnica/pt630.pdf",
+      "title": "Análisis del costo fijo del autotransporte de carga",
+      "observationYear": 2021,
+      "country": "MX",
+      "type": "COST_ALLOCATION_EXAMPLE",
+      "limitations": "The annual trip and kilometer figures are denominators in an illustrative insurance allocation example, not measured cohort productivity."
+    },
+    {
+      "id": "IMT_EECAN_2014_DT64",
+      "url": "https://imt.mx/resumen-boletines.html?IdArticulo=433&IdBoletin=161",
+      "observationYear": 2014,
+      "country": "MX",
+      "type": "ROAD_STATION_VEHICLE_OBSERVATIONS",
+      "limitations": "Ten stations in selected states; observed vehicle-empty share by configuration is not annual empty kilometers for a carrier."
+    },
+    {
+      "id": "IMT_EECAN_2017_DT75",
+      "url": "https://www.imt.mx/archivos/Publicaciones/DocumentoTecnico/dt75.pdf",
+      "observationYear": 2017,
+      "country": "MX",
+      "type": "ROAD_STATION_VEHICLE_OBSERVATIONS",
+      "limitations": "Six stations and mixed traffic; this is vehicle-state share at observed points, not national annual distance share or a carrier cohort. IMT states 2017 is the latest fieldwork available."
+    }
+  ],
+  "observations": [
+    {
+      "id": "PT260_T3S2_MODEL_CASE",
+      "sourceId": "IMT_PT260_2004",
+      "locator": "Chapter 4, base case, printed page 19",
+      "cohort": "MODELED_T3S2_RENEWAL_CASE",
+      "values": {
+        "annualDistance": { "value": 120000, "unit": "km/vehicle-year" },
+        "operatingDays": { "value": 300, "unit": "days/vehicle-year" },
+        "annualTonnage": { "value": 4224, "unit": "tonnes/year" },
+        "roundTripCapacityUtilization": { "value": 55, "unit": "percent" }
+      },
+      "limitation": "Model inputs for a historical economic case. Capacity utilization is not loaded-distance share; none of these values is adopted."
+    },
+    {
+      "id": "PT630_T3S2_INSURANCE_EXAMPLE",
+      "sourceId": "IMT_PT630_2021",
+      "locator": "Insurance example, printed page 14",
+      "cohort": "ILLUSTRATIVE_INSURANCE_COST_ALLOCATION",
+      "values": {
+        "annualTrips": { "value": 144, "unit": "trips/vehicle-year" },
+        "annualDistance": { "value": 110000, "unit": "km/vehicle-year" }
+      },
+      "limitation": "Example denominator for allocating insurance expense per trip/km, not measured annual operating records. Does not supply operating days or loaded/empty km."
+    },
+    {
+      "id": "EECAN_2014_T3S2_EMPTY_VEHICLE_SHARE",
+      "sourceId": "IMT_EECAN_2014_DT64",
+      "locator": "Summary for EECAN 2014; ten installed stations",
+      "cohort": "T3S2_VEHICLE_OBSERVATIONS_AT_2014_ROAD_STATIONS",
+      "values": {
+        "emptyVehicleObservationShare": { "value": 20.9, "unit": "percent-of-observed-T3S2-vehicles" }
+      },
+      "limitation": "Point/roadside vehicle state, not distance-weighted loaded/empty share; selected station network and historical year."
+    },
+    {
+      "id": "EECAN_2017_T3S2_EMPTY_VEHICLE_SHARE",
+      "sourceId": "IMT_EECAN_2017_DT75",
+      "locator": "Section 2.4; six stations explored in 2017",
+      "cohort": "T3S2_VEHICLE_OBSERVATIONS_AT_2017_ROAD_STATIONS",
+      "values": {
+        "emptyVehicleObservationShare": { "value": 60, "unit": "percent-of-observed-T3S2-vehicles" },
+        "allConfigurationEmptyVehicleObservationShare": { "value": 57, "unit": "percent-of-observed-vehicles" },
+        "stationRangeAllConfigurations": { "min": 32.4, "max": 80, "unit": "percent-of-observed-vehicles" }
+      },
+      "limitation": "Mixed traffic and six selected road stations; not a national annual empty-distance share or carrier cohort. Not comparable as a direct time series with the 2014 station network."
+    }
+  ],
+  "pilotInputs": {
+    "annualKmPerTractor": { "status": "MISSING", "adoptedValue": null },
+    "productiveDaysPerYear": { "status": "MISSING", "adoptedValue": null },
+    "emptyKmShare": { "status": "MISSING", "adoptedValue": null },
+    "roundTripCapacityUtilization": { "status": "MISSING", "adoptedValue": null }
+  },
+  "validation": {
+    "publicSourceEvidenceOnly": true,
+    "2014And2017EmptySharesAveraged": false,
+    "historicalCasesPromotedToDefaults": false,
+    "engineOrProductionChanged": false,
+    "limitations": [
+      "Official IMT PDF links were checked against indexed text; some PDFs returned HTTP 403 through the browser reader, so visual page inspection is not claimed.",
+      "No public Mexican source identified in this review supplies compatible current annual vehicle-km, productive days, and distance-weighted loaded/empty split for the pilot cohort."
+    ]
+  }
+}

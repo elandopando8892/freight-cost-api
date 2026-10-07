@@ -17,6 +17,7 @@ import { compareObservedTripCosts } from './engine-economic-validation.js'
 import { OperationalSegmentSchema, segmentFor } from '../cost-bases/operational-segments.js'
 import { requireRole } from '../../middleware/authorize.js'
 import { reviewedPartnerCost } from './partner-cost-snapshot.js'
+import { applyTripFuel, tripFuelReview, TripDateSchema, TripFuelSelectionSchema } from './trip-fuel-review.js'
 
 const MarketConditionEnum = z.enum([
   'Very Tight', 'Moderately Tight', 'Balanced', 'Slightly Loose', 'Very Loose',
@@ -200,6 +201,8 @@ export async function engineRoutes(app: FastifyInstance) {
 
   // ── Quote by route name — resolves leg facts from V3.0 reference tables ───
   const ByRouteSchema = z.object({
+    serviceDate: TripDateSchema.optional(),
+    tripFuel: TripFuelSelectionSchema.optional(),
     policy: EnginePolicySchema.optional(),
     costBaseId: z.string().min(1).optional(),
     assumptionSetId: z.string().min(1).optional(),
@@ -213,6 +216,18 @@ export async function engineRoutes(app: FastifyInstance) {
     route: z.string().default('Straight & Danger'),
     equipment: EquipmentSchema.default({}),
     fxRate: z.number().positive().optional(),
+  })
+
+  // Read-only resolution: no preview, quote, market refresh or assumption write.
+  app.post('/engine/route-inputs', { preHandler: requireRole('ADMIN', 'OPERATOR') }, async (request, reply) => {
+    reply.header('Cache-Control', 'no-store')
+    const { orgId } = request.user as JwtPayload
+    const body = ByRouteSchema.parse(request.body)
+    const input = { ...body, orgId, service: body.service ?? defaultService(body.operation) }
+    const resolved = await resolveRoute(input)
+    const issues = pricingInputIssues(body.operation, { mex: resolved.mexLeg, usa: resolved.usaLeg })
+    if (issues.length) return reply.status(422).send({ error: issues.join(' '), issues, warnings: resolved.warnings })
+    return reply.send({ fuel: resolved.usaLeg ? tripFuelReview(input, resolved.usaLeg) : null, warnings: resolved.warnings })
   })
 
   app.post('/engine/quote-by-route', { preHandler: requireRole('ADMIN', 'OPERATOR') }, async (request, reply) => {
@@ -239,6 +254,12 @@ export async function engineRoutes(app: FastifyInstance) {
     })
     if (inputIssues.length > 0) {
       return reply.status(422).send({ error: inputIssues.join(' '), issues: inputIssues, warnings: resolved.warnings })
+    }
+
+    if (resolved.usaLeg) {
+      const review = tripFuelReview({ ...body, orgId, service }, resolved.usaLeg)
+      resolved.usaLeg = applyTripFuel(review, resolved.usaLeg, body.tripFuel)
+      if (resolved.usaLeg.fuelReview?.provisional) resolved.warnings.push(review.warning)
     }
 
     let params: ParamMap = {}
@@ -278,6 +299,7 @@ export async function engineRoutes(app: FastifyInstance) {
       origin: body.outboundLocation.trim(), destination: body.inboundLocation.trim(),
       mexBorder: body.mexBorder, usBorder: body.usBorder, route: body.route,
       operation: body.operation, service, equipment: body.equipment, fxRate: body.fxRate ?? null,
+      serviceDate: body.serviceDate ?? null,
     }
     const preview = await prisma.quoteCalculationPreview.create({
       data: {

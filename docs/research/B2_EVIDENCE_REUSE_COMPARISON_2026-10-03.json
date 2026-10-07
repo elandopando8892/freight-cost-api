@@ -1,0 +1,449 @@
+{
+  "schemaVersion": 1,
+  "id": "B2_EVIDENCE_REUSE_COMPARISON_20261003",
+  "status": "CUT_2_LOCAL_COMPARISON_COMPLETE",
+  "observedAtUtc": "2026-10-03T22:26:03Z",
+  "worktree": {
+    "path": "D:/andre/worktrees/freight-cost-model/cost-tires-release-20260927",
+    "branch": "codex/cost-tires-release-s14",
+    "head": "4f5fc2de0c3d178dace917231e1092040dec21fd",
+    "dirtyWorkPreserved": true,
+    "newWorktree": false
+  },
+  "scope": {
+    "slice": "B2_MIXED_LODGING_EVIDENCE_REVIEW",
+    "wireframe": "A",
+    "dataClass": "SYNTHETIC_ONLY",
+    "monetaryAmounts": null,
+    "canonicalMappings": null,
+    "classification": "CVU",
+    "businessWrites": 0,
+    "authChanged": false,
+    "databaseChanged": false,
+    "engineChanged": false,
+    "mainDependencyManifestsChanged": false,
+    "productionDeployment": false,
+    "realAuthenticatedValidation": false,
+    "b2Closed": false
+  },
+  "decision": {
+    "winner": "EXISTING_REACT_COMPONENTS",
+    "refineVersion": "5.0.12",
+    "refineLicense": "MIT",
+    "why": "Identical UX and test outcome; existing Query/RHF/Button/Input use 19 variant-specific lines versus 44 for Refine. Refine adds a resource/filter provider and dependency overhead without code savings in this read-review workflow.",
+    "adoptedIntoProduct": false,
+    "scopeLimit": "Not a general assessment of Refine CRUD or enterprise features.",
+    "nextCut": "Project the existing B2 closeout into a read-only contract and connect the selected inspector; preserve economic gaps and permissions. No new registry or price adoption."
+  },
+  "execution": {
+    "provider": "OpenAI / Codex",
+    "requestedModel": "gpt-6.1-sol",
+    "requestedEffort": "high",
+    "exactRuntimeModelObserved": null,
+    "exactRuntimeEffortObserved": null,
+    "writer": "current Codex session",
+    "auxiliaryProviderInvocations": 0,
+    "subagents": 0,
+    "paidServicesActivated": 0,
+    "tokenUsage": null,
+    "charges": null,
+    "remainingQuota": null,
+    "clockWindowObserved": [
+      "2026-10-03T21:58:46Z",
+      "2026-10-03T22:26:03Z"
+    ],
+    "windowIsTotalTurnDuration": false,
+    "diagnosticCorrections": [
+      "Refine filters contract/query key adaptation",
+      "Browser assertion waits for actual focus return, not an arbitrary sleep",
+      "Prototype moved outside Next TypeScript scope; main app typecheck rerun"
+    ],
+    "budgetNote": "No auxiliary inference or new paid-service budget consumed; no assumed zero cost for native tokens or failed attempts."
+  },
+  "metrics": {
+    "at": "2026-10-03T22:25:56.269Z",
+    "method": "Nonblank source lines; variant entry plus variant hook/provider. Shared UI/data/CSS excluded from variant difference. Independent builds with --mode actual and --mode refine; JS bytes reachable from each generated HTML, unique paths, plus gzip per file. Not a Next production bundle or measured developer time savings.",
+    "code": {
+      "actual": 19,
+      "refine": 44,
+      "shared": {
+        "review.tsx": 138,
+        "contracts.ts": 64,
+        "style.css": 83
+      }
+    },
+    "bundles": {
+      "actual": {
+        "bytes": 315320,
+        "gzipBytes": 100359,
+        "files": [
+          "/assets/actual-BZqIhkJP.js"
+        ]
+      },
+      "refine": {
+        "bytes": 452901,
+        "gzipBytes": 145766,
+        "files": [
+          "/assets/refine-DNHNjAWH.js"
+        ]
+      }
+    },
+    "dependencies": {
+      "isolatedPackageCount": 38,
+      "refineNonBaselinePackages": [
+        {
+          "name": "@refinedev/core",
+          "version": "5.0.12"
+        },
+        {
+          "name": "@refinedev/devtools-internal",
+          "version": "2.0.2"
+        },
+        {
+          "name": "@refinedev/devtools-shared",
+          "version": "2.0.2"
+        },
+        {
+          "name": "call-bind-apply-helpers",
+          "version": "1.0.2"
+        },
+        {
+          "name": "call-bound",
+          "version": "1.0.4"
+        },
+        {
+          "name": "dunder-proto",
+          "version": "1.0.1"
+        },
+        {
+          "name": "error-stack-parser",
+          "version": "2.1.4"
+        },
+        {
+          "name": "es-define-property",
+          "version": "1.0.1"
+        },
+        {
+          "name": "es-errors",
+          "version": "1.3.0"
+        },
+        {
+          "name": "es-object-atoms",
+          "version": "1.1.2"
+        },
+        {
+          "name": "function-bind",
+          "version": "1.1.2"
+        },
+        {
+          "name": "get-intrinsic",
+          "version": "1.3.0"
+        },
+        {
+          "name": "get-proto",
+          "version": "1.0.1"
+        },
+        {
+          "name": "gopd",
+          "version": "1.2.0"
+        },
+        {
+          "name": "has-symbols",
+          "version": "1.1.0"
+        },
+        {
+          "name": "hasown",
+          "version": "2.0.4"
+        },
+        {
+          "name": "lodash",
+          "version": "4.18.1"
+        },
+        {
+          "name": "lodash-es",
+          "version": "4.18.1"
+        },
+        {
+          "name": "math-intrinsics",
+          "version": "1.1.0"
+        },
+        {
+          "name": "object-inspect",
+          "version": "1.13.4"
+        },
+        {
+          "name": "papaparse",
+          "version": "5.7.0"
+        },
+        {
+          "name": "pluralize",
+          "version": "8.0.0"
+        },
+        {
+          "name": "qs",
+          "version": "6.16.0"
+        },
+        {
+          "name": "side-channel",
+          "version": "1.1.1"
+        },
+        {
+          "name": "side-channel-list",
+          "version": "1.0.1"
+        },
+        {
+          "name": "side-channel-map",
+          "version": "1.0.1"
+        },
+        {
+          "name": "side-channel-weakmap",
+          "version": "1.0.2"
+        },
+        {
+          "name": "stackframe",
+          "version": "1.3.4"
+        },
+        {
+          "name": "tslib",
+          "version": "2.8.1"
+        },
+        {
+          "name": "warn-once",
+          "version": "0.1.1"
+        }
+      ],
+      "namesNotInMainLock": [
+        {
+          "name": "@refinedev/core",
+          "version": "5.0.12"
+        },
+        {
+          "name": "@refinedev/devtools-internal",
+          "version": "2.0.2"
+        },
+        {
+          "name": "@refinedev/devtools-shared",
+          "version": "2.0.2"
+        },
+        {
+          "name": "error-stack-parser",
+          "version": "2.1.4"
+        },
+        {
+          "name": "lodash",
+          "version": "4.18.1"
+        },
+        {
+          "name": "lodash-es",
+          "version": "4.18.1"
+        },
+        {
+          "name": "papaparse",
+          "version": "5.7.0"
+        },
+        {
+          "name": "pluralize",
+          "version": "8.0.0"
+        },
+        {
+          "name": "stackframe",
+          "version": "1.3.4"
+        },
+        {
+          "name": "warn-once",
+          "version": "0.1.1"
+        }
+      ]
+    }
+  },
+  "verification": {
+    "browser": {
+      "at": "2026-10-03T22:25:10.365Z",
+      "scope": "LOCAL_SYNTHETIC_ONLY",
+      "results": [
+        {
+          "name": "actual: loading and four synthetic records",
+          "status": "PASS"
+        },
+        {
+          "name": "actual: search / country / empty / status",
+          "status": "PASS"
+        },
+        {
+          "name": "actual: source / nulls / missing canonical link",
+          "status": "PASS"
+        },
+        {
+          "name": "actual: validate / save / deduplicate / reload local note",
+          "status": "PASS"
+        },
+        {
+          "name": "actual: simulated token renewal preserves unsaved draft",
+          "status": "PASS"
+        },
+        {
+          "name": "actual: scenario / funding / account reset and isolation",
+          "status": "PASS"
+        },
+        {
+          "name": "actual: period incompatible / source incomplete",
+          "status": "PASS"
+        },
+        {
+          "name": "actual: query error / retry / recovery",
+          "status": "PASS"
+        },
+        {
+          "name": "actual: viewer / operator / simulated expired session",
+          "status": "PASS"
+        },
+        {
+          "name": "actual: stale review visible and selection invalidated",
+          "status": "PASS"
+        },
+        {
+          "name": "actual: desktop visual and keyboard selection",
+          "status": "PASS"
+        },
+        {
+          "name": "actual: mobile 390×844 / focus return / no overflow",
+          "status": "PASS"
+        },
+        {
+          "name": "refine: loading and four synthetic records",
+          "status": "PASS"
+        },
+        {
+          "name": "refine: search / country / empty / status",
+          "status": "PASS"
+        },
+        {
+          "name": "refine: source / nulls / missing canonical link",
+          "status": "PASS"
+        },
+        {
+          "name": "refine: validate / save / deduplicate / reload local note",
+          "status": "PASS"
+        },
+        {
+          "name": "refine: simulated token renewal preserves unsaved draft",
+          "status": "PASS"
+        },
+        {
+          "name": "refine: scenario / funding / account reset and isolation",
+          "status": "PASS"
+        },
+        {
+          "name": "refine: period incompatible / source incomplete",
+          "status": "PASS"
+        },
+        {
+          "name": "refine: query error / retry / recovery",
+          "status": "PASS"
+        },
+        {
+          "name": "refine: viewer / operator / simulated expired session",
+          "status": "PASS"
+        },
+        {
+          "name": "refine: stale review visible and selection invalidated",
+          "status": "PASS"
+        },
+        {
+          "name": "refine: desktop visual and keyboard selection",
+          "status": "PASS"
+        },
+        {
+          "name": "refine: mobile 390×844 / focus return / no overflow",
+          "status": "PASS"
+        },
+        {
+          "name": "No external requests / business HTTP writes / uncaught browser errors",
+          "status": "PASS"
+        }
+      ],
+      "externalRequests": [],
+      "writes": [],
+      "errors": []
+    },
+    "unit": {
+      "runner": "Vitest 1.6.1",
+      "passed": 11,
+      "failed": 0
+    },
+    "prototypeTypecheck": "PASS",
+    "mainWebTypecheck": "PASS",
+    "independentBuilds": [
+      "actual: PASS",
+      "refine: PASS"
+    ],
+    "originalSourcePins": {
+      "checked": 22,
+      "mismatched": 0
+    },
+    "visual": {
+      "desktop": {
+        "width": 1440,
+        "height": 1000
+      },
+      "mobile": {
+        "width": 390,
+        "height": 844
+      },
+      "screenshots": 6,
+      "inspected": true,
+      "humanAcceptance": false,
+      "manualPagesReadAndRendered": [
+        12,
+        13
+      ],
+      "fontFallback": "Arial / Courier; approved font assets not bundled"
+    }
+  },
+  "failures": [
+    {
+      "at": "2026-10-03T22:07:27.746Z",
+      "phase": "first browser run",
+      "failure": "Refine search did not invalidate via custom meta.filters; timed out at expected two rows",
+      "resolution": "Use Refine CrudFilters and explicit scope discriminator; same shared synthetic reader"
+    },
+    {
+      "at": "2026-10-03T22:19:07.654Z",
+      "phase": "repeat browser run",
+      "failure": "Immediate focus assertion before requestAnimationFrame returned focus",
+      "resolution": "Wait for activeElement matching selected row, bounded 5s; unchanged UI behavior"
+    },
+    {
+      "phase": "main web typecheck before relocation",
+      "failure": "TS2322 StaticImageData not assignable to img src string; prototype was in Next glob",
+      "resolution": "Move own prototype to docs/prototypes/b2-evidence-reuse, no main config edits; main tsc exit0 afterward"
+    },
+    {
+      "phase": "unit command from wrong cwd",
+      "failure": "No test files found",
+      "resolution": "Run dedicated fixture Vitest config from its physical directory"
+    },
+    {
+      "phase": "initial isolated npm install from parent cwd",
+      "failure": "npm added an unwanted local parent dependency inside prototype only",
+      "resolution": "Remove own manifest entry and reconcile lock from prototype cwd; main manifest and lock unchanged"
+    }
+  ],
+  "artifacts": {
+    "prototype": "docs/prototypes/b2-evidence-reuse",
+    "browserReport": "tmp/reuse-spike-evidence/browser-results.json",
+    "metrics": "tmp/reuse-spike-evidence/metrics.json",
+    "desktop": "tmp/reuse-spike-evidence/actual-desktop.png",
+    "mobile": "tmp/reuse-spike-evidence/actual-mobile-detail.png",
+    "demo": "http://127.0.0.1:4320/actual.html"
+  },
+  "rollback": {
+    "type": "selective own artifacts only",
+    "steps": [
+      "Stop only the verified own Vite process bound to 127.0.0.1:4320; do not stop other servers",
+      "Archive/remove only this new docs/prototypes/b2-evidence-reuse folder and cut2 research files after verifying no later edits",
+      "Remove only the cut2 paragraph from SPRINT_STATUS.md, preserving earlier work",
+      "Retain tmp screenshots/JSON if needed for recovery; no DB/Auth/engine rollback needed"
+    ]
+  }
+}

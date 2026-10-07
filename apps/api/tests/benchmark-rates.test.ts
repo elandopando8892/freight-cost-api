@@ -8,7 +8,8 @@ function fixture(country: 'MX' | 'US' = 'MX') {
   const needed = new Set(Object.values(benchmarkRateRequirements(country)).flat())
   return { country, assetCostScope: 'TRACTOR_AND_TRAILER', serviceDate: '2026-09-29', baseRevision: 'SYNTHETIC-ONLY',
     parameters: PARAMETER_DEFINITIONS.filter(p => needed.has(p.key)).map(p => ({
-      key: p.key, value: p.defaultValue, unit: p.unit, evidenceIds: ['test'], derivation: 'Test fixture only',
+      key: p.key, value: p.field === 'Qty Recapeadas' ? 0 : p.defaultValue, unit: p.unit,
+      evidenceIds: ['test'], derivation: 'Test fixture only; installed positions, no additive retread row',
     })),
     evidence: [{ id: 'test', url: 'https://example.org/synthetic', locator: 'Fixture', country,
       equipment: 'TRACTOR_DRY_VAN_SINGLE', observedAt: '2026-09-01', validFrom: '2026-09-01', validUntil: '2026-09-30', limitations: 'Not evidence' }],
@@ -71,6 +72,53 @@ describe('canonical benchmark rates', () => {
     const after = deriveBenchmarkRates(input)
     expect(after.rates?.tiresUsdPerKm?.value).toBe(0.08)
     expect(after.rates?.maintenanceUsdPerKm).toEqual(before.rates?.maintenanceUsdPerKm)
+  })
+  it.each(['MX', 'US'] as const)('blocks ambiguous retreads before producing %s rates or a trip estimate', country => {
+    const input = fixture(country)
+    set(input, 'COST_TIRES', 'Qty Recapeadas', 8)
+    const result = deriveBenchmarkRates(input)
+    expect(result.status).toBe('INCOMPLETE')
+    expect(result.rates).toBeNull()
+    expect(result.issues).toContainEqual({ field: 'COST_TIRES__Qty Recapeadas', code: 'RETREAD_POSITION_OR_LIFECYCLE_REQUIRED' })
+    expect(result.tireMethod.legacyWorkbookFormulaChanged).toBe(false)
+    expect(calculateBenchmarkFromParameters(input, {}).leg).toBeNull()
+    expect(input.parameters.find(p => p.key === parameterKey('COST_TIRES', 'Qty Recapeadas'))!.value).toBe(8)
+    // Even when no new drive tires are declared, a standalone retread row does
+    // not identify a physical position or a sequential casing lifecycle.
+    set(input, 'COST_TIRES', 'Qty Traccion', 0)
+    expect(deriveBenchmarkRates(input).rates).toBeNull()
+  })
+  it.each(['TRACTOR_ONLY', 'TRACTOR_AND_TRAILER'])('does not hide ambiguous retreads under %s ownership', scope => {
+    const input = fixture(); input.assetCostScope = scope
+    const needed = new Set(Object.values(benchmarkRateRequirements('MX', scope === 'TRACTOR_ONLY')).flat())
+    input.parameters = input.parameters.filter(p => needed.has(p.key))
+    set(input, 'COST_TIRES', 'Qty Recapeadas', 1)
+    expect(deriveBenchmarkRates(input).issues).toContainEqual({ field: 'COST_TIRES__Qty Recapeadas', code: 'RETREAD_POSITION_OR_LIFECYCLE_REQUIRED' })
+  })
+  it.each(['Direccion', 'Traccion', 'Remolque'])('rejects fractional %s physical tire quantities rather than adopting aggregate equivalents', position => {
+    const input = fixture(); set(input, 'COST_TIRES', `Qty ${position}`, 1.5)
+    expect(deriveBenchmarkRates(input).issues).toContainEqual({ field: `COST_TIRES__Qty ${position}`, code: 'NON_INTEGER_PHYSICAL_TIRE_QUANTITY' })
+    expect(deriveBenchmarkRates(input).rates).toBeNull()
+  })
+  it('derives each installed position once with its own price/life and conserves all twelve dependencies', () => {
+    const input = fixture()
+    for (const [position, qty, price, life] of [
+      ['Direccion', 2, 100, 1000], ['Traccion', 8, 200, 2000], ['Remolque', 8, 400, 4000],
+    ] as const) {
+      set(input, 'COST_TIRES', `Qty ${position}`, qty)
+      set(input, 'COST_TIRES', `PU ${position}`, price)
+      set(input, 'COST_TIRES', `Life KM ${position}`, life)
+    }
+    set(input, 'COST_TIRES', 'PU Recapeadas', 1e8)
+    const full = deriveBenchmarkRates(input)
+    expect(full.rates!.tiresUsdPerKm!.value).toBeCloseTo(1.8, 12)
+    expect(full.requirements.tiresUsdPerKm).toHaveLength(12)
+    expect(full.tireMethod.publicAggregateIsAlternativeNotAdditionalExpense).toBe(true)
+    input.assetCostScope = 'TRACTOR_ONLY'
+    input.parameters = input.parameters.filter(p => new Set(Object.values(benchmarkRateRequirements('MX', true)).flat()).has(p.key))
+    const tractor = deriveBenchmarkRates(input)
+    expect(tractor.rates!.tiresUsdPerKm!.value).toBeCloseTo(1, 12)
+    expect(tractor.rates!.maintenanceUsdPerKm).toEqual(full.rates!.maintenanceUsdPerKm)
   })
   it('reports every omitted dependency instead of using engine defaults', () => {
     const input = fixture(); input.parameters = []

@@ -1,0 +1,16 @@
+{
+  "artifact": "FCM_B2_D2D_ROUTE_EVIDENCE_LINK",
+  "cutDate": "2026-09-30",
+  "baseHead": "4f5fc2de0c3d178dace917231e1092040dec21fd",
+  "caseReference": "D2D_PUBLIC_REFERENCE_MEXICO_DF_FORT_SMITH_72916_DRAFT_20260930",
+  "mode": "RESEARCH_PARTIAL_NO_TRIP_ADOPTION",
+  "casePin": {"file": "docs/research/B2_D2D_READINESS_CASE_2026-09-30.json", "sha256": "a897778d6f907b1041895f9bcace01cd91654cd2cb51dc9abc0570369024d28b"},
+  "requestPin": {"file": "docs/research/B2_SAKBE_MX_COMPARISON_REQUEST_2026-09-30.json", "sha256": "0070b004c76c07fbe6eb2d0b7c68dd492885eee44bcdab3e5393bb4c2f932f74"},
+  "detailPin": {"file": "docs/research/B2_SAKBE_MX_LIVE_DETAIL_2026-09-30.json", "sha256": "731cb21c1f7bfe2196ab90b12d56a91d4ebd4b1ef5b698ce73209341958b2970"},
+  "binding": {
+    "country": "MX", "direction": "MX_TO_US",
+    "origin": {"casePoint": "Mexico, DF", "referenceId": 2656, "referenceLabel": "Plaza de la Constitución, Cuauhtémoc"},
+    "gateway": {"casePoint": "Nuevo Laredo", "referenceId": 301105, "referenceLabel": "Puerto Fronterizo Nuevo Laredo III, Nuevo Laredo"}
+  },
+  "approval": {"operationalEndpointsConfirmed": false, "bridgeChosen": false, "equipmentConfirmed": false, "tariffsApproved": false}
+}

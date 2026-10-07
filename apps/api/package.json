@@ -19,6 +19,7 @@
     "verify:preview-pair": "tsx scripts/verify-preview-pair.ts",
     "audit:c1:quote-readiness": "tsx scripts/audit-c1-quote-readiness.ts --purpose=FLEET_COST",
     "audit:c1:xbf-readiness": "tsx scripts/audit-c1-quote-readiness.ts --purpose=THIRD_PARTY_BENCHMARK",
+    "audit:b1:inventory": "tsx scripts/reconcile-benchmark-evidence.ts",
     "provision:c1:preview-runtime": "tsx scripts/provision-c1-preview-runtime.ts",
     "db:generate": "prisma generate",
     "test": "vitest run",

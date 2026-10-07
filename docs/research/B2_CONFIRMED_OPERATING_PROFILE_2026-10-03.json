@@ -1,0 +1,120 @@
+{
+  "model": "FCM_B2_USER_CONFIRMED_OPERATING_PROFILE_V1",
+  "decisionId": "B2_USER_SCOPE_20261003",
+  "confirmedOn": "2026-10-03",
+  "caseReference": "MEXICO_DF_FORT_SMITH_72916_WTB_OWN_RELAY",
+  "company": {
+    "stage": "EXISTING_BINATIONAL_OPERATION",
+    "permits": "CURRENT_VALID_DECLARED_BY_USER",
+    "authorityIndependentlyVerified": false,
+    "yearsOfAuthorityAndCleanHistoryEstablished": false,
+    "initialAuthorityFeesAddedAutomatically": false,
+    "recurringComplianceExcluded": false
+  },
+  "compensation": {
+    "scope": "MARKET_STANDARD_BONUSES_AND_ADDITIONAL_BENEFITS_REQUIRED",
+    "statutoryMinimumAloneSufficient": false,
+    "genericExtraBenefitPercentAdded": false,
+    "hiringBonusAutomaticallyRecurring": false
+  },
+  "lodging": {
+    "policy": "MIXED_ROADSIDE_HOTEL_AND_PENSION",
+    "countryScope": "BOTH_MX_AND_US",
+    "hotelShare": null,
+    "perCycleNightCounts": null,
+    "baseReservedYardIsTravelLodging": false
+  },
+  "reference": {
+    "period": "2026-09",
+    "windowStart": "2026-09-28",
+    "windowEnd": "2026-09-30",
+    "interpretation": "LAST_MONDAY_BASED_CALENDAR_WEEK_PORTION_IN_SEPTEMBER_NOT_EXACT_DEPARTURE",
+    "exactDepartureDate": null
+  },
+  "cargo": {
+    "commodity": "AUTOMOTIVE_PARTS",
+    "declaredValueUsd": 75000,
+    "mxCargoInsurancePayer": "CLIENT",
+    "carrierPolicy": "GLOBAL_FLEET_POLICY",
+    "usLiabilitiesTreatment": "IN_GLOBAL_FLEET_POLICY_NOT_ADDITIONAL_PER_SHIPMENT_PREMIUM",
+    "supplementalCarrierTripPremium": "EXCLUDED_BY_CONFIRMED_COST_SCOPE",
+    "policyOrCoiSufficiencyVerified": false,
+    "territorialAndCustodyContinuityVerified": false,
+    "monthlyFleetPremiumExcluded": false
+  },
+  "benchmark": {
+    "capture": "PRIMARY_WEB_TEXT_EXTRACT_NOT_ORIGINAL_SOURCE_ARCHIVE",
+    "observedOn": "2026-10-03",
+    "fx": {
+      "sourceUrl": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do?idioma=sp",
+      "column": "FIX_DETERMINATION_NOT_DOF_OR_PAYMENT",
+      "observations": [
+        {"date": "2026-09-28", "mxnPerUsd": 17.8413},
+        {"date": "2026-09-29", "mxnPerUsd": 18.0710},
+        {"date": "2026-09-30", "mxnPerUsd": 18.0692}
+      ],
+      "selectedForCostEngine": false
+    },
+    "usMie": {
+      "sourceUrl": "https://www.irs.gov/pub/irs-drop/n-25-54.pdf",
+      "notice": "2025-54",
+      "effectiveFrom": "2025-10-01",
+      "referenceThrough": "2026-09-30",
+      "transportationConusUsdPerDay": 80,
+      "locator": "Section3 printedpage2 and Section6 printedpage7; reference range records the period of this case, not a stated statutory expiration.",
+      "isHotelPriceOrMandatoryAllowance": false,
+      "selectedForCostEngine": false
+    },
+    "usBenefits": {
+      "sourceUrl": "https://www.bls.gov/news.release/archives/ecec_09092026.htm",
+      "releaseDate": "2026-09-09",
+      "dataPeriod": "2026-06",
+      "group": "TRANSPORTATION_AND_MATERIAL_MOVING_NOT_TRUCK_DRIVER_ONLY",
+      "extraBonusOrBenefitsAddedToExistingAggregate": false
+    },
+    "mxBenefits": {
+      "sourceUrl": "https://careers.trayecto.com/operador-sencillo-caja-seca-xI1ywOf9L4-o/",
+      "population": "NATIONAL_SINGLE_DRYVAN_DRIVER_QUERETARO_NOT_BINATIONAL_FLEET_SAMPLE",
+      "publishedHiringBonusMxn": 15000,
+      "hiringBonusBasis": "DEFERRED_RECRUITMENT_NOT_RECURRING_MONTHLY_BONUS",
+      "publishedVouchersMxn": 3430,
+      "voucherFrequency": null,
+      "otherPublishedBenefits": ["SAVINGS_FUND", "SAVINGS_ACCOUNT", "UNIFORMS", "LIFE_INSURANCE"],
+      "extraBenefitsMonthlyMxn": null,
+      "historicalSeptemberOfferVerified": false
+    },
+    "pension": {
+      "sourceUrl": "https://pensiondetrailers40-5.com/",
+      "publishedMxnPer24Hours": 260,
+      "equipmentScope": "TRACTOR_PLUS_ONE_TRAILER_OR_TRAILER_OVER_9M",
+      "location": "CUAUTITLAN_IZCALLI_MX",
+      "hotelRoomIncluded": false,
+      "taxBasisVerified": false,
+      "historicalSeptemberPriceVerified": false,
+      "selectedForCostEngine": false
+    },
+    "mxMonthlyVoucherComparator": {
+      "sourceUrl": "https://careers.trayecto.com/operador-ala-u1hSQWtXJaoU/",
+      "population": "CDMX_SINGLE_DRYVAN_DRIVER_MEXICO_BAJIO_LAREDO_KNOWLEDGE_REQUIRED",
+      "publishedVouchersMxnPerEmployeeMonth": 3430,
+      "publishedWelcomeBonusMxn": 10000,
+      "recruitmentClosed": true,
+      "exactOfferPublicationDate": null,
+      "originalQueretaroOfferFrequencyChanged": false,
+      "extraBenefitsMonthlyTotalMxn": null,
+      "statutoryTaxAndRosterTreatmentVerified": false,
+      "selectedForCostEngine": false
+    },
+    "hotel": {
+      "sourceUrl": "https://hotelsanpedroexpress.com/hotel/",
+      "location": "FEDERAL57_KM108_MATEHUALA_SALTILLO",
+      "publicPriceMxnPerNight": null,
+      "truckParkingInRoomRateVerified": false,
+      "historicalSeptemberPriceVerified": false
+    },
+    "fleetInsuranceContextUrl": "https://www.fmcsa.dot.gov/international-programs/what-insurance-and-proof-financial-responsibility-do-i-need-operate-us"
+  },
+  "calibrated": false,
+  "quoteReady": false,
+  "adoptedValues": 0
+}

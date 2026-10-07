@@ -1,0 +1,523 @@
+{
+  "schemaVersion": 1,
+  "id": "ECOSYSTEM_REUSE_BASELINE_20261003",
+  "status": "CUT_1_COMPLETE_CUT_2_NOT_EXECUTED",
+  "observedAtUtc": "2026-10-03T21:38:28Z",
+  "scope": {
+    "writer": "Codex, sesión actual",
+    "writeRoot": "D:/andre/worktrees/freight-cost-model/cost-tires-release-20260927",
+    "implementationChanged": false,
+    "productionVerified": false,
+    "newSharedPackageCreated": false,
+    "externalWrites": false,
+    "authChanged": false,
+    "databaseChanged": false,
+    "priceAdoption": false
+  },
+  "execution": {
+    "requestedModel": "gpt-6.1-sol",
+    "requestedEffort": "high",
+    "exactRuntimeModelObserved": null,
+    "exactRuntimeEffortObserved": null,
+    "additionalProviderInvocations": 0,
+    "tokenUsageObserved": null,
+    "chargesObserved": null,
+    "timeBudgetMinutes": 120,
+    "maxDiagnosticRepairs": 2,
+    "auxiliaryInferenceBudget": 0,
+    "newPaidServicesBudget": 0,
+    "selectionRationale": "Elección de Codex para continuidad de contexto y escritura local; Claude considerado como candidato equivalente para arquitectura/UI. No se requiere otra inferencia para cerrar esta matriz. Disponibilidad exacta Claude/Fable no observada."
+  },
+  "repositories": [
+    {
+      "id": "FCM",
+      "path": "D:/andre/worktrees/freight-cost-model/cost-tires-release-20260927",
+      "branch": "codex/cost-tires-release-s14",
+      "head": "4f5fc2de0c3d178dace917231e1092040dec21fd",
+      "dirty": true,
+      "stack": "Next16.3.3/React19.2.4, Fastify5.12.3, Prisma5, Zod3, TanStack Query5, RHF7, Supabase SSR; rangos de package.json no son versiones instaladas verificadas"
+    },
+    {
+      "id": "RATEWARE",
+      "path": "D:/andre/worktrees/rateware/release-main-20260930",
+      "head": "e030ff8cff798158259a83160ea941283bd31b88",
+      "stack": "JavaScript ESM; Auth Supabase observado en código; backend Edge consumido por Bidware"
+    },
+    {
+      "id": "BIDWARE",
+      "path": "D:/andre/repos/Bidware",
+      "head": "0b19f09198459989350936aa46c6583fedf1aa68",
+      "stack": "React18, Vite6, TypeScript, React Router7, Supabase; manifest"
+    },
+    {
+      "id": "LOADS_QUICKPAY",
+      "path": "D:/andre/worktrees/marksman-loads/quickpay-foundation",
+      "head": "c4a0742c1abe5a289441711f242206b840774e13",
+      "stack": "Node24, pg8.23, MCP client2.1, paquetes y contratos JSON; manifest"
+    },
+    {
+      "id": "DEMAND_RADAR",
+      "path": "D:/andre/repos/marksman-demand-engine",
+      "head": "15870879a78f58d037e1ce307b62abae93433092",
+      "stack": "React19, Vite6, Supabase, libsql y MapLibre; manifest"
+    },
+    {
+      "id": "GRAPHIFY",
+      "path": "D:/andre/repos/graphify-portfolio",
+      "head": "d0e553c4ce8f308518e6af254e83d308cdae8f25",
+      "stack": "Node, MCP2.1, Supabase SSR, Neon serverless, Zod4; manifest"
+    }
+  ],
+  "sources": [
+    {
+      "id": "FCM_WEB",
+      "path": "D:/andre/worktrees/freight-cost-model/cost-tires-release-20260927/apps/web/package.json",
+      "sha256": "b81ce088a8ad2441db330115873c14833a74c2b4e551e1a4e4423f26d2ba2aa3",
+      "evidenceClass": "LOCAL_FILE_SNAPSHOT"
+    },
+    {
+      "id": "FCM_API",
+      "path": "D:/andre/worktrees/freight-cost-model/cost-tires-release-20260927/apps/api/package.json",
+      "sha256": "cd425e3452e7eb4cce1a8278b5a1ed1abcee006c0d70ade3c02575107f787f8b",
+      "evidenceClass": "LOCAL_FILE_SNAPSHOT"
+    },
+    {
+      "id": "FCM_FETCH",
+      "path": "D:/andre/worktrees/freight-cost-model/cost-tires-release-20260927/apps/web/lib/fetcher.ts",
+      "sha256": "df2c052f5aecc634ea0c499a8decb6242d9e113c311026e2d8ef24c275d37b74",
+      "evidenceClass": "LOCAL_FILE_SNAPSHOT"
+    },
+    {
+      "id": "FCM_ROLES",
+      "path": "D:/andre/worktrees/freight-cost-model/cost-tires-release-20260927/apps/api/src/middleware/authorize.ts",
+      "sha256": "7012bc5d7551b009a05a54d49aa5eed2b2c8749f37924c774ba71bc017326522",
+      "evidenceClass": "LOCAL_FILE_SNAPSHOT"
+    },
+    {
+      "id": "FCM_ASSUMPTIONS",
+      "path": "D:/andre/worktrees/freight-cost-model/cost-tires-release-20260927/apps/api/src/modules/assumptions/assumptions.routes.ts",
+      "sha256": "fd7ac7e0b1b535d9c664b7127dd79e750fe1376ee6ec80e048e7a3c3a80def14",
+      "evidenceClass": "LOCAL_FILE_SNAPSHOT"
+    },
+    {
+      "id": "FCM_CALIBRATION",
+      "path": "D:/andre/worktrees/freight-cost-model/cost-tires-release-20260927/apps/api/src/modules/cost-bases/cost-base-calibration.ts",
+      "sha256": "ec7d28899a9e9fb5d31b1025fbf41e1999a871ab185da79d4bdb0fb655c524d3",
+      "evidenceClass": "LOCAL_FILE_SNAPSHOT"
+    },
+    {
+      "id": "FCM_CLOSEOUT",
+      "path": "D:/andre/worktrees/freight-cost-model/cost-tires-release-20260927/apps/api/scripts/prepare-b2-closeout.ts",
+      "sha256": "d24b0727d67465ac6ee73f2b3c6f11b43463431b73ddc7e82aa039561ccfe1b9",
+      "evidenceClass": "LOCAL_FILE_SNAPSHOT"
+    },
+    {
+      "id": "FCM_PROFILE",
+      "path": "D:/andre/worktrees/freight-cost-model/cost-tires-release-20260927/apps/api/scripts/lib/b2-operating-profile.ts",
+      "sha256": "8a17fffa6411a0a0623a67c5dca4f641cf6f81c9d478c4fc2ae6fd0cad9111df",
+      "evidenceClass": "LOCAL_FILE_SNAPSHOT"
+    },
+    {
+      "id": "FCM_BENCHMARK_HTTP",
+      "path": "D:/andre/worktrees/freight-cost-model/cost-tires-release-20260927/apps/api/src/modules/engine/benchmark.routes.ts",
+      "sha256": "4ac2910d01553d189247b88531cc13776f801dbacf974bf8f05d7b98e1f15164",
+      "evidenceClass": "LOCAL_FILE_SNAPSHOT"
+    },
+    {
+      "id": "FCM_EVIDENCE",
+      "path": "D:/andre/worktrees/freight-cost-model/cost-tires-release-20260927/apps/api/src/modules/engine/benchmark-evidence-inventory.ts",
+      "sha256": "8e52735a871740f1cb4fb7d2193ae9af27abdf4d64f1da4ba1e29c04ea0a83ac",
+      "evidenceClass": "LOCAL_FILE_SNAPSHOT"
+    },
+    {
+      "id": "FCM_PROJECTION",
+      "path": "D:/andre/worktrees/freight-cost-model/cost-tires-release-20260927/apps/api/src/modules/engine/benchmark-binational-cost-projection.ts",
+      "sha256": "4e93fcfba6c0da647006b077cc95895eefebab515a84eb11b27f9f8844444776",
+      "evidenceClass": "LOCAL_FILE_SNAPSHOT"
+    },
+    {
+      "id": "FCM_INVENTORY",
+      "path": "D:/andre/worktrees/freight-cost-model/cost-tires-release-20260927/apps/api/scripts/reconcile-economic-model-inventory.ts",
+      "sha256": "8325234cae12b321a89f7771d5de885d6aa3ebcbafbe029b2f66771ab5ab168e",
+      "evidenceClass": "LOCAL_FILE_SNAPSHOT"
+    },
+    {
+      "id": "FCM_HANDOFF",
+      "path": "D:/andre/worktrees/freight-cost-model/cost-tires-release-20260927/apps/api/src/modules/ratebooks/ratebooks.routes.ts",
+      "sha256": "95d57d56d4dac8cf8110f00447e15e20648f7958b425320eebad70ed21a1e247",
+      "evidenceClass": "LOCAL_FILE_SNAPSHOT"
+    },
+    {
+      "id": "FCM_BRAND",
+      "path": "D:/andre/worktrees/freight-cost-model/cost-tires-release-20260927/docs/design/MARKSMAN_UI.md",
+      "sha256": "dcd9a4eca2ca900e16d6f3383852583a4cbfe65091fc0dd26b460021d79ceccc",
+      "evidenceClass": "LOCAL_FILE_SNAPSHOT"
+    },
+    {
+      "id": "B2_DELIVERY",
+      "path": "D:/andre/worktrees/freight-cost-model/cost-tires-release-20260927/docs/research/B2_CONFIRMED_PROFILE_DELIVERY_2026-10-03.md",
+      "sha256": "773cad996d43edaa90af2d9638e4bdac9f5a600610429e5621e4416790dc793c",
+      "evidenceClass": "LOCAL_FILE_SNAPSHOT"
+    },
+    {
+      "id": "RATEWARE_AUTH",
+      "path": "D:/andre/worktrees/rateware/release-main-20260930/src/auth.js",
+      "sha256": "f14289a47be9b707e5ca5a7bd2536b1d9dd4038a25255da9b095e7da6e674bdc",
+      "evidenceClass": "LOCAL_FILE_SNAPSHOT"
+    },
+    {
+      "id": "RATEWARE_CORRELATION",
+      "path": "D:/andre/worktrees/rateware/release-main-20260930/docs/architecture/ADR-007-rateware-correlation-and-idempotency.md",
+      "sha256": "193dae0081859cf8b1060155952d72c8a5a2f078212b76c25020e4f9f6c58044",
+      "evidenceClass": "LOCAL_FILE_SNAPSHOT"
+    },
+    {
+      "id": "BIDWARE_API",
+      "path": "D:/andre/repos/Bidware/src/lib/api-client.ts",
+      "sha256": "101d6ceb8e6c3165212d774719c9086ab97611f163be06a9cf0adbd6cdc14784",
+      "evidenceClass": "LOCAL_FILE_SNAPSHOT"
+    },
+    {
+      "id": "RADAR_SESSION",
+      "path": "D:/andre/repos/marksman-demand-engine/src/data/cloudSessionState.js",
+      "sha256": "c67cab55b7bece2c530ab4c7efdcb29edadc8f0bb9bd047b18758a9bac639644",
+      "evidenceClass": "LOCAL_FILE_SNAPSHOT"
+    },
+    {
+      "id": "QUICKPAY_CONTRACT",
+      "path": "D:/andre/worktrees/marksman-loads/quickpay-foundation/packages/shared-contracts/quickpay-operational-source-read.v2.schema.json",
+      "sha256": "e5dd64d030a8963ecc71d2658cd694b97c0c6a51ee6af04b5a8f2c355bf2b82d",
+      "evidenceClass": "LOCAL_FILE_SNAPSHOT"
+    },
+    {
+      "id": "PORTFOLIO_MAP",
+      "path": "D:/andre/repos/graphify-portfolio/docs/portfolio-contract-map.md",
+      "sha256": "652e546da39aed316b4f4fb1433c46f7f715a37d51b215f532e8157e97b4e346",
+      "evidenceClass": "DOCUMENTARY_PRIOR_CUT"
+    },
+    {
+      "id": "PORTFOLIO_BOUNDARIES",
+      "path": "D:/andre/repos/graphify-portfolio/docs/adr/0001-portfolio-module-boundaries.md",
+      "sha256": "45d0a0329e37e7c63ed25a699eff137663070563103e9b509ef22ba6d537e67a",
+      "evidenceClass": "DOCUMENTARY_PRIOR_CUT"
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "IDENTITY",
+      "capability": "Sesión e identidad",
+      "decision": "REUTILIZAR",
+      "baseline": "Auth Supabase existente por aplicación",
+      "owner": "FCM / Rateware / apps consumidoras",
+      "sourceIds": [
+        "RATEWARE_AUTH",
+        "FCM_WEB",
+        "RADAR_SESSION"
+      ],
+      "reason": "Reutilizar integración y pruebas; token renovado no equivale a cambio de usuario. No introducir otro IdP ni asumir sesiones compartidas por usar el mismo proyecto.",
+      "sharedAcrossAppsOperationallyVerified": false
+    },
+    {
+      "id": "TENANT_ROLE_ENFORCEMENT",
+      "capability": "Organización y permisos",
+      "decision": "REUTILIZAR",
+      "baseline": "Middleware y permisos de la API propietaria",
+      "owner": "API de cada dominio",
+      "sourceIds": [
+        "FCM_ROLES",
+        "FCM_ASSUMPTIONS",
+        "FCM_BENCHMARK_HTTP"
+      ],
+      "reason": "ADMIN modifica supuestos; ADMIN/OPERATOR calculan benchmark. La visibilidad de UI no concede permisos ni hace equivalente VIEWER en todas las apps.",
+      "sharedAcrossAppsOperationallyVerified": false
+    },
+    {
+      "id": "CANONICAL_MASTERS",
+      "capability": "Maestros de negocio",
+      "decision": "REUTILIZAR",
+      "baseline": "Autoridad y contratos existentes del portafolio",
+      "owner": "Rateware / ERP / Fleet Rocket según dominio",
+      "sourceIds": [
+        "PORTFOLIO_MAP",
+        "PORTFOLIO_BOUNDARIES",
+        "QUICKPAY_CONTRACT"
+      ],
+      "reason": "Conservar IDs y autoridad. El mapa es propuesta documental de un corte previo, no prueba de integración viva; verificar el contrato del par antes de conectarlo.",
+      "sharedAcrossAppsOperationallyVerified": false
+    },
+    {
+      "id": "UI_PRIMITIVES",
+      "capability": "Componentes y branding",
+      "decision": "REUTILIZAR",
+      "baseline": "Componentes FCM, shadcn/Base UI y tokens MARKSMAN",
+      "owner": "FCM y futuros consumidores React compatibles",
+      "sourceIds": [
+        "FCM_WEB",
+        "FCM_BRAND"
+      ],
+      "reason": "Reutilizar button/input/dialog/card y estilo. React18/19, Base UI y router requieren verificar compatibilidad antes de publicar un paquete compartido.",
+      "sharedAcrossAppsOperationallyVerified": false
+    },
+    {
+      "id": "GENERIC_RESOURCE_UI",
+      "capability": "Tablas y formularios repetitivos",
+      "decision": "ADOPTAR",
+      "baseline": "Refine Core v5 como candidato condicionado",
+      "owner": "FCM, después consumidores con segundo caso demostrado",
+      "sourceIds": [
+        "FCM_WEB",
+        "FCM_FETCH"
+      ],
+      "reason": "Adopción pendiente de comparación con React Query/RHF actuales. Mantener API de negocio; no depender de Enterprise ni añadir un segundo proveedor de cache. Ahorro todavía no medido.",
+      "sharedAcrossAppsOperationallyVerified": false
+    },
+    {
+      "id": "API_TRANSPORT",
+      "capability": "Clientes de API y errores",
+      "decision": "REUTILIZAR",
+      "baseline": "Fetcher BFF FCM y cliente Edge Bidware",
+      "owner": "FCM / Bidware / Rateware",
+      "sourceIds": [
+        "FCM_FETCH",
+        "BIDWARE_API"
+      ],
+      "reason": "Compartir contrato de error sólo donde sea compatible; FCM llama BFF y Bidware usa action+payload en Edge. No copiar un transporte como si ambos fueran iguales.",
+      "sharedAcrossAppsOperationallyVerified": false
+    },
+    {
+      "id": "SCHEMA_CONTRACTS",
+      "capability": "Validación y contratos versionados",
+      "decision": "REUTILIZAR",
+      "baseline": "Zod FCM y contratos JSON Schema Loads",
+      "owner": "Productor de cada contrato",
+      "sourceIds": [
+        "FCM_API",
+        "FCM_CLOSEOUT",
+        "QUICKPAY_CONTRACT"
+      ],
+      "reason": "Evitar validadores duplicados; conservar versionado. Zod3 en FCM y Zod4 en Graphify no prueban interoperabilidad binaria ni justifican actualización masiva.",
+      "sharedAcrossAppsOperationallyVerified": false
+    },
+    {
+      "id": "VERSION_REVIEW",
+      "capability": "Huella de revisión y obsolescencia",
+      "decision": "REUTILIZAR",
+      "baseline": "Checklist/fingerprint de calibración existentes",
+      "owner": "FCM",
+      "sourceIds": [
+        "FCM_CALIBRATION",
+        "FCM_ASSUMPTIONS"
+      ],
+      "reason": "Reutilizar semántica de revisión por versión donde aplique. Un registro por grupo no sustituye una fila de evidencia económica ni aprueba su precio.",
+      "sharedAcrossAppsOperationallyVerified": false
+    },
+    {
+      "id": "IDEMPOTENCY_HANDOFF",
+      "capability": "Comandos, correlación y recibos",
+      "decision": "REUTILIZAR",
+      "baseline": "Contratos de handoff y políticas de la API ejecutora",
+      "owner": "API propietaria del efecto",
+      "sourceIds": [
+        "FCM_HANDOFF",
+        "RATEWARE_CORRELATION",
+        "QUICKPAY_CONTRACT"
+      ],
+      "reason": "Correlación no es idempotencia durable. Exigir contrato/recibo real antes de declarar ejecutado un efecto entre apps; no inaugurar otro bus.",
+      "sharedAcrossAppsOperationallyVerified": false
+    },
+    {
+      "id": "PUBLIC_EVIDENCE_LEDGER",
+      "capability": "Fuentes y cobertura del inventario",
+      "decision": "REUTILIZAR",
+      "baseline": "Registro económico, reconciliador y source pins B2",
+      "owner": "FCM investigación",
+      "sourceIds": [
+        "FCM_EVIDENCE",
+        "FCM_INVENTORY",
+        "FCM_CLOSEOUT"
+      ],
+      "reason": "Fuente documentada, valor compatible, calibración y adopción son estados distintos. Reutilizar 210 filas y sus referencias; no reconstruir un segundo catálogo.",
+      "sharedAcrossAppsOperationallyVerified": false
+    },
+    {
+      "id": "B2_VISIBLE_REVIEW",
+      "capability": "Revisión visible del cierre confirmado",
+      "decision": "DESARROLLAR",
+      "baseline": "Proyección mínima de lectura desde el cierre existente",
+      "owner": "FCM",
+      "sourceIds": [
+        "FCM_CLOSEOUT",
+        "FCM_BENCHMARK_HTTP",
+        "FCM_PROFILE"
+      ],
+      "reason": "El cierre B2 confirmado es CLI local; el HTTP actual llama otro calculador. Preparar comparación con snapshot sintético; adapter autenticado y persistencia quedan para el corte de integración.",
+      "sharedAcrossAppsOperationallyVerified": false
+    },
+    {
+      "id": "ECONOMIC_ENGINE",
+      "capability": "CFU/CVU y composición de costos",
+      "decision": "REUTILIZAR",
+      "baseline": "Proyección y compositor FCM existentes",
+      "owner": "FCM",
+      "sourceIds": [
+        "FCM_PROJECTION",
+        "FCM_CLOSEOUT",
+        "FCM_PROFILE"
+      ],
+      "reason": "Usar una única implementación de fórmula. Refine/Windmill/ERPNext no aportan automáticamente esta metodología ni completan datos faltantes.",
+      "sharedAcrossAppsOperationallyVerified": false
+    },
+    {
+      "id": "ECONOMIC_BENCHMARK_GAPS",
+      "capability": "Calibración de importes pendientes",
+      "decision": "DESARROLLAR",
+      "baseline": "Investigación pública y normalización del benchmark",
+      "owner": "FCM investigación",
+      "sourceIds": [
+        "FCM_PROFILE",
+        "B2_DELIVERY"
+      ],
+      "reason": "Trabajo de datos/evidencia: remuneración, pernocta, vigenciaSept, permisos/seguros y viaje agregado. No requiere otra plataforma; no llenar vacíos con valores sintéticos.",
+      "sharedAcrossAppsOperationallyVerified": false
+    },
+    {
+      "id": "PORTFOLIO_CONTEXT",
+      "capability": "Contexto Graphify y MCP",
+      "decision": "REUTILIZAR",
+      "baseline": "Catálogo federado y fuentes gobernadas existentes",
+      "owner": "Graphify / Kognoz",
+      "sourceIds": [
+        "PORTFOLIO_MAP",
+        "PORTFOLIO_BOUNDARIES"
+      ],
+      "reason": "Contexto consultivo con corte y procedencia; inferencias del grafo no reemplazan permisos, maestros o resultados operativos.",
+      "sharedAcrossAppsOperationallyVerified": false
+    },
+    {
+      "id": "FINANCIAL_OPERATIONAL_BOUNDARIES",
+      "capability": "Handoffs financieros y operativos",
+      "decision": "REUTILIZAR",
+      "baseline": "Contratos del módulo receptor y QuickPay",
+      "owner": "ERP / Fleet Rocket / módulos de portal",
+      "sourceIds": [
+        "QUICKPAY_CONTRACT",
+        "PORTFOLIO_BOUNDARIES"
+      ],
+      "reason": "Un costo calculado no es factura, asiento, envío o embarque. No introducir otra contabilidad ni un segundo maestro desde una UI genérica.",
+      "sharedAcrossAppsOperationallyVerified": false
+    }
+  ],
+  "candidates": [
+    {
+      "id": "CURRENT",
+      "name": "Componentes actuales + adapter de lectura mínimo",
+      "role": "BASELINE_CONTROL",
+      "license": "Dependencias actuales; licencias por componente",
+      "additionalRuntimeRequired": false,
+      "savingsMeasured": false
+    },
+    {
+      "id": "REFINE",
+      "name": "Refine Core v5",
+      "role": "CONDITIONAL_RESOURCE_UI_CANDIDATE",
+      "license": "Core MIT; Enterprise fuera del baseline",
+      "exactPackageVersionVerified": null,
+      "installed": false,
+      "savingsMeasured": false,
+      "sources": [
+        "https://refine.dev/core/docs/guides-concepts/usage-with-existing-projects/",
+        "https://github.com/refinedev/refine/blob/main/LICENSE",
+        "https://refine.dev/core/docs/enterprise-edition/multitenancy/"
+      ]
+    },
+    {
+      "id": "WINDMILL",
+      "name": "Windmill",
+      "role": "DEFERRED_AUTOMATION_BENCHMARK",
+      "license": "Fuentes AGPL/Apache; partes Enterprise propietarias y binarios Community con términos adicionales",
+      "installed": false,
+      "sources": [
+        "https://github.com/windmill-labs/windmill/blob/main/LICENSE"
+      ]
+    },
+    {
+      "id": "FRAPPE",
+      "name": "Frappe / ERPNext",
+      "role": "FUNCTIONAL_PROCESS_BENCHMARK_NOT_SELECTED_FOR_MIGRATION",
+      "license": "Frappe MIT; ERPNext GPL3",
+      "installed": false,
+      "sources": [
+        "https://github.com/frappe/frappe",
+        "https://github.com/frappe/erpnext"
+      ]
+    }
+  ],
+  "selectedSlice": {
+    "id": "B2_MIXED_LODGING_EVIDENCE_REVIEW",
+    "userOutcome": "Encontrar la pernocta MX/US pendiente, ver su evidencia y vigencia, distinguir importe conocido de remanente y entender el impacto en CVU.",
+    "confirmedProfile": "B2_USER_SCOPE_20261003",
+    "targetConcepts": [
+      "MX_TRAVEL_EXPENSES",
+      "US_DRIVER_TOTAL"
+    ],
+    "classification": "CVU",
+    "countries": [
+      "MX",
+      "US"
+    ],
+    "cycleIds": [
+      "NETWORK_EXPECTED_EMPTY_PROXY",
+      "DEDICATED_EMPTY_SAME_BOX_RETURN"
+    ],
+    "fundingModes": [
+      "CASH",
+      "FINANCED"
+    ],
+    "referenceWindow": "2026-09-28/2026-09-30",
+    "canonicalParameterKeysInvented": false,
+    "canonicalLinkRule": "Usar vínculos verificables del inventario; si no existe mapeo literal/puente aprobado, mostrar SIN_VINCULO_CANONICO.",
+    "knownGap": "Cierre con perfil confirmado local en CLI; HTTP de benchmark actual usa calculateOwnedD2DScenarios y no expone prepareB2Closeout.",
+    "wireframe": "../design/B2_EVIDENCE_REUSE_WIREFRAMES_2026-10-03.md",
+    "cut2DataMode": "SYNTHETIC_ISOLATED_SNAPSHOT",
+    "cut2BusinessWrites": 0,
+    "cut2AuthProofClaimed": false,
+    "cut2PersistenceProofClaimed": false,
+    "permissionContract": {
+      "assumptionMutation": [
+        "ADMIN"
+      ],
+      "existingBenchmarkCalculation": [
+        "ADMIN",
+        "OPERATOR"
+      ],
+      "existingBenchmarkViewerAccess": false
+    },
+    "acceptance": [
+      "Mismo flujo y datos sintéticos en ambos candidatos",
+      "Buscar y filtrar sin perder contexto",
+      "Fuente/fecha/territorio/impuesto y faltantes visibles",
+      "null no se presenta como cero",
+      "Revisión no se presenta como adopción/calibración",
+      "No se reabre inclusión de comidaUS ni duplica patio de base",
+      "Identidad/cambios de perfil invalidan estado local sensible",
+      "Medir código propio, dependencias y esfuerzo de adapter; no porcentaje de ahorro inventado"
+    ],
+    "cut3Prerequisites": [
+      "Contrato de lectura del cierre confirmado y permisos server-side verificados",
+      "Dirección visual revisada",
+      "Alternativa técnica elegida con medición",
+      "Persistencia de revisión existente aplicable o gap explícito; no crear otro registro por defecto"
+    ]
+  },
+  "closure": {
+    "matrixComplete": true,
+    "capabilities": 15,
+    "reuse": 12,
+    "conditionalAdoption": 1,
+    "develop": 2,
+    "selectedGap": true,
+    "benchmarkComparisonExecuted": false,
+    "b2Closed": false,
+    "savingsPercent": null
+  }
+}

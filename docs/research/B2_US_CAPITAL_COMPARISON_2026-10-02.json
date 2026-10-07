@@ -1,0 +1,11 @@
+{
+  "artifact":"FCM_B2_US_CAPITAL_COMPARISON",
+  "reviewedDate":"2026-10-02",
+  "mode":"LOCAL_PUBLIC_RESEARCH_NOT_ADOPTED",
+  "source":{"id":"TRUCKER_TO_TRUCKER_LISTING","url":"https://truckertotrucker.com/sell-your-commercial-truck","locator":"Sell page: flat $49 one-time listing, no commissions or monthly fees; provider claim, not all seller costs","listingFeeUsd":49,"originalArchive":null,"archiveLimitation":"Direct GET blocked by Cloudflare; web reader reviewed. No invented archive/hash. No paid listing created."},
+  "scenario":{"holdingMonths":36,"acquisitionAdjustmentUsd":null,"otherDisposalCostsUsd":null,"financingFeeMonthlyUsd":null,"downPaymentFraction":0.1,"loanMonths":72,"nominalHypothesis":{"annualRate":0.09,"kind":"INDEPENDENT_ANALYTICAL_NOMINAL_HYPOTHESIS_NOT_APR_CONVERSION","providerNominalConfirmed":false}},
+  "assumptions":["Alternative direct-sale listing method only; not chosen future disposal or realized net residual","Use each existing joint capital/capacity scenario without selecting or summing them","9% nominal is an explicitly declared analytical sensitivity, NOT the published 9% APR translated into nominal","Ten percent down and 72 monthly level installments on asking-only proxy; no grace or balloon in this arithmetic, not confirmed lender terms","Acquisition tax/fees, additional disposal costs and financing fee allocation stay unresolved, not zero","Debt-free cash scenario; equity opportunity cost remains separate and unresolved","At month 36 outstanding loan principal is a settlement cash flow, not a second depreciation expense; prepayment fees remain unverified"],
+  "actualPurchaseLoanOrSaleExecuted":false,
+  "eligibleForBudget":false,
+  "calibrated":false
+}

@@ -1,0 +1,129 @@
+{
+  "artifact": "FCM_S2_FAMILY_ECONOMIC_RECONCILIATION_V1",
+  "reviewedOn": "2026-10-06",
+  "referencePeriod": "2026-09",
+  "scope": "LOCAL_PUBLIC_PLANNING_RECONCILIATION_NOT_CALIBRATION_OR_ADOPTION",
+  "branch": "codex/cost-tires-release-s14",
+  "head": "4f5fc2de0c3d178dace917231e1092040dec21fd",
+  "source": {
+    "scenarioPayloadSha256": "a8598d73a31f62246d540c293aee548f971a35096b0f1f0742341e42c2473655",
+    "reviewSnapshotSha256": "69a5d1af1d07d072b5238c5c92d4490479940c569bb3bca68dd7b0e8b6b8d2b3",
+    "planningPolicySha256": "0292435008061196cbfafdbef8bcf8f0815435b8f6bcfb65bac84ed754fe6bf3",
+    "runtimePackFileSha256": "d1235ca788312cb5f0dd7b82a8354809ab93756e57bf5385483e52f0026d7df0",
+    "priorAdoptionPacketFileSha256": "f751b51578520850f84e90a308d8aaefb40550b46f03a00b5d6064f7036308da"
+  },
+  "verification": {
+    "method": "READ_ONLY_NATIVE_NODE_TSX_EXISTING_COMPOSITOR_PLUS_INDEPENDENT_POOL_ALLOCATION_AND_OUTPUT_SUMS",
+    "successfulRunDurationSeconds": 7.819,
+    "exitCode": 0,
+    "casesChecked": 24,
+    "uniqueCaseKeys": 24,
+    "sourcePinsIntegrityChecked": 88,
+    "fixedRowsPerCase": 32,
+    "variableConceptsPerCase": 20,
+    "fixedRemainderRowsPerCase": 6,
+    "allocationMethod": "CENTS_LARGEST_REMAINDER_CANONICAL_RESOURCE_ORDER",
+    "outputAbsoluteToleranceUsd": 1e-7,
+    "ledgerAndExpenseIdentityAndAmountsMatch": true,
+    "monthlyPoolsConserved": true,
+    "resourceMonthlyAmountsMatch": true,
+    "independentCfuCvuAndTotalMatch": true,
+    "liveRefreshOfAllSourcesPerformed": false,
+    "authenticatedPanelAcceptancePerformed": false,
+    "projectSuitesRerunForThisDocumentOnlyChange": false
+  },
+  "centralComparisonBasis": {
+    "fxDate": "2026-09-30",
+    "mxnPerUsd": 18.0692,
+    "restInterpretation": "RATE_EXCLUDES_WEEKLY_REST",
+    "meaning": "EXPLICIT_COMPARISON_NOT_ACTUAL_SERVICE_DATE_OR_MARKET_BOUND"
+  },
+  "centralCases": [
+    {
+      "cycleId": "NETWORK_EXPECTED_EMPTY_PROXY",
+      "fundingMode": "CASH",
+      "cfuUsd": 1115.6092721214666,
+      "cvuUsd": 4326.70521951104,
+      "productiveCostUsd": 5442.314491632506,
+      "monthlyFixedUsd": { "MX_TRACTOR": 4636.22, "US_TRACTOR": 3760.79, "SHARED_TRAILER": 569.66 },
+      "identifiedPolicySubset": {
+        "fixedRemainderCfuUsd": 126.25906129033275,
+        "tollReserveUsd": 52.225662368092586,
+        "lodgingPolicyUsd": 294.62118749031504,
+        "mxExtraBenefitsPolicyUsd": 135.68222273511714,
+        "totalUsd": 608.7881338838574,
+        "shareOfProductiveCost": 0.11186199085331469
+      }
+    },
+    {
+      "cycleId": "NETWORK_EXPECTED_EMPTY_PROXY",
+      "fundingMode": "FINANCED",
+      "cfuUsd": 1227.85842230409,
+      "cvuUsd": 4326.70521951104,
+      "productiveCostUsd": 5554.56364181513,
+      "monthlyFixedUsd": { "MX_TRACTOR": 5066.72, "US_TRACTOR": 3979.23, "SHARED_TRAILER": 771.51 },
+      "identifiedPolicySubset": {
+        "totalUsd": 608.7881338838574,
+        "shareOfProductiveCost": 0.10960143282918919
+      }
+    },
+    {
+      "cycleId": "DEDICATED_EMPTY_SAME_BOX_RETURN",
+      "fundingMode": "CASH",
+      "cfuUsd": 2578.0497506255,
+      "cvuUsd": 8180.875813377248,
+      "productiveCostUsd": 10758.925564002748,
+      "monthlyFixedUsd": { "MX_TRACTOR": 4636.22, "US_TRACTOR": 3760.79, "SHARED_TRAILER": 569.66 },
+      "identifiedPolicySubset": {
+        "fixedRemainderCfuUsd": 322.83411887182314,
+        "tollReserveUsd": 104.45132473618517,
+        "lodgingPolicyUsd": 386.03358330750666,
+        "mxExtraBenefitsPolicyUsd": 264.1510189913704,
+        "totalUsd": 1077.4700459068854,
+        "shareOfProductiveCost": 0.10014662147230469
+      }
+    },
+    {
+      "cycleId": "DEDICATED_EMPTY_SAME_BOX_RETURN",
+      "fundingMode": "FINANCED",
+      "cfuUsd": 2839.655997891594,
+      "cvuUsd": 8180.875813377248,
+      "productiveCostUsd": 11020.531811268842,
+      "monthlyFixedUsd": { "MX_TRACTOR": 5066.72, "US_TRACTOR": 3979.23, "SHARED_TRAILER": 771.51 },
+      "identifiedPolicySubset": {
+        "totalUsd": 1077.4700459068854,
+        "shareOfProductiveCost": 0.09776933312829225
+      }
+    }
+  ],
+  "all24CaseEnvelope": {
+    "minimumProductiveCostUsd": 5396.41738578069,
+    "maximumProductiveCostUsd": 11090.808742078287,
+    "minimumIdentifiedPolicySubsetShare": 0.09625523722572095,
+    "maximumIdentifiedPolicySubsetShare": 0.11186363167014947,
+    "marketRange": false,
+    "uncertaintyFullyQuantified": false,
+    "remainderOfCostCertified": false
+  },
+  "documentedExclusions": ["HANDOFF_INCREMENTAL_SERVICES", "SUPPLEMENTAL_CARGO_VALUE_INSURANCE"],
+  "fixedRemainderRows": [
+    "MX_TRACTOR_PERMITS",
+    "US_TRACTOR_PERMITS",
+    "SHARED_TRAILER_PERMITS",
+    "MX_TRACTOR_FOREIGN_LIABILITY_REMAINDER",
+    "BOX_BINATIONAL_COVERAGE_REMAINDER",
+    "GROUP_SERVICE_TAX_INSTALLATION_REMAINDER"
+  ],
+  "verdict": {
+    "publicPlanningArithmetic": "RECONCILED",
+    "publicPlanningEconomicEvidence": "SHARE_WITH_CAVEATS",
+    "all210CanonicalInputsCalibrated": false,
+    "operationalCalibrationComplete": false,
+    "adoptedValues": 0,
+    "quoteReady": false,
+    "purchaseUsd": null,
+    "sellUsd": null,
+    "externalWrites": false,
+    "sprint2Complete": false
+  }
+}

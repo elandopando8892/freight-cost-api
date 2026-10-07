@@ -1,0 +1,59 @@
+{
+  "artifact": "FCM_B2_DRYVAN_DENOMINATOR_RECONCILIATION",
+  "observedAt": "2026-10-01",
+  "baseHead": "4f5fc2de0c3d178dace917231e1092040dec21fd",
+  "status": "CONDITIONAL_PUBLIC_MODEL_PROXY_NOT_ADOPTED_CAPACITY",
+  "captureKind": "STRUCTURED_EXTRACTION_FROM_PRIMARY_WEB_READER_NOT_ORIGINAL_HTTP_ARCHIVE",
+  "rawHttpArchiveObtained": false,
+  "source": {
+    "id": "PAMT_Q22026_10Q",
+    "url": "https://www.sec.gov/Archives/edgar/data/798287/000143774926026560/ptsi20260630_10q.htm",
+    "indexUrl": "https://www.sec.gov/Archives/edgar/data/798287/000143774926026560/0001437749-26-026560-index.htm",
+    "filedAt": "2026-08-07",
+    "periodEnd": "2026-06-30",
+    "locator": "MD&A Business Overview p16; three-month comparison p17; six-month comparison p18"
+  },
+  "averageTrucksInService": [
+    { "observationId": "H12025", "value": 2132, "isPeriodAverage": true },
+    { "observationId": "H12026", "value": 1999, "isPeriodAverage": true }
+  ],
+  "closingTrucksInService": [
+    { "asOf": "2025-06-30", "value": 2083, "isPeriodAverage": false },
+    { "asOf": "2026-06-30", "value": 1994, "isPeriodAverage": false }
+  ],
+  "productivityStatements": [
+    { "previousObservationId": "Q22025", "currentObservationId": "Q22026", "releasePercent": 12.8, "tenQPercent": 12.0, "publishedMetric": "MILES_PER_TRUCK_PER_DAY" },
+    { "previousObservationId": "H12025", "currentObservationId": "H12026", "releasePercent": null, "tenQPercent": 8.9, "publishedMetric": "MILES_PER_TRUCK_PER_DAY" }
+  ],
+  "interpretation": {
+    "averageCountCorroboration": "H1 average trucks in service equals release company-driver plus owner-operator average counts in both years. This corroborates the count, not the full mileage/population/day join.",
+    "mannedIsInServiceConfirmed": false,
+    "allMileageAssignedToCombinedAverageTrucksConfirmed": false,
+    "companyOnlyMileageAvailable": false,
+    "calendarDaysAreProductiveDays": false,
+    "sourceConflictResolved": false,
+    "releaseMatchProvesDenominator": false,
+    "ownRelayOrUsOnlyPopulationConfirmed": false,
+    "budgetPopulationMatched": false
+  },
+  "recommendation": {
+    "method": "REUSE_COMBINED_AVERAGE_TRUCK_PROXY_AS_EXPLICIT_CONDITIONAL_SCENARIO",
+    "preferredComparisonObservationId": "H12026",
+    "reason": "Recent six-month window with explicitly corroborated average counts; Q2 is an overlapping sensitivity, FY2025 is a full-year contrast, not additional activity to sum.",
+    "assumption": "For this contrast only, divide reported truckload mileage excluding power-only by the combined average company-driver and owner-operator trucks. Do not call the result observed owned-tractor productivity.",
+    "rejectedMethod": "TOTAL_MILES_DIVIDED_BY_COMPANY_DRIVER_TRUCKS_AS_OWNED_CAPACITY",
+    "rejectedReason": "Numerator has not been split by company-driver and owner-operator mileage; dropping owner-operators from only the denominator inflates the contrast.",
+    "statisticalConfidenceInterval": false,
+    "selectedForPilot": false,
+    "eligibleForResourceExposure": false
+  },
+  "completionBoundary": {
+    "researchDeliverable": "Reproducible conditional km per average truck-month and source disagreement, linked to existing summary without a second engine.",
+    "remainingEconomicDeliverable": "Explicit public-model fleet/profile and compatible fixed budget, productive asset-days for MX/US/one box, then serial route cycle and variable costs.",
+    "newGenericValidationSprintRequired": false
+  },
+  "calibrated": false,
+  "quoteReady": false,
+  "adoptedValues": 0,
+  "externalChanges": false
+}

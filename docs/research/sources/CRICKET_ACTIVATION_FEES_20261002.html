@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script>(function(w,i,g){w[g]=w[g]||[];if(typeof w[g].push=='function')w[g].push(i)})(window,'GTM-5WBVJR6','google_tags_first_party');</script><script>(function(w,d,s,l){w[l]=w[l]||[];(function(){w[l].push(arguments);})('set','developer_id.dYzZiYj',true);var f=d.getElementsByTagName(s)[0],j=d.createElement(s);j.async=true;j.src='/CkGtg1/';f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer');</script>
+        <script type="text/javascript"></script>
+<script
+    type="text/javascript"
+    id="bugsnagEnvironment">
+
+    
+        window.bugsnagEnvironment = 'production'
+    
+
+</script>
+<!--Neustar Snippet-->
+<script
+    type="text/javascript"
+    id="neustar">
+    const gpcCookie = document.cookie.includes('ck_privacy_view=ON-GPC');
+    const navigatorDNTorGPC = navigator.doNotTrack || navigator.globalPrivacyControl;
+    if (!navigatorDNTorGPC || !gpcCookie) {
+        
+            const head = document.head;
+            const neustarScript = document.createElement('script');
+            neustarScript.type = 'text/javascript';
+            neustarScript.id = 'neustar';
+            neustarScript.src = `https://aa.agkn.com/adscores/g.js?sid=9212284698&amp;page=${window.encodeURIComponent(window.location.href)}`;
+
+            function neustar_response(nue_resp) {
+                window.neustar = nue_resp;
+            }
+
+            head.appendChild(neustarScript);
+        
+    }
+</script>
+<!--End Neustar Snippet-->
+<!--Adobe Target Snippet-->
+<script>
+    !(function (n, o) {
+        o.forEach(function (o) {
+            n[o] ||
+                ((n.__alloyNS = n.__alloyNS || []).push(o),
+                (n[o] = function () {
+                    var u = arguments;
+                    return new Promise(function (i, l) {
+                        n[o].q.push([i, l, u]);
+                    });
+                }),
+                (n[o].q = []));
+        });
+    })(window, ['alloy']);
+</script>
+<script
+    src="/www.cricketwireless.com/buildassets/cricket-at.js"
+    async="async"></script>
+<script>
+    function targetPageParams() {
+        let userAuth = 'false';
+        const hasCsrfCookie = document.cookie.split('; ').some(function(row) { return row.startsWith('CK-CSRF-TOKEN-ACCOUNT='); });
+        if (hasCsrfCookie || sessionStorage.getItem('accountCsrfToken') !== null) userAuth = 'true';
+
+        return {
+            at_property: '56942b1b-7ad1-1b58-6480-a7a4dbb4213e',
+            cwUserAuth: userAuth,
+        };
+    }
+</script>
+<!--End Adobe Target Snippet-->
+<!-- GA trackEvent-pageLoad-->
+<script
+    id="google-analytics"
+    type="text/javascript">
+    const hasCsrfCookie = document.cookie.split('; ').some(function(row) { return row.startsWith('CK-CSRF-TOKEN-ACCOUNT='); });
+    const userAuth = hasCsrfCookie || sessionStorage.getItem('accountCsrfToken');
+    const metadataData = {
+        event: 'trackEvent-pageLoad',
+        documentTitle: '',
+        pageName: '',
+        pageType: '',
+        siteId: window.location.hostname.includes('spanol') ? 'cricket_es' : 'cricket_en',
+    };
+    if (userAuth) {
+        metadataData.userType = 'existing';
+    }
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push(metadataData);
+</script>
+<!-- End GA trackEvent-pageLoad-->
+<!-- FullStory Snippet NON-ODA -->
+<script>
+    window['_fs_debug'] = false;
+    window['_fs_host'] = 'rs.cricketwireless.com';
+    window['_fs_script'] = 'rs.cricketwireless.com/s/fs.js';
+    
+        window['_fs_org'] = 'KX23T';
+    
+
+    window['_fs_namespace'] = 'FS';
+    (function (m, n, e, t, l, o, g, y) {
+        if (e in m) {
+            if (m.console && m.console.log) {
+                m.console.log('FullStory namespace conflict. Please set window["_fs_namespace"].');
+            }
+            return;
+        }
+        g = m[e] = function (a, b, s) {
+            g.q ? g.q.push([a, b, s]) : g._api(a, b, s);
+        };
+        g.q = [];
+        o = n.createElement(t);
+        o.async = 1;
+        o.crossOrigin = 'anonymous';
+        o.src = 'https://' + _fs_script;
+        y = n.getElementsByTagName(t)[0];
+        y.parentNode.insertBefore(o, y);
+        g.identify = function (i, v, s) {
+            g(
+                l,
+                {
+                    uid: i,
+                },
+                s,
+            );
+            if (v) g(l, v, s);
+        };
+        g.setUserVars = function (v, s) {
+            g(l, v, s);
+        };
+        g.event = function (i, v, s) {
+            g(
+                'event',
+                {
+                    n: i,
+                    p: v,
+                },
+                s,
+            );
+        };
+        g.anonymize = function () {
+            g.identify(!!0);
+        };
+        g.shutdown = function () {
+            g('rec', !1);
+        };
+        g.restart = function () {
+            g('rec', !0);
+        };
+        g.log = function (a, b) {
+            g('log', [a, b]);
+        };
+        g.consent = function (a) {
+            g('consent', !arguments.length || a);
+        };
+        g.identifyAccount = function (i, v) {
+            o = 'account';
+            v = v || {};
+            v.acctId = i;
+            g(o, v);
+        };
+        g.clearUserCookie = function () {};
+        g._w = {};
+        y = 'XMLHttpRequest';
+        g._w[y] = m[y];
+        y = 'fetch';
+        g._w[y] = m[y];
+        if (m[y]) {
+            m[y] = function () {
+                return g._w[y].apply(this, arguments);
+            };
+        }
+        g._v = '1.2.0';
+    })(window, document, window['_fs_namespace'], 'script', 'user');
+</script>
+<!-- End FullStory Snippet NON-ODA -->
+<!-- Google Tag Manager -->
+<script type="text/javascript">
+    (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+        var f = d.getElementsByTagName(s)[0],
+            j = d.createElement(s),
+            dl = l != 'dataLayer' ? '&l=' + l : '';
+        j.async = true;
+        j.src='/CkGtg1/?id='+i+dl;
+
+        f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-5WBVJR6');
+</script>
+<!-- End Google Tag Manager -->
+<!-- Required meta tags -->
+<meta charset="utf-8" />
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1" />
+<link
+    rel="preload"
+    href="/www.cricketwireless.com/buildassets/supportui.d7d177c0d161671b9616.css"
+    as="style"
+    onload="this.onload=null;this.rel='stylesheet'" />
+<noscript
+    ><link
+        rel="stylesheet"
+        href="/www.cricketwireless.com/buildassets/supportui.d7d177c0d161671b9616.css"
+/></noscript>
+
+         <title>
+            
+                Charges and Fees
+            
+        </title>
+    
+<script>(window.BOOMR_mq=window.BOOMR_mq||[]).push(["addVar",{"rua.upush":"false","rua.cpush":"false","rua.upre":"false","rua.cpre":"false","rua.uprl":"false","rua.cprl":"false","rua.cprf":"false","rua.trans":"","rua.cook":"false","rua.ims":"false","rua.ufprl":"false","rua.cfprl":"false","rua.isuxp":"false","rua.texp":"norulematch","rua.ceh":"false","rua.ueh":"false","rua.ieh.st":"0"}]);</script>
+                                <script>!function(e){var n="https://s.go-mpulse.net/boomerang/";if("True"=="True")e.BOOMR_config=e.BOOMR_config||{},e.BOOMR_config.PageParams=e.BOOMR_config.PageParams||{},e.BOOMR_config.PageParams.pci=!0,n="https://s2.go-mpulse.net/boomerang/";if(window.BOOMR_API_key="QYA7Z-V52NT-XF9GH-UKL9Q-4V7A3",function(){function e(){if(!i){var e=document.createElement("script");e.id="boomr-scr-as",e.src=window.BOOMR.url,e.async=!0,o.parentNode.appendChild(e),i=!0}}function t(e){i=!0;var n,t,a,r,d=document,O=window;if(window.BOOMR.snippetMethod=e?"if":"i",t=function(e,n){var t=d.createElement("script");t.id=n||"boomr-if-as",t.src=window.BOOMR.url,BOOMR_lstart=(new Date).getTime(),e=e||d.body,e.appendChild(t)},!window.addEventListener&&window.attachEvent&&navigator.userAgent.match(/MSIE [67]\./))return window.BOOMR.snippetMethod="s",void t(o.parentNode,"boomr-async");a=document.createElement("IFRAME"),a.src="about:blank",a.title="",a.role="presentation",a.loading="eager",r=(a.frameElement||a).style,r.width=0,r.height=0,r.border=0,r.display="none",o.parentNode.appendChild(a);try{O=a.contentWindow,d=O.document.open()}catch(_){n=document.domain,a.src="javascript:var d=document.open();d.domain='"+n+"';void(0);",O=a.contentWindow,d=O.document.open()}if(n)d._boomrl=function(){this.domain=n,t()},d.write("<bo"+"dy onload='document._boomrl();'>");else if(O._boomrl=function(){t()},O.addEventListener)O.addEventListener("load",O._boomrl,!1);else if(O.attachEvent)O.attachEvent("onload",O._boomrl);d.close()}function a(e){window.BOOMR_onload=e&&e.timeStamp||(new Date).getTime()}if(!window.BOOMR||!window.BOOMR.version&&!window.BOOMR.snippetExecuted){window.BOOMR=window.BOOMR||{},window.BOOMR.snippetStart=(new Date).getTime(),window.BOOMR.snippetExecuted=!0,window.BOOMR.snippetVersion=12,window.BOOMR.url=n+"QYA7Z-V52NT-XF9GH-UKL9Q-4V7A3";var o=document.currentScript||document.getElementsByTagName("script")[0],i=!1,r=document.createElement("link");if(r.relList&&"function"==typeof r.relList.supports&&r.relList.supports("preload")&&"as"in r)window.BOOMR.snippetMethod="p",r.href=window.BOOMR.url,r.rel="preload",r.as="script",r.addEventListener("load",e),r.addEventListener("error",function(){t(!0)}),setTimeout(function(){if(!i)t(!0)},3e3),BOOMR_lstart=(new Date).getTime(),o.parentNode.appendChild(r);else t(!1);if(window.addEventListener)window.addEventListener("load",a,!1);else if(window.attachEvent)window.attachEvent("onload",a)}}(),"".length>0)if(e&&"performance"in e&&e.performance&&"function"==typeof e.performance.setResourceTimingBufferSize)e.performance.setResourceTimingBufferSize();!function(){if(BOOMR=e.BOOMR||{},BOOMR.plugins=BOOMR.plugins||{},!BOOMR.plugins.AK){var n=""=="true"?1:0,t="",a="qhpfwfyx2w4u62wafwra-f-217c8df30-clientnsv4-s.akamaihd.net",o="false"=="true"?2:1,i={"ak.v":"41","ak.cp":"1372043","ak.ai":parseInt("184545",10),"ak.ol":"0","ak.cr":47,"ak.ipv":4,"ak.proto":"http/1.1","ak.rid":"9c7783d4","ak.r":52653,"ak.a2":n,"ak.m":"ce","ak.n":"essl","ak.cport":48373,"ak.gh":"23.207.163.69","ak.quicv":"","ak.tlsv":"tls1.3","ak.0rtt":"","ak.0rtt.ed":"","ak.csrc":"-","ak.acc":"bbr","ak.t":"1790979490","ak.ak":"hOBiQwZUYzCg5VSAfCLimQ==7rtDmMgROUWgfUmLk+5bNGwx6QGQ3G2SHJcYGcBjH5xR9GV8rkk2D/87ynDu4C2NfxARBPqYos4vpa4VmUc64o46ZEp9kaqGM5E8veE25NrykvviKjP7osfKAojJ1bAfLKGoH6xnXPbE7zXM8uEPw04tCC5Yd58i6fPZJsWoB6ukyuma0kdAlTDxWJbt6R1HMlTu3IJjjI2QZUZvvTmcUwRVsuDA7eOo+deNN+3Khl/w2ZUtEEu1zGufbwVWiRYRhAEc14+5PfWz1Ec2ND4gW4H7ppyTpxl/c72JYFJ1PVA5y3Ak4POrpudJOSYt4F8QTTva7+HHm7lAi5BgXFn+3oI0pwY89nIGS1YqZ9FiLJg4PHl23W/goHcrb0Sk2xo8xtucu7PAB4Nf2JGh3+jBO7F5jpjYQ3BBHqvJ24cxW/8=","ak.pv":"5506","ak.dpoabenc":"","ak.tf":o};if(""!==t)i["ak.ruds"]=t;var r={i:!1,av:function(n){var t="http.initiator";if(n&&(!n[t]||"spa_hard"===n[t]))i["ak.feo"]=void 0!==e.aFeoApplied?1:0,BOOMR.addVar(i)},rv:function(){var e=["ak.cport","ak.cr","ak.csrc","ak.gh","ak.ipv","ak.m","ak.n","ak.ol","ak.proto","ak.quicv","ak.tlsv","ak.0rtt","ak.0rtt.ed","ak.r","ak.acc","ak.t","ak.tf"];BOOMR.removeVar(e)}};BOOMR.plugins.AK={akVars:i,akDNSPreFetchDomain:a,init:function(){if(!r.i){var e=BOOMR.subscribe;e("before_beacon",r.av,null,null),e("onbeacon",r.rv,null,null),r.i=!0}return this},is_complete:function(){return!0}}}}()}(window);</script></head>
+    <body class="responsive">
+         <div id="mainWrapper"><a href="#container" id="cw-skip-navigation-link" class="skip-link container courtesy-link header-nav-links py-2 px-4">
+    Skip to main content
+</a>
+<header class="d-none d-lg-grid m-0 main masthead no-subnav p-0 w-100 " id="desktop-header">
+    <input type="hidden" id="keepAliveUrlId" value="/selfservice/rest/authentication/ticket/validate/">
+    <div class="container-fluid courtesy-nav-background"></div>
+    <div class="container navigation-container">
+        <div class="flex-column-reverse g-3 g-lg-0 main-nav mt-3 mt-lg-0 navigation position-relative">
+            <nav class="courtesy-menu list-unstyled g-0" aria-label="Courtesy">
+        <ul data-version=desktop id="rightLinksDesktopCourtesy" class="w-100 h-100 align-items-lg-center justify-content-between courtesy-menu-list d-none d-lg-flex flex-lg-row gap-3 list-unstyled m-0 p-lg-0 px-3">
+    <li id="EspanolLink" class="topEspanol d-none d-lg-flex align-items-center courtesy-menu-item px-lg-2 py-2">
+        <a href="https://espanol.cricketwireless.com/" id="" class="px-lg-2 courtesy-link header-nav-links" data-event="trackEvent-headerLinks" data-event-label="Espa&ntilde;ol" data-event-action="header-links" data-event-category="header" lang="es-US">Espa&ntilde;ol</a>
+    </li>
+
+    <li id="FindAStoreLink" class="topStoreLoc d-none d-lg-flex align-items-center courtesy-menu-item px-lg-2 py-2">
+        <a href="/stores" id="" class="px-lg-2 courtesy-link header-nav-links" data-event="trackEvent-headerLinks" data-event-label="Find a Store" data-event-action="header-links" data-event-category="header">Find a Store</a>
+    </li>
+
+    <li id="CoverageLink" class="topCoverage d-none d-lg-flex align-items-center courtesy-menu-item px-lg-2 py-2">
+        <a href="/map.html" id="" class="px-lg-2 courtesy-link header-nav-links" data-event="trackEvent-headerLinks" data-event-label="Coverage" data-event-action="header-links" data-event-category="header">Coverage</a>
+    </li>
+
+    <li id="QuickPayLink" class="topQuickPay d-none d-lg-flex align-items-center courtesy-menu-item px-lg-2 py-2">
+        <a href="/quickpay.html" id="" class="px-lg-2 courtesy-link quick-pay-btn header-nav-links" data-event="trackEvent-headerLinks" data-event-label="Pay Bill" data-event-action="header-links" data-event-category="header">Pay Bill</a>
+    </li>
+
+    <li id="ActivateLink" class="topActivate d-none d-lg-flex align-items-center courtesy-menu-item px-lg-2 py-2">
+        <a href="/activate.html" id="" class="px-lg-2 courtesy-link activate-btn header-nav-links" data-event="trackEvent-headerLinks" data-event-label="Activate" data-event-action="header-links" data-event-category="header">Activate</a>
+    </li>
+
+<li id="litopChatDesktopCourtesy" class="top-help-link topChat align-items-center courtesy-menu-item px-lg-2">
+    <button
+        type="button"
+        id="chatItemDesktopCourtesy"
+        class="orc-text-button desktop-white help-chat courtesy-nav-links text-decoration-none gap-1 px-lg-2 px-2 m-0
+            border-0"
+        data-button="open-menu"
+        data-id="litopChatDesktopCourtesy"
+        data-event="trackEvent-headerLinks"
+        data-event-label="Help"
+        data-event-action="header-links"
+        data-event-category="header"
+        aria-controls="chatItemDesktopCourtesySubNavMenu"
+        aria-expanded="false">
+        Help
+        <img src="/uiassets/SmallUseArrowDown.svg" alt="" class="courtesy-button-icon">
+    </button>
+    <div class="courtesy-submenu py-lg-2 px-lg-3" id="chatItemDesktopCourtesySubNavMenu" data-controlled-by="chatItemDesktopCourtesy">
+        <div class="chat-container my-4 my-lg-0 p-4 px-lg-0 pt-lg-4 pb-lg-0 line-break">
+            <button id="chatWithUs" type="button" class="chat-with-us orc-button orc-primary" data-event="trackEvent-unified" data-event-label="ask-a-question" data-event-action="button-click" data-event-category="unified-chat">Chat With Us
+            </button>
+            <p class="mt-4 mb-0 mb-lg-3 text-center">
+                Chat with the Cricket Digital Assistant 24/7
+            </p>
+        </div>
+        <ul class="m-0 list-unstyled">
+            <li class="courtesy-submenu-list d-block d-lg-none">
+                <button
+                    type="button"
+                    class="orc-text-button btn-back cricket-book text-black mt-3 d-flex d-lg-none"
+                    data-button="back-button"
+                    data-subnav-name="litopChatDesktopCourtesy">
+                    Back
+                </button>
+            </li>
+            <li class="heading-1 d-block d-lg-none mobile-subhead cricket-demibold orc-text courtesy-submenu-list">
+                Help
+            </li>
+            <li class="courtesy-submenu-list">
+                <a class="orc-link p-lg-3 standalone courtesy-submenu-item cricket-medium text-black text-start" data-event="trackEvent-headerMenu" data-event-label="Support Center" data-event-action="header-menu" data-event-category="header" href="/support">Support Center</a>
+            </li>
+            <li class="courtesy-submenu-list">
+                <a class="orc-link p-lg-3 standalone courtesy-submenu-item cricket-medium text-black text-start" data-event="trackEvent-headerMenu" data-event-label="Account Support" data-event-action="header-menu" data-event-category="header" href="/support/account-management">Account Support</a>
+            </li>
+            <li class="courtesy-submenu-list">
+                <a class="orc-link p-lg-3 standalone courtesy-submenu-item cricket-medium text-black text-start" data-event="trackEvent-headerMenu" data-event-label="Order Support" data-event-action="header-menu" data-event-category="header" href="/support/orders-and-activations">Order Support</a>
+            </li>
+            <li class="courtesy-submenu-list">
+                <a class="orc-link p-lg-3 standalone courtesy-submenu-item cricket-medium text-black text-start" data-event="trackEvent-headerMenu" data-event-label="Billing Help" data-event-action="header-menu" data-event-category="header" href="/support/billing-and-payments">Billing Help</a>
+            </li>
+            <li class="courtesy-submenu-list">
+                <a class="orc-link p-lg-3 standalone courtesy-submenu-item cricket-medium text-black text-start" data-event="trackEvent-headerMenu" data-event-label="Contact Us" data-event-action="header-menu" data-event-category="header" href="/contactus">Contact Us</a>
+            </li>
+        </ul>
+    </div>
+</li>
+
+<li
+    id="signInBtnDesktopCourtesy"
+    class=" topActivate top-nav-item text-end align-items-center courtesy-menu-item ps-lg-2"> 
+    <button
+        type="button"
+        id="sign-in-btnDesktopCourtesy"
+        class="orc-text-button desktop-white header-nav-links sign-in-btn text-decoration-none gap-1 px-2 m-0 border-0"
+        data-button="open-menu"
+        data-id="signInBtnDesktopCourtesy"
+        data-event="trackEvent-headerLinks"
+        data-event-label="Sign In"
+        data-event-action="header-links"
+        data-event-category="header"
+        aria-controls="sign-in-btnDesktopCourtesySubNavMenu"
+        aria-expanded="false"
+        >
+        <span class="sign-in-btn-text">
+            Sign In
+        </span>
+         <span class="account-btn-text">
+            Account
+        </span>
+        <img src="/uiassets/SmallUseArrowDown.svg" alt="" class="courtesy-button-icon">
+    </button>
+    <div class="courtesy-submenu py-lg-2 px-lg-3" id="sign-in-btnDesktopCourtesySubNavMenu" data-controlled-by="sign-in-btnDesktopCourtesy"> 
+        <div class="chat-container my-4 my-lg-0 p-4 pb-1 px-lg-0 pt-lg-4 pb-lg-0 line-break">
+            <div class="d-flex justify-space-between">
+                <div id="linkButtonParent" class="w-100">
+                    <a id="linkButton" href="/cwlogin.html" class="orc-button link orc-primary sign-btn" data-event="trackEvent-headerMenu" data-event-label="Sign In" data-event-action="header-menu" data-event-category="header">Sign In</a>
+                    <span class="welcome-text mb-3 mb-lg-4">Welcome back<span data-username="username-text"></span>!</span>
+                    <button id="logoutButton" type="button" class="orc-button orc-secondary logout-button mb-4" data-event="trackEvent-headerMenu" data-event-label="Sign Out" data-event-action="header-menu" data-event-category="header" data-logout="logout-button">Sign Out
+                    </button>
+                </div>
+            </div>
+            <div>
+                <div id="createAccountLink">
+                    <a href="/createaccount" class="orc-link standalone create-link sign-btn my-1 py-3 pb-lg-2" data-event="trackEvent-headerMenu" data-event-label="Create Sign In" data-event-action="header-menu" data-event-category="header">
+                        Create Sign In
+                    </a>
+                </div>
+            </div>
+        </div>
+        <ul class="m-0 list-unstyled">
+            <li class="courtesy-submenu-list d-block d-lg-none">
+                <button
+                    type="button"
+                    class="orc-text-button btn-back cricket-book text-black mt-3 mb-2 d-flex d-lg-none"
+                    data-button="back-button"
+                    data-subnav-name="signInBtnDesktopCourtesy">
+                    Back
+                </button>
+            </li>
+            <li class="heading-1 d-block d-lg-none mobile-subhead cricket-demibold orc-text courtesy-submenu-list">
+                Account
+            </li>
+            <li class="courtesy-submenu-list">
+                <a
+                    class="orc-link p-lg-3 standalone courtesy-submenu-item cricket-medium text-black text-start"
+                     data-event="trackEvent-headerMenu" data-event-label="Pay My Bill" data-event-action="header-menu" data-event-category="header"
+                    href="/payments/auth-payment.html">Pay My Bill</a>
+            </li>
+            <li class="courtesy-submenu-list">
+                <a
+                    class="orc-link p-lg-3 standalone courtesy-submenu-item cricket-medium text-black text-start"
+                     data-event="trackEvent-headerMenu" data-event-label="Auto Pay" data-event-action="header-menu" data-event-category="header"
+                    href="/manageautopay">Auto Pay</a>
+            </li>
+            <li class="courtesy-submenu-list">
+                <a
+                    class="orc-link p-lg-3 standalone courtesy-submenu-item cricket-medium text-black text-start"
+                     data-event="trackEvent-headerMenu" data-event-label="Mobile Hotspot" data-event-action="header-menu" data-event-category="header"
+                    href="/mobilehotspot.html">Mobile Hotspot</a>
+            </li>
+            <li class="courtesy-submenu-list">
+                <a
+                    class="orc-link p-lg-3 standalone courtesy-submenu-item cricket-medium text-black text-start"
+                     data-event="trackEvent-headerMenu" data-event-label="Manage Account" data-event-action="header-menu" data-event-category="header"
+                    href="/l/manageaccount.html">Manage Account</a>
+            </li>
+            <li class="courtesy-submenu-list">
+                <a
+                    class="orc-link p-lg-3 standalone courtesy-submenu-item cricket-medium text-black text-start"
+                     data-event="trackEvent-headerMenu" data-event-label="Track My Order" data-event-action="header-menu" data-event-category="header"
+                    href="/track-order.html">Track My Order</a>
+            </li>
+            <li class="courtesy-submenu-list">
+                <a
+                    class="orc-link p-lg-3 standalone courtesy-submenu-item cricket-medium text-black text-start"
+                     data-event="trackEvent-headerMenu" data-event-label="Activate My Device" data-event-action="header-menu" data-event-category="header"
+                    href="/activate.html">Activate My Device</a>
+            </li>
+        </ul>
+    </div>
+</li>
+</ul>
+        </nav><div class="logo"><a href="/"
+                       id="cw-homepage-logo"
+                       class="has-focus-white-stroke d-flex text-start"
+                       data-event="trackEvent-headerMenu"
+                       data-event-label="Cricket Wireless Home Page"
+                       data-event-action="header-menu"
+                       data-event-category="header">
+                        <img src="/uiassets/logo_cricket-green.png" alt="Cricket Wireless Home Page">
+                    </a></div><nav class="primary-menu m-0" aria-label="Primary"><ul id="DesktopPrimary-nav-list" class="d-flex flex-column flex-lg-row justify-content-between list-unstyled m-0 navigation-row w-100"><li id="DesktopPrimary-phonesMenu" class="primNavOne has-subnav d-flex flex-nowrap flex-row has-subnav primary-menu-item"> 
+        <div class="primary-menu-item-button d-flex flex-row w-100"><a href="/shop/all-devices" id="DesktopPrimary-phones-devices" class="d-none d-lg-flex flex-grow-1 text-decoration-none text-start top-menu-link px-lg-2 p-2 cricket-book " data-event="trackEvent-headerLinks" data-event-label="Phones & Devices" data-event-action="header-links" data-event-category="header">Phones & Devices</a>
+            <button type="button" id="btn-DesktopPrimary-phones-devices" class="d-none d-lg-flex align-items-lg-center flex-grow-1 subnav-button text-end" data-event="trackEvent-headerMenu" data-event-label="Phones & Devices" data-event-action="header-menu-button" data-event-category="header" data-button="open-menu" data-id="DesktopPrimary-phonesMenu" aria-controls="DesktopPrimary-phonesMenuSubSubNavMenu" aria-expanded="false" aria-labelledby="DesktopPrimary-phones-devices" data-subnav-name="DesktopPrimary-phonesMenu">
+                <img src="/uiassets/SmallUseArrowDown.svg" data-id="DesktopPrimary-phonesMenu" alt="" class="chevron-up d-none d-lg-flex">
+            </button></div>
+        <div id="DesktopPrimary-phonesMenuSubSubNavMenu" class="primary-submenu list-unstyled position-absolute"> <ul id="DesktopPrimary-phonesMenuSub" class="px-lg-3 py-lg-2" aria-labelledby="mobile-nav-DesktopPrimary-phones-devices">
+                <li class="sub-nav-list d-block d-lg-none">
+                    <button id="DesktopPrimary-phonesMenuSub-back" class="orc-text-button btn-back cricket-book text-black me-1 mt-3 mb-2 d-flex d-lg-none" data-subnav-name="DesktopPrimary-phonesMenu" data-button="back-button">
+                        Back
+                    </button>
+                </li>
+                <li class="sub-nav-list d-block d-lg-none orc-text">
+                    <a href="/shop/all-devices" id="mobile-nav-DesktopPrimary-phones-devices" class="d-block d-lg-none mobile-subhead orc-link sub-nav-list text-decoration-none text-black " data-event="trackEvent-headerMenu" data-event-label="Phones & Devices" data-event-action="header-menu" data-event-category="header">Phones & Devices</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/shop/smartphones"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="Phones & Devices | Phones" data-event-action="header-menu" data-event-category="header">Phones</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/shop/smartwatches/apple"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="Phones & Devices | Smartwatches" data-event-action="header-menu" data-event-category="header">Smartwatches</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/device-payment-options.html"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="Phones & Devices | Finance &amp; Payment Plans" data-event-action="header-menu" data-event-category="header">Finance &amp; Payment Plans</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/shop/data-device/cricket-golink-5g-hotspot-dusk-blue"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="Phones & Devices | Hotspots" data-event-action="header-menu" data-event-category="header">Hotspots</a>
+                </li></ul></div>
+    </li><li id="DesktopPrimary-plansMenu" class="primNavTwo has-subnav d-flex flex-nowrap flex-row has-subnav primary-menu-item"> 
+        <div class="primary-menu-item-button d-flex flex-row w-100"><a href="/cell-phone-plans/all-plans" id="DesktopPrimary-plans" class="d-none d-lg-flex flex-grow-1 text-decoration-none text-start top-menu-link px-lg-2 p-2 cricket-book " data-event="trackEvent-headerLinks" data-event-label="Plans" data-event-action="header-links" data-event-category="header">Plans</a>
+            <button type="button" id="btn-DesktopPrimary-plans" class="d-none d-lg-flex align-items-lg-center flex-grow-1 subnav-button text-end" data-event="trackEvent-headerMenu" data-event-label="Plans" data-event-action="header-menu-button" data-event-category="header" data-button="open-menu" data-id="DesktopPrimary-plansMenu" aria-controls="DesktopPrimary-plansMenuSubSubNavMenu" aria-expanded="false" aria-labelledby="DesktopPrimary-plans" data-subnav-name="DesktopPrimary-plansMenu">
+                <img src="/uiassets/SmallUseArrowDown.svg" data-id="DesktopPrimary-plansMenu" alt="" class="chevron-up d-none d-lg-flex">
+            </button></div>
+        <div id="DesktopPrimary-plansMenuSubSubNavMenu" class="primary-submenu list-unstyled position-absolute"> <ul id="DesktopPrimary-plansMenuSub" class="px-lg-3 py-lg-2" aria-labelledby="mobile-nav-DesktopPrimary-plans">
+                <li class="sub-nav-list d-block d-lg-none">
+                    <button id="DesktopPrimary-plansMenuSub-back" class="orc-text-button btn-back cricket-book text-black me-1 mt-3 mb-2 d-flex d-lg-none" data-subnav-name="DesktopPrimary-plansMenu" data-button="back-button">
+                        Back
+                    </button>
+                </li>
+                <li class="sub-nav-list d-block d-lg-none orc-text">
+                    <a href="/cell-phone-plans/all-plans" id="mobile-nav-DesktopPrimary-plans" class="d-block d-lg-none mobile-subhead orc-link sub-nav-list text-decoration-none text-black " data-event="trackEvent-headerMenu" data-event-label="Plans" data-event-action="header-menu" data-event-category="header">Plans</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/plans/phone"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="Plans | Phone Plans" data-event-action="header-menu" data-event-category="header">Phone Plans</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/plans/phone/multi-month"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="Plans | Multi-month Phone Plans" data-event-action="header-menu" data-event-category="header">Multi-month Phone Plans</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/plans/smartwatch"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="Plans | Smartwatch Plans" data-event-action="header-menu" data-event-category="header">Smartwatch Plans</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/plans/cricket-home-internet"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="Plans | Home Internet Plans" data-event-action="header-menu" data-event-category="header">Home Internet Plans</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/plans/tablet"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="Plans | Tablet Plans" data-event-action="header-menu" data-event-category="header">Tablet Plans</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/plans/data-only"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="Plans | Hotspot Data Plans" data-event-action="header-menu" data-event-category="header">Hotspot Data Plans</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/shop/bring-your-phone"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="Plans | Bring Your Own Phone" data-event-action="header-menu" data-event-category="header">Bring Your Own Phone</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/plans/features"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="Plans | Add on Features" data-event-action="header-menu" data-event-category="header">Add on Features</a>
+                </li></ul></div>
+    </li><li id="DesktopPrimary-dealsMenu" class="primNavThree has-subnav d-flex flex-nowrap flex-row has-subnav primary-menu-item"> 
+        <div class="primary-menu-item-button d-flex flex-row w-100"><a href="/current-phone-and-plan-deals/all-deals" id="DesktopPrimary-deals" class="d-none d-lg-flex flex-grow-1 text-decoration-none text-start top-menu-link px-lg-2 p-2 cricket-book " data-event="trackEvent-headerLinks" data-event-label="Deals" data-event-action="header-links" data-event-category="header">Deals</a>
+            <button type="button" id="btn-DesktopPrimary-deals" class="d-none d-lg-flex align-items-lg-center flex-grow-1 subnav-button text-end" data-event="trackEvent-headerMenu" data-event-label="Deals" data-event-action="header-menu-button" data-event-category="header" data-button="open-menu" data-id="DesktopPrimary-dealsMenu" aria-controls="DesktopPrimary-dealsMenuSubSubNavMenu" aria-expanded="false" aria-labelledby="DesktopPrimary-deals" data-subnav-name="DesktopPrimary-dealsMenu">
+                <img src="/uiassets/SmallUseArrowDown.svg" data-id="DesktopPrimary-dealsMenu" alt="" class="chevron-up d-none d-lg-flex">
+            </button></div>
+        <div id="DesktopPrimary-dealsMenuSubSubNavMenu" class="primary-submenu list-unstyled position-absolute"> <ul id="DesktopPrimary-dealsMenuSub" class="px-lg-3 py-lg-2" aria-labelledby="mobile-nav-DesktopPrimary-deals">
+                <li class="sub-nav-list d-block d-lg-none">
+                    <button id="DesktopPrimary-dealsMenuSub-back" class="orc-text-button btn-back cricket-book text-black me-1 mt-3 mb-2 d-flex d-lg-none" data-subnav-name="DesktopPrimary-dealsMenu" data-button="back-button">
+                        Back
+                    </button>
+                </li>
+                <li class="sub-nav-list d-block d-lg-none orc-text">
+                    <a href="/current-phone-and-plan-deals/all-deals" id="mobile-nav-DesktopPrimary-deals" class="d-block d-lg-none mobile-subhead orc-link sub-nav-list text-decoration-none text-black " data-event="trackEvent-headerMenu" data-event-label="Deals" data-event-action="header-menu" data-event-category="header">Deals</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/current-phone-and-plan-deals"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="Deals | Device Deals" data-event-action="header-menu" data-event-category="header">Device Deals</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/shop/deals/trade-in"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="Deals | Device Trade-in" data-event-action="header-menu" data-event-category="header">Device Trade-in</a>
+                </li></ul></div>
+    </li><li id="DesktopPrimary-moreMenu" class="primNavFour has-subnav d-flex flex-nowrap flex-row has-subnav primary-menu-item"> 
+        <div class="primary-menu-item-button d-flex flex-row w-100"><a href="/more" id="DesktopPrimary-more" class="d-none d-lg-flex flex-grow-1 text-decoration-none text-start top-menu-link px-lg-2 p-2 cricket-book " data-event="trackEvent-headerLinks" data-event-label="More" data-event-action="header-links" data-event-category="header" aria-current="true">More</a>
+            <button type="button" id="btn-DesktopPrimary-more" class="d-none d-lg-flex align-items-lg-center flex-grow-1 subnav-button text-end" data-event="trackEvent-headerMenu" data-event-label="More" data-event-action="header-menu-button" data-event-category="header" data-button="open-menu" data-id="DesktopPrimary-moreMenu" aria-controls="DesktopPrimary-moreMenuSubSubNavMenu" aria-expanded="false" aria-labelledby="DesktopPrimary-more" data-subnav-name="DesktopPrimary-moreMenu">
+                <img src="/uiassets/SmallUseArrowDown.svg" data-id="DesktopPrimary-moreMenu" alt="" class="chevron-up d-none d-lg-flex">
+            </button></div>
+        <div id="DesktopPrimary-moreMenuSubSubNavMenu" class="primary-submenu list-unstyled position-absolute"> <ul id="DesktopPrimary-moreMenuSub" class="px-lg-3 py-lg-2" aria-labelledby="mobile-nav-DesktopPrimary-more">
+                <li class="sub-nav-list d-block d-lg-none">
+                    <button id="DesktopPrimary-moreMenuSub-back" class="orc-text-button btn-back cricket-book text-black me-1 mt-3 mb-2 d-flex d-lg-none" data-subnav-name="DesktopPrimary-moreMenu" data-button="back-button">
+                        Back
+                    </button>
+                </li>
+                <li class="sub-nav-list d-block d-lg-none orc-text">
+                    <a href="/more" id="mobile-nav-DesktopPrimary-more" class="d-block d-lg-none mobile-subhead orc-link sub-nav-list text-decoration-none text-black " data-event="trackEvent-headerMenu" data-event-label="More" data-event-action="header-menu" data-event-category="header">More</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/how-cricket-works"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="More | How Cricket Works" data-event-action="header-menu" data-event-category="header">How Cricket Works</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/why-cricket"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="More | Why Choose Cricket" data-event-action="header-menu" data-event-category="header">Why Choose Cricket</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/apps-and-services"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="More | Apps and Services" data-event-action="header-menu" data-event-category="header">Apps and Services</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/support" aria-current="page" class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="More | Support" data-event-action="header-menu" data-event-category="header">Support</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/free-trial.html"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="More | Free Trial" data-event-action="header-menu" data-event-category="header">Free Trial</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/5G"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="More | Our 5G Network" data-event-action="header-menu" data-event-category="header">Our 5G Network</a>
+                </li></ul></div>
+    </li></ul>
+</nav></div><div id="search-container" class="search-container flex-grow-0 mt-lg-2 pb-lg-0 rounded-lg-3 is-search yextContainerDesktopSearch">
+    <nav
+        id="yextSearch"
+        class="yextSearch search-panel yextDesktopSearch"
+        aria-label="Search">
+        <div class="search_formDesktopSearch"></div>
+    </nav>
+    <div class="mobile-search">
+        <button
+            id="yextSearch-mobile"
+            class="yextButtonDesktopSearch"
+            type="button">
+            <img
+                src="https://www.cricketwireless.com/uiassets/SmallUseSearch_extradarkgreyicon.svg"
+                alt="Search" />
+        </button>
+    </div>
+</div><div id="top-cart" class="topCart top-cart d-flex pt-lg-1 align-items-center" data-event="trackEvent-headerLinks" data-event-label="Cart"
+     data-event-action="header-links" data-event-category="header">
+    <a class="cart_icon header-nav-links align-items-center d-flex gap-1"
+       id="cartIcon"
+       href="/shop/cart.html">
+        <img src="/uiassets/SmallUseCart_extradarkgreyicon.svg" width="24px" alt="cart">
+    </a>
+</div></div>
+</header>
+<header class="d-grid m-0 d-lg-none main masthead no-subnav p-0 " id="mobile-header">
+    <input type="hidden" id="keepAliveUrlId" value="/selfservice/rest/authentication/ticket/validate/">
+    <div class="container-fluid courtesy-nav-background"></div>
+    <div class="container navigation-container"><div class="logo"><a href="/"
+                       id="cw-homepage-logo"
+                       class="has-focus-white-stroke d-flex text-start"
+                       data-event="trackEvent-headerMenu"
+                       data-event-label="Cricket Wireless Home Page"
+                       data-event-action="header-menu"
+                       data-event-category="header">
+                        <img src="/uiassets/logo_cricket-green.png" alt="Cricket Wireless Home Page">
+                    </a></div><div id="search-container" class="search-container flex-grow-0 mt-lg-2 pb-lg-0 rounded-lg-3 is-search yextContainerMobileSearch">
+    <nav
+        id="yextSearch"
+        class="yextSearch search-panel yextMobileSearch"
+        aria-label="Search">
+        <div class="search_formMobileSearch"></div>
+    </nav>
+    <div class="mobile-search">
+        <button
+            id="yextSearch-mobile"
+            class="yextButtonMobileSearch"
+            type="button">
+            <img
+                src="https://www.cricketwireless.com/uiassets/SmallUseSearch_extradarkgreyicon.svg"
+                alt="Search" />
+        </button>
+    </div>
+</div><div id="top-cart" class="topCart top-cart d-flex pt-lg-1 align-items-center" data-event="trackEvent-headerLinks" data-event-label="Cart"
+     data-event-action="header-links" data-event-category="header">
+    <a class="cart_icon header-nav-links align-items-center d-flex gap-1"
+       id="cartIcon"
+       href="/shop/cart.html">
+        <img src="/uiassets/SmallUseCart_extradarkgreyicon.svg" width="24px" alt="cart">
+    </a>
+</div><div class="mobile-menu">
+            <button id="menu-toggle" class="menu-toggle" type="button" data-menu-button="true" aria-expanded="false" aria-controls="mobile-menu-toggled">
+                <span class="visually-hidden">Menu</span>
+                <span class="line line1"></span>
+                <span class="line line2"></span>
+                <span class="line line3"></span>
+            </button>
+        </div><div class="g-lg-0 main-nav mt-lg-0 navigation position-relative"
+             id="mobile-menu-toggled"><nav class="primary-menu m-0" aria-label="Primary"><ul id="MobilePrimary-nav-list" class="d-flex flex-column flex-lg-row justify-content-between list-unstyled m-0 navigation-row w-100"><li id="MobilePrimary-phonesMenu" class="primNavOne has-subnav d-flex flex-nowrap flex-row has-subnav primary-menu-item"> 
+        <div class="primary-menu-item-button d-flex flex-row w-100"><button type="button" id="btn-MobilePrimary-phones-devices" class="test-class subnav-button cricket-book d-flex d-lg-none flex-grow-1 px-2 justify-content-between align-items-center" data-button="open-menu" data-id="MobilePrimary-phonesMenu" data-event="trackEvent-headerMenu" data-event-label="Phones & Devices" data-event-action="header-menu" data-event-category="header" data-subnav-name="MobilePrimary-phonesMenu">
+                Phones & Devices
+                <img src="/uiassets/SmallUseArrowUp.svg" data-id="MobilePrimary-phonesMenu" alt="" class="chevron-up d-flex d-lg-none">
+            </button></div>
+        <div id="MobilePrimary-phonesMenuSubSubNavMenu" class="primary-submenu list-unstyled position-absolute"> <ul id="MobilePrimary-phonesMenuSub" class="px-lg-3 py-lg-2" aria-labelledby="mobile-nav-MobilePrimary-phones-devices">
+                <li class="sub-nav-list d-block d-lg-none">
+                    <button id="MobilePrimary-phonesMenuSub-back" class="orc-text-button btn-back cricket-book text-black me-1 mt-3 mb-2 d-flex d-lg-none" data-subnav-name="MobilePrimary-phonesMenu" data-button="back-button">
+                        Back
+                    </button>
+                </li>
+                <li class="sub-nav-list d-block d-lg-none orc-text">
+                    <a href="/shop/all-devices" id="mobile-nav-MobilePrimary-phones-devices" class="d-block d-lg-none mobile-subhead orc-link sub-nav-list text-decoration-none text-black " data-event="trackEvent-headerMenu" data-event-label="Phones & Devices" data-event-action="header-menu" data-event-category="header">Phones & Devices</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/shop/smartphones"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="Phones & Devices | Phones" data-event-action="header-menu" data-event-category="header">Phones</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/shop/smartwatches/apple"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="Phones & Devices | Smartwatches" data-event-action="header-menu" data-event-category="header">Smartwatches</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/device-payment-options.html"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="Phones & Devices | Finance &amp; Payment Plans" data-event-action="header-menu" data-event-category="header">Finance &amp; Payment Plans</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/shop/data-device/cricket-golink-5g-hotspot-dusk-blue"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="Phones & Devices | Hotspots" data-event-action="header-menu" data-event-category="header">Hotspots</a>
+                </li></ul></div>
+    </li><li id="MobilePrimary-plansMenu" class="primNavTwo has-subnav d-flex flex-nowrap flex-row has-subnav primary-menu-item"> 
+        <div class="primary-menu-item-button d-flex flex-row w-100"><button type="button" id="btn-MobilePrimary-plans" class="test-class subnav-button cricket-book d-flex d-lg-none flex-grow-1 px-2 justify-content-between align-items-center" data-button="open-menu" data-id="MobilePrimary-plansMenu" data-event="trackEvent-headerMenu" data-event-label="Plans" data-event-action="header-menu" data-event-category="header" data-subnav-name="MobilePrimary-plansMenu">
+                Plans
+                <img src="/uiassets/SmallUseArrowUp.svg" data-id="MobilePrimary-plansMenu" alt="" class="chevron-up d-flex d-lg-none">
+            </button></div>
+        <div id="MobilePrimary-plansMenuSubSubNavMenu" class="primary-submenu list-unstyled position-absolute"> <ul id="MobilePrimary-plansMenuSub" class="px-lg-3 py-lg-2" aria-labelledby="mobile-nav-MobilePrimary-plans">
+                <li class="sub-nav-list d-block d-lg-none">
+                    <button id="MobilePrimary-plansMenuSub-back" class="orc-text-button btn-back cricket-book text-black me-1 mt-3 mb-2 d-flex d-lg-none" data-subnav-name="MobilePrimary-plansMenu" data-button="back-button">
+                        Back
+                    </button>
+                </li>
+                <li class="sub-nav-list d-block d-lg-none orc-text">
+                    <a href="/cell-phone-plans/all-plans" id="mobile-nav-MobilePrimary-plans" class="d-block d-lg-none mobile-subhead orc-link sub-nav-list text-decoration-none text-black " data-event="trackEvent-headerMenu" data-event-label="Plans" data-event-action="header-menu" data-event-category="header">Plans</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/plans/phone"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="Plans | Phone Plans" data-event-action="header-menu" data-event-category="header">Phone Plans</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/plans/phone/multi-month"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="Plans | Multi-month Phone Plans" data-event-action="header-menu" data-event-category="header">Multi-month Phone Plans</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/plans/smartwatch"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="Plans | Smartwatch Plans" data-event-action="header-menu" data-event-category="header">Smartwatch Plans</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/plans/cricket-home-internet"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="Plans | Home Internet Plans" data-event-action="header-menu" data-event-category="header">Home Internet Plans</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/plans/tablet"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="Plans | Tablet Plans" data-event-action="header-menu" data-event-category="header">Tablet Plans</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/plans/data-only"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="Plans | Hotspot Data Plans" data-event-action="header-menu" data-event-category="header">Hotspot Data Plans</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/shop/bring-your-phone"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="Plans | Bring Your Own Phone" data-event-action="header-menu" data-event-category="header">Bring Your Own Phone</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/plans/features"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="Plans | Add on Features" data-event-action="header-menu" data-event-category="header">Add on Features</a>
+                </li></ul></div>
+    </li><li id="MobilePrimary-dealsMenu" class="primNavThree has-subnav d-flex flex-nowrap flex-row has-subnav primary-menu-item"> 
+        <div class="primary-menu-item-button d-flex flex-row w-100"><button type="button" id="btn-MobilePrimary-deals" class="test-class subnav-button cricket-book d-flex d-lg-none flex-grow-1 px-2 justify-content-between align-items-center" data-button="open-menu" data-id="MobilePrimary-dealsMenu" data-event="trackEvent-headerMenu" data-event-label="Deals" data-event-action="header-menu" data-event-category="header" data-subnav-name="MobilePrimary-dealsMenu">
+                Deals
+                <img src="/uiassets/SmallUseArrowUp.svg" data-id="MobilePrimary-dealsMenu" alt="" class="chevron-up d-flex d-lg-none">
+            </button></div>
+        <div id="MobilePrimary-dealsMenuSubSubNavMenu" class="primary-submenu list-unstyled position-absolute"> <ul id="MobilePrimary-dealsMenuSub" class="px-lg-3 py-lg-2" aria-labelledby="mobile-nav-MobilePrimary-deals">
+                <li class="sub-nav-list d-block d-lg-none">
+                    <button id="MobilePrimary-dealsMenuSub-back" class="orc-text-button btn-back cricket-book text-black me-1 mt-3 mb-2 d-flex d-lg-none" data-subnav-name="MobilePrimary-dealsMenu" data-button="back-button">
+                        Back
+                    </button>
+                </li>
+                <li class="sub-nav-list d-block d-lg-none orc-text">
+                    <a href="/current-phone-and-plan-deals/all-deals" id="mobile-nav-MobilePrimary-deals" class="d-block d-lg-none mobile-subhead orc-link sub-nav-list text-decoration-none text-black " data-event="trackEvent-headerMenu" data-event-label="Deals" data-event-action="header-menu" data-event-category="header">Deals</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/current-phone-and-plan-deals"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="Deals | Device Deals" data-event-action="header-menu" data-event-category="header">Device Deals</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/shop/deals/trade-in"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="Deals | Device Trade-in" data-event-action="header-menu" data-event-category="header">Device Trade-in</a>
+                </li></ul></div>
+    </li><li id="MobilePrimary-moreMenu" class="primNavFour has-subnav d-flex flex-nowrap flex-row has-subnav primary-menu-item"> 
+        <div class="primary-menu-item-button d-flex flex-row w-100"><button type="button" id="btn-MobilePrimary-more" class="test-class subnav-button cricket-book d-flex d-lg-none flex-grow-1 px-2 justify-content-between align-items-center"  aria-current="true"data-button="open-menu" data-id="MobilePrimary-moreMenu" data-event="trackEvent-headerMenu" data-event-label="More" data-event-action="header-menu" data-event-category="header" data-subnav-name="MobilePrimary-moreMenu">
+                More
+                <img src="/uiassets/SmallUseArrowUp.svg" data-id="MobilePrimary-moreMenu" alt="" class="chevron-up d-flex d-lg-none">
+            </button></div>
+        <div id="MobilePrimary-moreMenuSubSubNavMenu" class="primary-submenu list-unstyled position-absolute"> <ul id="MobilePrimary-moreMenuSub" class="px-lg-3 py-lg-2" aria-labelledby="mobile-nav-MobilePrimary-more">
+                <li class="sub-nav-list d-block d-lg-none">
+                    <button id="MobilePrimary-moreMenuSub-back" class="orc-text-button btn-back cricket-book text-black me-1 mt-3 mb-2 d-flex d-lg-none" data-subnav-name="MobilePrimary-moreMenu" data-button="back-button">
+                        Back
+                    </button>
+                </li>
+                <li class="sub-nav-list d-block d-lg-none orc-text">
+                    <a href="/more" id="mobile-nav-MobilePrimary-more" class="d-block d-lg-none mobile-subhead orc-link sub-nav-list text-decoration-none text-black " data-event="trackEvent-headerMenu" data-event-label="More" data-event-action="header-menu" data-event-category="header">More</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/how-cricket-works"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="More | How Cricket Works" data-event-action="header-menu" data-event-category="header">How Cricket Works</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/why-cricket"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="More | Why Choose Cricket" data-event-action="header-menu" data-event-category="header">Why Choose Cricket</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/apps-and-services"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="More | Apps and Services" data-event-action="header-menu" data-event-category="header">Apps and Services</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/support" aria-current="page" class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="More | Support" data-event-action="header-menu" data-event-category="header">Support</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/free-trial.html"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="More | Free Trial" data-event-action="header-menu" data-event-category="header">Free Trial</a>
+                </li><li class=" d-flex flex-column flex-nowrap primary-submenu-item"> 
+                    <a href="/5G"  class="cricket-book d-flex px-lg-2 py-lg-2 primary-submenu-link text-black text-decoration-none text-start" data-event="trackEvent-headerMenu" data-event-label="More | Our 5G Network" data-event-action="header-menu" data-event-category="header">Our 5G Network</a>
+                </li></ul></div>
+    </li></ul>
+</nav><nav class="courtesy-menu list-unstyled g-0" aria-label="Courtesy">
+        
+        <ul data-version=mobile id="rightLinksMobileCourtesy" class="d-lg-none d-flex w-100 h-100 courtesy-menu-list flex-column list-unstyled m-0 px-3">
+<li
+    id="signInBtnMobileCourtesy"
+    class=" topActivate top-nav-item text-end align-items-center courtesy-menu-item ps-lg-2"> 
+    <button
+        type="button"
+        id="sign-in-btnMobileCourtesy"
+        class="orc-text-button desktop-white header-nav-links sign-in-btn text-decoration-none gap-1 px-2 m-0 border-0"
+        data-button="open-menu"
+        data-id="signInBtnMobileCourtesy"
+        data-event="trackEvent-headerLinks"
+        data-event-label="Sign In"
+        data-event-action="header-links"
+        data-event-category="header"
+        >
+        <span class="sign-in-btn-text">
+            Sign In
+        </span>
+         <span class="account-btn-text">
+            Account
+        </span>
+        <img src="/uiassets/SmallUseArrowDown.svg" alt="" class="courtesy-button-icon">
+    </button>
+    <div class="courtesy-submenu py-lg-2 px-lg-3" id="sign-in-btnMobileCourtesySubNavMenu" data-controlled-by="sign-in-btnMobileCourtesy"> 
+        <div class="chat-container my-4 my-lg-0 p-4 pb-1 px-lg-0 pt-lg-4 pb-lg-0 line-break">
+            <div class="d-flex justify-space-between">
+                <div id="linkButtonParent" class="w-100">
+                    <a id="linkButton" href="/cwlogin.html" class="orc-button link orc-primary sign-btn" data-event="trackEvent-headerMenu" data-event-label="Sign In" data-event-action="header-menu" data-event-category="header">Sign In</a>
+                    <span class="welcome-text mb-3 mb-lg-4">Welcome back<span data-username="username-text"></span>!</span>
+                    <button id="logoutButton" type="button" class="orc-button orc-secondary logout-button mb-4" data-event="trackEvent-headerMenu" data-event-label="Sign Out" data-event-action="header-menu" data-event-category="header" data-logout="logout-button">Sign Out
+                    </button>
+                </div>
+            </div>
+            <div>
+                <div id="createAccountLink">
+                    <a href="/createaccount" class="orc-link standalone create-link sign-btn my-1 py-3 pb-lg-2" data-event="trackEvent-headerMenu" data-event-label="Create Sign In" data-event-action="header-menu" data-event-category="header">
+                        Create Sign In
+                    </a>
+                </div>
+            </div>
+        </div>
+        <ul class="m-0 list-unstyled">
+            <li class="courtesy-submenu-list d-block d-lg-none">
+                <button
+                    type="button"
+                    class="orc-text-button btn-back cricket-book text-black mt-3 mb-2 d-flex d-lg-none"
+                    data-button="back-button"
+                    data-subnav-name="signInBtnMobileCourtesy">
+                    Back
+                </button>
+            </li>
+            <li class="heading-1 d-block d-lg-none mobile-subhead cricket-demibold orc-text courtesy-submenu-list">
+                Account
+            </li>
+            <li class="courtesy-submenu-list">
+                <a
+                    class="orc-link p-lg-3 standalone courtesy-submenu-item cricket-medium text-black text-start"
+                     data-event="trackEvent-headerMenu" data-event-label="Pay My Bill" data-event-action="header-menu" data-event-category="header"
+                    href="/payments/auth-payment.html">Pay My Bill</a>
+            </li>
+            <li class="courtesy-submenu-list">
+                <a
+                    class="orc-link p-lg-3 standalone courtesy-submenu-item cricket-medium text-black text-start"
+                     data-event="trackEvent-headerMenu" data-event-label="Auto Pay" data-event-action="header-menu" data-event-category="header"
+                    href="/manageautopay">Auto Pay</a>
+            </li>
+            <li class="courtesy-submenu-list">
+                <a
+                    class="orc-link p-lg-3 standalone courtesy-submenu-item cricket-medium text-black text-start"
+                     data-event="trackEvent-headerMenu" data-event-label="Mobile Hotspot" data-event-action="header-menu" data-event-category="header"
+                    href="/mobilehotspot.html">Mobile Hotspot</a>
+            </li>
+            <li class="courtesy-submenu-list">
+                <a
+                    class="orc-link p-lg-3 standalone courtesy-submenu-item cricket-medium text-black text-start"
+                     data-event="trackEvent-headerMenu" data-event-label="Manage Account" data-event-action="header-menu" data-event-category="header"
+                    href="/l/manageaccount.html">Manage Account</a>
+            </li>
+            <li class="courtesy-submenu-list">
+                <a
+                    class="orc-link p-lg-3 standalone courtesy-submenu-item cricket-medium text-black text-start"
+                     data-event="trackEvent-headerMenu" data-event-label="Track My Order" data-event-action="header-menu" data-event-category="header"
+                    href="/track-order.html">Track My Order</a>
+            </li>
+            <li class="courtesy-submenu-list">
+                <a
+                    class="orc-link p-lg-3 standalone courtesy-submenu-item cricket-medium text-black text-start"
+                     data-event="trackEvent-headerMenu" data-event-label="Activate My Device" data-event-action="header-menu" data-event-category="header"
+                    href="/activate.html">Activate My Device</a>
+            </li>
+        </ul>
+    </div>
+</li>
+
+<li id="litopChatMobileCourtesy" class="top-help-link topChat align-items-center courtesy-menu-item px-lg-2">
+    <button
+        type="button"
+        id="chatItemMobileCourtesy"
+        class="orc-text-button desktop-white help-chat courtesy-nav-links text-decoration-none gap-1 px-lg-2 px-2 m-0
+            border-0"
+        data-button="open-menu"
+        data-id="litopChatMobileCourtesy"
+        data-event="trackEvent-headerLinks"
+        data-event-label="Help"
+        data-event-action="header-links"
+        data-event-category="header">
+        Help
+        <img src="/uiassets/SmallUseArrowDown.svg" alt="" class="courtesy-button-icon">
+    </button>
+    <div class="courtesy-submenu py-lg-2 px-lg-3" id="chatItemMobileCourtesySubNavMenu" data-controlled-by="chatItemMobileCourtesy">
+        <div class="chat-container my-4 my-lg-0 p-4 px-lg-0 pt-lg-4 pb-lg-0 line-break">
+            <button id="chatWithUs" type="button" class="chat-with-us orc-button orc-primary" data-event="trackEvent-unified" data-event-label="ask-a-question" data-event-action="button-click" data-event-category="unified-chat">Chat With Us
+            </button>
+            <p class="mt-4 mb-0 mb-lg-3 text-center">
+                Chat with the Cricket Digital Assistant 24/7
+            </p>
+        </div>
+        <ul class="m-0 list-unstyled">
+            <li class="courtesy-submenu-list d-block d-lg-none">
+                <button
+                    type="button"
+                    class="orc-text-button btn-back cricket-book text-black mt-3 d-flex d-lg-none"
+                    data-button="back-button"
+                    data-subnav-name="litopChatMobileCourtesy">
+                    Back
+                </button>
+            </li>
+            <li class="heading-1 d-block d-lg-none mobile-subhead cricket-demibold orc-text courtesy-submenu-list">
+                Help
+            </li>
+            <li class="courtesy-submenu-list">
+                <a class="orc-link p-lg-3 standalone courtesy-submenu-item cricket-medium text-black text-start" data-event="trackEvent-headerMenu" data-event-label="Support Center" data-event-action="header-menu" data-event-category="header" href="/support">Support Center</a>
+            </li>
+            <li class="courtesy-submenu-list">
+                <a class="orc-link p-lg-3 standalone courtesy-submenu-item cricket-medium text-black text-start" data-event="trackEvent-headerMenu" data-event-label="Account Support" data-event-action="header-menu" data-event-category="header" href="/support/account-management">Account Support</a>
+            </li>
+            <li class="courtesy-submenu-list">
+                <a class="orc-link p-lg-3 standalone courtesy-submenu-item cricket-medium text-black text-start" data-event="trackEvent-headerMenu" data-event-label="Order Support" data-event-action="header-menu" data-event-category="header" href="/support/orders-and-activations">Order Support</a>
+            </li>
+            <li class="courtesy-submenu-list">
+                <a class="orc-link p-lg-3 standalone courtesy-submenu-item cricket-medium text-black text-start" data-event="trackEvent-headerMenu" data-event-label="Billing Help" data-event-action="header-menu" data-event-category="header" href="/support/billing-and-payments">Billing Help</a>
+            </li>
+            <li class="courtesy-submenu-list">
+                <a class="orc-link p-lg-3 standalone courtesy-submenu-item cricket-medium text-black text-start" data-event="trackEvent-headerMenu" data-event-label="Contact Us" data-event-action="header-menu" data-event-category="header" href="/contactus">Contact Us</a>
+            </li>
+        </ul>
+    </div>
+</li>
+
+    <li id="ActivateLink" class="topActivate d-flex d-lg-none align-items-center courtesy-menu-item">
+        <a href="/activate.html" id="" class="px-2 courtesy-link activate-btn header-nav-links" data-event="trackEvent-headerLinks" data-event-label="Activate" data-event-action="header-links" data-event-category="header">
+            Activate
+        </a>
+    </li>
+
+    <li id="QuickPayLink" class="topQuickPay d-flex d-lg-none align-items-center courtesy-menu-item">
+        <a href="/quickpay.html" id="" class="px-2 courtesy-link quick-pay-btn header-nav-links" data-event="trackEvent-headerLinks" data-event-label="Pay Bill" data-event-action="header-links" data-event-category="header">
+            Pay Bill
+        </a>
+    </li>
+
+    <li id="CoverageLink" class="topCoverage d-flex d-lg-none align-items-center courtesy-menu-item">
+        <a href="/map.html" id="" class="px-2 courtesy-link header-nav-links" data-event="trackEvent-headerLinks" data-event-label="Coverage" data-event-action="header-links" data-event-category="header">
+            Coverage
+        </a>
+    </li>
+
+    <li id="FindAStoreLink" class="topStoreLoc d-flex d-lg-none align-items-center courtesy-menu-item">
+        <a href="/stores" id="" class="px-2 courtesy-link header-nav-links" data-event="trackEvent-headerLinks" data-event-label="Find a Store" data-event-action="header-links" data-event-category="header">
+            Find a Store
+        </a>
+    </li>
+
+    <li id="EspanolLink" class="topEspanol d-flex d-lg-none align-items-center courtesy-menu-item">
+        <a href="https://espanol.cricketwireless.com/" id="" class="px-2 courtesy-link header-nav-links" data-event="trackEvent-headerLinks" data-event-label="Espa&ntilde;ol" data-event-action="header-links" data-event-category="header">
+            Espa&ntilde;ol
+        </a>
+    </li>
+</ul></nav>
+        </div>
+    </div>
+</header>
+<div class="desktop-spacer d-none d-lg-block"></div>
+<div class="mobile-spacer d-lg-none"></div><link rel="stylesheet" type="text/css" href="https://assets.sitescdn.net/answers-search-bar/v1.6.2/answers.css">
+<script src="https://assets.sitescdn.net/answers-search-bar/v1.6.2/answerstemplates-iife.compiled.min.js"
+        defer=""></script>
+<script>
+    function initAnswers() {
+        let searchUrl = "https://search.cricketwireless.com";
+        let experienceKey = "cricket-wireless-answers";
+        let searchPlaceHolder = "Search Cricket";
+        if (window.location.href.indexOf("espanol") > -1) {
+            searchUrl = "https://buscar.cricketwireless.com";
+            experienceKey = "cricket-wireless-answers-spanish";
+            searchPlaceHolder = "Buscar en Cricket";
+        }
+        ANSWERS.init({
+            experienceKey: experienceKey,
+            businessId: "3698978",
+            apiKey: "7f7c4d30a6fc41f51d425ed2ed177b02",
+            experienceVersion: "PRODUCTION",
+            locale: "en",
+            templateBundle: TemplateBundle,
+            onReady: function () {
+                ANSWERS.addComponent("SearchBar", {
+                    container: ".search_formDesktopSearch",
+                    name: "search-bar",
+                    redirectUrl: searchUrl,
+                    placeholderText: searchPlaceHolder,
+                    submitIcon: "magnifying_glass"
+                });
+                ANSWERS.addComponent("SearchBar", {
+                    container: ".search_formMobileSearch",
+                    name: "search-bar-mobile",
+                    redirectUrl: searchUrl,
+                    placeholderText: searchPlaceHolder,
+                    submitIcon: "magnifying_glass"
+                });
+            }
+        });
+    }
+</script>
+<script src="https://assets.sitescdn.net/answers-search-bar/v1.2/answers.min.js" onload="ANSWERS.domReady(initAnswers)" defer=""></script><div tabindex="-1"><div class="main subnav-margin-fix body" id="container" style="opacity: 1;" tabindex="0">
+            <main id="supportPagesUI">
+                <article class="container-fluid"><div class="row constrain-width-1024"><div class="row constrain-width-1024">
+    <nav class="col-sm-12" aria-label="Breadcrumb">
+        <ul class="breadcrumbs"><li aria-current="page" class="breadcrumbs-link">
+                <a href="/support"> <span>support Home</span>
+                    <i class="icon-font icon-arrow-forward icon-blue" aria-hidden="true"></i>
+                </a>
+            </li><li aria-current="page" class="breadcrumbs-link">
+                <a href="/support/billing-and-payments"> <span>billing-and-payments </span>
+                    <i class="icon-font icon-arrow-forward icon-blue" aria-hidden="true"></i>
+                </a>
+            </li><li class="bread-last" aria-current="page">charges-and-fees </li></ul>
+    </nav>
+</div><div class="row constrain-width-1024">
+    <div class="col-md-12 support_search_form"></div>
+</div><div class="row">
+        <div class="col-md-8">
+            <article class="supportArticle">
+                <h1 class="display-3">
+                    Charges and Fees
+                </h1><div class="article-content"><p>To keep things simple, our&nbsp;<a href="/support/plans-and-features/plans">monthly rate plans</a>&nbsp;and&nbsp;<a href="/support/plans-and-features/features">added features</a>&nbsp;include applicable state and local taxes. To see all charges on your account, sign in to&nbsp;<a href="/manageaccount">manage your account</a>&nbsp;or the&nbsp;<a href="/support/apps-and-services/mycricket-app">myCricket App</a>.</p>
+<h2>Cricket&nbsp;Fees for Wireless Accounts</h2>
+<p><strong>Note:</strong>&nbsp;All charges and fees are nonrefundable and subject to change at any time without notice.</p>
+<table border="1" cellpadding="1" cellspacing="1" role="presentation" style="width:650px">
+	<tbody>
+		<tr>
+			<th scope="rowgroup" width="25%">
+			<p><strong>Transaction</strong></p>
+			</th>
+			<th>
+			<p><strong>Description</strong></p>
+			</th>
+			<th width="25%">
+			<p><strong>Fee</strong></p>
+			</th>
+		</tr>
+		<tr>
+			<td scope="rowgroup">
+			<p><strong>Activation Fee</strong></p>
+			</td>
+			<td>
+			<p>Applies to both Cricket-purchased devices and devices that you bring to Cricket.</p>
+			</td>
+			<td>
+			<p>In Store: $25</p>
+<p><p>Online: $0</p>
+</td>
+</tr>
+<tr>
+<td scope="rowgroup">
+<p><strong>Device Upgrade Fee</strong></p>
+</td>
+<td>
+<p>A fee for upgrading to a new Cricket-purchased device. (Does not apply to service plan changes.)</p>
+</td>
+<td>
+<p>In Store: $25</p></p>
+<p><p>Online: $25</p>
+</td>
+</tr>
+<tr>
+<td scope="rowgroup">
+<p><strong>Reactivation Fee</strong></p>
+</td>
+<td>
+<p>A fee charged for reactivating a suspended account. If you miss your due date, your account will be suspended immediately. A Reactivation Fee will be charged before the account can be reactivated.*</p>
+</td>
+<td>
+<p>$5 (single-line account)</p></p>
+<p><p>$15 (multi-line account)</p>
+</td>
+</tr>
+<tr>
+<td scope="rowgroup">
+<p><strong>Non-Compliant Return Fee</strong></p>
+</td>
+<td>
+<p>A fee that may be applied when a device purchased online at cricketwireless.com or at a Cricket store is returned damaged or without the original contents of the device packaging.</p>
+</td>
+<td>
+<p>In Store: Up to $25</p></p>
+<p><p>Online: $25</p>
+</td>
+</tr>
+<tr>
+<td scope="rowgroup">
+<p><strong>Cricket Mobile Number Change Fee</strong></p>
+</td>
+<td>
+<p>Applies if you're a <strong>current</strong> Cricket customer and you <a href="/support/account-management/change-my-phone-number">change your mobile number</a>. (Does NOT apply to new customers who transfer a number from another carrier at the time of activation.)</p>
+</td>
+<td>
+<p>$15</p>
+</td>
+</tr>
+<tr>
+<td scope="rowgroup">
+<p><strong>Customer Assistance Fee</strong></p>
+</td>
+<td>
+<p>Applies to service payments made in an <a href="/content/aio/en/map.html#stores">Authorized Retail store</a> or over the phone with <a href="/contactus">Customer Support</a>. (No fee is charged for payments made through the <a href="https://support/apps-and-services/mycricket-app">myCricket App</a>, <a href="/l/manageaccount">online</a>, <a href="/quickpay">Quick Pay</a>, or for customer enrolled in <a href="/support/billing-and-payments/auto-pay-setup">Auto Pay</a>.)</p>
+</td>
+<td>
+<p>$5**</p>
+</td>
+</tr>
+<tr>
+<td scope="rowgroup">
+<p><strong>Automated Phone System</strong></p>
+</td>
+<td>
+<p>Applies to service payments made using the <a href="/support/billing-and-payments/bill-pay-methods">Automated Phone System</a>.</p>
+</td>
+<td>
+<p>$5**</p>
+</td>
+</tr>
+<tr>
+<td scope="rowgroup">
+<p><strong>BridgePay<sup>®</sup> Fee</strong></p>
+</td>
+<td>
+<p>A fee for activating BridgePay. A <a href="/support/billing-and-payments/bridge-pay">minimum payment</a> is also due for each line on your account and varies by rate plan.</p>
+</td>
+<td>
+<p>$5 – single-line account</p></p>
+<p><p>$15 – multi-line accounts</p>
+</td>
+</tr>
+</tbody></p>
+</table>
+<h2>Cricket&nbsp;Fees for Home Internet</h2>
+<p><strong>Note:</strong>&nbsp;All charges and fees are nonrefundable and subject to change at any time without notice.</p>
+<table border="1" cellpadding="1" cellspacing="1" role="presentation" style="width:650px">
+	<tbody>
+		<tr>
+			<th scope="rowgroup" width="25%">
+			<p><strong>Transaction</strong></p>
+			</th>
+			<th>
+			<p><strong>Description</strong></p>
+			</th>
+			<th width="25%">
+			<p><strong>Fee</strong></p>
+			</th>
+		</tr>
+		<tr>
+			<td scope="rowgroup">
+			<p><strong>Reactivation Fee</strong></p>
+			</td>
+			<td>
+			<p>A fee charged for reactivating a suspended account. If you miss your due date, your account will be suspended immediately. A Reactivation Fee will be charged before the account can be reactivated.*</p>
+			</td>
+			<td>
+			<p>$5 (single-line account)</p>
+<p><p>$15 (multi-line account)</p>
+</td>
+</tr>
+<tr>
+<td scope="rowgroup">
+<p><strong>Non-Compliant Return Fee</strong></p>
+</td>
+<td>
+<p>A fee that may be applied when a device purchased online at cricketwireless.com or at a Cricket store is returned damaged or without the original contents of the device packaging.</p>
+</td>
+<td>
+<p>In Store: Up to $25</p></p>
+<p><p>Online: $25</p>
+</td>
+</tr>
+<tr>
+<td scope="rowgroup">
+<p><strong>Customer Assistance Fee</strong></p>
+</td>
+<td>
+<p>Applies to service payments made in an <a href="/content/aio/en/map.html#stores">Authorized Retail store</a> or over the phone with <a href="/contactus">Customer Support</a>. (No fee is charged for payments made through the <a href="https://support/apps-and-services/mycricket-app">myCricket App</a>, <a href="/l/manageaccount">online</a>, <a href="/quickpay">Quick Pay</a>, or for customer enrolled in <a href="/support/billing-and-payments/auto-pay-setup">Auto Pay</a>.)</p>
+</td>
+<td>
+<p>$5**</p>
+</td>
+</tr>
+<tr>
+<td scope="rowgroup">
+<p><strong>Automated Phone System</strong></p>
+</td>
+<td>
+<p>Applies to service payments made using the <a href="/support/billing-and-payments/bill-pay-methods">Automated Phone System</a>.</p>
+</td>
+<td>
+<p>$5**</p>
+</td>
+</tr>
+<tr>
+<td scope="rowgroup">
+<p><strong>BridgePay<sup>®</sup> Fee</strong></p>
+</td>
+<td>
+<p>A fee for activating BridgePay. A <a href="/support/billing-and-payments/bridge-pay">minimum payment</a> is also due for each line on your account and varies by rate plan.</p>
+</td>
+<td>
+<p>$5 – single-line account</p></p>
+<p><p>$15 – multi-line accounts</p>
+</td>
+</tr>
+</tbody></p>
+</table>
+<p>*Payments are due on or before the account's due date by 11:59 p.m. Central time. The&nbsp;<strong>Reactivation Fee</strong>&nbsp;applies to suspended accounts that are reactivated within 59 days after the due date. On the 60<sup>th</sup>&nbsp;day, the account will be canceled and can't be reactivated.</p>
+<p><strong>**Fee Exclusions:&nbsp;</strong>The&nbsp;Customer Assistance Fee does not apply to payments made in Cricket stores in Connecticut or Vermont, and the Automated Phone System Payments Fee does not apply to payments made to accounts with a Connecticut billing address. This info is subject to change and may be modified or terminated at any time without notice.</p>
+<div class="accordion" id="accordionFaqs"></div></div>
+<div class="col-md-12 survey-container">
+    <div class="article-helpful body-1-demi">Was this article helpful?</div>
+    <div class="buttons-wrapper"> 
+        <button class="verint-button orc-button orc-secondary" 
+                id="verintYesButton">
+        Yes
+        </button>
+        <button class="verint-button orc-button orc-secondary" 
+                id="verintNoButton">
+        No
+        </button>
+    </div>    
+</div></article>
+        </div>
+        <div class="col-md-4"><aside id="relatedArticles" name="relatedArticles" class="sideBar"><div id="relatedLinks" class="sidebar-wrapper">
+            <h3 class="heading-4">Related Articles</h3>
+            <ul class="related-article-list"><li class="related-article-item">
+                            <a href="/support/billing-and-payments/bill-pay-methods"  class="related-article-item-link subheading-1 ga-support orc-link" data-event-label="Bill Pay Methods">
+                                Bill Pay Methods
+                            </a>
+                        </li><li class="related-article-item">
+                            <a href="/support/billing-and-payments/payment-due-dates"  class="related-article-item-link subheading-1 ga-support orc-link" data-event-label="Payment Due Dates">
+                                Payment Due Dates
+                            </a>
+                        </li><li class="related-article-item">
+                            <a href="/support/billing-and-payments/auto-pay-setup"  class="related-article-item-link subheading-1 ga-support orc-link" data-event-label="Auto Pay Setup">
+                                Auto Pay Setup
+                            </a>
+                        </li></ul>
+        </div></aside>
+<aside id="relatedCategories" name="relatedCategories" class="sideBar">
+        <div class="sidebar-wrapper">
+            <h3 class="heading-4">Related Topics</h3><div class="row no-wrap-block">
+                    <div class="article-icon related-topic-icon">
+                        <img src="/uiassets/icon-smile-green-32x32.png" alt="Green smiley face on white background "/>
+                    </div><div class="article-title">
+                        <a href="/l/manageaccount" aria-label="" class="link-black">
+                            Manage Your Account
+                        </a>
+                    </div>
+                </div><div class="row no-wrap-block">
+                    <div class="article-icon related-topic-icon">
+                        <img src="/uiassets/icon-bundles-32_px-green.png" alt="Green wrapped giftbox on white background "/>
+                    </div><div class="article-title">
+                        <a href="/support/discounts-and-savings" aria-label="" class="link-black">
+                            Discounts and Savings
+                        </a>
+                    </div>
+                </div></div>
+    </aside><div class="article-page-help"><div class="row constrain-width-1024"><div class="sidebar-wrapper">
+            <h3 class="heading-4">Can't find what you need? We can help</h3>
+        </div>
+        <div class="help-section-elements">
+            <div class="row"><div class="col-md-4 col-sm-12 col-xs-12 help-item">
+                    <div class="col-12 help-section-element article-title ga-support" data-event-label="Contact Us"><a href="/contactus" class="help-section-element-link link-black">
+                            <div class="help-section-item--image">
+                                <img src="/uiassets/icon-support-white-32x32.png"
+                                    alt =" "/>
+                            </div>
+                            <span >Contact Us</span>
+                        </a></div>
+                </div><div class="col-md-4 col-sm-12 col-xs-12 help-item">
+                    <div class="col-12 help-section-element article-title ga-support" data-event-label="Chat"><a href="javascript:void(0)" onclick="adaEmbed.toggle()" class="help-section-element-link link-black">
+                            <div class="help-section-item--image">
+                                <img src="/uiassets/icon-chat-white-32x32.png"
+                                    alt =" "/>
+                            </div>
+                            <span >Chat</span>
+                        </a></div>
+                </div><div class="col-md-4 col-sm-12 col-xs-12 help-item">
+                    <div class="col-12 help-section-element article-title ga-support" data-event-label="Store Locator"><a href="/stores" class="help-section-element-link link-black">
+                            <div class="help-section-item--image">
+                                <img src="/uiassets/icon-store-white-32x32.png"
+                                    alt =" "/>
+                            </div>
+                            <span >Store Locator</span>
+                        </a></div>
+                </div></div>
+        </div></div>
+</div></div>
+    </div>
+</div>
+</article>
+            </main>
+    </div>
+</div>
+
+             <footer id="footer" class="footer">
+    <div class="cms-base-footer">
+    <div class="container footer-container">
+        <nav class="row" aria-label="Footer"><div class="col-12 col-sm-6 col-lg-4 footer-column">
+        <h2 class="body-2-demi mb-2" id="about-us-header">About Us</h2>
+        <ul class="ps-0"><li class="footer-book">
+                        <a id="why-cricket" href="/why-cricket"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="About Us | Why Cricket"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            Why Cricket
+                        </a>
+                    </li><li class="footer-book">
+                        <a id="culture-and-inclusion" href="/why-cricket/culture-and-inclusion"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="About Us | What We Stand For"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            What We Stand For
+                        </a>
+                    </li><li class="footer-book">
+                        <a id="sponsorships" href="/sponsorships"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="About Us | Sponsorships"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            Sponsorships
+                        </a>
+                    </li><li class="footer-book">
+                        <a id="coverage-map" href="/map.html"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="About Us | Coverage"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            Coverage
+                        </a>
+                    </li><li class="footer-book">
+                        <a id="the-cricket-blog" href="/blog.html"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="About Us | The Cricket Blog"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            The Cricket Blog
+                        </a>
+                    </li><li class="footer-book">
+                        <a id="the-cricket-connection" href="/the-cricket-connection/index.html"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="About Us | News"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            News
+                        </a>
+                    </li><li class="footer-book">
+                        <a id="our-team" href="/why-cricket/our-team.html"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="About Us | Our Team"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            Our Team
+                        </a>
+                    </li><li class="footer-book">
+                        <a id="cricket-careers" href="https://work.att.jobs/Cricket"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="About Us | Careers"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            Careers
+                        </a>
+                    </li><li class="footer-book">
+                        <a id="become-a-dealer" href="/become-a-dealer"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="About Us | Become an Authorized Retailer"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            Become an Authorized Retailer
+                        </a>
+                    </li><li class="footer-book">
+                        <a id="bridge-pay" href="/support/billing-and-payments/bridge-pay"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="About Us | Bridge Pay"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            Bridge Pay
+                        </a>
+                    </li><li class="footer-book">
+                        <a id="device-payment-options" href="/device-payment-options.html"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="About Us | Phone Payment Plans"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            Phone Payment Plans
+                        </a>
+                    </li><li class="footer-book">
+                        <a id="llms-text-file" href="/llms.txt"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="About Us | LLMS? Click here"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            LLMS? Click here
+                        </a>
+                    </li></ul>
+    </div><div class="col-12 col-sm-6 col-lg-4 footer-column">
+        <h2 class="body-2-demi mb-2" id="customer-support-header">Customer Support</h2>
+        <ul class="ps-0"><li class="footer-book">
+                        <a id="support-accessibility" href="/support/accessibility"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="Customer Support | Accessibility"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            Accessibility
+                        </a>
+                    </li><li class="footer-book">
+                        <a id="sitemap" href="/sitemap.html"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="Customer Support | Sitemap"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            Sitemap
+                        </a>
+                    </li><li class="footer-book">
+                        <a id="cwlogin" href="/cwlogin.html"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="Customer Support | Sign in to Your Account"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            Sign in to Your Account
+                        </a>
+                    </li><li class="footer-book">
+                        <a id="stores" href="/stores"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="Customer Support | Store Locator"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            Store Locator
+                        </a>
+                    </li><li class="footer-book">
+                        <a id="track-order" href="/track-order.html"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="Customer Support | Track My Order"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            Track My Order
+                        </a>
+                    </li><li class="footer-book">
+                        <a id="devices" href="/support/device-tutorials#/devices"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="Customer Support | User Guides &amp; Device Tutorials"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            User Guides &amp; Device Tutorials
+                        </a>
+                    </li><li class="footer-book">
+                        <a id="returns-and-exchanges" href="/support/orders-and-activations/returns-and-exchanges"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="Customer Support | Returns &amp; Refund Policy"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            Returns &amp; Refund Policy
+                        </a>
+                    </li><li class="footer-book">
+                        <button id="chat"
+                                class="orc-text-button px-0"
+                                data-event="trackEvent-footerLinks"
+                                data-event-label="Customer Support | Chat"
+                                data-event-action="link-click"
+                                data-event-category="footer">Chat</button>
+                    </li><li class="footer-book">
+                        <a id="contact-us" href="/contactus"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="Customer Support | Contact Us"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            Contact Us
+                        </a>
+                    </li></ul>
+    </div><div class="col-12 col-sm-6 col-lg-4 footer-column">
+        <h2 class="body-2-demi mb-2" id="legal-header">Legal</h2>
+        <ul class="ps-0"><li class="footer-book">
+                        <a id="customer-controls" href="/legal-info/customer-choices-and-controls-marketing-emails.html"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="Legal | Unsubscribe"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            Unsubscribe
+                        </a>
+                    </li><li class="footer-book">
+                        <a id="advertising-choices" href="https://youradchoices.com"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="Legal | Advertising Choices"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            Advertising Choices
+                        </a>
+                    </li><li class="footer-book">
+                        <a id="privacy-policy" href="/privacy"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="Legal | Privacy Notice"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            Privacy Notice
+                        </a>
+                    </li><li class="footer-book">
+                        <a id="terms-conditions" href="/terms"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="Legal | Cricket Wireless Terms &amp; Conditions of Service"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            Cricket Wireless Terms &amp; Conditions of Service
+                        </a>
+                    </li><li class="footer-book">
+                        <a id="website-terms-of-use" href="/legal-info/website-terms-of-use.html"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="Legal | Website Terms of Use"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            Website Terms of Use
+                        </a>
+                    </li><li class="footer-book">
+                        <a id="legal-information" href="/legal-info/legal-information.html"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="Legal | Other Legal Info"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            Other Legal Info
+                        </a>
+                    </li><li class="footer-book">
+                        <a id="california-consumer-privacy-act-sell" href="/legal-info/california-consumer-privacy-act.html"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="Legal | Do Not Sell or Share My Personal Information"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            Do Not Sell or Share My Personal Information
+                        </a>
+                    </li><li class="footer-book">
+                        <a id="california-consumer-privacy-act-limit" href="/legal-info/california-consumer-privacy-act.html"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="Legal | Limit the Use of My Sensitive Personal Information"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            Limit the Use of My Sensitive Personal Information
+                        </a>
+                    </li><li class="footer-book">
+                        <a id="broadband-facts-machine-readable-plans" href="/broadband-facts-machine-readable-plans"
+                            data-event="trackEvent-footerLinks"
+                            data-event-label="Legal | Broadband Facts Machine Readable File (.CSV)"
+                            data-event-action="link-click"
+                            data-event-category="footer">
+                            Broadband Facts Machine Readable File (.CSV)
+                        </a>
+                    </li></ul>
+    </div></nav>
+        <div class="row">
+            <div class="d-flex flex-column col-12"><div class='mt-4 mb-2 footer-column'>
+    <div class='row'>
+        <div class='col-12 icons-wrapper'>
+            <div class='social-icons facebook'>
+                <a
+                    class='has-focus'
+                    href='https://www.facebook.com/cricketwireless'
+                    data-event='trackEvent-footerLinks'
+                    data-event-label='Cricket on Facebook'
+                    data-event-action='link-click'
+                    data-event-category='footer'
+                    target="_blank"
+                >
+                    <img src='/uiassets/FacebookFooter.svg'
+                         alt='Cricket on Facebook (opens a new window)'
+                         class='img-responsive' />
+                </a>
+            </div>
+            <div class='social-icons twitter'>
+                <a
+                    class='has-focus'
+                    href='https://twitter.com/CricketNation'
+                    data-event='trackEvent-footerLinks'
+                    data-event-label='Cricket on Twitter'
+                    data-event-action='link-click'
+                    data-event-category='footer'
+                    target="_blank"
+                >
+                    <img src='/uiassets/XFooter.svg'
+                         alt='Cricket on Twitter (opens a new window)'
+                         class='img-responsive' />
+                </a>
+            </div>
+            <div class='social-icons instagram'>
+                <a
+                    class='has-focus'
+                    href='http://instagram.com/cricketwireless'
+                    data-event='trackEvent-footerLinks'
+                    data-event-label='Cricket on Instagram'
+                    data-event-action='link-click'
+                    data-event-category='footer'
+                    target="_blank"
+                >
+                    <img src='/uiassets/InstagramFooter.svg'
+                         alt='Cricket on Instagram (opens a new window)'
+                         class='img-responsive' />
+                </a>
+            </div>
+            <div class='social-icons youtube'>
+                <a
+                    class='has-focus'
+                    href='https://www.youtube.com/user/CricketNation'
+                    data-event='trackEvent-footerLinks'
+                    data-event-label='Cricket on YouTube'
+                    data-event-action='link-click'
+                    data-event-category='footer'
+                    target="_blank"
+                >
+                    <img src='/uiassets/YouTubeFooter.svg'
+                         alt='Cricket on YouTube (opens a new window)'
+                         class='img-responsive' />
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="att-attribution">
+    <img src="/uiassets/SubsidaryATT.svg" alt="Subsidiary of AT&amp;T">
+</div>
+<div class='footer-book mt-3 col-12'>
+    <span>&copy; <span id='copyright-year'></span> Cricket Wireless LLC. Cricket Wireless, AT&amp;T, the Globe, and other marks are trademarks of AT&amp;T Intellectual Property.</span>
+</div>
+</div>
+        </div>
+    </div><button class='d-lg-none has-focus' id='mobile-scroll-icon' type='button mobile-scroll-icon'>
+    <img src='/uiassets/scroll-top.png' alt='Top of page' />
+</button>
+</div>
+
+</footer>
+
+        </div>
+    <script type="text/javascript"  src="/RG9uU15C2rZn0f-0sQ/9Qi3twzD2QhDptuc/EGtHdV0efQs/L1FW/cm8CA34"></script></body>
+    <script
+        src="/www.cricketwireless.com/buildassets/supportui.d7d177c0d161671b9616.js"
+        async></script>
+    
+</html>

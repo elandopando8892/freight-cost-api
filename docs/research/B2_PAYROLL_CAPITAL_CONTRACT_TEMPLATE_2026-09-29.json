@@ -1,0 +1,235 @@
+{
+  "artifact": "FCM_B2_PAYROLL_CAPITAL_RESEARCH_TEMPLATE",
+  "createdDate": "2026-09-29",
+  "state": "DRAFT_INCOMPLETE",
+  "adopted": false,
+  "quoteReady": false,
+  "contracts": [
+    {
+      "methodId": "FCM_PAYROLL_CAPITAL_CONTRACT_V1",
+      "baseRevision": "UNRESOLVED",
+      "country": "MX",
+      "cohortId": "MX_THIRD_PARTY_D2D_DRY_VAN_T3_S2_REFERENCE_UNRESOLVED",
+      "referencePeriod": "UNRESOLVED",
+      "equipment": "TRACTOR_DRY_VAN_SINGLE",
+      "serviceDate": "2026-09-29",
+      "assetCostScope": null,
+      "separateCostFamilies": [],
+      "evidence": [],
+      "exposure": {
+        "fleetTractors": null,
+        "totalKmPerFleetMonth": null,
+        "productiveVehicleDaysPerFleetMonth": null
+      },
+      "assets": [
+        {
+          "id": "UNRESOLVED_MX_TRACTOR",
+          "assetClass": "TRACTOR",
+          "condition": null,
+          "tenure": null,
+          "costBearer": null,
+          "quantity": null,
+          "acquisitionCost": null,
+          "residual": null,
+          "horizon": null,
+          "horizonBasis": null,
+          "depreciationBasis": null,
+          "monthlyInterest": null,
+          "financingBasis": null,
+          "monthlyRent": null,
+          "rentCoveredFamilies": []
+        },
+        {
+          "id": "UNRESOLVED_MX_DRY_VAN_TRAILER",
+          "assetClass": "DRY_VAN_TRAILER",
+          "condition": null,
+          "tenure": null,
+          "costBearer": null,
+          "quantity": null,
+          "acquisitionCost": null,
+          "residual": null,
+          "horizon": null,
+          "horizonBasis": null,
+          "depreciationBasis": null,
+          "monthlyInterest": null,
+          "financingBasis": null,
+          "monthlyRent": null,
+          "rentCoveredFamilies": []
+        }
+      ],
+      "administration": {
+        "method": null,
+        "roles": [
+          {
+            "role": "DISPATCHER",
+            "fte": null,
+            "compensationBasis": null,
+            "monthlyWage": null,
+            "monthlyBenefits": null
+          },
+          {
+            "role": "TRAFFIC_MANAGER",
+            "fte": null,
+            "compensationBasis": null,
+            "monthlyWage": null,
+            "monthlyBenefits": null
+          },
+          {
+            "role": "OPERATIONS_MANAGER",
+            "fte": null,
+            "compensationBasis": null,
+            "monthlyWage": null,
+            "monthlyBenefits": null
+          },
+          {
+            "role": "SALES_MANAGER",
+            "fte": null,
+            "compensationBasis": null,
+            "monthlyWage": null,
+            "monthlyBenefits": null
+          },
+          {
+            "role": "SAFETY_MANAGER",
+            "fte": null,
+            "compensationBasis": null,
+            "monthlyWage": null,
+            "monthlyBenefits": null
+          },
+          {
+            "role": "TRACKING_CS",
+            "fte": null,
+            "compensationBasis": null,
+            "monthlyWage": null,
+            "monthlyBenefits": null
+          },
+          {
+            "role": "BILLING_ADMIN",
+            "fte": null,
+            "compensationBasis": null,
+            "monthlyWage": null,
+            "monthlyBenefits": null
+          }
+        ],
+        "combinedOverhead": null
+      },
+      "driver": {
+        "compensationBasis": null,
+        "wage": null,
+        "benefits": null
+      }
+    },
+    {
+      "methodId": "FCM_PAYROLL_CAPITAL_CONTRACT_V1",
+      "baseRevision": "UNRESOLVED",
+      "country": "US",
+      "cohortId": "US_THIRD_PARTY_D2D_DRY_VAN_T3_S2_REFERENCE_UNRESOLVED",
+      "referencePeriod": "UNRESOLVED",
+      "equipment": "TRACTOR_DRY_VAN_SINGLE",
+      "serviceDate": "2026-09-29",
+      "assetCostScope": null,
+      "separateCostFamilies": [],
+      "evidence": [],
+      "exposure": {
+        "fleetTractors": null,
+        "totalKmPerFleetMonth": null,
+        "productiveVehicleDaysPerFleetMonth": null
+      },
+      "assets": [
+        {
+          "id": "UNRESOLVED_US_TRACTOR",
+          "assetClass": "TRACTOR",
+          "condition": null,
+          "tenure": null,
+          "costBearer": null,
+          "quantity": null,
+          "acquisitionCost": null,
+          "residual": null,
+          "horizon": null,
+          "horizonBasis": null,
+          "depreciationBasis": null,
+          "monthlyInterest": null,
+          "financingBasis": null,
+          "monthlyRent": null,
+          "rentCoveredFamilies": []
+        },
+        {
+          "id": "UNRESOLVED_US_DRY_VAN_TRAILER",
+          "assetClass": "DRY_VAN_TRAILER",
+          "condition": null,
+          "tenure": null,
+          "costBearer": null,
+          "quantity": null,
+          "acquisitionCost": null,
+          "residual": null,
+          "horizon": null,
+          "horizonBasis": null,
+          "depreciationBasis": null,
+          "monthlyInterest": null,
+          "financingBasis": null,
+          "monthlyRent": null,
+          "rentCoveredFamilies": []
+        }
+      ],
+      "administration": {
+        "method": null,
+        "roles": [
+          {
+            "role": "DISPATCHER",
+            "fte": null,
+            "compensationBasis": null,
+            "monthlyWage": null,
+            "monthlyBenefits": null
+          },
+          {
+            "role": "TRAFFIC_MANAGER",
+            "fte": null,
+            "compensationBasis": null,
+            "monthlyWage": null,
+            "monthlyBenefits": null
+          },
+          {
+            "role": "OPERATIONS_MANAGER",
+            "fte": null,
+            "compensationBasis": null,
+            "monthlyWage": null,
+            "monthlyBenefits": null
+          },
+          {
+            "role": "SALES_MANAGER",
+            "fte": null,
+            "compensationBasis": null,
+            "monthlyWage": null,
+            "monthlyBenefits": null
+          },
+          {
+            "role": "SAFETY_MANAGER",
+            "fte": null,
+            "compensationBasis": null,
+            "monthlyWage": null,
+            "monthlyBenefits": null
+          },
+          {
+            "role": "TRACKING_CS",
+            "fte": null,
+            "compensationBasis": null,
+            "monthlyWage": null,
+            "monthlyBenefits": null
+          },
+          {
+            "role": "BILLING_ADMIN",
+            "fte": null,
+            "compensationBasis": null,
+            "monthlyWage": null,
+            "monthlyBenefits": null
+          }
+        ],
+        "combinedOverhead": null
+      },
+      "driver": {
+        "compensationBasis": null,
+        "wage": null,
+        "benefits": null
+      }
+    }
+  ]
+}

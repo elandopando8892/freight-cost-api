@@ -1,0 +1,152 @@
+{
+  "schema": "fcm.b1.insurance-evidence.v1",
+  "cutDate": "2026-09-29",
+  "head": "4f5fc2de0c3d178dace917231e1092040dec21fd",
+  "status": "COVERAGE_RECONCILED_PILOT_PREMIUM_INCOMPLETE",
+  "calibrated": false,
+  "quoteReady": false,
+  "adoptedValues": 0,
+  "businessGatesComplete": 0,
+  "canonicalInventory": { "required": 135, "documented": 135, "candidate": 3, "contrast": 47, "missingEvidence": 85, "adopted": 0 },
+  "sources": [
+    {
+      "id": "PROGRESSIVE_NEW_2025",
+      "url": "https://www.progressivecommercial.com/commercial-auto-insurance/truck-insurance/commercial-truck-insurance-cost/",
+      "locator": "How much is commercial truck insurance; footnote double dagger",
+      "capture": "DIRECT_PUBLIC_WEB_RELEVANT_SECTION_AND_FOOTNOTE",
+      "observationYear": 2025,
+      "country": "US",
+      "sha256": null,
+      "limitation": "Insurer national new-policy average; not a current matched dry-van cross-border offer. Term, limits, deductibles and trailer allocation not disclosed here."
+    },
+    {
+      "id": "FMCSA_FILINGS_20260326",
+      "url": "https://www.fmcsa.dot.gov/registration/insurance-filing-requirements",
+      "locator": "Insurance Filing Requirements Chart: For-Hire Property Carriers (Non-Hazardous), GVWR >= 10,001 pounds",
+      "capture": "DIRECT_PUBLIC_WEB_TABLE",
+      "updatedAt": "2026-03-26",
+      "country": "US",
+      "sha256": null,
+      "limitation": "Financial-responsibility filing threshold, not a premium, deductible or sufficient commercial policy for the pilot."
+    },
+    {
+      "id": "DOF_SICT_20250702",
+      "url": "https://diariooficial.segob.gob.mx/abrirPDF.php?anio=2025&archivo=02072025-MAT.pdf&repo=",
+      "locator": "Article Third; printed/PDF p.35, row 2 SICT-03-008-A; tourism row starts p.34",
+      "capture": "DIRECT_PUBLIC_PDF_TEXT_AND_VISUAL",
+      "publishedAt": "2025-07-02",
+      "country": "MX",
+      "sha256": "206521364ef088ba952a7a4ba7d15f520fe78c9ce1f05ddbded4f02a449e80f7",
+      "limitation": "Cargo-general row requires current civil-liability policy or guarantee fund without a numeric amount in this row. Numeric 19,000 UMA on the same page belongs to tourism. No conclusion that a statutory cargo minimum was abolished."
+    },
+    {
+      "id": "IMT_PT630_2021",
+      "url": "https://www.imt.mx/archivos/Publicaciones/PublicacionTecnica/pt630.pdf",
+      "locator": "Section 2.2.3, printed p.14 / PDF p.30",
+      "capture": "DIRECT_PUBLIC_PDF_TEXT_AND_VISUAL",
+      "observationYear": 2021,
+      "country": "MX",
+      "sha256": "96d6b5eaded68e0bbaa6bc58e90c7bbbc2dc4d234662f0fef6755a5c77145590",
+      "limitation": "Historical T3-S2 illustration; not a current policy, complete coverage package or measured pilot exposure. Printed per-km amount does not reconcile."
+    },
+    {
+      "id": "ATRI_OPS_2025",
+      "url": "https://truckingresearch.org/wp-content/uploads/2025/07/ATRI-Operational-Costs-of-Trucking-07-2025.pdf",
+      "locator": "Table 8 printed p.15 / PDF p.18; Table 13 printed p.18 / PDF p.21; questionnaire printed p.57 / PDF p.60",
+      "capture": "DIRECT_PUBLIC_PDF_TEXT; QUESTIONNAIRE_VISUAL",
+      "observationYear": 2024,
+      "country": "US",
+      "sha256": "581b91b68a76f232102a63f543eff92bb59c9478556b164d84d2be85118902f8",
+      "limitation": "Historical mileage-weighted aggregates; not the same insured risks as Progressive, nor a pilot annual premium."
+    }
+  ],
+  "observations": {
+    "progressive": {
+      "sourceId": "PROGRESSIVE_NEW_2025",
+      "transportMonthlyPerPowerUnit": 926,
+      "currency": "USD",
+      "currencyBasis": "US insurer domestic dollar price; ISO inferred from country context",
+      "unit": "USD/power-unit-month",
+      "annualEquivalentPerPowerUnit": 11112,
+      "annualEquivalentFormula": "926 * 12",
+      "annualEquivalentIsQuotedAnnualPolicy": false,
+      "knownIncluded": ["LIABILITY", "PHYSICAL_DAMAGE"],
+      "driverCondition": "NO_DRIVER_VIOLATIONS",
+      "otherCoverageStatus": "NOT_ESTABLISHED_BY_AVERAGE",
+      "policyTermMonths": null,
+      "pilotAdopted": false
+    },
+    "fmcsa": {
+      "sourceId": "FMCSA_FILINGS_20260326",
+      "entity": "FOR_HIRE_PROPERTY_NON_HAZ_GVWR_AT_LEAST_10001_LB",
+      "bipdFilingMinimumUsd": 750000,
+      "cargoFilingMinimumUsd": 0,
+      "cargoPremiumUsd": null,
+      "cargoFilingZeroMeansNoCommercialCargoNeed": false
+    },
+    "sict": {
+      "sourceId": "DOF_SICT_20250702",
+      "generalCargoHomoclave": "SICT-03-008-A",
+      "generalCargoRequiresCurrentRcOrGuarantee": true,
+      "generalCargoNumericMinimumInThisRow": null,
+      "uma19000RowOwner": "SICT-03-007_INTERNATIONAL_TOURISM",
+      "currentPilotLegalCoverageLimit": null,
+      "oldCargoRequirementAbolishedClaim": false
+    },
+    "imt": {
+      "sourceId": "IMT_PT630_2021",
+      "currency": "MXN",
+      "historicalT3S2AnnualRange": [120000, 150000],
+      "exampleAnnualPremium": 135000,
+      "exampleMonthlyPremium": 11250,
+      "exampleAnnualTrips": 144,
+      "exampleAnnualKm": 110000,
+      "printedPerTrip": 937.5,
+      "printedPerKm": 1.4423,
+      "reconstructedPerTrip": 937.5,
+      "reconstructedPerKm": 1.2272727272727273,
+      "perKmPrintedMatchesInputs": false,
+      "reconstructionIsCurrentBenchmark": false
+    },
+    "atri": {
+      "sourceId": "ATRI_OPS_2025",
+      "unit": "USD/total-mile",
+      "national2024": 0.102,
+      "southCentral2024": 0.104,
+      "knownIncluded": ["LIABILITY", "CARGO", "EXCESS_LIABILITY"],
+      "knownExcluded": ["WORKERS_COMPENSATION", "PHYSICAL_DAMAGE", "JURY_AWARDS", "OUT_OF_COURT_SETTLEMENTS"],
+      "outOfPocketCrashCostsAreSeparate": true,
+      "combinedWithProgressive": false,
+      "annualPremiumBacksolvedFromOtherCohortMiles": false
+    }
+  },
+  "coverageMapping": [
+    { "family": "LIABILITY", "candidateDestination": "FIXED_INSURANCE", "condition": "Matched carrier, territory, period and unique premium component" },
+    { "family": "PHYSICAL_DAMAGE", "candidateDestination": "FIXED_INSURANCE_OR_ASSET_CONTRACT", "condition": "Check ownership, insured value and lease inclusions; no duplicate" },
+    { "family": "CARGO", "candidateDestination": "FIXED_IF_POLICY_OR_EXPLICIT_TRIP_CHARGE", "condition": "Merchandise cover is not damage caused by cargo; identify insured party and actual charging basis" },
+    { "family": "TRAILER_INTERCHANGE", "candidateDestination": "FIXED_OR_EXPLICIT_INTERCHANGE_CHARGE", "condition": "Custody, owner, territory, transfer point and written responsibility; coverage not assumed" },
+    { "family": "EXCESS_LIABILITY", "candidateDestination": "FIXED_ONLY_IF_REQUIRED_AND_INCREMENTAL", "condition": "Underlying limits and exclusions; not part of deductible" },
+    { "family": "DEDUCTIBLE_AND_RETAINED_LOSS", "candidateDestination": "RISK_SEPARATE", "condition": "Validated frequency and retained severity; never deductible/12 or automatic premium addition" }
+  ],
+  "canonicalBridge": {
+    "quantityKey": "fcm.v3.cost-insurance.prima-anual-por-vehiculo",
+    "quantityUnit": "policy/vehicle",
+    "premiumKey": "fcm.v3.cost-insurance.poliza-x-vehiculo",
+    "premiumCatalogUnit": "USD/year/tractor",
+    "periodKey": "fcm.v3.cost-insurance.periodo-de-poliza",
+    "periodUnit": "months",
+    "destination": "monthlyFixedUsd",
+    "activeFormula": "policyQuantityPerVehicle * premiumInputUsd * fleetTractors / periodMonths",
+    "proposalOnlyAnnualNormalization": "termPremiumUsd * 12 / termMonths; use normalizedAnnualPremium / 12",
+    "periodNormalizationImplemented": false,
+    "advancedCoverageFullyIntegratedVerified": false,
+    "risk": "Annual input divided by a non-12 policy term mis-scales monthly cost; already annualized premium divided by six doubles the correct rate.",
+    "automaticConversionOrAdoption": false,
+    "activeFormulaChanged": false
+  },
+  "pilotCards": [
+    { "country": "MX", "status": "INCOMPLETE", "mode": "PUBLIC_REFERENCE_NOT_XBF_POLICY", "carrierCohort": null, "territory": null, "assetAndCustodyAllocation": null, "policyQuantityPerVehicle": null, "termPremiumUsd": null, "policyTermMonths": null, "coverageLimit": null, "deductible": null, "includedFamilies": null, "excludedFamilies": null, "annualExposureKm": null, "productiveVehicleDays": null, "monthlyInsuranceFleetUsd": null, "cfu": null, "insuranceTripChargeUsd": null },
+    { "country": "US", "status": "INCOMPLETE", "mode": "PUBLIC_REFERENCE_NOT_XBF_POLICY", "carrierCohort": null, "territory": null, "assetAndCustodyAllocation": null, "policyQuantityPerVehicle": null, "termPremiumUsd": null, "policyTermMonths": null, "coverageLimit": null, "deductible": null, "includedFamilies": null, "excludedFamilies": null, "annualExposureKm": null, "productiveVehicleDays": null, "monthlyInsuranceFleetUsd": null, "cfu": null, "insuranceTripChargeUsd": null }
+  ],
+  "externalChanges": { "database": false, "auth": false, "users": false, "infrastructure": false, "deployment": false, "businessOperations": false, "applicationAi": false }
+}

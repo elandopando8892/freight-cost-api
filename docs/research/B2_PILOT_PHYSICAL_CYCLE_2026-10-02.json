@@ -1,0 +1,24 @@
+{
+  "model":"FCM_OWN_RELAY_PARALLEL_PHYSICAL_CYCLE_V1",
+  "reviewedAt":"2026-10-02T16:59:00Z",
+  "scope":"OWN_MX_US_RELAY_SAME_TRAILER",
+  "handoffSide":"US_SIDE_NOT_ACTUAL_SELECTED_YARD",
+  "borderTiming":{"loadedNorthMinutes":87,"bobtailSouthMinutesHypothesis":87,"bobtailNorthMinutesHypothesis":87,"attachedEmptySouthMinutesHypothesis":87,"basis":"2019_NORTHBOUND_COMPLETE_CROSSING_MEAN_TRANSFERRED_TO_OTHER_MOVEMENTS_NOT_OBSERVED_BOBTAIL_OR_SOUTHBOUND","additionalRoadClockOverlapHoursHypothesis":0},
+  "dedicatedRecovery":"MX_BOBTAIL_SOUTH_WAIT_MX_BOBTAIL_NORTH_SYNCHRONIZED_WITH_US_RETURN_SAME_BOX",
+  "networkRecovery":"MX_BOBTAIL_SOUTH_BEFORE_MX_NEXT_PICKUP_US_BOX_STAYS_US",
+  "borderBobtailDistance":{"perCrossingKm":null,"basis":"PENDING_GATE_AND_YARD_ROAD_SCOPE_NOT_ZERO_NOT_PLANNED_EXPANSION_SPAN"},
+  "restPolicy":{"mxRecoveryRestHours":14,"dedicatedRestOverlapsCommittedWaiting":true},
+  "sourceRefs":["pilotCycle#/borderPolicy","pilotCycle#/sources","pilotRoadBorder#/borderTimeline","pilotRoadBorder#/assumptions"],
+  "assumptions":[
+    "Same own national tractors and one53foot box. US tractor staysUS; MX tractor executes each mandatory bridge movement once. No third drayage vehicle or external carrier fee is silently added.",
+    "Transfer to US-side yard is the existing prospective hypothesis, not an actual location/carrier choice or authorization to operate.",
+    "87min was2019northbound total crossing, not pure driving or queue. Other directions and bobtail use an explicit symmetric time sensitivity, not actual measurements.",
+    "Dedicated MX tractor first returns south empty and later north empty to recover the same box. Synchronize its north arrival with US return for the time alternative; its wait contains a rest opportunity, not additional box delay.",
+    "Two bobtail crossings during the US trip use MX tractor time concurrently with the box on the US tractor. Do not append them to the serial box clock or count committed wait plus the entire US trip twice.",
+    "Network MX south bobtail precedes reset and next pickup. Prior road/crossing clock overlap is assumed0, not proven; it is a sensitivity, not HOS or labor approval.",
+    "Bobtail distance, approach time, queue/drive split and paid-duty scope remain unknown. Do not turn an expansion-project span length into existing operational gate-to-yard route distance.",
+    "Until those road scopes are evidenced, total MX distance and compatible MX variable charges are incomplete. Preserve known base distances for comparison; never reuse old fuel/driver totals as physically complete.",
+    "The published empty-share metric is not proof of a physical repositioning itinerary. Dedicated road reversal and network next-pickup remain prospective hypotheses; no dispatch or business operation is performed.",
+    "Normalized administration and existing cash box alternatives may be projected by time, but complete CFU/CVU/D2D require all compatible fixed and variable amounts."
+  ]
+}

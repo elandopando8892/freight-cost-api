@@ -1,0 +1,26 @@
+{
+  "model": "FCM_SHARED_BOX_PROSPECTIVE_CONDITIONAL_V1",
+  "reviewedAt": "2026-10-02T07:43:00Z",
+  "referencePeriod": "2026-10",
+  "profileReference": "ONE_UTILITY4000DX2021_DRYVAN53_SHARED_MX_US_REFERENCE_V1",
+  "permissionEvidence": "USER_AUTORIZO_CAMBIO_METODOLOGICO_2026_10_02",
+  "measurement": "NET_MARKET_VALUE_USE_NO_PURCHASE_OR_DISPOSAL_EVENT",
+  "scenarioOnly": true,
+  "holdingMonths": 24,
+  "genericVatRateReference": 0.16,
+  "newerOfferId": "UTILITY_2021",
+  "olderOfferId": "UTILITY_2019",
+  "modelAssumptions": [
+    "Treat the two-model-year gap as a 24-month prospective planning analogy, not observed remaining service life.",
+    "Assume later age, condition and market resemble the older advertised group. This is a conditional hypothesis, not a measured age effect, residual forecast or statistically calibrated curve.",
+    "Use net market values for a reference taxable enterprise. No actual purchase, sale, VAT settlement or VAT-recovery cash flow is modeled.",
+    "Keep both unresolved 2019 tax-price bases as independent alternatives; do not select a midpoint or call either an observed tax treatment.",
+    "Cash scenario is debt-free by definition. Financed box capital remains unknown; neither tractor credit offers nor US residual coefficients are transferred.",
+    "One physical box, charged once in its shared resource; seller stock counts are not fleet quantities. Equity required return is separate and unresolved."
+  ],
+  "sources": [
+    {"id":"UTILITY_2021","url":"https://www.remolquesythermos.mx/product-page/2021-utility-4000-d-x-68-000-lbs-53-x102-caja-seca","locator":"Asking 630000 MXN + IVA; 53 x 102 Utility4000D-X specifications."},
+    {"id":"UTILITY_2019","url":"https://www.remolquesythermos.mx/product-page/2019-utility-4000-d-x-68-000-lbs-53-x102-caja-seca","locator":"Asking 540000 MXN; 13 published specifications match. IVA treatment not disclosed."},
+    {"id":"LIVA","url":"https://www.diputados.gob.mx/LeyesBiblio/pdf/LIVA.pdf","locator":"Previously reviewed articles1,5,9IV; generic16% sensitivity, not actual transaction tax eligibility."}
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "artifact": "FCM_B1_INEGI_EAT_2024_4841_COST_OBSERVATIONS_V1",
+  "retrievedDate": "2026-09-29",
+  "use": "PUBLIC_SECTOR_COST_STRUCTURE_ONLY",
+  "adopted": false,
+  "quoteReady": false,
+  "population": {
+    "country": "MX",
+    "scian": "4841",
+    "name": "Autotransporte de carga general",
+    "referenceYear": 2024,
+    "status": "PRELIMINARY",
+    "observationUnit": "enterprise",
+    "geography": "national",
+    "dryVanCrossBorderSpecific": false,
+    "fleetCohortSpecific": false
+  },
+  "sources": [
+    {
+      "id": "INEGI_EAT_2024_RESULTS",
+      "url": "https://www.inegi.org.mx/contenidos/saladeprensa/boletines/2025/eat/EAT2024_RR.pdf",
+      "locator": "Methodology pp.2-3; employment and remuneration tables pp.4-7; hours table p.10; remuneration mean p.12; fixed-asset structure pp.14-15; next release 2026-12-10",
+      "fact": "The 2024 survey covered a sample of 1,339 enterprises/establishments across national transport domains. The report says precision indicators are published for employment and income by study domain."
+    },
+    {
+      "id": "INEGI_EAT_INTERACTIVE_EXPENSES",
+      "url": "https://www.inegi.org.mx/app/tabulados/interactivos/?bd=EAT&px=EAT_2",
+      "retrievedDate": "2026-09-29",
+      "filters": {
+        "statistic": "Dato",
+        "scian": "4841 Autotransporte de carga general",
+        "year": 2024,
+        "variables": "all 32 published variables in Gastos e ingresos"
+      },
+      "pageNote": "The tabulator states 2024 figures are preliminary and that 2024 data come from direct respondent collection."
+    }
+  ],
+  "monetaryUnit": "thousand MXN current prices as displayed by the interactive table",
+  "observations": {
+    "goodsAndServicesExpenses": {
+      "value": 142797153,
+      "unit": "thousand MXN",
+      "sourceId": "INEGI_EAT_INTERACTIVE_EXPENSES"
+    },
+    "expensesByLine": [
+      { "id": "fuelAndLubricants", "value": 60860623, "shareOfGoodsServicesExpensesPct": 42.62, "fcmBridge": "CVU_FUEL_PUBLIC_CONTRAST" },
+      { "id": "thirdPartyRepairsPartsAndCurrentMaintenance", "value": 18601610, "shareOfGoodsServicesExpensesPct": 13.027, "fcmBridge": "CVU_MAINTENANCE_PARTIAL_PUBLIC_CONTRAST" },
+      { "id": "materialsForServices", "value": 2688749, "shareOfGoodsServicesExpensesPct": 1.883, "fcmBridge": "UNCLASSIFIED_MATERIALS" },
+      { "id": "electricity", "value": 1734264, "shareOfGoodsServicesExpensesPct": 1.214, "fcmBridge": "POTENTIAL_COMPANY_OVERHEAD_UNALLOCATED" },
+      { "id": "rentalOfTransportEquipment", "value": 12611315, "shareOfGoodsServicesExpensesPct": 8.832, "fcmBridge": "TENURE_OR_PURCHASED_CAPACITY_UNRESOLVED" },
+      { "id": "rentalOfOtherMovableAndImmovableProperty", "value": 1704029, "shareOfGoodsServicesExpensesPct": 1.193, "fcmBridge": "POTENTIAL_COMPANY_OVERHEAD_UNALLOCATED" },
+      { "id": "paymentsToCompanySupplyingPersonnel", "value": 1129492, "shareOfGoodsServicesExpensesPct": 0.791, "fcmBridge": "LABOR_OR_SUBCONTRACT_OVERLAP_UNRESOLVED" },
+      { "id": "honorariaOrCommissionWithoutFixedSalary", "value": 845618, "shareOfGoodsServicesExpensesPct": 0.592, "fcmBridge": "LABOR_OR_SERVICE_SCOPE_UNRESOLVED" },
+      { "id": "advertising", "value": 159633, "shareOfGoodsServicesExpensesPct": 0.112, "fcmBridge": "POTENTIAL_COMPANY_OVERHEAD_UNALLOCATED" },
+      { "id": "communications", "value": 870535, "shareOfGoodsServicesExpensesPct": 0.61, "fcmBridge": "POTENTIAL_COMPANY_OVERHEAD_UNALLOCATED" },
+      { "id": "tollsAndSpecializedInfrastructure", "value": 17190026, "shareOfGoodsServicesExpensesPct": 12.038, "fcmBridge": "CVU_TOLLS_PUBLIC_CONTRAST_NATIONAL_NOT_ROUTE" },
+      { "id": "platesAndDriverLicenses", "value": 742820, "shareOfGoodsServicesExpensesPct": 0.52, "fcmBridge": "PERMITS_FIXED_OR_VARIABLE_UNRESOLVED" },
+      { "id": "premiumsForInsuranceOfProperty", "value": 5841177, "shareOfGoodsServicesExpensesPct": 4.091, "fcmBridge": "CFU_INSURANCE_PARTIAL_ASSET_SCOPE_UNRESOLVED" },
+      { "id": "otherGoodsAndServicesExpenses", "value": 17817264, "shareOfGoodsServicesExpensesPct": 12.477, "fcmBridge": "UNCLASSIFIED_OTHER_NOT_OVERHEAD_PROXY" }
+    ],
+    "taggedOrUnavailableLines": [
+      { "id": "merchandiseForResale", "value": "ND" },
+      { "id": "rentalOfMovableAndImmovableProperty", "value": "ND" },
+      { "id": "professionalServices", "value": "NA" },
+      { "id": "royalties", "value": "ND" },
+      { "id": "pollutionPreventionAndControlRAndD", "value": "NA" }
+    ],
+    "totalGoodsAndServicesIncome": { "value": 265365927, "unit": "thousand MXN" },
+    "incomeFromFreightTransport": { "value": 247289946, "unit": "thousand MXN", "shareOfTotalGoodsServicesIncomePct": 93.188 },
+    "goodsServicesExpenseToTotalIncomePct": 53.811,
+    "numericExpenseLineSum": { "value": 142797155, "unit": "thousand MXN", "differenceVsReportedTotal": 2, "unitOfDifference": "thousand MXN", "note": "Published component values sum to 2 thousand MXN above the published total; preserve the reported values and difference." }
+  },
+  "laborAndAssetContext": {
+    "employment": { "value": 167612, "unit": "persons", "referenceYear": 2024, "status": "PRELIMINARY", "sourceLocator": "EAT report Table 9, p.9" },
+    "hoursWorked": { "value": 414, "unit": "million hours", "referenceYear": 2024, "status": "PRELIMINARY", "sourceLocator": "EAT report Table 11, p.10" },
+    "remunerationPaidToDependentPersonnel": { "women": 6206, "men": 32398, "total": 38604, "unit": "million MXN current prices", "referenceYear": 2024, "status": "PRELIMINARY", "sourceLocator": "EAT report Table 7, p.7" },
+    "transportEquipmentShareOfFixedAssets": { "value": 72.0, "unit": "percent", "scope": "all transport enterprises, not SCIAN 4841 alone", "referenceYear": 2024, "status": "PRELIMINARY", "sourceLocator": "EAT report Graph 6, p.15" }
+  },
+  "checks": {
+    "expenseRowsReconcileWithinRounding": true,
+    "expenseShareDenominator": "reported total goods and services expenses for SCIAN 4841",
+    "incomeRatioDenominator": "all goods and services income, including non-freight revenue categories",
+    "expenseToIncomeIsNotMarginOrCarrierProfit": true,
+    "noMatchedPublicTractorKmOrVehicleDayDenominatorInThisCut": true
+  },
+  "limitations": [
+    "National enterprise-level branch totals do not identify a dry-van D2D cross-border carrier, a particular carrier's cost, a lane, asset tenure, loaded/empty mileage, or per-vehicle monthly exposure.",
+    "Expense categories are annual sector aggregates, not prices, quantities, or rates per trip, mile, vehicle, or month.",
+    "Repairs cover third-party current maintenance and parts as described in the table; this does not prove coverage of internal labor, all maintenance, or tires.",
+    "Property-insurance premiums do not identify tractor/trailer coverage, policy limits, or asset allocation.",
+    "Transport-equipment rents may represent rental capacity or other tenure treatment and are not an automatic substitute for capital cost.",
+    "The all-transport fixed-asset share is context only and cannot be applied as a 4841 estimate.",
+    "The 2024 EAT results are preliminary. The report says the definitive 2024 results are expected on 2026-12-10."
+  ]
+}

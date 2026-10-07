@@ -1,0 +1,26 @@
+{
+  "artifact":"FCM_B2_IRP_STATE_REFERENCE_RECONCILIATION",
+  "reviewedAt":"2026-10-01T18:15:15-06:00",
+  "status":"STATUTORY_REGISTRATION_COMPONENTS_NOT_COMPLETE_CURRENT_PERMITS",
+  "profile":{"gvwLb":80000,"termMonths":12,"currency":"USD","actualRegistrant":null,"compatibleWithPilotConfirmed":false},
+  "sources":[
+    {"id":"FL_320_08_2025","url":"https://www.flsenate.gov/Laws/Statutes/2025/320.08","locator":"320.08 introductory annual license-tax clause and (4)(l), heavy trucks/truck tractors >=72000lb","evidenceType":"OFFICIAL_STATUTE_2025_EDITION","archive":{"file":"docs/research/sources/FL_320_08_2025_REVIEW_20261001.html","sha256":"dc094641386b2f18c510ca454cd567077e669b0f527bc4884e729bce1485ec74"},"currentAsOfServiceDateConfirmed":false},
+    {"id":"NE_60_3_198","url":"https://nebraskalegislature.gov/laws/statutes.php?statute=60-3,198","locator":"(1)(b)(ii), beginning2024-07-01; (1)(g) nonresident reciprocity","evidenceType":"OFFICIAL_WEB_READER_OBSERVATION_NOT_ORIGINAL_ARCHIVE","archive":null,"originalDownload":"TIMEOUT_20_SECONDS_NO_RETRY","ratePerTonUsd":33.5,"priorRatePerTonUsd":35,"rateBegins":"2024-07-01","currentAsOfServiceDateConfirmed":false},
+    {"id":"NE_60_3_204","url":"https://nebraskalegislature.gov/laws/statutes.php?statute=60-3,204","locator":"(1)-(3), fleet-distance quotient and full annual/apportioned fee","evidenceType":"OFFICIAL_WEB_READER_OBSERVATION_NOT_ORIGINAL_ARCHIVE","archive":null,"originalDownload":"TIMEOUT_20_SECONDS_NO_RETRY","currentAsOfServiceDateConfirmed":false}
+  ],
+  "rules":[
+    {"id":"FL","locator":"FL320.08(4)(l); IRP Guidelines Florida A3:A8","sourceIds":["FL_320_08_2025"],"baseRegistrationUsd":1322,"effectiveDateOfReference":null,"sourceEdition":2025,"separatePublishedCharges":[],"unresolved":"All fees/surcharges and service-date validity; public general heavy-tractor reference, not a certified for-hire invoice","originalExerciseMappingWasExplicit":false,"generalWeightScopeSupported":true},
+    {"id":"NE","locator":"NE60-3,198(1)(b)(ii); 60-3,204; original exercise Nebraska A29 external appendix absent","sourceIds":["NE_60_3_198","NE_60_3_204"],"baseRegistrationUsd":1340,"effectiveDateOfReference":"2024-07-01","gvwLb":80000,"assumedUsShortTonLb":2000,"ratePerTonUsd":33.5,"derivation":"80000/2000*33.5=1340; public short-ton convention explicit, registry applicability not confirmed","separatePublishedCharges":[],"unresolved":"Registrant/reciprocity and ton convention confirmation, applicable additional fees/plate events, service date; no reconstruction of absent Handlog appendix"}
+  ],
+  "exerciseContrasts":[
+    {"id":"FL","testShare":0.01695,"rawReferenceComponentUsd":22.4079,"roundedToCentContrastUsd":22.41,"texasReporterUsd":22.41,"reporterUsedToDeriveBase":false},
+    {"id":"NE","testShare":0.01695,"rawReferenceComponentUsd":22.713,"roundedToCentContrastUsd":22.71,"texasReporterUsd":22.71,"reporterUsedToDeriveBase":false,"old35PerTonNotApplied":true}
+  ],
+  "retainedBlocks":[
+    {"id":"ID","reason":"Hire/private exercise label conflict; official agency links to legislature49-434 but web reader robots failure; mileage-tier applicability unconfirmed","url":"https://itd.idaho.gov/dmv/commercial-vehicle-services/","feeAdopted":false},
+    {"id":"UT","reason":"Exercise total22.16 vs reporter21.91 unresolved; general DMV fee pages do not reconcile this IRP calculation","url":"https://dmv.utah.gov/register/registration-taxes-fees/","feeAdopted":false},
+    {"id":"VT","reason":"Exercise internally inconsistent; DMV current truck table search result differs but full source HTTP403; do not substitute an unverified annual/IRP column","url":"https://dmv.vermont.gov/registrations/fees/truck-registration-fees","feeAdopted":false}
+  ],
+  "remaining":["Registration references missing/conflicted: ID UT VT; preserved null, no further open-ended research in next cut","All59 still require applicable complete current fees, registrant/value/date/rounding before full IRP","Continue compatible public insurance and employer-cost budget, capacity/cycle and variable integration; do not block all business progress on three IRP references"],
+  "actualFeeUsd":null,"completeIrpUsd":null,"adoptedValues":0,"quoteReady":false,"externalChanges":false
+}

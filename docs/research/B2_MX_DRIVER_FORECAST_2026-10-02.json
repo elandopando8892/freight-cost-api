@@ -1,0 +1,25 @@
+{
+ "model":"FCM_MX_DRIVER_ANNUAL_MEAN_PUBLIC_FORECAST_V1","reviewedAt":"2026-10-02T18:53:38Z","referenceMonth":"2026-10",
+ "calendar":{"year":2026,"weeklyRestDay":"SUNDAY","holidays":["2026-01-01","2026-02-02","2026-03-16","2026-05-01","2026-09-16","2026-11-16","2026-12-25"],"primaryVacationWorkedDays":12,"reliefCoveredCalendarDays":14,"reliefScope":"TWO_NON_HOLIDAY_WEEKS_12_WORKED_DAYS_2_REST_DAYS","regionalElectionDaysScope":"NOT_MODELED_PENDING_NO_ACTUAL_SERVICE_DATE"},
+ "wagePolicy":"EXPLICIT_GROSS_KM_TRANSFER_NO_WEEKLY_GUARANTEE_ASSUMED",
+ "holidayVacationIncomePolicy":"ROAD_EARNINGS_WORKED_DAY_MEAN_PLANNING_PROXY_NOT_OBSERVED_30DAY_HISTORY",
+ "contributionBasis":"ANNUAL_MEAN_ELIGIBLE_CASH_PROXY_NOT_STATUTORY_BIMESTER_OR_RETURN",
+ "riskPolicy":"INITIAL_CARGO_CLASS_V_RATE_SENSITIVITY_NOT_ACTUAL_EXISTING_PREMIUM",
+ "employerJurisdictionHypothesis":"NUEVO_LEON_NOT_INFERRED_FROM_ROUTE_OR_OFFER","statePayrollRate":0.03,"professionalDailyFloorMxn":370.90,"umaDailyMxn":117.31,
+ "sourceRefs":["mxVariableDriver#/sources","mxEmployerRules#/normativeRulePack","mxWorkRisk#/sources","nlPayrollTax#/sources","pilotCycle#/capacityPolicy","pilotPhysicalCycle#/assumptions","https://sidof.segob.gob.mx/notas/docFuente/5775534#CHOFER_DE_CAMION_DE_CARGA_EN_GENERAL","https://www.diputados.gob.mx/LeyesBiblio/pdf/LFT.pdf#ART69_74_TRANSITORY2026"],
+ "assumptions":[
+  "Retain both gross2.10MXN/km rest interpretations. One offer supplies a contrast, not a calibrated market mean or complete Trayecto package; superior benefits remain unpriced.",
+  "Forward financial budget as ofOctober2026, not actual service date, fiscal payroll or an invented historical bimester. Additional legally eligible cash is not inserted into real LSS30 receipts by this planner.",
+  "Public LFT2026 calendar:52Sundays and7national nonoverlapping holidays; first-anniversary12worked-day paid leave. Ordinary road-work capacity is a declared six-day, non-holiday scheduling contrast, not proof of dispatch/labor compliance.",
+  "A relief person covers12productive days during2non-holiday weeks/14calendar days. The road-wage pool is partitioned294primary+12relief days, never increased by the same relief mileage again. Relief maintains prior resource capacity as an explicit staffing hypothesis, not a proven roster.",
+  "Annual income per worked road day uses prospective compatible fleet cycles, not published weekly salary or24asset elapsed days treated as employee work days. Last30worked-day and aguinaldo references are declared steady income proxies, not observed legal entitlements.",
+  "Primary paid vacation and national holiday income are additional to km-only road remuneration. Vacation must be enjoyed, not replaced by cash. Short-contract relief benefits are proportionately reserved including termination vacation, not a second full annual wage.",
+  "Contribution bases are annual-mean eligible-cash financial proxies, not actual variable/mixed SBC or cash-payment calendars. Cap25UMA and fixed covered-day contribution separately per person; ordinary31covered days of referenceOctober and14annualreliefcovered days, latter expense normalized/12.",
+  "ClassV7.58875percent is initial-registration rate sensitivity only. Actual existing employer premium may differ; no actual registration/date inference. CEAV2026bracket4.01UMA+ only; fail if projected person below supported bracket.",
+  "NL3percent is a separate jurisdiction hypothesis, not copied as actual jurisdiction from the Queretaro offer, route or administrator. Tax base is remuneration, not SBC or IMSS contributions; mean accrual not tax return.",
+  "Professional minimum370.90MXN/day general area from DOFresolution9Dec2025 for2026, row16; northern zone440.87 distinct. Means are comparison diagnostics, not daily/legal minimum compliance certification; no daily floor guarantee invented.",
+  "Calendar/normative sources re-read2Oct2026: LFTphysical22-23,454complete rendered/text/visual. Current law40h wording has gradual48h in2026 and9overtime hours; NOM10h-driving blocks do not prove labor compliance. Overtime/sunday/holiday-work premiums/paid standby/PTU remain unpriced, not zeros.",
+  "HCNLdirect page timed out2Oct2026; official indexed primary reader article157 re-confirms3percent, and existing NL2026continuity archive reused. Draft4percent is not promulgation; source applicability still conditional.",
+  "Known distance/time capacity limits are conserved. Additional gate/yard bobtailkm/time remain incomplete; no physical coverage or full B2 cost claim from the resulting component totals."
+ ],"adoptedValues":0,"quoteReady":false
+}

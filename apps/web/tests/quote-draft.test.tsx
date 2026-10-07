@@ -4,9 +4,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useQuoteDraft, type QuoteDraft } from '../app/(app)/quote/use-quote-draft'
 import type { QuoteResult } from '../app/(app)/quote/quote-shared'
 import { QuoteModes } from '../app/(app)/quote/quote-modes'
+import {ClientApiError} from '../lib/fetcher'
 
 const http = vi.hoisted(() => ({ fetcher: vi.fn() }))
-vi.mock('@/lib/fetcher', () => http)
+vi.mock('@/lib/fetcher', async original => ({...await original<typeof import('../lib/fetcher')>(),fetcher:http.fetcher}))
 vi.mock('sonner', () => ({ toast: { success: vi.fn() } }))
 // Child form renderers are isolated; the actual mode buttons and draft owner mount.
 vi.mock('../app/(app)/quote/quote-wizard', () => ({ QuoteWizard: DraftProbe }))
@@ -42,11 +43,25 @@ beforeEach(async () => {
 })
 afterEach(async () => { await act(async () => root.unmount()); host.remove() })
 async function calculate(id = 'preview-a') {
-  http.fetcher.mockResolvedValueOnce(result(id))
+  http.fetcher.mockResolvedValueOnce({fuel:null}).mockResolvedValueOnce(result(id))
   await act(async () => { await draft.quote.mutate() })
 }
 
 describe('mounted shared quote draft', () => {
+  it.each([401,403,409])('clears accepted fuel after HTTP %s and requires a fresh review',async status=>{
+    const fuel={contextHash:'a'.repeat(64),serviceDate:'2026-09-30',origin:'Synthetic MX',destination:'Synthetic US',
+      outState:'TX',region:null,referencePriceUsdGal:5,observationDate:null,source:'USA_FUEL_CACHE',fscUsdMile:0.8,warning:'Synthetic provisional reference'}
+    http.fetcher.mockResolvedValueOnce({fuel})
+    await act(async()=>{await draft.quote.mutate()})
+    expect(draft.fuelReview?.contextHash).toBe('a'.repeat(64))
+    http.fetcher.mockRejectedValueOnce(new ClientApiError(status,null,'synthetic denial'))
+    await act(async()=>{await draft.acceptFuel({mode:'REFERENCE',contextHash:'a'.repeat(64),provisionalAccepted:true})})
+    expect(draft.fuelReview).toBeNull();expect(draft.reviewed).toBeNull();expect(draft.saveState).toBeNull()
+    http.fetcher.mockResolvedValueOnce({fuel})
+    await act(async()=>{await draft.quote.mutate()})
+    expect(http.fetcher.mock.calls.at(-1)?.[0]).toBe('/api/v1/engine/route-inputs')
+    expect(draft.reviewed).toBeNull();expect(draft.fuelReview?.contextHash).toBe('a'.repeat(64))
+  })
   it('actual mode buttons preserve every captured field, result and save intent', async () => {
     await act(async () => root.render(createElement(QuoteModes)))
     await act(async () => draft.update(f => ({ ...f, outboundLocation: 'Monterrey', inboundLocation: 'Dallas', mexBorder: 'Nuevo Laredo', usBorder: 'Laredo', fxRate: '18.75', truckType: 'Thorton', trailer: 'Reefer', config: 'Tandem', driver: 'CDL', route: 'fixture-route', service: 'Roundtrip', costBaseId: 'fixture-base' })))
@@ -61,7 +76,7 @@ describe('mounted shared quote draft', () => {
       expect(draft.reviewed?.form).toEqual(capture)
       expect(draft.saveState?.key).toBe(intent)
     }
-    expect(http.fetcher).toHaveBeenCalledTimes(1)
+    expect(http.fetcher).toHaveBeenCalledTimes(2)
   })
   it('retains capture and reviewed result on parent mode rerenders without another request', async () => {
     await act(async () => draft.update(previous => ({ ...previous, outboundLocation: 'Monterrey, NL', inboundLocation: 'Dallas, TX', fxRate: '18.75' })))
@@ -73,7 +88,7 @@ describe('mounted shared quote draft', () => {
       expect(draft.reviewed?.form).toEqual(capture)
       expect(draft.reviewed?.result.previewId).toBe('preview-a')
     }
-    expect(http.fetcher).toHaveBeenCalledTimes(1)
+    expect(http.fetcher).toHaveBeenCalledTimes(2)
   })
   it('invalidates result and saved association only for effective input changes', async () => {
     await act(async () => draft.update(f => ({ ...f, outboundLocation: 'Monterrey' })))

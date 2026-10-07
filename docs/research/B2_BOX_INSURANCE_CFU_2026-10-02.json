@@ -1,0 +1,38 @@
+{
+  "model":"FCM_ONE_BOX_INSURANCE_CFU_COMPONENT_V1",
+  "reviewedAt":"2026-10-02T20:37:13Z",
+  "referencePeriod":"2026-10",
+  "scope":"OWNED_SHARED_BOX_PD_PARTIAL_NOT_COMPLETE_BINATIONAL_INSURANCE",
+  "physicalBoxCount":1,
+  "guideId":"LOGROCK_OWNED_TRAILER_PD_2026",
+  "premiumBasis":"PUBLISHED_MONTHLY_ENDPOINTS_NOT_VALUE_FORMULA_OR_MIDPOINT",
+  "allocationBasis":"SAME_SHARED_BOX_MAX_DISTANCE_TIME_ONCE",
+  "monthlyAvailableDays":24,
+  "pricingTransfer":"US_PUBLIC_GUIDE_ONE_SHARED_ASSET_PROSPECTIVE_ONLY",
+  "coverageEvidence":{
+    "namedAssetAndCoverageScheduleRequired":true,
+    "qualitasPhysicalDamageTheftExtensionToUsCanadaDocumented":true,
+    "qualitasUsAutoLiabilityInferred":false,
+    "detachedTheftRequiresSecuredContractualYard":true,
+    "commonInsuredLegalOwnerObserved":false,
+    "matchedBinationalPremiumObserved":false,
+    "fullInsuranceFamilyComplete":false
+  },
+  "sources":[
+    {"id":"QUALITAS_RESIDENT_CARGO_202606","url":"https://www.qualitas.com.mx/documents/19189400/21568120/Seguro%2Bde%2Bpick%2Bups%2Bde%2Bcarga%2By%2Bcamiones%2Bde%2Bcarga%2Bresidentes%2B17062026.pdf/72e281c6-b685-2311-f6ab-1369a23c6c61?t=1781739210295","locator":"Current official catalog link136; resident cargo trucks QJ/01 0626-CC. Physical16 definition,19-20 materialdamage,27 detachedtheft,134 territory. Conditional capabilities, not proof of an issued policy or price.","archive":{"file":"docs/research/sources/QUALITAS_RESIDENT_CARGO_TERMS_20261002.pdf","sha256":"beaa23a16d67a74fb79b92841086a14a273a58b6aed2d4ca61b4df137f0779e4"}},
+    {"id":"PROGRESSIVE_INTERCHANGE_SCOPE","url":"https://www.progressivecommercial.com/coverages/trailer-interchange/","locator":"Coverage for non-owned trailers under written agreement; ownership/custody and listed trailer required. Read primaryweb2Oct2026, not a premium offer.","archive":null}
+  ],
+  "assumptions":[
+    "One53ftbox kept through own MX/US relay. Ownership within a corporate group does not prove the same insured legal entity; actual underwriting eligibility remains unknown.",
+    "Project the already reviewed US public owned-trailer guide as two separate prospective monthly cost components25/150USD, not a matched Mexican or binational premium, confidence interval or bounds on actual cost.",
+    "Do not also add the alternative1%-3% value rule, an inferred asset value or a midpoint. The source guide is not a statistical matched53ft2021 cohort.",
+    "Allocate each single recurring box component over the whole shared-box productive cycle with the existing24-day distance/time MAX. Do not multiply by tractors, territories, handoffs or trips, or prorate the monthly premium by country hours.",
+    "Public Mexican terms demonstrate that one named-asset physicaldamage/theft coverage can have MX/US/Canada reach when contracted; they do not prove that this US guide prices that policy. Do not infer US liability or insured cargo from physicaldamage.",
+    "Detached theft conditions concern secured owned or contractually related yards. Actual yards, endorsement, custody, insured owner, value and deductible remain unverified.",
+    "Same premium-expense component cash/asset-financed; no additional premium-finance interest, lender compliance or actual policy binding assumed.",
+    "Do not add a second full country policy automatically. Future matched coverage must replace or reconcile overlapping components, not append another whole-box charge.",
+    "Complete insurance and complete D2D costs stay unknown. This increment prices one explicit component, does not set border liability, MX cargo, retainedloss or unquoted fees to zero."
+  ],
+  "quoteReady":false,
+  "adoptedValues":0
+}

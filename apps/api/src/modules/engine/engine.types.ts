@@ -1,6 +1,7 @@
 import type { ParamMap } from '../assumptions/assumptions.service.js'
 import type { CostBaseProfile } from '../cost-bases/cost-base-profile.js'
 import type { MarketCondition } from './engine.factors.js'
+import type { TripFuelSnapshot } from './trip-fuel-review.js'
 
 export type { MarketCondition }
 
@@ -51,6 +52,8 @@ export interface UsaLegInput {
   driverExpenses?: number
   outState: string                // for fuel/FSC lookup
   dieselUsdGal: number            // usaFuel by state
+  fuelRegion?: string | null      // cache mapping; not a corridor refueling plan
+  fuelReview?: TripFuelSnapshot   // route/date decision frozen in new quote snapshots
   fscUsdMile: number              // usaFuel by state
   originCondition: MarketCondition // usaMktCondition (origin market, by trailer)
   destCondition: MarketCondition   // usaMktCondition (dest market, by trailer)

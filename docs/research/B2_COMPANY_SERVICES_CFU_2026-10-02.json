@@ -1,0 +1,27 @@
+{
+ "model":"FCM_COMPANY_SERVICES_CFU_V1","reviewedAt":"2026-10-02T21:14:00Z","referencePeriod":"2026-10",
+ "quantityBasis":"TWO_NAMED_CONTROL_RESERVATIONS_NOT_SEVEN_ROLES_OR_FRACTIONAL_INVOICES",
+ "namedControls":2,"modeledFleetPairs":1,"monthlyAvailableDays":24,
+ "office":{"memberships":2,"publishedMonthlyUsdPerMembership":100,"businessAddressIncluded":false,"continuousAccessIncluded":false,"phoneIncluded":false},
+ "mobile":{"adminLines":2,"publishedMonthlyBlockUsd":100,"providerFeeMonthlyUsdPerLine":4.49,"autopayOrPromoApplied":false,"actualOtherSurchargesAndTaxUsd":null},
+ "yard":{"mode":"SEPARATE_RESERVED_TRACTOR_AND_TRAILER_SPACES","tractorSpaces":1,"trailerSpaces":1,"publishedMonthlyTractorUsd":150,"publishedMonthlyTrailerUsd":175,"comboAdded":false,"introductoryDurationMonths":null,"mxYardMonthlyUsd":null,"taxAndPaymentFeesUsd":null},
+ "allocation":"SHARED_OFFICE_MOBILE_EQUAL_TRACTORS_DIRECT_US_TRACTOR_AND_ONE_SHARED_BOX_BAYS",
+ "sources":[
+  {"id":"MILEONE_SERVICES_TWO_MEMBERS","url":"https://www.mileoneinc.com/services/","locator":"Coworking100USD/month; WiFi and printing/scanning included; weekday9am-10pm;24/7 extra not selected.","capture":"PRIMARY_WEB_READER","directDownloadStatus":"HTTP_403_NOT_ARCHIVED","archive":null},
+  {"id":"MILEONE_MEMBERSHIP_FAQ","url":"https://www.mileoneinc.com/faq/","locator":"Each worker needs membership/daypass; phone service not offered; business address only qualifying Incubator/Launchpad.","capture":"ORIGINAL_HTTP_HTML","directDownloadStatus":"HTTP_200","archive":{"file":"docs/research/sources/MILEONE_FAQ_20261002.html","sha256":"26e999afac2dd7781d0904cc27e314ea3ea61564e0d7c6bdb80606689524c6bc"}},
+  {"id":"TMOBILE_CORE_TWO_LINES","url":"https://www.t-mobile.com/business/wireless-business-plans","locator":"CoreMobile Broadband Facts M0006945950TBI000000000407: two lines100USD total/month before AutoPay; provider4.49/line. Other actual taxes/surcharges unresolved;35 connection fee is one-time, not recurring.","capture":"PRIMARY_WEB_READER","directDownloadStatus":"HTTP_403_NOT_ARCHIVED","archive":null},
+  {"id":"OUTPOST_SEPARATE_US_BAYS","url":"https://outpost.us/locations/laredo-metropolitan/","locator":"Tractor36x12ft150/month; trailer53x12ft175/month; combo200 alternative NOT added. Prices introductory by occupancy; no duration/nonpromo quote. Original1Oct archive rechecked2Oct primaryweb.","capture":"ORIGINAL_HTTP_HTML_RECHECKED_PRIMARY_WEB","directDownloadStatus":"REUSED_2026_10_01_ARCHIVE","archive":{"file":"docs/research/sources/OUTPOST_LAREDO_YARD_20261001.html","sha256":"016a154ca9f4b526990adca3174f4a3cde90f82d1c1461e70bc1356e6f0f1afa"}}
+ ],
+ "assumptions":[
+  "Reserve one named admin workspace and phone per existing national-leg control account as an explicit service-quantity hypothesis. Two controls do not prove two full-time people, actual roster, workload or24/7 monitoring.",
+  "Do not inherit seven desk/phone quantities from seven functions; do not multiply source invoices by0.412676allocated-person equivalent. Payroll remains its prior shared-network allocation; full named access cost is conservative reserved capacity, not measured required staffing.",
+  "One group office/mobile pool is split equally across the two tractor cost centres, following the existing admin allocation. Internet and printing are bundled; no second charge. No TMS or payroll added again.",
+  "The modeled box is detached at relay. Use one tractor and one trailer space rather than claiming attached-combo permission covers separate equipment. Assign the trailer bay to the same physical SHARED_TRAILER, not a second box or national duplicate.",
+  "Monthly reserved spaces are fixed capacity cost even while assets are away. Apply existing per-resource MAX distance/time exposure, not elapsed yard dwell as a per-trip tariff and not add another parking fee for the same service.",
+  "One US yard is a public price reference, not an agreed handoff location or verified gate/bay/size/cargo custody fit. MX tractor temporary access, MX yard, storage/handling/driver accommodation and actual local distances remain unresolved.",
+  "633.98USD is the known monthly component only. Office/mobile tax, actual mobile surcharges, devices, yard tax/payment processing, promotional duration and nonpromo renewal are unknown, not zero. No claim of full invoice or long-term fixed tariff.",
+  "Same office/mobile/yard component in cash and asset-financed alternatives; no additional asset interest or premium, no application, reservation, provider activation or payment.",
+  "The historical seven-seat and combo sensitivities are retained separately; this projection does not replace canonical data, active base, tax treatment, legal registrants or operational entities."
+ ],
+ "completeCompanyMonthlyUsd":null,"completeD2DCostUsd":null,"quoteReady":false,"adoptedValues":0
+}

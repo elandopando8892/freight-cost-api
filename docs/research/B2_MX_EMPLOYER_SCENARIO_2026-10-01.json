@@ -1,0 +1,27 @@
+{
+  "artifact":"FCM_B2_MX_EMPLOYER_SCENARIO",
+  "reviewedAt":"2026-10-01T19:39:16-06:00",
+  "status":"HYPOTHETICAL_FIXED_GROSS_PUBLIC_COMPONENTS_NOT_PAYROLL_CALIBRATION",
+  "ruleSourceRef":"mxEmployerRules#/normativeRulePack",
+  "wageSourceRef":"facilityStaffing#/sources",
+  "sources":[
+    {"id":"PROFEDET_AGUINALDO","url":"https://www.profedet.gob.mx/micrositio/index.php/aguinaldo","observed":"PRIMARY_WEB_READER_TODAY","rule":"minimum 15 salary days per full service year"},
+    {"id":"PROFEDET_VACATION","url":"https://www.profedet.gob.mx/micrositio/index.php/vacaciones","observed":"PRIMARY_WEB_READER_TODAY","rule":"first service year 12 paid vacation days"},
+    {"id":"PROFEDET_PREMIUM","url":"https://www.profedet.gob.mx/micrositio/index.php/prima-vacacional","observed":"PRIMARY_WEB_READER_TODAY","rule":"25 percent additional vacation premium"},
+    {"id":"LSS_RECHECK","url":"https://www.diputados.gob.mx/LeyesBiblio/pdf/LSS.pdf","observed":"PRIMARY_WEB_READER_TODAY_REFORM_2026_01_15_AND_REUSED_VISUAL_P153","reusedLocalPdfSha256":"8a28a16e1dce1f8e666f4cce5ed19745bc912b2ab1ca49787d5d4bef229398ed","rule":"2026 CEAV 4.01 UMA and above 7.513 percent"},
+    {"id":"UMA_CORROBORATION","url":"https://dof.gob.mx/nota_detalle_popup.php?codigo=5779543","observed":"PRIMARY_WEB_READER_TODAY","rule":"UMA daily 117.31 from 2026-02-01; construction cost tables not adopted"}
+  ],
+  "scenario":{
+    "month":"2026-10","role":"TRACKING_CS","location":"General Escobedo, Nuevo Leon",
+    "wageSourceId":"MX_TRACKING","wageEndpoints":["low","high"],
+    "compensationBasis":"GROSS_FIXED_WAGES_ONLY_HYPOTHESIS",
+    "profile":"FIRST_YEAR_MINIMUM_BENEFITS_NO_ABSENCE",
+    "umaDailyMxn":117.31,"ceavRate":0.07513,
+    "employeeCountAssumption":1,"advertisedGrossNetConfirmed":false,
+    "actualTenureAndBenefitPackageConfirmed":false,"actualSbcConfirmed":false,
+    "fullCalendarCoverageAndNoAbsenceAssumed":true,"continuousShiftCoverageEstablished":false
+  },
+  "scope":{"fixedMonthlyDailyDivisor":30,"benefitIntegrationYearDays":365,"vacationDays":12,"aguinaldoDays":15,"vacationPremiumFraction":0.25,"sbcUpperUma":25,"supportedCeavBracket":"4.01 UMA and above only","period":"one complete calendar month Feb-Dec 2026; not annualized October quota","variableOrMixedSbcSupported":false,"minimumSalaryAndLowerCeavBracketsSupported":false,"sbcIsCashWage":false},
+  "missing":["Source does not confirm gross/net: scenario is counterfactual, not observed payroll","Employer risk premium and local payroll tax base/rate/exemptions not known, not zero","Overtime, Sunday/holiday/night premiums, shift relief, PTU and other benefits or costs not quantified","One public monitoring role is not whole group admin or an operator; geography not adjusted","Staff workload, pool/resource exposure and date-compatible FX remain unjoined"],
+  "monthlyCompleteEmployerCostMxn":null,"driverEmployerCvu":null,"adoptedValues":0,"quoteReady":false,"externalChanges":false
+}

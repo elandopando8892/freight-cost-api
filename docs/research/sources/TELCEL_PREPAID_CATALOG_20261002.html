@@ -1,0 +1,356 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+
+
+
+<head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="">
+        <meta name="author" content="Mx">
+        <title>MiTelcel</title>
+        <link rel="icon" href="favicon.png" type="image/png" />
+        <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600' rel='stylesheet' type='text/css'>
+        <script src="js/jquery-2.2.4.min.js"></script>
+        <!-- Bootstrap core CSS & Libs -->
+        <link href="css/telcelFont.css" rel="stylesheet">
+        <link href="css/libs.min.css" rel="stylesheet">
+        <!-- Layout TelCel -->
+        <link href="css/custom.css" rel="stylesheet">
+        <!-- Layout MiTelcel -->
+        <link href="css/mitelcel.css" rel="stylesheet">
+        <!-- Estilos aplicados a los widgets de js -->
+        <link href="css/widgets.css" rel="stylesheet">
+        <link href="css/new.css" rel="stylesheet" >
+        
+        <script type="text/javascript" src="js/moment.min.js"></script>
+        <script type="text/javascript" src="js/moment-es.js"></script>
+        
+        <script type='text/javascript' src='dwr/engine.js'></script>
+		<script type='text/javascript' src='dwr/util.js'></script>
+        <script type='text/javascript' src='dwr/interface/UpdateCard.js'> </script>
+        <script type='text/javascript' src='dwr/interface/DisplayCard.js'> </script>
+        <script type='text/javascript' src='dwr/interface/PINNumber.js'> </script>
+        <script type='text/javascript' src='dwr/interface/Services.js'> </script>
+        
+</head>
+
+
+
+<body>
+  
+	 <input type="hidden" id="conc_pago" />
+	 <input type="hidden" id="tipo_tarj" />
+	
+	
+
+
+
+
+<script type='text/javascript' src='js/IntervarResize.js'></script>
+
+<script type='text/javascript' src='dwr/interface/Services.js'></script>
+<script type='text/javascript' src='dwr/engine.js'></script>
+<script type='text/javascript' src='dwr/util.js'></script>
+
+<!-- Title -->
+<h1 id="paga-tu-factura-titulo" class="text-center" style="margin-top:0px;">
+
+</h1>
+	
+
+
+
+
+
+
+<input type="hidden" name="t2p" value="true">
+<div class="imprimir ocultar_administracion">
+<div class="row justify-content-center">
+	<div class="col-md-8 align-self-center col-md-offset-2">
+
+
+		<div id="mensajes-de-transaccion">
+			<div class="bg-blue form-last-step text-center">
+				<h1>
+					<strong>Compra de Recargas y Paquetes por SMS</strong>
+				</h1>
+
+			</div>
+		</div>
+		<div id="datapackages-catalogo">
+		    <div>
+		    
+		      <strong>Paquetes Sin L&iacute;mite, Internet Amigo o Internet por Tiempo</strong>
+		      <span class="note-packages"><strong>Compra Paquete:</strong> "Para realizar una compra de paquete env&iacute;a COMPRA, un espacio y el c&oacute;digo del paquete a la marcaci&oacute;n 3434".
+                <br /><span class="note-packages-ex">Ejemplo: COMPRA SL100</span></span>
+		      
+		      <span class="note-packages"><strong>Regala Paquete:</strong> "Para regalar un paquete env&iacute;a COMPRA, un espacio, el c&oacute;digo del paquete, espacio y los 10 d&iacute;gitos del n&uacute;mero Telcel a la marcaci&oacute;n 3434".
+                <br /><span class="note-packages-ex">Ejemplo: COMPRA SL100 ##########</span></span>
+                
+                <br>
+                
+                <strong>Recarga de Saldo</strong>
+                <span class="note-packages"><strong>Compra Saldo:</strong> "Para realizar una compra de saldo env&iacute;a RECARGA, un espacio y el monto de la recarga a la marcaci&oacute;n 3434".
+                <br /><span class="note-packages-ex">Ejemplo: RECARGA 100</span></span>
+                
+                <span class="note-packages"><strong>Regala Saldo:</strong> "Para regalar una recarga de saldo env&iacute;a RECARGA, un espacio, el monto de la recarga, espacio y los 10 d&iacute;gitos del n&uacute;mero Telcel a la marcaci&oacute;n 3434".
+                <br /><span class="note-packages-ex">Ejemplo: RECARGA 100 ##########</span></span>
+		    </div>
+			<div class="table-responsive">
+				<table id="htmlgrid-2"
+					class="table-tooltips table table-bordered">
+					<thead>
+						<tr>
+							<th class="col">C&oacute;digo</th>
+                            <th class="col">Nombre del paquete</th>
+                            <th class="col">Monto</th>
+							<th class="col">Datos incluidos</th>
+							<th class="col">Vigencia</th>
+						</tr>
+					</thead>
+					<tbody>
+						
+							<tr>
+								<td>SL10</td>
+								<td>Sin L&iacute;mite 10</td>
+								<td>&#36; 10.00</td>
+								<td>50 MB</td>
+								<td>1 d&iacute;a</td>
+							</tr>
+						
+							<tr>
+								<td>SL20</td>
+								<td>Sin L&iacute;mite 20</td>
+								<td>&#36; 20.00</td>
+								<td>100 MB</td>
+								<td>2 d&iacute;as</td>
+							</tr>
+						
+							<tr>
+								<td>SL30</td>
+								<td>Sin L&iacute;mite 30</td>
+								<td>&#36; 30.00</td>
+								<td>160 MB</td>
+								<td>3 d&iacute;as</td>
+							</tr>
+						
+							<tr>
+								<td>SL50</td>
+								<td>Sin L&iacute;mite 50</td>
+								<td>&#36; 50.00</td>
+								<td>500 MB</td>
+								<td>7 d&iacute;as</td>
+							</tr>
+						
+							<tr>
+								<td>SL80</td>
+								<td>Sin L&iacute;mite 80</td>
+								<td>&#36; 80.00</td>
+								<td>800 MB</td>
+								<td>13 d&iacute;as</td>
+							</tr>
+						
+							<tr>
+								<td>SL100</td>
+								<td>Sin L&iacute;mite 100</td>
+								<td>&#36; 100.00</td>
+								<td>1.5 GB</td>
+								<td>15 d&iacute;as</td>
+							</tr>
+						
+							<tr>
+								<td>SL150</td>
+								<td>Sin L&iacute;mite 150</td>
+								<td>&#36; 150.00</td>
+								<td>2.5 GB</td>
+								<td>25 d&iacute;as</td>
+							</tr>
+						
+							<tr>
+								<td>SL200</td>
+								<td>Sin L&iacute;mite 200</td>
+								<td>&#36; 200.00</td>
+								<td>3.5 GB</td>
+								<td>30 d&iacute;as</td>
+							</tr>
+						
+							<tr>
+								<td>SLA270</td>
+								<td>Sin L&iacute;mite 270</td>
+								<td>&#36; 270.00</td>
+								<td>3 GB</td>
+								<td>30 d&iacute;as</td>
+							</tr>
+						
+							<tr>
+								<td>SL300</td>
+								<td>Sin L&iacute;mite 300</td>
+								<td>&#36; 300.00</td>
+								<td>5.5 GB</td>
+								<td>30 d&iacute;as</td>
+							</tr>
+						
+							<tr>
+								<td>SLA400</td>
+								<td>Sin L&iacute;mite 400</td>
+								<td>&#36; 400.00</td>
+								<td>4 GB</td>
+								<td>30 d&iacute;as</td>
+							</tr>
+						
+							<tr>
+								<td>SL500</td>
+								<td>Sin L&iacute;mite 500</td>
+								<td>&#36; 500.00</td>
+								<td>8 GB</td>
+								<td>30 d&iacute;as</td>
+							</tr>
+						
+							<tr>
+								<td>SR1200</td>
+								<td>Paquete Prepagado 1200</td>
+								<td>&#36; 1200.00</td>
+								<td>7 GB</td>
+								<td>182 d&iacute;as</td>
+							</tr>
+						
+							<tr>
+								<td>SR2400</td>
+								<td>Paquete Prepagado 2400</td>
+								<td>&#36; 2400.00</td>
+								<td>7 GB</td>
+								<td>365 d&iacute;as</td>
+							</tr>
+						
+							<tr>
+								<td>INT10</td>
+								<td>Internet 10 70MB 1 d&iacute;a</td>
+								<td>&#36; 10.00</td>
+								<td>70 MB</td>
+								<td>1 d&iacute;a</td>
+							</tr>
+						
+							<tr>
+								<td>INT20</td>
+								<td>Internet 20 140MB 2 d&iacute;as</td>
+								<td>&#36; 20.00</td>
+								<td>140 MB</td>
+								<td>2 d&iacute;as</td>
+							</tr>
+						
+							<tr>
+								<td>INT30</td>
+								<td>Internet 30 220MB 3 d&iacute;as</td>
+								<td>&#36; 30.00</td>
+								<td>220 MB</td>
+								<td>3 d&iacute;as</td>
+							</tr>
+						
+							<tr>
+								<td>INT50</td>
+								<td>Internet 50 600MB 7 d&iacute;as</td>
+								<td>&#36; 50.00</td>
+								<td>600 MB</td>
+								<td>7 d&iacute;as</td>
+							</tr>
+						
+							<tr>
+								<td>INT80</td>
+								<td>Internet 80 1GB 12 d&iacute;as</td>
+								<td>&#36; 80.00</td>
+								<td>1 GB</td>
+								<td>13 d&iacute;as</td>
+							</tr>
+						
+							<tr>
+								<td>INT100</td>
+								<td>Internet 100 1.8GB 15 d&iacute;as</td>
+								<td>&#36; 100.00</td>
+								<td>1.8 GB</td>
+								<td>15 d&iacute;as</td>
+							</tr>
+						
+							<tr>
+								<td>INT150</td>
+								<td>Internet 150 3GB 25 d&iacute;as</td>
+								<td>&#36; 150.00</td>
+								<td>3 GB</td>
+								<td>25 d&iacute;as</td>
+							</tr>
+						
+							<tr>
+								<td>INT200</td>
+								<td>Internet 200 4GB 30 d&iacute;as</td>
+								<td>&#36; 200.00</td>
+								<td>4 GB</td>
+								<td>30 d&iacute;as</td>
+							</tr>
+						
+							<tr>
+								<td>INT300</td>
+								<td>Internet 300 6.5GB 30 d&iacute;as</td>
+								<td>&#36; 300.00</td>
+								<td>6.5 GB</td>
+								<td>30 d&iacute;as</td>
+							</tr>
+						
+							<tr>
+								<td>INT500</td>
+								<td>Internet 500 10GB 30 d&iacute;as</td>
+								<td>&#36; 500.00</td>
+								<td>10 GB</td>
+								<td>30 d&iacute;as</td>
+							</tr>
+						
+							<tr>
+								<td>ILIM10</td>
+								<td>Internet Ilimitado</td>
+								<td>&#36; 10.00</td>
+								<td>Ilimitados</td>
+								<td>1 hora</td>
+							</tr>
+						
+							<tr>
+								<td>ILIM30</td>
+								<td>Internet Ilimitado</td>
+								<td>&#36; 15.00</td>
+								<td>Ilimitados</td>
+								<td>2 horas</td>
+							</tr>
+						
+							<tr>
+								<td>ILP25B</td>
+								<td>Internet Ilimitado</td>
+								<td>&#36; 25.00</td>
+								<td>Ilimitados</td>
+								<td>4 horas</td>
+							</tr>
+						
+							<tr>
+								<td>ILIM25B</td>
+								<td>Internet Ilimitado</td>
+								<td>&#36; 25.00</td>
+								<td>Ilimitados</td>
+								<td>4 horas</td>
+							</tr>
+						
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	</div>
+</div>
+</html>
+	
+	
+	
+	<script src="js/libs.js"></script>
+	<script src="js/customplugins.js"></script>
+	<script src="js/scripts-t2p.js"></script>
+
+</body>
+</html>

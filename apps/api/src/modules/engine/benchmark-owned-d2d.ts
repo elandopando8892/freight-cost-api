@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { BenchmarkD2DSchema, calculateBenchmarkD2D } from './benchmark-d2d.js'
 import { OwnedFixedSchema, calculateOwnedFixedScenarios } from './benchmark-owned-fixed.js'
 import { SharedTrailerSchema } from './benchmark-shared-trailer.js'
+import { TrailerAttachmentSchema } from './benchmark-trailer-attachment.js'
 
 export const OwnedD2DSchema = z.object({
   route: BenchmarkD2DSchema.omit({ sharedTrailer: true }).extend({ assetAllocation: z.literal('SHARED_TRAILER') }).strict(),
@@ -10,8 +11,9 @@ export const OwnedD2DSchema = z.object({
 }).strict()
 
 /** Compose from original inputs; callers cannot supply monthly fixed or completed totals. */
-export function calculateOwnedD2DScenarios(raw: unknown) {
+export function calculateOwnedD2DScenarios(raw: unknown, rawTrailerAttachment?: unknown) {
   const input = OwnedD2DSchema.parse(raw)
+  const attachment = rawTrailerAttachment === undefined ? undefined : TrailerAttachmentSchema.parse(rawTrailerAttachment)
   const fixed = calculateOwnedFixedScenarios(input.fixed)
   const issues = fixed.issues.map(issue => ({ ...issue, field: `fixed.${issue.field}` }))
   if (input.fixed.capital.assetReference !== input.trailer.assetReference) issues.push({ field: 'trailer', code: 'ASSET_MISMATCH' })
@@ -52,7 +54,11 @@ export function calculateOwnedD2DScenarios(raw: unknown) {
       productiveKmPerMonth: datum(input.trailer.productiveKmPerMonth), productiveDaysPerMonth: datum(input.trailer.productiveDaysPerMonth),
       totalKm: datum(input.trailer.totalKm), cycleDays: datum(input.trailer.cycleDays),
       maintenanceUsdPerKm: datum(input.trailer.maintenanceUsdPerKm), tiresUsdPerKm: datum(input.trailer.tiresUsdPerKm),
-    } })
+    } }, attachment ? { ...attachment,
+      evidenceIds: attachment.evidenceIds.map(id => `trip:${id}`),
+      mxAttachedDays: datum(attachment.mxAttachedDays), borderDetachedDays: datum(attachment.borderDetachedDays),
+      usAttachedDays: datum(attachment.usAttachedDays),
+    } : undefined)
     issues.push(...result.issues.map(issue => ({ ...issue, field: `scenarios.${scenario.id}.${issue.field}` })))
     return { id: scenario.id, result }
   })

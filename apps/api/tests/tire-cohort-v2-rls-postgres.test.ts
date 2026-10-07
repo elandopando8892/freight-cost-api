@@ -4,9 +4,9 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { TireCohortV2ResearchPersistence } from '../src/modules/cost-bases/tire-cohort-v2-persistence.js'
 import { reviewTireCohortRecordV2 } from '../src/modules/cost-bases/tire-cohort-v2.js'
 import { setTireCalibrationTenantContext } from '../src/modules/cost-bases/tire-calibration-tenant-context.js'
+import {readTireTestEnvironment} from './fixtures/tire-test-environment.js'
 
-const adminUrl = process.env.FCM_TEST_ADMIN_DATABASE_URL
-const appUrl = process.env.FCM_TEST_DATABASE_URL
+const {adminUrl,appUrl}=readTireTestEnvironment(process.env)
 const isolated = [adminUrl, appUrl].every(value =>
   value && /^postgresql:\/\/[^@]+@127\.0\.0\.1:\d+\/fcm_tire_s8(?:\?|$)/.test(value))
 

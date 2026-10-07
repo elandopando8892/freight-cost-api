@@ -1,0 +1,38 @@
+{
+  "model":"FCM_PILOT_CYCLE_EXPOSURE_PUBLIC_SCENARIOS_V1",
+  "reviewedAt":"2026-10-02T10:07:00Z",
+  "referencePeriod":"2026-10",
+  "physicalScope":"OWN_MX_US_RELAY_SAME_TRAILER",
+  "fleetPairs":1,
+  "productiveElapsedAssetDaysPerMonth":24,
+  "productiveDaysBasis":"DECLARED_CALENDAR_CAPACITY_NOT_ANNUAL_OPERATING_DAYS_DIVIDED_BY12",
+  "usCityRoadReference":{"publishedMiles":708,"internationalMileKm":1.609344,"publishedDrivingMinutes":680,"sourceCapture":"PRIMARY_PUBLISHER_SEARCH_READER_TIME_PAGE_OPEN_UNAVAILABLE","truckValidated":false,"zip72916OrBridgeEndpointMatched":false},
+  "movementPolicy":{"mxHoursPer24Block":10,"usHoursPer24Block":10,"usBreakAfterDrivingHours":8,"usBreakHours":0.5,"blockHours":24,"freshDriverStartAssumed":true,"terminalHandlingHours":2,"handoffHours":2,"recoveryRestHours":14},
+  "borderPolicy":{"northboundCrossingMinutes":87,"historicalMedianMinutes":70,"period":2019,"direction":"MX_TO_US","lane":"STANDARD","roadCrossingOverlapConfirmed":false,"additionalRoadOverlapHoursAssumed":0,"southboundSymmetricMinutesAssumption":87,"handoffIsSeparateFromCrossingAssumed":true},
+  "capacityPolicy":{"mxSourceId":"IMT_PT260_CASE","mxAnnualKm":120000,"monthsPerYear":12,"usObservationId":"H12026","usAverageTruckProxyBasis":"COMBINED_COMPANY_AND_OWNER_OPERATOR_NOT_COMPANY_ONLY","boxCapacityDriver":"MIN_BOTH_TRACTOR_KM_CYCLES_AND_SERIAL_BOX_AVAILABLE_TIME","boxStockRatioImported":false},
+  "scenarios":[
+    {"id":"NETWORK_EXPECTED_EMPTY_PROXY","kind":"UNCOMPENSATED_EMPTY_FACTOR_ASSUMED_PHYSICAL_NETWORK_REPOSITIONING","emptyShareOfTotalKm":0.0761,"mxAndBoxTransferExplicit":true,"boxRecoveryTimeBasis":"SAME_US_TRACTOR_NEXT_PICKUP_NO_MX_EMPTY_REPOSITIONING_INHERITED","selected":false},
+    {"id":"DEDICATED_EMPTY_SAME_BOX_RETURN","kind":"SYMMETRIC_EMPTY_RETURN_SENSITIVITY_MX_TRACTOR_WAITS_FOR_SAME_BOX","emptyShareOfTotalKm":0.5,"mxAndBoxTransferExplicit":true,"boxRecoveryTimeBasis":"SERIAL_REVERSE_SAME_BOX_NOT_TWO_TRACTOR_RETURNS_SUMMED","selected":false}
+  ],
+  "sources":[
+    {"id":"TRAVELMATH_US_DISTANCE","url":"https://www.travelmath.com/drive-distance/from/Laredo,+TX/to/Fort+Smith,+AR","locator":"Publisher city-road distance708miles, rounded1139km. Not a truck-restricted itinerary or selected terminal."},
+    {"id":"TRAVELMATH_US_TIME","url":"https://www.travelmath.com/driving-time/from/Laredo,+TX/to/Fort+Smith,+AR","locator":"Primary publisher search reader reports11h20; direct reader failed. No original HTTP or retained Google content; planning road-clock proxy only."},
+    {"id":"FMCSA_PROPERTY_HOS","url":"https://www.fmcsa.dot.gov/regulations/hours-service/summary-hours-service-regulations","locator":"Property:11h driving/14h window/10h reset,30min after8h driving,60/70weekly; 10h/24planning policy not a published average or full ELD audit."},
+    {"id":"FMCSA_DETENTION_CONTEXT","url":"https://www.fmcsa.dot.gov/research-and-analysis/impact-driver-detention-time-safety-and-operations","locator":"Historical study:2h standard handling and1.4h detention beyond it at affected stops; two-hour terminal/handoff hypotheses are not current MX/border observations or detention averages."},
+    {"id":"TTI_WORLD_TRADE_VISUAL","url":"https://static.tti.tamu.edu/tti.tamu.edu/documents/TTI-2023-5-presentation.pdf","locator":"PDF7mean87standard/86FAST;PDF8median70both; full pages visually reviewed. Study2019 northbound, not current wait or detached handoff.","archive":{"file":"docs/research/sources/TTI_BORDER_COMPARISON_20261002.pdf","sha256":"c078f640f6550363aeb8e6eed269931d5f0e7e4d439769070627a8f502a15085"}},
+    {"id":"TTI_STUDY_PERIOD","url":"https://static.tti.tamu.edu/tti.tamu.edu/documents/TTI-2023-5.pdf","locator":"Section3/printed5/PDF14: study limited to2019; BCIS crossing definition is not additional wait plus full crossing."}
+  ],
+  "modelAssumptions":[
+    "This is a dated prospective planning comparison, not selected carrier, actual itinerary, service date, productive calendar observation, statistical confidence interval or operational promise.",
+    "One physical MX tractor, one US tractor and one53ft box form the modeled capacity cohort, not a fleet inferred from the user trip. Twenty-four available elapsed asset-days is explicit calendar capacity, not IMT300or ATRI268operating days divided by12.",
+    "MX120000km/year and US combined-average H12026 mileage are transferred as explicit prospective capacity proxies despite cohort/year/owned-profile limits. A single box's capacity is derived from the limiting cycle, not historical tractor km or closing carrier stock ratio.",
+    "US city-road mileage and time replace no authenticated Google review, exact72916terminal or PuenteIIIaccess. Source time is primary-publisher search readout only; highway class, restrictions, tolls and endpoint geometry remain unverified.",
+    "SAKBE and Travelmath clocks are assumed nominal driving, with independent fresh-driver ten-hour/24h blocks and public break structure. Two-hour loading, unload and handoff and fourteen-hour recovery reset are planning quantities, not measured averages. Weekly duty, actual hours and appointments are not certified.",
+    "TTI87min is historical complete crossing, not87min wait plus70min crossing. Add once to MX attached phase; road/crossing measurement overlap is assumed zero for sensitivity, not verified. Detached handoff2h is a separate modeled transfer, not implied by TTI. Southbound87min is explicitly symmetric hypothesis, never a northbound measurement relabelled as southbound.",
+    "Network7.61percent is PAMT uncompensated-empty metric. Equivalence to physical empty distance and transfer to MX/US are uncertain hypotheses, not observed return. Each tractor total=loaded/(1-e), not loaded*(1+e). After US delivery the same box stays with the US tractor to its modeled next pickup: inherit that physical US recovery movement only, not MX tractor's separate repositioning or7.61percent of combined box loaded distance. No full route return added on top.",
+    "Dedicated alternative uses full empty return of the same box. MX tractor stays committed at the border while US tractor completes roundtrip, then returns with that box; no immediate MX return without box plus simultaneous same-box recovery. Both crossings and both handoffs are serial and once on the box timeline.",
+    "Existing known fixed monthly components are allocated with the existing MAX(distance,time). Missing fixed/variable/company/border monetary components are outside this partial amount, never zero; whole CFU/CVU/D2D remains incomplete.",
+    "Effective monthly cycles cannot exceed either tractor distance capacity or any resource elapsed-day capacity. Box monthly km and days derive from those same cycles, not independent impossible capacities. No budget from ten-pair administrative scale is joined."
+  ],
+  "decision":"PROSPECTIVE_CYCLE_AND_PARTIAL_FIXED_ALLOCATION_NOT_COMPLETE_PILOT"
+}

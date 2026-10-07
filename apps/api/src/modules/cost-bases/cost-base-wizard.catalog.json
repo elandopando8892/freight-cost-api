@@ -1,0 +1,191 @@
+{
+  "schema": "FCM_WIZARD_REFERENCE_V1",
+  "profile": {
+    "id": "D2D_BINATIONAL_OWN_DRY_VAN_53_RELAY_SEP2026",
+    "segment": "D2D_BINATIONAL_OWN",
+    "equipment": "DRY_VAN_53",
+    "tractorPolicy": "OWN_MX_US_RELAY_SAME_TRAILER",
+    "period": "2026-09"
+  },
+  "cards": [
+    {
+      "id": "diesel-mx",
+      "label": "Precio de diésel · México",
+      "section": "FUEL",
+      "country": "MX",
+      "unit": "MXN/L",
+      "effect": "CVU",
+      "native": {
+        "key": "fcm.v3.fuel.diesel-mx",
+        "section": "FUEL",
+        "field": "Diesel MX",
+        "unit": "MXN/L"
+      },
+      "statistics": {
+        "minimum": null,
+        "central": 27,
+        "maximum": null,
+        "measure": "PUBLISHED_AGGREGATE_MEAN",
+        "sampleSize": null
+      },
+      "standard": {
+        "value": 27,
+        "status": "PROVISIONAL_PROFILE_REFERENCE"
+      },
+      "premises": [
+        "Compra en el ámbito y periodo de la fuente; no acredita un convenio o costo real del carrier.",
+        "La media nacional no demuestra el precio del corredor.",
+        "Revisar impuestos, recuperación fiscal y condiciones de abastecimiento."
+      ],
+      "evidence": {
+        "id": "PROFECO_20260928",
+        "url": "https://www.gob.mx/profeco/prensa/profeco-presenta-mapa-de-calor-para-identificar-los-precios-de-los-24-productos-de-la-canasta-pacic-por-cadena-comercial?idiom=es-MX",
+        "locator": "Indexed official paragraph: national diesel average as of 25 September; not selected station extrema",
+        "publishedDate": "2026-09-28",
+        "capture": "PRIMARY_OFFICIAL_INDEXED_EXCERPT_ONLY",
+        "limitations": [
+          "Direct web read returned 403; shell HTTP 200 was Challenge Validation, not report content. No direct-body or raw snapshot claim.",
+          "National average is not a station/corridor/contract/net carrier price; product grade and tax recoverability are not established."
+        ],
+        "country": "MX",
+        "file": "docs/research/B2_FUEL_PRICE_PERFORMANCE_REFERENCE_2026-09-30.json",
+        "sha256": "8824dcdb1180e28c9b7950bb4b77155b94edce78410f6a392a3cdaecc8c80be1",
+        "observationDate": "2026-09-25",
+        "geography": "MEXICO_NATIONAL_REPORTED_AVERAGE",
+        "taxBasis": "REPORTED_RETAIL_RECOVERABILITY_UNRESOLVED",
+        "sourceValue": 27,
+        "sourceUnit": "MXN/liter",
+        "normalization": "IDENTITY",
+        "pointer": "/prices/0"
+      },
+      "limitations": [
+        "Direct web read returned 403; shell HTTP 200 was Challenge Validation, not report content. No direct-body or raw snapshot claim.",
+        "National average is not a station/corridor/contract/net carrier price; product grade and tax recoverability are not established."
+      ],
+      "mappingStatus": "STAGED_NATIVE_INPUT"
+    },
+    {
+      "id": "diesel-us",
+      "label": "Precio de diésel · EE. UU.",
+      "section": "FUEL",
+      "country": "US",
+      "unit": "USD/L",
+      "effect": "CVU",
+      "native": {
+        "key": "fcm.v3.fuel.diesel-us-border",
+        "section": "FUEL",
+        "field": "Diesel US Border",
+        "unit": "USD/L"
+      },
+      "statistics": {
+        "minimum": null,
+        "central": 1.573144571792774,
+        "maximum": null,
+        "measure": "PUBLISHED_AGGREGATE_MEAN",
+        "sampleSize": null
+      },
+      "standard": {
+        "value": 1.573144571792774,
+        "status": "PROVISIONAL_PROFILE_REFERENCE"
+      },
+      "premises": [
+        "Compra en el ámbito y periodo de la fuente; no acredita un convenio o costo real del carrier.",
+        "PADD3 no es una media observada de Laredo ni del corredor completo.",
+        "Revisar impuestos, recuperación fiscal y condiciones de abastecimiento."
+      ],
+      "evidence": {
+        "id": "EIA_PADD3_20260928",
+        "url": "https://www.eia.gov/dnav/pet/PET_PRI_GND_DCUS_R30_W.htm",
+        "locator": "Diesel (On-Highway) All Types and ULSD, observation 09/28/26; Dollars per Gallon Including Taxes",
+        "publishedDate": "2026-09-29",
+        "capture": "DIRECT_PUBLIC_WEB_TABLE",
+        "limitations": [
+          "PADD3 Gulf Coast, not a chosen corridor, terminal/discounted carrier price or purchase.",
+          "Raw response not archived; release and observation read directly on 30 September."
+        ],
+        "country": "US",
+        "file": "docs/research/B2_FUEL_PRICE_PERFORMANCE_REFERENCE_2026-09-30.json",
+        "sha256": "8824dcdb1180e28c9b7950bb4b77155b94edce78410f6a392a3cdaecc8c80be1",
+        "observationDate": "2026-09-28",
+        "geography": "GULF_COAST_PADD3",
+        "taxBasis": "INCLUDING_TAXES_RECOVERABILITY_UNRESOLVED",
+        "sourceValue": 5.955,
+        "sourceUnit": "USD/US-gallon",
+        "normalization": "USD_PER_US_GALLON / 3.785411784",
+        "pointer": "/prices/1"
+      },
+      "limitations": [
+        "PADD3 Gulf Coast, not a chosen corridor, terminal/discounted carrier price or purchase.",
+        "Raw response not archived; release and observation read directly on 30 September."
+      ],
+      "mappingStatus": "STAGED_NATIVE_INPUT"
+    },
+    {
+      "id": "maintenance-us",
+      "label": "Mantenimiento · EE. UU.",
+      "section": "COST_MAINT",
+      "country": "US",
+      "unit": "USD/milla",
+      "effect": "CVU",
+      "native": null,
+      "statistics": {
+        "minimum": null,
+        "central": 0.198,
+        "maximum": null,
+        "measure": "PUBLISHED_AGGREGATE_MEAN",
+        "sampleSize": null
+      },
+      "standard": {
+        "value": 0.198,
+        "status": "PROVISIONAL_PROFILE_REFERENCE"
+      },
+      "premises": [
+        "Promedio de operaciones 2024, no costo observado del carrier en septiembre de 2026.",
+        "Compuesto tractor y remolque; excluye llantas. No añadir otra partida de lubricación sobre el mismo total.",
+        "El agregado por milla no determina cantidades y precios de cada servicio PM del catálogo canónico."
+      ],
+      "evidence": {
+        "id": "ATRI2025_MAINTENANCE_ORIGINAL",
+        "url": "https://truckingresearch.org/wp-content/uploads/2025/07/ATRI-Operational-Costs-of-Trucking-07-2025.pdf",
+        "locator": "Table8 printed15/PDF18:2024 R&M0.198USD/mile; survey Q3 printed57/PDF60 defines all truck/trailer repair and maintenance, labor/roadside included, tires separate. Routine oil/lube is not explicitly named.",
+        "publishedDate": "2025",
+        "observationDate": "2024",
+        "geography": "US_INDUSTRY_AGGREGATE",
+        "capture": "ARCHIVED_ORIGINAL_REPORT",
+        "taxBasis": "NOT_HOMOGENIZED",
+        "sourceValue": 0.198,
+        "sourceUnit": "USD/international-mile",
+        "normalization": "REFERENCE_ONLY_NO_PM_BACKSOLVE",
+        "file": "docs/research/B2_US_MAINTENANCE_PLANNING_2026-10-03.json",
+        "pointer": "/maintenanceUsdPerInternationalMile",
+        "sha256": "0eab0a22dbf81f074080f305ae44afbe9a1c14f106b920e2544c9e4c637306a1",
+        "archive": {
+          "file": "docs/research/sources/ATRI_OPSCOST_2025_REVIEW_20261001.pdf",
+          "sha256": "581b91b68a76f232102a63f543eff92bb59c9478556b164d84d2be85118902f8"
+        },
+        "limitations": [
+          "Observed historical industry aggregate, not a 2026 carrier observation or matched used Cascadia/dryvan53 small-fleet maintenance estimate.",
+          "Routine lubrication included as an explicit planning interpretation of all maintenance, not a separately measured rate or empirically confirmed survey microcategory. Do not add an oil price on top.",
+          "Different maintenance/tyre/population source alternatives remain visible; tyres retain their prior TTI rate and DEF remains an operating-fluid input. This is not one jointly observed cohort.",
+          "No homogeneous net-tax basis, VAT increment, inflation escalation or guaranteed conservative bound is inferred.",
+          "Bonus averages cover recipients, not all drivers. Neither carrier prevalence nor published average determines pilot eligibility, staffing or fixed/variable allocation.",
+          "Employer charges, workers compensation, wait compensation and other driver scope remain unresolved. Federal tax rules do not prove the ATRI benefit aggregate already includes or excludes each tax."
+        ]
+      },
+      "limitations": [
+        "Observed historical industry aggregate, not a 2026 carrier observation or matched used Cascadia/dryvan53 small-fleet maintenance estimate.",
+        "Routine lubrication included as an explicit planning interpretation of all maintenance, not a separately measured rate or empirically confirmed survey microcategory. Do not add an oil price on top.",
+        "Different maintenance/tyre/population source alternatives remain visible; tyres retain their prior TTI rate and DEF remains an operating-fluid input. This is not one jointly observed cohort.",
+        "No homogeneous net-tax basis, VAT increment, inflation escalation or guaranteed conservative bound is inferred.",
+        "Bonus averages cover recipients, not all drivers. Neither carrier prevalence nor published average determines pilot eligibility, staffing or fixed/variable allocation.",
+        "Employer charges, workers compensation, wait compensation and other driver scope remain unresolved. Federal tax rules do not prove the ATRI benefit aggregate already includes or excludes each tax."
+      ],
+      "mappingStatus": "REFERENCE_ONLY_COMPONENT_MAPPING_REQUIRED"
+    }
+  ],
+  "revision": "6877e7bd211afd800355acbb2b4aba872db0d9bd8db8c76de85dda89171fcfd1",
+  "externallyRefreshedThisCut": false,
+  "statisticsFromCatalogDefaults": false,
+  "calibrated": false,
+  "quoteReady": false
+}

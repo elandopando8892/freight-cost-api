@@ -1,0 +1,15 @@
+{
+  "artifact":"FCM_B2_MX_WORK_RISK_REFERENCE",
+  "reviewedAt":"2026-10-01T21:36:00-06:00",
+  "status":"INITIAL_REGISTRATION_PUBLIC_HYPOTHESIS_NOT_CARRIER_PREMIUM",
+  "sources":[
+    {"id":"LSS_RISK_2026","url":"https://www.diputados.gob.mx/LeyesBiblio/pdf/LSS.pdf","archive":{"file":"docs/research/sources/LSS_RISK_REVIEW_20261001.pdf","sha256":"8a28a16e1dce1f8e666f4cce5ed19745bc912b2ab1ca49787d5d4bef229398ed"},"locator":"Physical pages 26-27 visually inspected; articles 72-75, reform 2026-01-15","observation":"Article 73 class V mean 7.58875 percent at first registration/change of activity; annual actual premium is a distinct determination"},
+    {"id":"RACERF_RISK_CLASS","url":"https://www.diputados.gob.mx/LeyesBiblio/regley/Reg_LSS_MACERF.pdf","archive":{"file":"docs/research/sources/RACERF_RISK_REVIEW_20261001.pdf","sha256":"78fb70d213053e46d3e739b9d80bf7da733d80f27446af7d5812fc6de80533c9"},"locator":"Physical pages 8 and 98 visually inspected; articles 24,26,196; printed page counts say of 113 although downloaded file has 111 physical pages; reform 2005-07-15","observation":"Fraction 712 exclusive general cargo transport class V; classification is employer/activity-based, not automatically class I for office workers"}
+  ],
+  "ruleEvidence":{"fraction":712,"riskClass":"V","initialMeanRatePercent":7.58875,"initialMeanRateFraction":0.0758875,"actualAnnualPremiumRangeFraction":[0.005,0.15],"actualCarrierRateKnown":false,"nationalStatisticalAverageSelected":false,"classIVCargoAssumptionRejected":true,"newRegistrationHypothesisNotObservedCarrierHistory":true},
+  "scenario":{"employerActivity":"EXCLUSIVE_GENERAL_CARGO_TRANSPORT_FRACTION_712","employeeRegistrationHypothesis":"SAME_TRANSPORT_EMPLOYER_REGISTRATION","registrationBasis":"NEW_REGISTRATION_CLASS_V_REFERENCE","riskClass":"V","referenceRate":0.0758875,"sourceLocation":"General Escobedo, Nuevo Leon","wageSourceId":"MX_TRACKING","employeeRole":"TRACKING_CS","initialRegistrationPeriodApplicabilityAssumed":true},
+  "expectedOctoberComponents":[{"monthlySalaryMxn":15000,"coveredDays":31,"workRiskContributionMxn":1234.2634075342464},{"monthlySalaryMxn":16000,"coveredDays":31,"workRiskContributionMxn":1316.5476347031963}],
+  "integration":{"reuseEmployerScenarioRef":"mxEmployerScenario#/scenario","reuseNlTaxRef":"nlPayrollTax#/scenario","riskBase":"CAPPED_DAILY_SBC_TIMES_CALENDAR_COVERED_DAYS","isnBase":"ANNUAL_PAID_REMUNERATION_HYPOTHESIS_NOT_SBC","vacationSalaryAddedAgain":false,"newRiskRateSelectedForActualCarrier":false,"historicalEmployerAndNlDossiersUnchanged":true},
+  "remaining":["Scenario first-registration status and same-risk registration are hypotheses, not identified carrier facts","Public salary gross/net, tenure, actual benefits and overtime remain unresolved","Other employer costs, whole staffing pool/FTE, fleet/resource exposure and compatible FX are not quantified","Driver remuneration and assignment per kilometre remain separate from this administrative employee"],
+  "actualEmployerPremium":null,"completeMonthlyEmployerCostMxn":null,"driverEmployerCvu":null,"adoptedValues":0,"quoteReady":false,"externalChanges":false
+}

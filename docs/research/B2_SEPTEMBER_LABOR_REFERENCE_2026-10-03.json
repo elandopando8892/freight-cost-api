@@ -1,0 +1,29 @@
+{
+  "model": "FCM_B2_SEPTEMBER_LABOR_REFERENCE_V1",
+  "referenceMonth": "2026-09",
+  "observedOn": "2026-10-03",
+  "profileId": "B2_USER_SCOPE_20261003",
+  "fxPolicy": "THREE_PINNED_PROFILE_OBSERVATIONS_NO_SELECTION",
+  "riskPolicy": "EXISTING_EMPLOYER_RATE_UNKNOWN",
+  "mxBasis": "REBUILD_EXISTING_ANNUAL_MEAN_FORMULA_WITH_30_COVERED_DAYS_NOT_ACTUAL_BIMESTER",
+  "capacityBasis": "EXISTING_DECLARED_ORDINARY_DUTY_HYPOTHESIS_NOT_OBSERVED_SEPTEMBER_CAPACITY",
+  "usMie": {
+    "notice": "2025-54",
+    "effectiveFrom": "2025-10-01",
+    "referenceThrough": "2026-09-30",
+    "transportationConusUsdPerDay": 80,
+    "url": "https://www.irs.gov/pub/irs-drop/n-25-54.pdf",
+    "locator": "Sections3 and6; referenceThrough bounds this comparison, not a statutory expiration; actual trip/payment dates not supplied",
+    "isHotelPriceOrMandatoryAllowance": false
+  },
+  "lss": {
+    "url": "https://www.diputados.gob.mx/LeyesBiblio/pdf/LSS.pdf",
+    "locator": "2026-01-15 reform; arts27-30: payroll base rules; annual-mean planning is not actual variable-pay bimester"
+  },
+  "foodTreatment": "RETAIN_EXISTING_REMUNERATIVE_CASH_AND_NL_DIRECT_FOOD_EXEMPT_HYPOTHESIS_NOT_PROVEN",
+  "extraBenefits": "BASKET_UNPRICED_NOT_ADDED_AS_ZERO_OR_REPEATED_VOUCHER",
+  "wholeTripReferenceRebuilt": false,
+  "calibrated": false,
+  "quoteReady": false,
+  "adoptedValues": 0
+}

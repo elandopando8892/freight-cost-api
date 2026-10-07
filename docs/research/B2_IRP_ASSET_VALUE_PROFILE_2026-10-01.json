@@ -1,0 +1,27 @@
+{
+ "artifact":"FCM_B2_IRP_ASSET_VALUE_PROFILE",
+ "observedAt":"2026-10-01","status":"PUBLIC_ASKING_HYPOTHESIS_NOT_PURCHASE_OR_TAX_BASE",
+ "assetRef":"capitalInsurance#/assetReferences/1",
+ "asset":{"resourceId":"US_TRACTOR","sourceId":"RYDER_US_SLEEPER_526505","stock":"526505","vin":"3AKJHHDR6MSNB0628","modelYear":2021,"askingUsd":40495,"askingExcludesTaxesAndFees":true,"purchasePriceUsd":null,"capitalizableAcquisitionUsd":null,"msrpUsd":null,"factoryPriceUsd":null,"actualTaxableValueUsd":null,"purchaseDate":null,"selectedForBudget":false},
+ "askingArchive":{"file":"docs/research/sources/RYDER_SLEEPER526505_REVIEW_20261001.html","sha256":"99708b73688f59d6d3d25fd1dbf9e0cb9ff2d703c32eee1e8946e05d529b7070"},
+ "askingWebReview":{"url":"https://www.ryder.com/en-us/used-trucks/inventory/oklahoma/oklahoma-city/tractor/tandem-axle-sleeper-tractor/2021/freightliner-mercedes/new-cascadia-px12664/526505","reviewedAt":"2026-10-01","readerCrawlAgeDays":4,"locator":"VEH-526505, price/year/VIN and listed-price disclaimer","sellerAvailabilityOrCurrentOdometerCertified":false,"offerIsTransaction":false},
+ "ruleArchive":{"file":"docs/research/sources/IRP_FEE_TEST_GUIDELINES_2026_REVIEW_20261001.xlsx","sha256":"5db191bc435844030366c5edd0b44401b7f832f73edc67ef587b30475b3f9df1"},
+ "scenario":{"id":"ASKING_EQUALS_PURCHASE_ONLY_FOR_SENSITIVITY","hypotheticalPurchaseUsd":40495,"registrationReferenceYear":2026,"termMonths":12,"askingAndTariffAreSameObservedPeriod":false,"invoiceRoundingApplied":false,"eligibleForBudget":false,"appliedToPilot":false},
+ "maine":{"registrationBaseUsd":837,"grossWeightBaseUsd":877,"tractorTrailerCreditUsd":40,"registrationLocator":"Maine F39:F41 (sheet20.xml)","modelYearUpperInclusive":2021,"modelYearFactor":0.004,"factorCell":"K51","factorLocator":"Maine J51:K51, model year 2021 and older","factorFor2022NotUsed":0.0065,"purchaseValueKnown":false,"datedModelYearMatch":true,"yearFactorIsDepreciationForCapital":false,"currentFeeConfirmed":false},
+ "purchaseSensitivities":[
+  {"id":"ME","pricePath":"USD_ASKING_HYPOTHESIS","currency":"USD","factor":0.004,"valueMultiplier":1,"factorApplicableToModel2021ConfirmedInDatedChart":true,"factorSourceRef":"maine"},
+  {"id":"BC","pricePath":"USD_ASKING_HYPOTHESIS","currency":"USD","factor":0.03294,"valueMultiplier":1,"factorApplicableToModel2021ConfirmedInDatedChart":false,"factorSourceRef":"irpCurrencyValue#/valueTestRules/0"},
+  {"id":"MB","pricePath":"USD_TO_CAD_TO_USD_HYPOTHESIS","currency":"USD","factor":0.03294,"valueMultiplier":1,"factorApplicableToModel2021ConfirmedInDatedChart":false,"factorSourceRef":"irpCurrencyValue#/valueTestRules/1"},
+  {"id":"SK","pricePath":"USD_TO_CAD_HYPOTHESIS","currency":"CAD","factor":0.02823,"valueMultiplier":1,"factorApplicableToModel2021ConfirmedInDatedChart":false,"factorSourceRef":"irpCurrencyValue#/valueTestRules/2"},
+  {"id":"SC","pricePath":"USD_ASKING_HYPOTHESIS","currency":"USD","factor":0.0269,"valueMultiplier":0.9,"factorApplicableToModel2021ConfirmedInDatedChart":false,"factorSourceRef":"irpCurrencyValue#/valueTestRules/6"}
+ ],
+ "blockedBases":[
+  {"id":"CO","reason":"Used requires MSRP, not asking price; own model-year factor also unresolved"},
+  {"id":"NV","reason":"Requires factory/chart maximum and matching model year; neither 2022 chart nor asking proves it"},
+  {"id":"KY","reason":"Example year derived from purchase date, not VIN model year; do not apply chart2021 factor0.00446 without purchase-year basis","sourceLocator":"Kentucky C37:C38 and C58:C59 (sheet18.xml)","purchaseYearKnown":false},
+  {"id":"WV","reason":"First-year factor in example does not establish acquisition/registration timing for reference"},
+  {"id":"CA","reason":"Used taxable-value/age/rounding basis not established by asking offer"}
+ ],
+ "remaining":["13 US registration bases unresolved after Maine base integration","Actual or eligible public-model purchase/taxable/MSRP basis and applicable factors/dates remain unselected; purchase sensitivities are not a tariff","Current validity, jurisdiction conflicts/rounding/extra fees, full fixed budget/exposure/cycle remain open"],
+ "adoptedValues":0,"quoteReady":false,"externalChanges":false
+}

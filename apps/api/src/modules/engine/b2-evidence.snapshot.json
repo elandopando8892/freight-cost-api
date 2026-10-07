@@ -1,0 +1,976 @@
+{
+  "sha256": "99594a2ee1e31c67351a77d1124e75ec53d8d5ccbee593c7a5fce2baa264059f",
+  "payload": {
+    "model": "FCM_B2_READ_EVIDENCE_V1",
+    "profileId": "B2_USER_SCOPE_20261003",
+    "referencePeriod": "2026-09",
+    "sourceObservedOn": "2026-10-03",
+    "capture": "PINNED_LOCAL_PUBLIC_RESEARCH_NOT_LIVE_SOURCE_ARCHIVE",
+    "caseReference": "MEXICO_DF_FORT_SMITH_72916_WTB_OWN_RELAY",
+    "presetPolicy": "EXISTING_COMPARISON_PRESETS_NOT_USER_FINANCE_SELECTION",
+    "producerHashPolicy": "UTF8_CRLF_TO_LF_NO_OTHER_NORMALIZATION",
+    "calibrated": false,
+    "quoteReady": false,
+    "adoptedValues": 0,
+    "arithmeticComplete": false,
+    "notesPersisted": false,
+    "canonicalParameterCount": 210,
+    "producerPins": [
+      {
+        "file": "apps/api/scripts/prepare-b2-closeout.ts",
+        "sha256": "d24b0727d67465ac6ee73f2b3c6f11b43463431b73ddc7e82aa039561ccfe1b9"
+      },
+      {
+        "file": "apps/api/scripts/project-b2-evidence.ts",
+        "sha256": "4199b335cc58110cffb518bfff2496f7c6dff4100347aecbd52d0420aa3624e8"
+      },
+      {
+        "file": "apps/api/src/modules/engine/engine.outputs.ts",
+        "sha256": "df2dce2471aeda22bfead8812525e6cad61ec8f90b13599a84bf1004bd51b777"
+      }
+    ],
+    "sourcePins": [
+      {
+        "id": "capitalInsurance",
+        "file": "docs/research/B2_CAPITAL_INSURANCE_COMPONENTS_2026-10-01.json",
+        "sha256": "9eae7d6cf036a89f5be5f43c4cc3ab8407702dc2d1f418e1eed95ad160a3b8f5"
+      },
+      {
+        "id": "registration",
+        "file": "docs/research/B2_FIXED_REGISTRATION_COMPONENTS_2026-10-01.json",
+        "sha256": "14cc6c23795d1e0ce38dd8fdf1f5eee4ecff4aa171334a1269497a6569383e99"
+      },
+      {
+        "id": "exposure",
+        "file": "docs/research/B2_REFERENCE_PROFILE_EXPOSURE_2026-09-29.json",
+        "sha256": "336c00c88d3e13f64ce6706905cf926142885bc591c7355b3f7a666508bb7857"
+      },
+      {
+        "id": "worksheet",
+        "file": "docs/research/B2_BINATIONAL_FIXED_BUDGET_WORKSHEET_2026-10-01.json",
+        "sha256": "63629b174897277ce5501f833e9c24a40fdd24e4c2e323e8663366e2a1a24b80"
+      },
+      {
+        "id": "selection",
+        "file": "docs/research/B2_BINATIONAL_OWN_RELAY_SELECTED.json",
+        "sha256": "9e169339515fb467f5207748d3c0676bed1dbb6cfb30b01f0696b56ccfd4a775"
+      },
+      {
+        "id": "case",
+        "file": "docs/research/B2_D2D_READINESS_CASE_2026-09-30.json",
+        "sha256": "a897778d6f907b1041895f9bcace01cd91654cd2cb51dc9abc0570369024d28b"
+      },
+      {
+        "id": "overhead",
+        "file": "docs/research/B1_OVERHEAD_EXPOSURE_BRIDGE_2026-09-29.json",
+        "sha256": "587cc5ecb2aaaceaf3de1dd86c56599b3f188eca727a3b536f0e2bc63719eb47"
+      },
+      {
+        "id": "mxUsedMarket",
+        "file": "docs/research/B2_MX_USED_MARKET_COMPARABILITY_2026-10-01.json",
+        "sha256": "96eed7e67cf7fdef8b63ec46efaea2e0b0162bbce96144d05f2672bec908ca9b"
+      },
+      {
+        "id": "cashFinanced",
+        "file": "docs/research/B2_CASH_FINANCED_CAPITAL_2026-10-01.json",
+        "sha256": "5faff7e9ee44a233ef8c501bfd8102d64c687dd81a3b0ecc91d6da25a294ce8e"
+      },
+      {
+        "id": "trailerOverhead",
+        "file": "docs/research/B2_TRAILER_OVERHEAD_COMPONENTS_2026-10-01.json",
+        "sha256": "6330b2b0a83e907b0ae26ed6c7863ba1b01d53a8b370fede1231264b0e31109d"
+      },
+      {
+        "id": "payrollComparators",
+        "file": "docs/research/B1_MX_US_PAYROLL_ASSET_COMPARATORS_2026-09-29.json",
+        "sha256": "1a032ae20fa9d2fe64cc9e15db600fa63e7d325a3ceda722937947a4e6579460"
+      },
+      {
+        "id": "facilityStaffing",
+        "file": "docs/research/B2_OFFICE_YARD_ADMIN_SCENARIOS_2026-10-01.json",
+        "sha256": "7c1cbc154a5bae865a8e6f516d67754e2fac0d452dbe8ab1c62c5405f49a032a"
+      },
+      {
+        "id": "resourceExposure",
+        "file": "docs/research/B2_RESOURCE_BUDGET_EXPOSURE_HANDOFF_2026-10-01.json",
+        "sha256": "601717e1cd49dce33fb645b03ec57564b7858f69878500ce5a306250ebc74cf7"
+      },
+      {
+        "id": "dryVanCapacity",
+        "file": "docs/research/B2_US_DRYVAN_CAPACITY_2026-10-01.json",
+        "sha256": "ac224e566b80e51d5ff56675e85d67c2b38c181ce845b0b486130677c9a44e8a"
+      },
+      {
+        "id": "dryVanDenominator",
+        "file": "docs/research/B2_DRYVAN_DENOMINATOR_RECONCILIATION_2026-10-01.json",
+        "sha256": "fce0a1a773bb2c75857e0e665b72b3bdae14596f1ce2e8d65014ac95fa19b805"
+      },
+      {
+        "id": "economicProfiles",
+        "file": "docs/research/B2_RESOURCE_ECONOMIC_PROFILES_2026-10-01.json",
+        "sha256": "52c83c5c6a0bbb82350895c4ab2ba3cfa6caa851e1fc765c20599960fc37de4b"
+      },
+      {
+        "id": "recurringCompliance",
+        "file": "docs/research/B2_US_RECURRING_COMPLIANCE_2026-10-01.json",
+        "sha256": "aa99998bc00da3fd0e86e75625732d71bc41d27733150f2398782805018074b5"
+      },
+      {
+        "id": "irpModel",
+        "file": "docs/research/B2_IRP_PUBLIC_MODEL_2026-10-01.json",
+        "sha256": "757b6fdb26e25fc15ebb54135419125e2dc4ece819a63994ad276506c76ec388"
+      },
+      {
+        "id": "irpRules",
+        "file": "docs/research/B2_IRP_CONSOLIDATED_RULES_2026-10-01.json",
+        "sha256": "e84419618759d959b4db0e978cd8544c3ae92bce825d9cf8249771030d2bed16"
+      },
+      {
+        "id": "irpUsBatch",
+        "file": "docs/research/B2_IRP_US_RULE_BATCH_2026-10-01.json",
+        "sha256": "3dd09afe78ca8e5eff021d43d7902b193289e3cfdf483c2b896175c4c09b0dfe"
+      },
+      {
+        "id": "irpUsWeightRules",
+        "file": "docs/research/B2_IRP_US_WEIGHT_RULES_2026-10-01.json",
+        "sha256": "975648a038fb350e2ec03c8f48d34c4517e88fe7c3215f7b3a1e29f845ef3261"
+      },
+      {
+        "id": "irpCurrencyValue",
+        "file": "docs/research/B2_IRP_CURRENCY_VALUE_RULES_2026-10-01.json",
+        "sha256": "e454640050b4184c3f8239f5d637497d396c8d632712e5234e101959dac295ee"
+      },
+      {
+        "id": "irpAssetValue",
+        "file": "docs/research/B2_IRP_ASSET_VALUE_PROFILE_2026-10-01.json",
+        "sha256": "77f1b126fc404ae732ac977f4ee5300a1e3d83cec68c690eb8308e89ef176c65"
+      },
+      {
+        "id": "irpSeparableRegistration",
+        "file": "docs/research/B2_IRP_SEPARABLE_REGISTRATION_2026-10-01.json",
+        "sha256": "2f4e13c785b0082c6a08d3d022e977262edc6e78cf85fb2abdcabb811dbfe54a"
+      },
+      {
+        "id": "irpStateReferences",
+        "file": "docs/research/B2_IRP_STATE_REFERENCE_RECONCILIATION_2026-10-01.json",
+        "sha256": "b8c149c12a41791e3af58e9cc4d52fc22b026dd1bfdccec51e9d4fe095153df0"
+      },
+      {
+        "id": "insuranceEmployer",
+        "file": "docs/research/B2_INSURANCE_EMPLOYER_COMPONENTS_2026-10-01.json",
+        "sha256": "6b69a7198ca533a5c7d7a7e8f2f141d7549c386501daad0bcd3c853d38f2efb0"
+      },
+      {
+        "id": "mxEmployerRules",
+        "file": "docs/research/B1_MX_DRIVER_EMPLOYER_COST_RULES_2026-09-29.json",
+        "sha256": "570937768fe0e4cc2f402f6b0fff0f3ea24af9fa51cf5af041f6597c21975176"
+      },
+      {
+        "id": "mxEmployerScenario",
+        "file": "docs/research/B2_MX_EMPLOYER_SCENARIO_2026-10-01.json",
+        "sha256": "c206e93e464142bcced5ce12193f211a18288578371d53aebef0359745af9f22"
+      },
+      {
+        "id": "nlPayrollTax",
+        "file": "docs/research/B2_NL_PAYROLL_TAX_REFERENCE_2026-10-01.json",
+        "sha256": "e06b3d1cb3fb81c59d5388b275a8da21de4de88d36f11e2bff0917444de59064"
+      },
+      {
+        "id": "mxWorkRisk",
+        "file": "docs/research/B2_MX_WORK_RISK_REFERENCE_2026-10-01.json",
+        "sha256": "4b72bc1b23bfac7677028d1a9c3279668d9db7e462564dbf46cac7ca33720b17"
+      },
+      {
+        "id": "monitoringCoverage",
+        "file": "docs/research/B2_MONITORING_COVERAGE_REFERENCE_2026-10-01.json",
+        "sha256": "06d7b4ff7928573994805a6e81cc42fa2e135872cfa41ad841e7a7fdc8e3b84a"
+      },
+      {
+        "id": "mxDrivingStage",
+        "file": "docs/research/B2_MX_DRIVING_STAGE_REFERENCE_2026-10-01.json",
+        "sha256": "1c9f949fd08b6617757a83e58f6588f446fb949032446f750ea9f9f5f8613ee0"
+      },
+      {
+        "id": "sakbeMxDetail",
+        "file": "docs/research/B2_SAKBE_MX_LIVE_DETAIL_2026-09-30.json",
+        "sha256": "731cb21c1f7bfe2196ab90b12d56a91d4ebd4b1ef5b698ce73209341958b2970"
+      },
+      {
+        "id": "googleUsReceipt",
+        "file": "docs/research/B2_GOOGLE_BASIC_LIVE_RECEIPT_2026-09-30.json",
+        "sha256": "38ac14333857627c86defeaa76ef82f604fc307837234929b2dd5c5e218980f8"
+      },
+      {
+        "id": "fuelReference",
+        "file": "docs/research/B2_FUEL_PRICE_PERFORMANCE_REFERENCE_2026-09-30.json",
+        "sha256": "8824dcdb1180e28c9b7950bb4b77155b94edce78410f6a392a3cdaecc8c80be1"
+      },
+      {
+        "id": "maintenanceReference",
+        "file": "docs/research/B2_MAINTENANCE_TIRES_REFERENCE_2026-09-30.json",
+        "sha256": "021cc89442452036fd1c6edc782fc42db89c6e5b5b8398db56150fdf89dfdbdb"
+      },
+      {
+        "id": "variableComponents",
+        "file": "docs/research/B2_VARIABLE_COMPONENTS_REFERENCE_2026-10-01.json",
+        "sha256": "4e9749bad7caeb7db3a26c62883965cd74d4bf729cfc2e7e68635ec15ef730d2"
+      },
+      {
+        "id": "laborBridge",
+        "file": "docs/research/B2_LABOR_COMPENSATION_BRIDGE_2026-09-29.json",
+        "sha256": "321c07a2b208b41b8f6be256cafed9ff521ef083ad3751ba56402b081f4f00aa"
+      },
+      {
+        "id": "pilotAssetLabor",
+        "file": "docs/research/B1_PILOT_ASSET_LABOR_EVIDENCE_2026-09-29.json",
+        "sha256": "ba33bcbdf4fcfabef81c926c76e7ed3dd58f8792bffe44177817aea4d1cc716f"
+      },
+      {
+        "id": "driverComponents",
+        "file": "docs/research/B2_DRIVER_DISTANCE_COMPONENTS_2026-10-01.json",
+        "sha256": "d97fcef52ff5824eb9c1b680613f879e4f19c2fbee6b42088225033118fbf9a8"
+      },
+      {
+        "id": "sharedBoxProjection",
+        "file": "docs/research/B2_SHARED_BOX_CAPITAL_EXPOSURE_2026-10-01.json",
+        "sha256": "4582155bd880562736219b62be63b312e291096db68ad8e1ecdb47174b6fb719"
+      },
+      {
+        "id": "sharedBoxInsurance",
+        "file": "docs/research/B2_SHARED_BOX_INSURANCE_REFERENCE_2026-10-01.json",
+        "sha256": "f8e677b4aeb8b60427d3ec1997ad911ce3455ba12a49bdd8c6bd7fb861a44a01"
+      },
+      {
+        "id": "sharedBoxTxCompliance",
+        "file": "docs/research/B2_SHARED_BOX_TX_COMPLIANCE_2026-10-01.json",
+        "sha256": "e3f1ea7e63ff1cbd7d8fa100543bbc6325f02fd893a2c8fd9a21a42a27273b39"
+      },
+      {
+        "id": "sharedBoxMxInspection",
+        "file": "docs/research/B2_SHARED_BOX_MX_INSPECTION_2026-10-02.json",
+        "sha256": "317a9be97cc8cc17981405f4c9e5aceb6d152793d673ca3f3d927871e15387c4"
+      },
+      {
+        "id": "usInsurancePublicModel",
+        "file": "docs/research/B2_US_INSURANCE_PUBLIC_MODEL_2026-10-02.json",
+        "sha256": "060d813a21599e0864d26089227df79705c496f9c9e24b6887b4cdf057e4a80a"
+      },
+      {
+        "id": "usCapitalComparison",
+        "file": "docs/research/B2_US_CAPITAL_COMPARISON_2026-10-02.json",
+        "sha256": "bb5145b51dc22afc7e6d0faa2f1150ffd1223d280587926149c9459efc5e43bc"
+      },
+      {
+        "id": "usProspectiveCapital",
+        "file": "docs/research/B2_US_PROSPECTIVE_CAPITAL_2026-10-02.json",
+        "sha256": "cfcb00305f4ec09868ada9e40589ef57c8c4e58240e1634ead4c501700f2248a"
+      },
+      {
+        "id": "datedFx",
+        "file": "docs/research/B2_FX_REFERENCE_2026-10-02.json",
+        "sha256": "b1e62ecb4f9e569fc5763155b59bfd39042a72e3067f6be1b4dabafafa8e4713"
+      },
+      {
+        "id": "boxProspective",
+        "file": "docs/research/B2_BOX_PROSPECTIVE_SCENARIOS_2026-10-02.json",
+        "sha256": "c5a709e3bb96b399de1e7286ca1834959e317596e2c93117a622771c24fdc1bf"
+      },
+      {
+        "id": "mxProspective",
+        "file": "docs/research/B2_MX_PROSPECTIVE_CAPITAL_2026-10-02.json",
+        "sha256": "c58a40cdbc57cbe73aff36cbec0e341fc5afc907cc8d84c5c1e2264e9066eee7"
+      },
+      {
+        "id": "mxInsuranceModel",
+        "file": "docs/research/B2_MX_INSURANCE_PUBLIC_MODEL_2026-10-02.json",
+        "sha256": "4c3f9f5061c37a77cd8dc5bda90be7c35ac1149cd9eb064268d1f9cad4741254"
+      },
+      {
+        "id": "permitComponentScenario",
+        "file": "docs/research/B2_RECURRING_PERMIT_COMPONENT_SCENARIO_2026-10-02.json",
+        "sha256": "f3c94f8a627a3a9a267c8bac8a20f0f8753fe103d799976d0e5b36a6e224fae5"
+      },
+      {
+        "id": "adminPool",
+        "file": "docs/research/B2_CENTRAL_ADMIN_POOL_SCENARIOS_2026-10-02.json",
+        "sha256": "eb62ffdd98781fbb04b48849bd69fbdfe32f7f43621ea93b45625241ce3800f8"
+      },
+      {
+        "id": "companyPool",
+        "file": "docs/research/B2_COMPANY_SERVICE_POOL_SCENARIOS_2026-10-02.json",
+        "sha256": "5eb76af7da21df1459d0628f254a03d1bf6b512f61cba278c02e420697790ab5"
+      },
+      {
+        "id": "pilotCycle",
+        "file": "docs/research/B2_PILOT_CYCLE_EXPOSURE_SCENARIOS_2026-10-02.json",
+        "sha256": "327674619252a10df0a01ed692f40829829c67141d330bc46e568debde4b9ea4"
+      },
+      {
+        "id": "pilotUsPostalRoad",
+        "file": "docs/research/B2_US_POSTAL_ROUTE_REFERENCE_2026-10-03.json",
+        "sha256": "1698466636bfd6f4b400c5c8193576d127b7fee3031eec1b2b5f40f00da4f1ed"
+      },
+      {
+        "id": "pilotVariables",
+        "file": "docs/research/B2_PILOT_VARIABLE_SCENARIOS_2026-10-02.json",
+        "sha256": "15dced8b67235a42b04213420f2770438b15b5cd9d2002576a5dac40f94a773a"
+      },
+      {
+        "id": "mxTollFollowup",
+        "file": "docs/research/B2_MX_TOLL_FOLLOWUP_2026-09-30.json",
+        "sha256": "52cecc69261cfb3b7410389acf978a2c8b544a0b26038daf538e18c26edadee6"
+      },
+      {
+        "id": "borderTariffResearch",
+        "file": "docs/research/B2_BINATIONAL_BORDER_2026-09-30.json",
+        "sha256": "5a6cce075e02b2dd1e7df2d6339f9f374618e22d950a3f73ccf7541390338827"
+      },
+      {
+        "id": "pilotRoadBorder",
+        "file": "docs/research/B2_PILOT_ROAD_BORDER_SCENARIOS_2026-10-02.json",
+        "sha256": "69047bd29c1c08938f784a7811b8244bb05255bb09637bda23fa9566b774d2e5"
+      },
+      {
+        "id": "adminScale",
+        "file": "docs/research/B2_ADMIN_SCALE_PUBLIC_MODEL_2026-10-02.json",
+        "sha256": "6beb2c17384e49cf3d5bad774ae1d8dbc9b27afb832fabc6e64e0d44af48d058"
+      },
+      {
+        "id": "pilotPhysicalCycle",
+        "file": "docs/research/B2_PILOT_PHYSICAL_CYCLE_2026-10-02.json",
+        "sha256": "b17f8889c8a16e68a788dcded3ad03d88f61d2e6168def030aa1431bb820c6ad"
+      },
+      {
+        "id": "mxVariableDriver",
+        "file": "docs/research/B2_MX_VARIABLE_DRIVER_PUBLIC_MODEL_2026-10-02.json",
+        "sha256": "23f5a5d777d47987fe0976d99e4f958c0bb5ad5484ff6213a58dee16bc89e945"
+      },
+      {
+        "id": "mxDriverForecast",
+        "file": "docs/research/B2_MX_DRIVER_FORECAST_2026-10-02.json",
+        "sha256": "01e73bb21c19dbdd929d9cbdb35b6bf5ac3da45c3c6599fe0d8645128e5189c4"
+      },
+      {
+        "id": "pilotFinancedCfu",
+        "file": "docs/research/B2_PILOT_FINANCED_CFU_2026-10-02.json",
+        "sha256": "bc01b7e12e8bc9c2a33fea8184f0b0cbbcfcc1bf24d72bff947de16fb46a9626"
+      },
+      {
+        "id": "pilotOrdinaryDuty",
+        "file": "docs/research/B2_PILOT_ORDINARY_DUTY_2026-10-02.json",
+        "sha256": "25dec0b7045723b853f8c8441f859033ce7325fe9914b3812e36db4af179ef00"
+      },
+      {
+        "id": "boxInsuranceCfu",
+        "file": "docs/research/B2_BOX_INSURANCE_CFU_2026-10-02.json",
+        "sha256": "dcb982c615b061dbe212e3388479a506e797c4f06d053ca6d36fa24b8baf6f5d"
+      },
+      {
+        "id": "cargoTripInsurance",
+        "file": "docs/research/B2_CARGO_TRIP_INSURANCE_2026-10-02.json",
+        "sha256": "5cbb5946c8e7af7a91b271a253f0bc9ba80d0c6ca6a7308f881fa7c0fcce92a8"
+      },
+      {
+        "id": "companyServicesCfu",
+        "file": "docs/research/B2_COMPANY_SERVICES_CFU_2026-10-02.json",
+        "sha256": "fcf41cbe0f02243e23afbebfce1fe4defd5b7c87c3f332fdfa0c67c77afbfb83"
+      },
+      {
+        "id": "driverConnectivity",
+        "file": "docs/research/B2_DRIVER_CONNECTIVITY_2026-10-02.json",
+        "sha256": "cb1a77798897f6f5b4ede191c7eb76746e4cffec2d93542d4759e6efeeb2d255"
+      },
+      {
+        "id": "boxVisibility",
+        "file": "docs/research/B2_BOX_VISIBILITY_2026-10-02.json",
+        "sha256": "a72919049cc74391779f6a076b03e2ca92b74157f7c346f2a12b8efab85d8c9b"
+      },
+      {
+        "id": "tripSupplements",
+        "file": "docs/research/B2_PILOT_TRIP_SUPPLEMENTS_2026-10-02.json",
+        "sha256": "85a0981e4bcc1159d4f67cd3b49a3050b56ed78f8004d3ad4ba29278f81757cb"
+      },
+      {
+        "id": "operatingFluids",
+        "file": "docs/research/B2_OPERATING_FLUIDS_2026-10-02.json",
+        "sha256": "2b3f3d2655a1bb42fcdf5ff5123fc83d1615b5215bac82a416fb02b328f83763"
+      },
+      {
+        "id": "mxReservedYard",
+        "file": "docs/research/B2_MX_YARD_2026-10-02.json",
+        "sha256": "fca23386ca34e2a48e9d204c1db222dad4bb367e847e2fe47aefd14960ef0c05"
+      },
+      {
+        "id": "mxTollCoverage",
+        "file": "docs/research/B2_MX_TOLL_COVERAGE_2026-10-02.json",
+        "sha256": "54c02d00a8aacdae7c7c432d1ba0a16e7b93224613d18620123174e7cf56880f"
+      },
+      {
+        "id": "crossborderInsuranceExposure",
+        "file": "docs/research/B2_CROSSBORDER_INSURANCE_EXPOSURE_2026-10-03.json",
+        "sha256": "cfce41e1d640f201038a47f971df1feb83d74b5a264c850670456f15f7d7aff5"
+      },
+      {
+        "id": "borderLinkPlanning",
+        "file": "docs/research/B2_BORDER_LINK_PLANNING_2026-10-03.json",
+        "sha256": "9b1330d9a4bdea66e21548bd683a88a0d0c5ebe88a4bad2cd8407a0a2a930572"
+      },
+      {
+        "id": "mxBobtailWear",
+        "file": "docs/research/B2_MX_BOBTAIL_WEAR_REFERENCE_2026-10-03.json",
+        "sha256": "e18d4f618c70b2deabfa1b0b0d03852e41e730279d38d62f9b757e226f28bb54"
+      },
+      {
+        "id": "crossborderLiabilityForecast",
+        "file": "docs/research/B2_CROSSBORDER_LIABILITY_FORECAST_2026-10-03.json",
+        "sha256": "2fdee42c4a15d9336b75166f4d02559c484f6eafbfb8f6e3d46269fa8c2893de"
+      },
+      {
+        "id": "usMaintenancePlanning",
+        "file": "docs/research/B2_US_MAINTENANCE_PLANNING_2026-10-03.json",
+        "sha256": "0eab0a22dbf81f074080f305ae44afbe9a1c14f106b920e2544c9e4c637306a1"
+      },
+      {
+        "id": "usDriverHourlyPlanning",
+        "file": "docs/research/B2_US_DRIVER_HOURLY_PLANNING_2026-10-03.json",
+        "sha256": "d997a9837b3ea3859a2d13bbf5aa58b5dcc661cd05b8af29fa06e2d1512b7cd4"
+      },
+      {
+        "id": "mxFoodEmployerPlanning",
+        "file": "docs/research/B2_MX_FOOD_EMPLOYER_PLANNING_2026-10-03.json",
+        "sha256": "1276b3df491fac11166cfd38428a55aa09658726e2397da253762e0b29c4be2c"
+      },
+      {
+        "id": "confirmedB2OperatingProfile",
+        "file": "docs/research/B2_CONFIRMED_OPERATING_PROFILE_2026-10-03.json",
+        "sha256": "161d071f3038f5fe8fc0a8fac09b78bb00e4c480f2e79744164e9e00f9cb9d39"
+      }
+    ],
+    "cases": [
+      {
+        "cycleId": "NETWORK_EXPECTED_EMPTY_PROXY",
+        "fundingMode": "CASH",
+        "historicalReferencePeriod": "2026-10",
+        "acceptedForUserReferencePeriod": false,
+        "issues": [
+          {
+            "field": "budget.referencePeriod",
+            "code": "B2_REFERENCE_PERIOD_REVALUATION_REQUIRED",
+            "rationale": "Historical monetary worksheet must be rebuilt for September, not relabeled."
+          },
+          {
+            "field": "fxObservationDate",
+            "code": "B2_FX_AFTER_REFERENCE_WINDOW",
+            "rationale": "October FIX must not value the September reference case."
+          },
+          {
+            "field": "usMieEffectiveFrom",
+            "code": "B2_MIE_NOT_EFFECTIVE_FOR_WHOLE_REFERENCE_WINDOW",
+            "rationale": "Equal nominal USD80 does not make the October notice applicable to September. Use the prior applicable notice."
+          },
+          {
+            "field": "mxWorkRiskBasis",
+            "code": "B2_EXISTING_EMPLOYER_RISK_IS_INITIAL_RATE_PROXY",
+            "rationale": "Initial classV rate remains a sensitivity, not an observed or matched existing-employer premium. Preserve the amount for comparison, not calibrated acceptance."
+          },
+          {
+            "field": "lodging",
+            "code": "B2_MIXED_LODGING_EVIDENCE_REQUIRED",
+            "rationale": "Mixed lodging in both countries requires night mix, tax/bundle boundaries and applicable published prices. Food or reserved home yard is not lodging."
+          }
+        ],
+        "fixedRemainders": [
+          "MX_TRACTOR_PERMITS",
+          "US_TRACTOR_PERMITS",
+          "SHARED_TRAILER_PERMITS",
+          "MX_TRACTOR_FOREIGN_LIABILITY_REMAINDER",
+          "BOX_BINATIONAL_COVERAGE_REMAINDER",
+          "GROUP_SERVICE_TAX_INSTALLATION_REMAINDER"
+        ],
+        "variableRemainders": [
+          "MX_DRIVER_TOTAL",
+          "US_DRIVER_TOTAL",
+          "MX_ROAD_TOLLS",
+          "US_ROAD_TOLLS",
+          "BRIDGE_TOLLS",
+          "HANDOFF_INCREMENTAL_SERVICES",
+          "MX_TRAVEL_EXPENSES"
+        ],
+        "outputs": {
+          "cfuUsd": null,
+          "cvuUsd": null,
+          "productiveCostUsd": null,
+          "purchaseUsd": null,
+          "sellUsd": null
+        },
+        "rows": [
+          {
+            "id": "MX_TRAVEL_EXPENSES",
+            "country": "MX",
+            "title": "Pernocta MX · hotel de paso + pensión",
+            "canonicalKey": null,
+            "valueUsdPerCycle": null,
+            "included": "El concepto existente conserva comida del operador MX. El patio reservado de base no sustituye pernocta en viaje.",
+            "missing": [
+              "Noches por ciclo y mezcla de hotel/pensión no seleccionadas.",
+              "Precio histórico de septiembre, impuestos y estacionamiento incluido no acreditados."
+            ],
+            "sources": [
+              {
+                "id": "B2_MX_PENSION",
+                "title": "Pensión de trailers 40-5 · Cuautitlán Izcalli",
+                "url": "https://pensiondetrailers40-5.com/",
+                "kind": "LODGING_COMPARATOR",
+                "observedOn": "2026-10-03",
+                "historicalSeptemberPriceVerified": false,
+                "comparisonValue": 260,
+                "currency": "MXN",
+                "unit": "24 horas · tractor y una caja",
+                "taxBasisVerified": false,
+                "selectedForCostEngine": false,
+                "limitation": "Comparador publicado de estacionamiento. No incluye habitación ni demuestra precio de septiembre; no es tarifa del recorrido."
+              },
+              {
+                "id": "B2_MX_HOTEL",
+                "title": "Hotel San Pedro Express · Federal 57 km 108",
+                "url": "https://hotelsanpedroexpress.com/hotel/",
+                "kind": "LODGING_COMPARATOR",
+                "observedOn": "2026-10-03",
+                "historicalSeptemberPriceVerified": false,
+                "comparisonValue": null,
+                "currency": "MXN",
+                "unit": "noche · precio pendiente",
+                "taxBasisVerified": false,
+                "selectedForCostEngine": false,
+                "limitation": "Existencia de hotel de paso, sin precio público ni acreditación del estacionamiento incluido o vigencia de septiembre."
+              }
+            ],
+            "effect": "Remanente dentro de MX_TRAVEL_EXPENSES → CVU. No se suma dos veces ni se interpreta null como cero."
+          },
+          {
+            "id": "US_DRIVER_TOTAL",
+            "country": "US",
+            "title": "Pernocta US · hotel de paso + pensión",
+            "canonicalKey": null,
+            "valueUsdPerCycle": null,
+            "included": "El agregado existente conserva salario, prestaciones de referencia y comida. La hipótesis histórica de sleeper no satisface la pernocta mixta confirmada.",
+            "missing": [
+              "Precio y evidencia de alojamiento US pendientes.",
+              "Noches por ciclo, mezcla hotel/pensión y vigencia de septiembre pendientes."
+            ],
+            "sources": [
+              {
+                "id": "B2_US_MIE_CONTEXT",
+                "title": "IRS Notice 2025-54 · contexto de comida, no alojamiento",
+                "url": "https://www.irs.gov/pub/irs-drop/n-25-54.pdf",
+                "kind": "MEAL_CONTEXT_NOT_LODGING",
+                "observedOn": "2026-10-03",
+                "historicalSeptemberPriceVerified": false,
+                "comparisonValue": null,
+                "currency": "USD",
+                "unit": "M&IE · no precio de hotel",
+                "taxBasisVerified": false,
+                "selectedForCostEngine": false,
+                "limitation": "M&IE no acredita alojamiento ni una obligación de pago. No existe tarifa de hotel/pensión US en este expediente."
+              }
+            ],
+            "effect": "Remanente dentro de US_DRIVER_TOTAL → CVU. No se crea un segundo cargo ni se usa comida como tarifa de hotel."
+          }
+        ]
+      },
+      {
+        "cycleId": "DEDICATED_EMPTY_SAME_BOX_RETURN",
+        "fundingMode": "CASH",
+        "historicalReferencePeriod": "2026-10",
+        "acceptedForUserReferencePeriod": false,
+        "issues": [
+          {
+            "field": "budget.referencePeriod",
+            "code": "B2_REFERENCE_PERIOD_REVALUATION_REQUIRED",
+            "rationale": "Historical monetary worksheet must be rebuilt for September, not relabeled."
+          },
+          {
+            "field": "fxObservationDate",
+            "code": "B2_FX_AFTER_REFERENCE_WINDOW",
+            "rationale": "October FIX must not value the September reference case."
+          },
+          {
+            "field": "usMieEffectiveFrom",
+            "code": "B2_MIE_NOT_EFFECTIVE_FOR_WHOLE_REFERENCE_WINDOW",
+            "rationale": "Equal nominal USD80 does not make the October notice applicable to September. Use the prior applicable notice."
+          },
+          {
+            "field": "mxWorkRiskBasis",
+            "code": "B2_EXISTING_EMPLOYER_RISK_IS_INITIAL_RATE_PROXY",
+            "rationale": "Initial classV rate remains a sensitivity, not an observed or matched existing-employer premium. Preserve the amount for comparison, not calibrated acceptance."
+          },
+          {
+            "field": "lodging",
+            "code": "B2_MIXED_LODGING_EVIDENCE_REQUIRED",
+            "rationale": "Mixed lodging in both countries requires night mix, tax/bundle boundaries and applicable published prices. Food or reserved home yard is not lodging."
+          }
+        ],
+        "fixedRemainders": [
+          "MX_TRACTOR_PERMITS",
+          "US_TRACTOR_PERMITS",
+          "SHARED_TRAILER_PERMITS",
+          "MX_TRACTOR_FOREIGN_LIABILITY_REMAINDER",
+          "BOX_BINATIONAL_COVERAGE_REMAINDER",
+          "GROUP_SERVICE_TAX_INSTALLATION_REMAINDER"
+        ],
+        "variableRemainders": [
+          "MX_DRIVER_TOTAL",
+          "US_DRIVER_TOTAL",
+          "MX_ROAD_TOLLS",
+          "US_ROAD_TOLLS",
+          "BRIDGE_TOLLS",
+          "HANDOFF_INCREMENTAL_SERVICES",
+          "MX_TRAVEL_EXPENSES"
+        ],
+        "outputs": {
+          "cfuUsd": null,
+          "cvuUsd": null,
+          "productiveCostUsd": null,
+          "purchaseUsd": null,
+          "sellUsd": null
+        },
+        "rows": [
+          {
+            "id": "MX_TRAVEL_EXPENSES",
+            "country": "MX",
+            "title": "Pernocta MX · hotel de paso + pensión",
+            "canonicalKey": null,
+            "valueUsdPerCycle": null,
+            "included": "El concepto existente conserva comida del operador MX. El patio reservado de base no sustituye pernocta en viaje.",
+            "missing": [
+              "Noches por ciclo y mezcla de hotel/pensión no seleccionadas.",
+              "Precio histórico de septiembre, impuestos y estacionamiento incluido no acreditados."
+            ],
+            "sources": [
+              {
+                "id": "B2_MX_PENSION",
+                "title": "Pensión de trailers 40-5 · Cuautitlán Izcalli",
+                "url": "https://pensiondetrailers40-5.com/",
+                "kind": "LODGING_COMPARATOR",
+                "observedOn": "2026-10-03",
+                "historicalSeptemberPriceVerified": false,
+                "comparisonValue": 260,
+                "currency": "MXN",
+                "unit": "24 horas · tractor y una caja",
+                "taxBasisVerified": false,
+                "selectedForCostEngine": false,
+                "limitation": "Comparador publicado de estacionamiento. No incluye habitación ni demuestra precio de septiembre; no es tarifa del recorrido."
+              },
+              {
+                "id": "B2_MX_HOTEL",
+                "title": "Hotel San Pedro Express · Federal 57 km 108",
+                "url": "https://hotelsanpedroexpress.com/hotel/",
+                "kind": "LODGING_COMPARATOR",
+                "observedOn": "2026-10-03",
+                "historicalSeptemberPriceVerified": false,
+                "comparisonValue": null,
+                "currency": "MXN",
+                "unit": "noche · precio pendiente",
+                "taxBasisVerified": false,
+                "selectedForCostEngine": false,
+                "limitation": "Existencia de hotel de paso, sin precio público ni acreditación del estacionamiento incluido o vigencia de septiembre."
+              }
+            ],
+            "effect": "Remanente dentro de MX_TRAVEL_EXPENSES → CVU. No se suma dos veces ni se interpreta null como cero."
+          },
+          {
+            "id": "US_DRIVER_TOTAL",
+            "country": "US",
+            "title": "Pernocta US · hotel de paso + pensión",
+            "canonicalKey": null,
+            "valueUsdPerCycle": null,
+            "included": "El agregado existente conserva salario, prestaciones de referencia y comida. La hipótesis histórica de sleeper no satisface la pernocta mixta confirmada.",
+            "missing": [
+              "Precio y evidencia de alojamiento US pendientes.",
+              "Noches por ciclo, mezcla hotel/pensión y vigencia de septiembre pendientes."
+            ],
+            "sources": [
+              {
+                "id": "B2_US_MIE_CONTEXT",
+                "title": "IRS Notice 2025-54 · contexto de comida, no alojamiento",
+                "url": "https://www.irs.gov/pub/irs-drop/n-25-54.pdf",
+                "kind": "MEAL_CONTEXT_NOT_LODGING",
+                "observedOn": "2026-10-03",
+                "historicalSeptemberPriceVerified": false,
+                "comparisonValue": null,
+                "currency": "USD",
+                "unit": "M&IE · no precio de hotel",
+                "taxBasisVerified": false,
+                "selectedForCostEngine": false,
+                "limitation": "M&IE no acredita alojamiento ni una obligación de pago. No existe tarifa de hotel/pensión US en este expediente."
+              }
+            ],
+            "effect": "Remanente dentro de US_DRIVER_TOTAL → CVU. No se crea un segundo cargo ni se usa comida como tarifa de hotel."
+          }
+        ]
+      },
+      {
+        "cycleId": "NETWORK_EXPECTED_EMPTY_PROXY",
+        "fundingMode": "FINANCED",
+        "historicalReferencePeriod": "2026-10",
+        "acceptedForUserReferencePeriod": false,
+        "issues": [
+          {
+            "field": "budget.referencePeriod",
+            "code": "B2_REFERENCE_PERIOD_REVALUATION_REQUIRED",
+            "rationale": "Historical monetary worksheet must be rebuilt for September, not relabeled."
+          },
+          {
+            "field": "fxObservationDate",
+            "code": "B2_FX_AFTER_REFERENCE_WINDOW",
+            "rationale": "October FIX must not value the September reference case."
+          },
+          {
+            "field": "usMieEffectiveFrom",
+            "code": "B2_MIE_NOT_EFFECTIVE_FOR_WHOLE_REFERENCE_WINDOW",
+            "rationale": "Equal nominal USD80 does not make the October notice applicable to September. Use the prior applicable notice."
+          },
+          {
+            "field": "mxWorkRiskBasis",
+            "code": "B2_EXISTING_EMPLOYER_RISK_IS_INITIAL_RATE_PROXY",
+            "rationale": "Initial classV rate remains a sensitivity, not an observed or matched existing-employer premium. Preserve the amount for comparison, not calibrated acceptance."
+          },
+          {
+            "field": "lodging",
+            "code": "B2_MIXED_LODGING_EVIDENCE_REQUIRED",
+            "rationale": "Mixed lodging in both countries requires night mix, tax/bundle boundaries and applicable published prices. Food or reserved home yard is not lodging."
+          }
+        ],
+        "fixedRemainders": [
+          "MX_TRACTOR_PERMITS",
+          "US_TRACTOR_PERMITS",
+          "SHARED_TRAILER_PERMITS",
+          "MX_TRACTOR_FOREIGN_LIABILITY_REMAINDER",
+          "BOX_BINATIONAL_COVERAGE_REMAINDER",
+          "GROUP_SERVICE_TAX_INSTALLATION_REMAINDER"
+        ],
+        "variableRemainders": [
+          "MX_DRIVER_TOTAL",
+          "US_DRIVER_TOTAL",
+          "MX_ROAD_TOLLS",
+          "US_ROAD_TOLLS",
+          "BRIDGE_TOLLS",
+          "HANDOFF_INCREMENTAL_SERVICES",
+          "MX_TRAVEL_EXPENSES"
+        ],
+        "outputs": {
+          "cfuUsd": null,
+          "cvuUsd": null,
+          "productiveCostUsd": null,
+          "purchaseUsd": null,
+          "sellUsd": null
+        },
+        "rows": [
+          {
+            "id": "MX_TRAVEL_EXPENSES",
+            "country": "MX",
+            "title": "Pernocta MX · hotel de paso + pensión",
+            "canonicalKey": null,
+            "valueUsdPerCycle": null,
+            "included": "El concepto existente conserva comida del operador MX. El patio reservado de base no sustituye pernocta en viaje.",
+            "missing": [
+              "Noches por ciclo y mezcla de hotel/pensión no seleccionadas.",
+              "Precio histórico de septiembre, impuestos y estacionamiento incluido no acreditados."
+            ],
+            "sources": [
+              {
+                "id": "B2_MX_PENSION",
+                "title": "Pensión de trailers 40-5 · Cuautitlán Izcalli",
+                "url": "https://pensiondetrailers40-5.com/",
+                "kind": "LODGING_COMPARATOR",
+                "observedOn": "2026-10-03",
+                "historicalSeptemberPriceVerified": false,
+                "comparisonValue": 260,
+                "currency": "MXN",
+                "unit": "24 horas · tractor y una caja",
+                "taxBasisVerified": false,
+                "selectedForCostEngine": false,
+                "limitation": "Comparador publicado de estacionamiento. No incluye habitación ni demuestra precio de septiembre; no es tarifa del recorrido."
+              },
+              {
+                "id": "B2_MX_HOTEL",
+                "title": "Hotel San Pedro Express · Federal 57 km 108",
+                "url": "https://hotelsanpedroexpress.com/hotel/",
+                "kind": "LODGING_COMPARATOR",
+                "observedOn": "2026-10-03",
+                "historicalSeptemberPriceVerified": false,
+                "comparisonValue": null,
+                "currency": "MXN",
+                "unit": "noche · precio pendiente",
+                "taxBasisVerified": false,
+                "selectedForCostEngine": false,
+                "limitation": "Existencia de hotel de paso, sin precio público ni acreditación del estacionamiento incluido o vigencia de septiembre."
+              }
+            ],
+            "effect": "Remanente dentro de MX_TRAVEL_EXPENSES → CVU. No se suma dos veces ni se interpreta null como cero."
+          },
+          {
+            "id": "US_DRIVER_TOTAL",
+            "country": "US",
+            "title": "Pernocta US · hotel de paso + pensión",
+            "canonicalKey": null,
+            "valueUsdPerCycle": null,
+            "included": "El agregado existente conserva salario, prestaciones de referencia y comida. La hipótesis histórica de sleeper no satisface la pernocta mixta confirmada.",
+            "missing": [
+              "Precio y evidencia de alojamiento US pendientes.",
+              "Noches por ciclo, mezcla hotel/pensión y vigencia de septiembre pendientes."
+            ],
+            "sources": [
+              {
+                "id": "B2_US_MIE_CONTEXT",
+                "title": "IRS Notice 2025-54 · contexto de comida, no alojamiento",
+                "url": "https://www.irs.gov/pub/irs-drop/n-25-54.pdf",
+                "kind": "MEAL_CONTEXT_NOT_LODGING",
+                "observedOn": "2026-10-03",
+                "historicalSeptemberPriceVerified": false,
+                "comparisonValue": null,
+                "currency": "USD",
+                "unit": "M&IE · no precio de hotel",
+                "taxBasisVerified": false,
+                "selectedForCostEngine": false,
+                "limitation": "M&IE no acredita alojamiento ni una obligación de pago. No existe tarifa de hotel/pensión US en este expediente."
+              }
+            ],
+            "effect": "Remanente dentro de US_DRIVER_TOTAL → CVU. No se crea un segundo cargo ni se usa comida como tarifa de hotel."
+          }
+        ]
+      },
+      {
+        "cycleId": "DEDICATED_EMPTY_SAME_BOX_RETURN",
+        "fundingMode": "FINANCED",
+        "historicalReferencePeriod": "2026-10",
+        "acceptedForUserReferencePeriod": false,
+        "issues": [
+          {
+            "field": "budget.referencePeriod",
+            "code": "B2_REFERENCE_PERIOD_REVALUATION_REQUIRED",
+            "rationale": "Historical monetary worksheet must be rebuilt for September, not relabeled."
+          },
+          {
+            "field": "fxObservationDate",
+            "code": "B2_FX_AFTER_REFERENCE_WINDOW",
+            "rationale": "October FIX must not value the September reference case."
+          },
+          {
+            "field": "usMieEffectiveFrom",
+            "code": "B2_MIE_NOT_EFFECTIVE_FOR_WHOLE_REFERENCE_WINDOW",
+            "rationale": "Equal nominal USD80 does not make the October notice applicable to September. Use the prior applicable notice."
+          },
+          {
+            "field": "mxWorkRiskBasis",
+            "code": "B2_EXISTING_EMPLOYER_RISK_IS_INITIAL_RATE_PROXY",
+            "rationale": "Initial classV rate remains a sensitivity, not an observed or matched existing-employer premium. Preserve the amount for comparison, not calibrated acceptance."
+          },
+          {
+            "field": "lodging",
+            "code": "B2_MIXED_LODGING_EVIDENCE_REQUIRED",
+            "rationale": "Mixed lodging in both countries requires night mix, tax/bundle boundaries and applicable published prices. Food or reserved home yard is not lodging."
+          }
+        ],
+        "fixedRemainders": [
+          "MX_TRACTOR_PERMITS",
+          "US_TRACTOR_PERMITS",
+          "SHARED_TRAILER_PERMITS",
+          "MX_TRACTOR_FOREIGN_LIABILITY_REMAINDER",
+          "BOX_BINATIONAL_COVERAGE_REMAINDER",
+          "GROUP_SERVICE_TAX_INSTALLATION_REMAINDER"
+        ],
+        "variableRemainders": [
+          "MX_DRIVER_TOTAL",
+          "US_DRIVER_TOTAL",
+          "MX_ROAD_TOLLS",
+          "US_ROAD_TOLLS",
+          "BRIDGE_TOLLS",
+          "HANDOFF_INCREMENTAL_SERVICES",
+          "MX_TRAVEL_EXPENSES"
+        ],
+        "outputs": {
+          "cfuUsd": null,
+          "cvuUsd": null,
+          "productiveCostUsd": null,
+          "purchaseUsd": null,
+          "sellUsd": null
+        },
+        "rows": [
+          {
+            "id": "MX_TRAVEL_EXPENSES",
+            "country": "MX",
+            "title": "Pernocta MX · hotel de paso + pensión",
+            "canonicalKey": null,
+            "valueUsdPerCycle": null,
+            "included": "El concepto existente conserva comida del operador MX. El patio reservado de base no sustituye pernocta en viaje.",
+            "missing": [
+              "Noches por ciclo y mezcla de hotel/pensión no seleccionadas.",
+              "Precio histórico de septiembre, impuestos y estacionamiento incluido no acreditados."
+            ],
+            "sources": [
+              {
+                "id": "B2_MX_PENSION",
+                "title": "Pensión de trailers 40-5 · Cuautitlán Izcalli",
+                "url": "https://pensiondetrailers40-5.com/",
+                "kind": "LODGING_COMPARATOR",
+                "observedOn": "2026-10-03",
+                "historicalSeptemberPriceVerified": false,
+                "comparisonValue": 260,
+                "currency": "MXN",
+                "unit": "24 horas · tractor y una caja",
+                "taxBasisVerified": false,
+                "selectedForCostEngine": false,
+                "limitation": "Comparador publicado de estacionamiento. No incluye habitación ni demuestra precio de septiembre; no es tarifa del recorrido."
+              },
+              {
+                "id": "B2_MX_HOTEL",
+                "title": "Hotel San Pedro Express · Federal 57 km 108",
+                "url": "https://hotelsanpedroexpress.com/hotel/",
+                "kind": "LODGING_COMPARATOR",
+                "observedOn": "2026-10-03",
+                "historicalSeptemberPriceVerified": false,
+                "comparisonValue": null,
+                "currency": "MXN",
+                "unit": "noche · precio pendiente",
+                "taxBasisVerified": false,
+                "selectedForCostEngine": false,
+                "limitation": "Existencia de hotel de paso, sin precio público ni acreditación del estacionamiento incluido o vigencia de septiembre."
+              }
+            ],
+            "effect": "Remanente dentro de MX_TRAVEL_EXPENSES → CVU. No se suma dos veces ni se interpreta null como cero."
+          },
+          {
+            "id": "US_DRIVER_TOTAL",
+            "country": "US",
+            "title": "Pernocta US · hotel de paso + pensión",
+            "canonicalKey": null,
+            "valueUsdPerCycle": null,
+            "included": "El agregado existente conserva salario, prestaciones de referencia y comida. La hipótesis histórica de sleeper no satisface la pernocta mixta confirmada.",
+            "missing": [
+              "Precio y evidencia de alojamiento US pendientes.",
+              "Noches por ciclo, mezcla hotel/pensión y vigencia de septiembre pendientes."
+            ],
+            "sources": [
+              {
+                "id": "B2_US_MIE_CONTEXT",
+                "title": "IRS Notice 2025-54 · contexto de comida, no alojamiento",
+                "url": "https://www.irs.gov/pub/irs-drop/n-25-54.pdf",
+                "kind": "MEAL_CONTEXT_NOT_LODGING",
+                "observedOn": "2026-10-03",
+                "historicalSeptemberPriceVerified": false,
+                "comparisonValue": null,
+                "currency": "USD",
+                "unit": "M&IE · no precio de hotel",
+                "taxBasisVerified": false,
+                "selectedForCostEngine": false,
+                "limitation": "M&IE no acredita alojamiento ni una obligación de pago. No existe tarifa de hotel/pensión US en este expediente."
+              }
+            ],
+            "effect": "Remanente dentro de US_DRIVER_TOTAL → CVU. No se crea un segundo cargo ni se usa comida como tarifa de hotel."
+          }
+        ]
+      }
+    ]
+  }
+}

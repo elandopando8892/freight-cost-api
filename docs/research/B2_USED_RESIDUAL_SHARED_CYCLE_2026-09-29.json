@@ -1,0 +1,276 @@
+{
+  "artifact": "FCM_B2_USED_RESIDUAL_AND_SHARED_TRAILER_SCENARIOS",
+  "cutDate": "2026-09-29",
+  "baseHead": "4f5fc2de0c3d178dace917231e1092040dec21fd",
+  "status": "CONDITIONAL_RESEARCH_SCENARIOS_NOT_LIFE_OR_NET_RESIDUAL_CALIBRATION",
+  "calibrated": false,
+  "quoteReady": false,
+  "adoptedValues": 0,
+  "sources": [
+    {
+      "id": "ANL_ESD_21_4",
+      "url": "https://publications.anl.gov/anlpubs/2021/05/167399.pdf",
+      "downloadUrl": "https://downloads.regulations.gov/EPA-HQ-OAR-2022-0985-1644/attachment_11.pdf",
+      "publicationYear": 2021,
+      "observationPeriod": "September 2019 listing data",
+      "locator": "Section 3.2.5.2, printed pp.58-60 / PDF pp.89-91, Eq 3.8, Table 3.11; 3-year first-owner scenario printed p.170 / PDF p.201",
+      "snapshotSha256": "c49755ae06436d51fda2c629d9b3ab8595279713f7e852d825e9a90e400d4425",
+      "pages": 227,
+      "readRelevantPages": [
+        89,
+        90,
+        91,
+        201
+      ],
+      "visualRelevantPagesReviewed": true,
+      "evidenceType": "HISTORICAL_LISTING_PRICE_REGRESSION_NOT_TRANSACTION_PANEL",
+      "canonicalDownloadSucceeded": false,
+      "governmentMirrorDownloaded": true,
+      "mirrorRelevantTextMatchesCanonicalWebRead": true,
+      "byteIdentityToCanonicalEstablished": false,
+      "targetEquipment": "CLASS8_SLEEPER_TRACTOR_NOT_TRAILER",
+      "annualAgeRetention": 0.9071,
+      "retentionPerThousandAdditionalMiles": 0.999,
+      "coefficientPrecision": "As published to four decimals; p-value significance does not provide a prediction interval.",
+      "limitations": [
+        "US 2019 cross-sectional advertisements; not 2026 or future realized prices.",
+        "Body segment matches US sleeper tractor broadly, not a VIN, manufacturer, engine, border-service or maintenance cohort.",
+        "No used-asset remaining economic life, net sale costs or survival probability estimated.",
+        "No manufacturer-specific coefficients or raw regression covariance/usable prediction intervals reconstructed."
+      ]
+    },
+    {
+      "id": "ATRI_EXPOSURE_REUSED",
+      "url": "https://truckingresearch.org/wp-content/uploads/2025/07/ATRI-Operational-Costs-of-Trucking-07-2025.pdf",
+      "localReference": "B2_REFERENCE_PROFILE_EXPOSURE_2026-09-29.json",
+      "publicationYear": 2025,
+      "observationYear": 2024,
+      "annualMiles": 82677,
+      "evidenceType": "REUSED_HISTORICAL_NATIONAL_ALL_SECTORS_EXPOSURE_NOT_SAME_REGRESSION_SAMPLE",
+      "snapshotSha256": "581b91b68a76f232102a63f543eff92bb59c9478556b164d84d2be85118902f8",
+      "limitations": [
+        "Not measured exposure of the offered used sleeper or a forward mileage forecast.",
+        "Combined with ANL only as a disclosed conditional scenario, not as a jointly observed cohort."
+      ]
+    },
+    {
+      "id": "HEARTLAND_FY2025",
+      "url": "https://www.sec.gov/Archives/edgar/data/799233/000079923326000006/htld-20251231.htm",
+      "observationYear": 2025,
+      "locator": "Revenue equipment estimates, printed p.39; Note 1, printed F-10, acquired equipment and expected remaining use",
+      "evidenceType": "ACCOUNTING_METHOD_CONTRAST_NOT_NUMERIC_USED_LIFE",
+      "remainingUseTreatment": "Equipment acquired through business acquisitions and originally obtained over a year earlier is revalued and depreciated over expected remaining use.",
+      "transferOfNewAssetLifeOrResidual": false,
+      "limitations": [
+        "Business-acquisition accounting is not direct purchase economics for the offered tractor.",
+        "New-tractor/new-trailer lives and salvage dollars are not transferred to used pilot offers."
+      ]
+    },
+    {
+      "id": "US_OFFER_ANCHOR_REUSED",
+      "url": "https://schneider.com/used-equipment/semi-trucks-for-sale/20753",
+      "localReference": "B2_CAPITAL_ACQUISITION_BRIDGE_2026-09-29.json",
+      "observedDate": "2026-09-29",
+      "stock": "20753",
+      "askingPriceUnits": 45000,
+      "currency": null,
+      "publishedSymbol": "$",
+      "odometerMiles": 531334,
+      "evidenceType": "REUSED_INDIVIDUAL_ASKING_PRICE_ANCHOR_NOT_ACQUISITION_COST",
+      "limitations": [
+        "Availability, explicit currency, executed amount and capitalizable additions remain unresolved.",
+        "Used asking price scales gross model sensitivity only, not net residual or governed acquisition cost."
+      ]
+    }
+  ],
+  "method": {
+    "originalEquation": "RV(a,m) = C * exp(A*a + M*m), m in thousands of miles",
+    "incrementalRatio": "q(h,deltaMiles) = RV(a+h,m+deltaMiles/1000)/RV(a,m) = 0.9071^h * 0.9990^(deltaMiles/1000)",
+    "anchoringAssumption": "Assume the historical segment's proportional age/mileage effect remains valid and a current asking-price anchor scales it. Not an unbiased fitted prediction for this VIN; does not reconstruct C.",
+    "grossResidualEquation": "Gross market-reference endpoint = V_current * q",
+    "netResidualEquation": "R_net = V_current * q - K_disposal",
+    "depreciationBridge": "D_month = (A_capitalizable - V_current*q + K_disposal) / N_remaining_planned_months; no numerical D while A or K unknown",
+    "horizonMonths": 36,
+    "horizonKind": "CONDITIONAL_PLANNED_HOLDING_PERIOD_NOT_OBSERVED_REMAINING_LIFE",
+    "horizonBasis": "Three years uses ANL's first-owner comparison window as an analytical planning reference for a used-asset stress, NOT evidence that this used unit has three productive years remaining.",
+    "manufactureAgeUsedToInferLife": false,
+    "bookLifeTransferred": false,
+    "sourceToMXTransferred": false,
+    "sourceToTrailerTransferred": false,
+    "uncertaintyKind": "SCENARIO_SPREAD_NOT_CONFIDENCE_OR_PREDICTION_INTERVAL",
+    "referencePeriod": null,
+    "sourceValidityCertified": false,
+    "transferToGovernedContract": false
+  },
+  "usTractor": {
+    "condition": "USED",
+    "segment": "CLASS8_SLEEPER_TRACTOR",
+    "annualExposureAnchorMiles": 82677,
+    "currentOfferOdometerMiles": 531334,
+    "residualScenarios": [
+      {
+        "id": "LESS_USE_STRESS",
+        "multiplier": 0.8,
+        "additionalMiles": 198424.80000000002,
+        "grossRetentionFraction": 0.6119945983862856,
+        "grossOfferAnchorUnits": 27539.75692738285,
+        "valueLossPer100AnchorPerMonth": 1.077792782260318,
+        "annualMiles": 66141.6,
+        "horizonMonths": 36,
+        "kind": "ANALYTICAL_PLUS_MINUS_20_PERCENT_USE_STRESS_NOT_SOURCE_INTERVAL",
+        "grossOfferAnchorCurrency": null,
+        "netResidualUsd": null,
+        "capitalizableCostUsd": null,
+        "monthlyDepreciationUsd": null,
+        "remainingEconomicLifeMonths": null
+      },
+      {
+        "id": "HISTORICAL_EXPOSURE_CONDITIONAL",
+        "multiplier": 1,
+        "additionalMiles": 248031,
+        "grossRetentionFraction": 0.5823621101586334,
+        "grossOfferAnchorUnits": 26206.294957138503,
+        "valueLossPer100AnchorPerMonth": 1.1601052495593516,
+        "annualMiles": 82677,
+        "horizonMonths": 36,
+        "kind": "HISTORICAL_EXPOSURE_CONDITIONAL",
+        "grossOfferAnchorCurrency": null,
+        "netResidualUsd": null,
+        "capitalizableCostUsd": null,
+        "monthlyDepreciationUsd": null,
+        "remainingEconomicLifeMonths": null
+      },
+      {
+        "id": "MORE_USE_STRESS",
+        "multiplier": 1.2,
+        "additionalMiles": 297637.19999999995,
+        "grossRetentionFraction": 0.5541644129583486,
+        "grossOfferAnchorUnits": 24937.398583125687,
+        "valueLossPer100AnchorPerMonth": 1.2384321862268093,
+        "annualMiles": 99212.4,
+        "horizonMonths": 36,
+        "kind": "ANALYTICAL_PLUS_MINUS_20_PERCENT_USE_STRESS_NOT_SOURCE_INTERVAL",
+        "grossOfferAnchorCurrency": null,
+        "netResidualUsd": null,
+        "capitalizableCostUsd": null,
+        "monthlyDepreciationUsd": null,
+        "remainingEconomicLifeMonths": null
+      }
+    ],
+    "ageOnlyCounterfactual": {
+      "kind": "HYPOTHETICAL_ZERO_ADDITIONAL_MILEAGE_NOT_OPERATING_CASE",
+      "grossRetentionFraction": 0.746389464911
+    },
+    "adoptedScenarioId": null
+  },
+  "mxTractor": {
+    "condition": "USED",
+    "remainingEconomicLifeMonths": null,
+    "netResidualMxn": null,
+    "conditionalRetentionFraction": null,
+    "reason": "No matched MX used-sleeper age-plus-mileage model established in the reviewed sources. Do not transfer US coefficients, infer age-based retirement or apply the IMT refrigerated historical model to dry van."
+  },
+  "sharedTrailer": {
+    "physicalCase": "SAME_LOADED_DRY_VAN_INTERCHANGED_NO_TRANSLOAD",
+    "chosenEconomicOwner": null,
+    "chosenCostBearer": null,
+    "chosenSettlementShares": null,
+    "countryOfEconomicBase": null,
+    "knownZeroCost": false,
+    "costIncludedInTractorOnlyLegs": false,
+    "existingCalculator": "benchmark-shared-trailer.ts::calculateSharedTrailer",
+    "allocationRule": "Calculate one trailer cycle using its own monthly budget/exposure: max(C*cycleTotalKm/monthlyTrailerKm,C*cycleDays/monthlyTrailerDays). Only then attribute reporting or settlement shares if agreed; shares sum to 1 and never re-run max per reporting share.",
+    "responsibilityOptions": [
+      {
+        "id": "MX_PROVIDES",
+        "kind": "UNSELECTED_ACCOUNTABILITY_POLICY",
+        "costBearer": "MX_CARRIER",
+        "reportingShareMX": 1,
+        "reportingShareUS": 0,
+        "actualOwnershipEstablished": false
+      },
+      {
+        "id": "US_PROVIDES",
+        "kind": "UNSELECTED_ACCOUNTABILITY_POLICY",
+        "costBearer": "US_CARRIER",
+        "reportingShareMX": 0,
+        "reportingShareUS": 1,
+        "actualOwnershipEstablished": false
+      },
+      {
+        "id": "AGREED_POOL",
+        "kind": "UNSELECTED_ACCOUNTABILITY_POLICY",
+        "costBearer": "AGREED_PARTIES",
+        "reportingShareMX": null,
+        "reportingShareUS": null,
+        "actualOwnershipEstablished": false
+      }
+    ],
+    "stressOnly": {
+      "kind": "SYNTHETIC_ALLOCATION_REGRESSION_NOT_PUBLIC_INPUTS",
+      "monthlyFixedUsd": 1000,
+      "monthlyTrailerKm": 10000,
+      "monthlyTrailerDays": 20,
+      "mx": {
+        "km": 80,
+        "days": 2
+      },
+      "us": {
+        "km": 920,
+        "days": 0.5
+      },
+      "oneCycleCfuUsd": 125,
+      "sumOfPerLegMaxUsd": 192,
+      "overAllocationUsd": 67,
+      "splitExample": {
+        "mxShare": 0.4,
+        "usShare": 0.6,
+        "mxUsd": 50,
+        "usUsd": 75
+      }
+    },
+    "missingForEconomicCombination": [
+      "Economic owner and cost bearer; ownership alone is not payment responsibility.",
+      "Country/cohort/period of trailer base and observed/explicit planned fleet denominator.",
+      "Capital or rent and inclusions, net residual/planned horizon and interest.",
+      "Trailer-specific exposure, full physical cycle including dwell and applicable empty movement.",
+      "Documented settlement/reporting shares; no automatic 50/50 or distance-share default."
+    ]
+  },
+  "outputs": {
+    "capitalMonthlyMX": null,
+    "capitalMonthlyUS": null,
+    "sharedTrailerMonthlyCapital": null,
+    "cfuUsd": null,
+    "cvuUsd": null,
+    "purchaseCostUsd": null,
+    "sellPriceUsd": null
+  },
+  "decision": {
+    "B2": "PARTIAL",
+    "B1": "OPEN",
+    "E1": "OPEN",
+    "businessGatesClosed": 0,
+    "businessGatesTotal": 4,
+    "currentIncrement": "US residual-age/mileage sensitivity and shared-cycle allocation analysis delivered; not calibrated lifetime or net capital.",
+    "next": "Continue B2 with remuneration/employer-cost and remaining fixed families in the same MX/US profiles, carrying A/K/life/MX residual/trailer responsibility gaps into the partial result. No further generic tractor asking-price or new accounting-life searches."
+  },
+  "unchangedFiles": [
+    {
+      "file": "B2_PAYROLL_CAPITAL_CONTRACT_TEMPLATE_2026-09-29.json",
+      "sha256": "cabfda00873356406d838306bfa87b912eccd9a6026449c0ebb26046acd8bd85"
+    },
+    {
+      "file": "B2_PUBLIC_REFERENCE_COMPONENTS_LEDGER_2026-09-29.json",
+      "sha256": "e57cdd449f0a285f9758ded2ac438838d38edc6eef6e06ccb082d9238a8a6d60"
+    },
+    {
+      "file": "B2_REFERENCE_PROFILE_EXPOSURE_2026-09-29.json",
+      "sha256": "336c00c88d3e13f64ce6706905cf926142885bc591c7355b3f7a666508bb7857"
+    },
+    {
+      "file": "B2_CAPITAL_ACQUISITION_BRIDGE_2026-09-29.json",
+      "sha256": "c8247644791d663c841cdbce7bee28c89be03c3c1a4bb3932d566a8ebb9381c3"
+    }
+  ]
+}

@@ -1,0 +1,180 @@
+{
+  "artifact": "FCM_B1_MX_US_PAYROLL_ASSET_COMPARATORS_V1",
+  "retrievedDate": "2026-09-29",
+  "targetCohort": "THIRD_PARTY_D2D_DRY_VAN_T3_S2_MX_US",
+  "use": "PUBLIC_CONTRAST_ONLY",
+  "adopted": false,
+  "currentQuoteReady": false,
+  "sources": [
+    {
+      "id": "DATAMEXICO_ENOE_DRIVERS_2026Q1",
+      "url": "https://www.economia.gob.mx/datamexico/es/profile/occupation/conductores-de-camiones-camionetas-y-automoviles-de-carga",
+      "country": "MX",
+      "referencePeriod": "2026-Q1",
+      "type": "OCCUPATION_AGGREGATE",
+      "limitations": "Broad occupational grouping; page flags low statistical precision for salary. Not truck tractor, for-hire long haul, dry van or employer total cost."
+    },
+    {
+      "id": "BLS_OEWS_DRIVER_2025",
+      "url": "https://www.bls.gov/ooh/transportation-and-material-moving/heavy-and-tractor-trailer-truck-drivers.htm",
+      "country": "US",
+      "referencePeriod": "2025-May",
+      "type": "OCCUPATION_AND_INDUSTRY_WAGE_MEDIANS",
+      "limitations": "Worker annual wage medians, not employer total cost, per-mile pay, MX/US cross-border carrier cohort, or the specific pilot's route/equipment."
+    },
+    {
+      "id": "BLS_OEWS_NATIONAL_OCCUPATIONS_2025",
+      "url": "https://www.bls.gov/news.release/ocwage.t01.htm",
+      "country": "US",
+      "referencePeriod": "2025-May",
+      "type": "NATIONAL_OCCUPATION_MEAN_WAGE_TABLE",
+      "limitations": "National cross-industry occupational categories; job mappings are approximate and do not establish carrier-specific FTE mix or rates."
+    },
+    {
+      "id": "BLS_ECEC_PRIVATE_2026Q2",
+      "url": "https://www.bls.gov/news.release/ecec.nr0.htm",
+      "country": "US",
+      "referencePeriod": "2026-June",
+      "type": "PRIVATE_INDUSTRY_COMPENSATION_AGGREGATE",
+      "limitations": "All private industry, not trucking or pilot roles. Benefit-to-total compensation share is not a universal markup on salary."
+    },
+    {
+      "id": "IMSS_SBC_AND_RISK_2026",
+      "url": "https://www.imss.gob.mx/node/96496",
+      "country": "MX",
+      "referencePeriod": "accessed-2026-09-29",
+      "type": "EMPLOYER_PAYROLL_CALCULATION_GUIDANCE",
+      "limitations": "SBC may differ from actual pay; employer cost requires applicable pay components and risk-class/premium facts. No universal burden percentage inferred."
+    },
+    {
+      "id": "COVENANT_2025_10K",
+      "url": "https://www.sec.gov/Archives/edgar/data/928658/000100888626000092/ars.pdf",
+      "country": "US",
+      "referencePeriod": "2025-FY",
+      "type": "CARRIER_ACCOUNTING_POLICY",
+      "limitations": "Company and segment accounting estimates; market used values and operating profile drive estimates. Not a purchase price or universal economic life."
+    },
+    {
+      "id": "MARTEN_2025_10K",
+      "url": "https://www.sec.gov/Archives/edgar/data/799167/000143774926005971/mrtn20251231_10k.htm",
+      "country": "US",
+      "referencePeriod": "2025-FY",
+      "type": "CARRIER_ACCOUNTING_POLICY_AND_FLEET_PROFILE",
+      "limitations": "Company-specific accounting and mixed dry/refrigerated trailer fleet; not pure dry van or MX carrier."
+    },
+    {
+      "id": "IRS_PUBLICATION_946_2025",
+      "url": "https://www.irs.gov/publications/p946",
+      "country": "US",
+      "referencePeriod": "2025-tax-publication",
+      "type": "TAX_DEPRECIATION_RULE",
+      "limitations": "Tax recovery period is not book depreciation, service life or used-market residual value."
+    },
+    {
+      "id": "MX_LISR_2024",
+      "url": "https://www.diputados.gob.mx/LeyesBiblio/pdf/LISR.pdf",
+      "country": "MX",
+      "referencePeriod": "last-reform-2024-04-01",
+      "type": "TAX_DEDUCTION_RULE",
+      "limitations": "Maximum fiscal deduction is not an observed economic asset life or market residual."
+    }
+  ],
+  "observations": [
+    {
+      "id": "MX_DRIVER_OCCUPATION_MONTHLY_MEAN",
+      "sourceId": "DATAMEXICO_ENOE_DRIVERS_2026Q1",
+      "cohort": "MX_SINCO_8341_BROAD_DRIVER_OCCUPATION",
+      "values": { "averageMonthlySalary": { "value": 9710, "unit": "MXN/month/person", "displayRounding": "MXN 9.71k" } },
+      "adopted": false,
+      "limitation": "Page reports low statistical precision; not an employed T3-S2 long-haul driver cohort and no employer burden/km denominator."
+    },
+    {
+      "id": "US_DRIVER_ANNUAL_WAGE_MEDIAN",
+      "sourceId": "BLS_OEWS_DRIVER_2025",
+      "cohort": "US_SOC_53_3032_ALL_INDUSTRIES",
+      "values": { "medianAnnualWage": { "value": 58640, "unit": "USD/year/person" }, "truckTransportationIndustryMedianAnnualWage": { "value": 60320, "unit": "USD/year/person" } },
+      "adopted": false,
+      "limitation": "Annual medians cannot be transformed into an FCM rate per mile without matching employer payroll terms and productive miles; worker wages are not employer total cost."
+    },
+    {
+      "id": "US_PRIVATE_EMPLOYER_COMPENSATION_ALL_INDUSTRY",
+      "sourceId": "BLS_ECEC_PRIVATE_2026Q2",
+      "cohort": "US_ALL_PRIVATE_INDUSTRIES",
+      "values": { "wagesPerHour": { "value": 32.82, "unit": "USD/hour" }, "benefitsPerHour": { "value": 14.07, "unit": "USD/hour" }, "totalCompensationPerHour": { "value": 46.89, "unit": "USD/hour" } },
+      "adopted": false,
+      "limitation": "All private industries, not the occupation/industry/country mix of a specific cost base. Do not reuse as fixed LABOR burden."
+    },
+    {
+      "id": "COVENANT_EQUIPMENT_ACCOUNTING_POLICY",
+      "sourceId": "COVENANT_2025_10K",
+      "cohort": "US_CARRIER_REVENUE_EQUIPMENT_ACCOUNTING_ESTIMATES",
+      "values": {
+        "newTractorUsefulLifeYears": { "value": 5, "unit": "years" },
+        "newTractorResidualCostPercent": { "min": 0, "max": 35, "unit": "percent-of-cost", "dependsOn": "reportable-segment-profile" },
+        "dryVanTrailerUsefulLifeYears": { "value": 10, "unit": "years" },
+        "dryVanTrailerResidualCostPercent": { "value": 25, "unit": "percent-of-cost" },
+        "reeferTrailerUsefulLifeYears": { "value": 7, "unit": "years" },
+        "reeferTrailerResidualCostPercent": { "value": 20, "unit": "percent-of-cost" }
+      },
+      "adopted": false,
+      "limitation": "Company accounting estimates, revised with used market/segment assumptions; no unit acquisition price."
+    },
+    {
+      "id": "MARTEN_EQUIPMENT_ACCOUNTING_POLICY",
+      "sourceId": "MARTEN_2025_10K",
+      "cohort": "US_CARRIER_MIXED_TRAILER_FLEET",
+      "values": {
+        "tractorUsefulLifeYears": { "value": 5, "unit": "years" },
+        "tractorResidualCostPercentForPlacedInService2024Plus": { "value": 20, "unit": "percent-of-cost" },
+        "trailerUsefulLifeYears": { "value": 7, "unit": "years" },
+        "trailerResidualCostPercent": { "value": 35, "unit": "percent-of-cost" },
+        "tractorReplacementAge2025": { "value": 4.2, "unit": "years-after-purchase" },
+        "trailerReplacementAge2025": { "value": 8.1, "unit": "years-after-purchase" }
+      },
+      "adopted": false,
+      "limitation": "Marten reports 2,244 dry vans and 2,863 refrigerated trailers; seven-year trailer useful life is company-wide for its trailer pool, not dry-van-only."
+    },
+    {
+      "id": "MX_LISR_TAX_DEDUCTION_RATE",
+      "sourceId": "MX_LISR_2024",
+      "locator": "Article 34, section VI",
+      "cohort": "MX_TAX_RULE_FOR_LISTED_VEHICLE_CLASSES",
+      "values": { "annualMaximumDeductionRate": { "value": 25, "unit": "percent-of-investment", "appliesTo": ["automobiles", "buses", "cargo trucks", "tractor trucks", "trailers"] } },
+      "adopted": false,
+      "limitation": "Fiscal allowance only; not economic useful life or market residual value."
+    }
+  ],
+  "roleCrosswalkUS": [
+    { "role": "Despachador", "candidateOccupation": "Dispatchers, except police, fire, and ambulance", "meanAnnualWageUsd": 54740, "sourcePeriod": "2025-May", "match": "broad" },
+    { "role": "Jefe Trafico", "candidateOccupation": "Transportation, storage, and distribution managers", "meanAnnualWageUsd": 121600, "sourcePeriod": "2025-May", "match": "functional-proxy" },
+    { "role": "Gerente Operaciones", "candidateOccupation": "General and operations managers", "meanAnnualWageUsd": 134940, "sourcePeriod": "2025-May", "match": "broad" },
+    { "role": "Gerente Comercial", "candidateOccupation": "Sales managers", "meanAnnualWageUsd": 164350, "sourcePeriod": "2025-May", "match": "broad" },
+    { "role": "Safety Manager", "candidateOccupation": "Occupational health and safety specialists", "meanAnnualWageUsd": 93860, "sourcePeriod": "2025-May", "match": "specialist-not-manager" },
+    { "role": "Tracking CS", "candidateOccupation": "Customer service representatives", "meanAnnualWageUsd": 46590, "sourcePeriod": "2025-May", "match": "broad" },
+    { "role": "Billing Admin", "candidateOccupation": "Billing and posting clerks", "meanAnnualWageUsd": 51070, "sourcePeriod": "2025-May", "match": "broad" }
+  ],
+  "pilotInputs": {
+    "mxDriverPayUsdPerMile": "MISSING",
+    "usDriverPayUsdPerMile": "MISSING",
+    "mxEmployerLaborBurden": "MISSING",
+    "usEmployerLaborBurden": "MISSING",
+    "adminRoleFteCountsMXUS": "MISSING",
+    "adminRoleMonthlyCostPerFteMXUS": "MISSING",
+    "assetAcquisitionPriceByCountryClassCondition": "MISSING",
+    "assetResidualValueByCountryClassCondition": "MISSING",
+    "economicUsefulLifeByCountryClassCondition": "MISSING",
+    "assetPriceAnnualDateCurrencyTaxTreatment": "MISSING"
+  },
+  "methodRisks": [
+    "Canonical LABOR__Carga Social is shared across MX/US despite different legal employer-cost calculation bases.",
+    "Cost-card depreciation represents residual as qty times PU of rescue units and applies one depreciation horizon; separate scenario calculator uses explicit evidence-linked acquisition cost, horizon and residual.",
+    "Public wage-role values are not carrier-specific and do not establish FTE count or fleet allocation."
+  ],
+  "validation": {
+    "adoptedValues": 0,
+    "crossCountryWagesCombined": false,
+    "taxDepreciationTreatedAsEconomicLife": false,
+    "bookLivesAveragedAcrossCarriers": false,
+    "engineOrProductionChanged": false
+  }
+}

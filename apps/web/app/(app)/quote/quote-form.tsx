@@ -14,6 +14,7 @@ import {
   validate, Field, CostBaseSelector, CalculationContextPanel, ResultSkeleton, QuoteErrorState, Placeholder, Result,
 } from './quote-shared'
 import type { QuoteDraft } from './use-quote-draft'
+import { TripFuelPanel } from './trip-fuel-panel'
 
 export type { LaneHint }
 
@@ -175,6 +176,9 @@ export function QuoteForm({ draft, recentLanes = [], costBases = [], initialQuot
         </CardHeader>
         <CardContent className="px-4 pb-4 pt-0">
           <form className="grid gap-4" onSubmit={onSubmit} onKeyDown={onFormKeyDown} noValidate>
+            <Field label="Fecha del servicio" error={errors.serviceDate} hint="El combustible se revisa para este viaje y fecha, no como un precio universal de la base.">
+              <Input type="date" value={form.serviceDate} onChange={e=>set('serviceDate',e.target.value)} />
+            </Field>
             <Field label="Origen (remitente)" error={errors.outboundLocation} hint="Lugar donde se origina la carga. Escribe una ciudad o código postal para ver sugerencias.">
               <LocationInput value={form.outboundLocation} onChange={(v) => set('outboundLocation', v)} suggestions={locations} placeholder="Ej. 30901 o Augusta, GA" ariaInvalid={Boolean(errors.outboundLocation)} />
             </Field>
@@ -244,7 +248,7 @@ export function QuoteForm({ draft, recentLanes = [], costBases = [], initialQuot
             )}
 
             <div className="flex gap-2">
-              <Button type="submit" disabled={quote.isPending} className="flex-1">{quote.isPending ? 'Calculando…' : 'Generar tarifa'}</Button>
+              <Button type="submit" disabled={quote.isPending} className="flex-1">{quote.isPending ? 'Resolviendo…' : 'Revisar y calcular'}</Button>
               <Button type="button" variant="outline" disabled={quote.isPending} onClick={clear} title="Reiniciar el formulario y limpiar el resultado">Limpiar</Button>
             </div>
             <p className="text-center text-[11px] text-muted-foreground">
@@ -267,6 +271,11 @@ export function QuoteForm({ draft, recentLanes = [], costBases = [], initialQuot
         />
         {quote.isPending ? (
           <ResultSkeleton />
+        ) : draft.fuelReview && !result ? (
+          <div className="grid gap-3">
+            <TripFuelPanel key={draft.fuelReview.contextHash} review={draft.fuelReview} busy={quote.isPending} onConfirm={draft.acceptFuel}/>
+            {quote.isError && <QuoteErrorState error={quote.error} onRetry={()=>quote.mutate()}/>}
+          </div>
         ) : result ? (
           <Result
             draft={draft}

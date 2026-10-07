@@ -1,0 +1,32 @@
+{
+  "model": "FCM_MX_FOOD_EMPLOYER_PLANNING_V1",
+  "reviewedOn": "2026-10-03",
+  "referencePeriod": "2026-10",
+  "foodMxnPerStartedDay": 300,
+  "foodIncomeTreatment": "DECLARED_REMUNERATIVE_CASH_WITH_WEEKLY_REST_INCLUDED",
+  "sbcTreatment": "ANNUAL_MEAN_CASH_PROXY_WITH_EXISTING_PER_PERSON_CAPS_NOT_ACTUAL_BIMESTER",
+  "nlDirectFoodTreatment": "DECLARED_ART160_I_G_FOOD_EXEMPT_NOT_REAL_TAX_DETERMINATION",
+  "extraAccrualTreatment": "EXISTING_FIRST_ANNIVERSARY_HOLIDAY_VACATION_AGUINALDO_REFERENCE",
+  "cashFoodChargedAgain": false,
+  "workerWithholdingAdded": false,
+  "sources": [
+    {"id":"TIVUS_MX_FOOD_RECHECK","url":"https://mx.indeed.com/viewjob?jk=050282e84f698f0c","locator":"Recruiter-authored dryvan/foraneo posting re-read3Oct2026, lines48-57: food300MXN/day or2100/week separate from5000netweekly salary. No wage/SBC/state-tax characterization; lodging facilities at its plant are not transferred to the pilot."},
+    {"id":"LFT_CASH_SALARY_2026","url":"https://www.diputados.gob.mx/LeyesBiblio/pdf/LFT.pdf","locator":"Current14May2026 reform; art84/87/89 and257-259, printed25/71. Cash wage composition and benefit bases; law does not prove this offer's food is salary. Existing planning steady worked-day income, first-anniversary and inclusive-rest assumptions retained."},
+    {"id":"LSS_CASH_FOOD_2026","url":"https://www.diputados.gob.mx/LeyesBiblio/pdf/LSS.pdf","locator":"Current15Jan2026 reform; art27 including cash/food and exclusions, printed10-11; arts28/30. Declared remunerative cash sensitivity, not in-kind art32 percentage, onerous-food exemption or observed variable bimester."},
+    {"id":"NL_PAYROLL_FOOD_2026","url":"https://www.hcnl.gob.mx/trabajo_legislativo/leyes/leyes/ley_de_hacienda_del_estado_de_nuevo_leon/","locator":"Primary current public text read3Oct2026, arts154/156/157/160-I-f,g:3percent general payroll rate, distinct exemption for vouched employer travel and for food. Declared food classification excludes direct allowance from this NL tax scenario; newly accrued wage benefits remain taxed. Neither route nor offer proves actual jurisdiction or exemption."}
+  ],
+  "capture": "DIRECT_PRIMARY_WEB_READER_EXTRACT_NOT_ORIGINAL_DOCUMENT_ARCHIVE",
+  "assumptions": [
+    "An explicit optional planning alternative, not a conclusion that public food allowance is legally remunerative. Legacy unresolved treatment stays available and unchanged by omission.",
+    "Use the already selected300MXN food allowance once per started MX away calendar day, one occupied position. Its inclusive weekly/rest pattern is a declared interpretation, not another16.66percent on food. No weekly2100added again and no gross-up for employee withholding.",
+    "Same ordinary-duty resource exposure, compatible cycles and294primary/12relief productive-day partition as the existing driver forecast. Direct annual food cash augments worked-day income and per-person eligible-cash contribution proxies, not productive hours or kilometres.",
+    "Recompute benefit accruals and contribution caps with the existing calculator. Subtract the no-food forecast to isolate incremental burden; do not charge salary, food, fixed IMSS quota or administration again. This is not a generic social-burden percentage.",
+    "Federal social-insurance cash-remuneration hypothesis and NL state food-exemption hypothesis are deliberately separate. Do not assume IMSS integration implies NL tax on the direct food amount; do not assume the NL exemption proves an IMSS exemption. Other wage accruals retain the selected NL3percent hypothesis.",
+    "Annual mean is a forward cost projection, not legal SBC/payroll filing, actual last30worked-day wages, tax refund, private carrier payroll or proof of employer geography.",
+    "No additional lodging, PTU, superior benefits, extraordinary delay compensation, holiday roster or service date is silently priced at zero. Food allowance remains partial travel scope and MX driver row remains partial labor scope.",
+    "Primary public recruiter and legal reader texts were rechecked; originals were not downloaded or visually reverified here. Source integrity pin protects this local policy/extract only. Prior original normative archives remain part of the existing pinned research."
+  ],
+  "calibrated": false,
+  "quoteReady": false,
+  "adoptedValues": 0
+}

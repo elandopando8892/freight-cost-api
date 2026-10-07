@@ -1,0 +1,49 @@
+{
+  "artifact":"FCM_B2_CASH_FINANCED_CAPITAL_COMPARISON",
+  "observedAt":"2026-10-01",
+  "baseHead":"4f5fc2de0c3d178dace917231e1092040dec21fd",
+  "mode":"LOCAL_PUBLIC_REFERENCE_AND_DECLARED_PLANNING_ONLY",
+  "userSelection":{"scenarios":["CASH","FINANCED"],"evidence":"User: ambos escenarios","actualCarrierDebtInferred":false},
+  "sources":[
+    {"id":"DTFS_USED_MX","url":"https://www.daimlertruck-financialservices.mx/legales/terminosycondiciones","publicContentUrl":"https://cms.daimlertruck-financialservices.mx/vc/api/legals?id=35&type=normal","locator":"legal.id=35 / Plan Especial Seminuevos Carga / Credito Directo","archive":{"file":"docs/research/sources/DTFS_USED_CREDIT_TERMS_20261001.json","sha256":"5517fa2ca618310042ef9bc2cc0202f0569cc25dbba0ce2358977e87c2b3bb5c"}},
+    {"id":"USMFCU_USED_US","url":"https://www.usmfcu.org/auto-loans","locator":"Auto Loans rate table / Semi-Truck - Used, not passenger-car special","archive":{"file":"docs/research/sources/USMFCU_AUTO_LOAN_RATES_20261001.html","sha256":"5a65ceba2a48c7e7703ba07f8dfdcb848f4f3a926aab67bd877426bc1c18082c"}},
+    {"id":"USMFCU_COMMERCIAL_SCOPE","url":"https://www.usmfcu.org/commercial-vehicle-loans","locator":"Commercial vehicles, lender maximum amount and term","archive":{"file":"docs/research/sources/USMFCU_COMMERCIAL_VEHICLE_20261001.html","sha256":"dd8de2020726448e20df681e34e777c4b23c0520e94915b3e84e927947305705"}}
+  ],
+  "rateDefinitionReview":{"url":"https://www.consumerfinance.gov/ask-cfpb/what-is-the-difference-between-a-loan-interest-rate-and-the-apr-en-733/","reviewedExternally":true,"originalArchive":null,"captureLimitation":"Direct HTTP capture denied; web-reader content reviewed. No invented archive or hash.","finding":"APR combines interest and additional fees; not interchangeable with nominal interest. No commercial-loan legal applicability inferred."},
+  "mxHistoricalOffer":{
+    "sourceId":"DTFS_USED_MX","currency":"MXN","validUntil":"2026-08-31","expiredAtObservation":true,
+    "scope":"USED_FREIGHTLINER_ONLY_NOT_UTILITY_TRAILER",
+    "publishedRates":[0.115,0.157],"publishedRateBasis":"UNSPECIFIED_IN_THIS_PLAN_TEXT_NOT_CONFIRMED_NOMINAL_ANNUAL",
+    "publishedCatFrom":0.1462,"downPaymentFraction":0.2,"openingFeeFractionOfFinancedAmount":0.015,
+    "termRangeMonths":[12,60],"totalGraceMonths":1,
+    "ageIncludingFinanceTermMaximumYears":10,
+    "unresolved":["Annual/nominal rate basis and rate-to-term mapping","Grace capitalization, day count and whether grace is inside term","Downpayment/loan tax basis, fee tax and financed fees","Credit approval, current offer, asset and registrant eligibility"],
+    "currentApplicableOffer":false
+  },
+  "usPublishedOffer":{
+    "sourceId":"USMFCU_USED_US","currency":"USD","archiveEffectiveDateText":"Thursday, October 1st, 2026",
+    "scope":"USED_SEMI_TRUCK_NOT_TRAILER_RATE","downPaymentFraction":0.1,"aprAsLowAs":0.09,
+    "maximumTermMonths":72,"commercialLoanMaximumUsd":49999,
+    "nominalAnnualRate":null,"openingFee":null,"graceTreatment":null,"balloon":null,
+    "unresolved":["Contract nominal rate, fees and repayment structure","Membership, underwriting, geographical and binational eligibility","Loan tax/delivery basis and dated service validity"],
+    "discountAlreadyInPublishedRates":true,"discountReapplied":false,
+    "archiveVsCachedReader":"Cached web reader said September 24; original direct capture says October 1. Date label alone does not certify actual rate update or future validity.",
+    "eligibleForBudget":false
+  },
+  "mxHistoricalStressPlan":{
+    "classification":"EXPIRED_PUBLIC_RATE_ENDPOINTS_WITH_EXPLICIT_ANALYTICAL_ASSUMPTIONS_NOT_PRODUCT_PAYMENT",
+    "assetResourceId":"MX_TRACTOR",
+    "priceBasis":"RODAL_MX_2021_ASKING_BEFORE_IVA_NOT_CAPITALIZABLE_TOTAL",
+    "ratesUsedAsPlanningAnnualNominal":[0.115,0.157],
+    "rateBasisAssumedNotProviderConfirmed":true,
+    "termMonths":60,"comparisonMonths":36,"totalGraceMonths":1,
+    "graceTreatment":"CAPITALIZE_MONTHLY_INTEREST",
+    "feeTreatment":"PAID_UPFRONT_EXCLUDED_FROM_PRINCIPAL",
+    "balloon":0,
+    "assumptions":["Only the published pre-tax asking amount is used as the finance-base proxy; actual tax/delivery principal is unknown","Interpret the historical rate endpoints as annual nominal solely for sensitivity, not confirmed lender terms","Choose 60 total months including one capitalized-interest grace month, then 59 level end-of-month payments","Opening fee is paid upfront, not financed; fee tax and other fees excluded and unresolved","No balloon or early disposal/prepayment in this illustrative schedule; no actual contract inferred","36-month cost comparison is analytical and distinct from 60-month debt term and remaining asset life"],
+    "appliesToTrailer":false,"selectedActualFinancing":false,"eligibleForBudget":false
+  },
+  "cashPolicy":{"debtInterest":0,"reason":"Explicit debt-free purchase scenario requested by user, not actual carrier financial evidence","acquisitionCashFlowNotMonthlyProductiveCost":true,"opportunityCostIncluded":false,"opportunityCostPolicy":"Separate unresolved financing/equity policy; not silently adopted as zero productive cost"},
+  "commonCapitalPolicy":{"sameAssetAndDepreciationAcrossPaymentModes":true,"capitalizableAcquisitionResolved":false,"remainingHorizonResolved":false,"netResidualResolved":false,"principalRepaymentInCapitalCost":false,"feeAllocationResolved":false,"fxConversionPerformed":false,"sharedTrailerChargedOnce":true},
+  "outcome":{"calibrated":false,"quoteReady":false,"adoptedValues":0,"completeBudgetRowsFilled":0,"cfuUsd":null,"cvuUsd":null,"next":"Resolve compatible capital/residual/fee terms and fixed budget in the existing B2 queue; then cycle/variables and one SaaS pilot, not another generic financing search"}
+}

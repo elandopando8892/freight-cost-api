@@ -1,0 +1,57 @@
+{
+  "artifact": "FCM_B2_MX_USED_MARKET_COMPARABILITY",
+  "observedAt": "2026-10-01",
+  "baseHead": "4f5fc2de0c3d178dace917231e1092040dec21fd",
+  "status": "PUBLIC_CROSS_SECTION_REFERENCE_NOT_NET_RESIDUAL_OR_REMAINING_LIFE",
+  "pins": [
+    {"file":"docs/research/B2_CAPITAL_INSURANCE_COMPONENTS_2026-10-01.json","sha256":"9eae7d6cf036a89f5be5f43c4cc3ab8407702dc2d1f418e1eed95ad160a3b8f5"},
+    {"file":"docs/research/B1_USED_CAPITAL_LIFECYCLE_2026-09-29.json","sha256":"76c523a15f0dc1f21fd251d4c652e3b0ce9df38230c4fe5cb73dfadaffbd6a47"},
+    {"file":"docs/research/B2_BINATIONAL_FIXED_BUDGET_WORKSHEET_2026-10-01.json","sha256":"63629b174897277ce5501f833e9c24a40fdd24e4c2e323e8663366e2a1a24b80"}
+  ],
+  "sources": [
+    {"id":"UTILITY_2021","url":"https://www.remolquesythermos.mx/product-page/2021-utility-4000-d-x-68-000-lbs-53-x102-caja-seca","locator":"Product title, asking price, Descripcion and Precio tables","reviewedExternallyThisCut":true,"archiveReused":true,"archive":{"file":"docs/research/sources/UTILITY_DRYVAN2021_REVIEW_20261001.html","sha256":"dfb1a8c3751ac104b732dcf0942229fb62c32a5b5fcee659b29c183d55b7d0ec"}},
+    {"id":"UTILITY_2019","url":"https://www.remolquesythermos.mx/product-page/2019-utility-4000-d-x-68-000-lbs-53-x102-caja-seca","locator":"Product title, asking price and Descripcion table; tax inclusions not established","reviewedExternallyThisCut":true,"archiveReused":false,"archive":{"file":"docs/research/sources/UTILITY_DRYVAN2019_MARKET_REVIEW_20261001.html","sha256":"9bfaf041d02a422ef6de62af7dbe1fc9e07d09cb55b86311ca9659bfb8432484"}},
+    {"id":"RYT_CASCADIA_2021","url":"https://www.remolquesythermos.mx/product-page/2021-freightliner-cascadia-72-detroit-dd15-tractocami%C3%B3n","locator":"Selected product 20 unidades, price and Descripcion table; not another 2021 product with the same name","reviewedExternallyThisCut":true,"archiveReused":false,"archive":{"file":"docs/research/sources/RYT_CASCADIA2021_MARKET_REVIEW_20261001.html","sha256":"a3e738cd0b935a4aa628a29029028273814265021d7652d82bcb819a4d29a1f2"}},
+    {"id":"RYT_CASCADIA_2018","url":"https://www.remolquesythermos.mx/product-page/2018-freightliner-cascadia-72-detroit-dd15-tractocami%C3%B3n","locator":"Product price and Descripcion table","reviewedExternallyThisCut":true,"archiveReused":false,"archive":{"file":"docs/research/sources/RYT_CASCADIA2018_MARKET_REVIEW_20261001.html","sha256":"c3fc327212339af58e4fd6b6e14c7834a0a7490c13777eb958fd9a9e3abc1e25"}},
+    {"id":"RODAL_2021","url":"https://rodaltruckfinancials.com/catalogo/freightliner-cascadia-2021--vhc-f8668c8f02","locator":"Specifications and cash-price paragraph, manual 18 speeds; sleeper size not established","reviewedExternallyThisCut":true,"archiveReused":true,"archive":{"file":"docs/research/sources/RODAL_CASCADIA2021_REVIEW_20261001.html","sha256":"2886f1a8b46d2ad65b64b4750158f634f890f82cfd14c8d0d5faf52bd8865878"}}
+  ],
+  "offers": [
+    {"sourceId":"UTILITY_2021","sellerId":"REMOLQUES_Y_THERMOS","resourceClass":"DRY_VAN_TRAILER","year":2021,"askingMxn":630000,"listMxn":680000,"taxTreatment":"PLUS_IVA","availableUnitsPublished":2,"brand":"Utility","model":"4000 D-X","capacityLb":68000,"lengthFeet":53,"widthInches":102,"height":"13 feet 6 inches","suspension":"PNEUMATIC","doors":"SWING","roof":"ALUMINUM","wheelSize":"22.5","rims":"STEEL","vin":null,"odometerKm":null,"conditionInspection":null},
+    {"sourceId":"UTILITY_2019","sellerId":"REMOLQUES_Y_THERMOS","resourceClass":"DRY_VAN_TRAILER","year":2019,"askingMxn":540000,"listMxn":590000,"taxTreatment":"UNRESOLVED","availableUnitsPublished":3,"brand":"Utility","model":"4000 D-X","capacityLb":68000,"lengthFeet":53,"widthInches":102,"height":"13 feet 6 inches","suspension":"PNEUMATIC","doors":"SWING","roof":"ALUMINUM","wheelSize":"22.5","rims":"STEEL","vin":null,"odometerKm":null,"conditionInspection":null},
+    {"sourceId":"RYT_CASCADIA_2021","sellerId":"REMOLQUES_Y_THERMOS","resourceClass":"TRACTOR","year":2021,"askingMxn":1550000,"listMxn":1650000,"taxTreatment":"UNRESOLVED","availableUnitsPublished":20,"brand":"Freightliner","model":"Cascadia","engine":"DD15","transmission":"DT12_AUTOMATIC","sleeperInches":72,"differentialLb":46000,"differentialRatio":3.42,"odometerKm":600000,"wheelSize":"24.5","vin":null,"conditionInspection":null},
+    {"sourceId":"RYT_CASCADIA_2018","sellerId":"REMOLQUES_Y_THERMOS","resourceClass":"TRACTOR","year":2018,"askingMxn":575000,"listMxn":675000,"taxTreatment":"UNRESOLVED","availableUnitsPublished":5,"brand":"Freightliner","model":"Cascadia","engine":"DD15","transmission":"AUTOMATIC_12_SPEEDS_NOT_EXACT_MODEL_CONFIRMED","sleeperInches":72,"differentialLb":40000,"differentialRatio":3.73,"odometerKm":550000,"odometerBasis":"PUBLISHED_GROUP_AVERAGE","wheelSize":"11R_22.5","vin":null,"conditionInspection":null},
+    {"sourceId":"RODAL_2021","sellerId":"RODAL","resourceClass":"TRACTOR","year":2021,"askingMxn":1198275.86,"taxTreatment":"PLUS_IVA","brand":"Freightliner","model":"Cascadia","engine":"DD15","transmission":"MANUAL_18_SPEEDS","sleeperInches":null,"differentialLb":46000,"odometerKm":694920,"vin":null,"conditionInspection":null}
+  ],
+  "trailerMarketContrast": {
+    "newerOfferId":"UTILITY_2021",
+    "olderOfferId":"UTILITY_2019",
+    "matchedSpecificationFields":["sellerId","resourceClass","brand","model","capacityLb","lengthFeet","widthInches","height","suspension","doors","roof","wheelSize","rims"],
+    "kind":"CROSS_SECTION_PUBLISHED_PRICE_GAP_ONLY",
+    "economicTaxBasisCompatible":null,
+    "sameAssetLongitudinalObservation":false,
+    "remainingLifeMonths":null,
+    "selectedPlannedHoldingMonths":null,
+    "netResidualMxn":null,
+    "monthlyCompleteCapitalMxn":null,
+    "transferToUsdEngine":false,
+    "conditionalModelAssumptions":["Explicitly assume tax-comparable published prices before treating a price gap economically","Treat the two-model-year gap as a 24-month planning analogy, never observed remaining life","Assume the later age/condition/market resembles the older listing; model error remains unknown","Capitalizable acquisition correction, net disposal costs and financing are unknown, not zero"],
+    "completeCapitalBridge":"(630000 - 540000 + acquisitionCorrectionMxn - futureResaleAndTaxAlignmentCorrectionMxn + disposalCostsMxn)/24 + monthlyInterestMxn",
+    "limitations":["Tax treatment of the 2019 price is unresolved; economic comparability is not established","Two different groups of offered boxes, not transactions or one asset followed over time","No independent-condition, mileage, service-start, maintenance or future-market control","Available-unit counts are stock counts, not sample observations or required fleet quantities","No regression, forecast interval, life estimate, universal age rate or new-life policy derived"],
+    "selected":false,"eligibleForBudget":false
+  },
+  "mxTractorReview": {
+    "sameSellerPair":["RYT_CASCADIA_2021","RYT_CASCADIA_2018"],
+    "decision":"REJECT_AGE_ONLY_CAPITAL_MODEL_AND_TRANSFER_TO_RODAL",
+    "incompatibleOrUncontrolledFields":["differentialLb","differentialRatio","wheelSize","exactTransmissionModel","condition","taxTreatment","VIN_and_service_history"],
+    "reason":"Older product has lower published mean mileage, not a forward additional-mile trajectory. The previous RODAL manual tractor is not the seller's automatic 72-inch sleeper. Price/year alone cannot identify age-driven depreciation.",
+    "monthlyDepreciationMxn":null,"remainingLifeMonths":null,"netResidualMxn":null,
+    "usAnlModelTransferred":false,"historicalReeferModelTransferred":false,"newBookLifeTransferred":false
+  },
+  "outcome": {
+    "documentedSameSpecTrailerComparisons":1,
+    "rejectedTractorAgeOnlyComparisons":1,
+    "completeBudgetRowsFilled":0,"cfuUsd":null,"cvuUsd":null,
+    "calibrated":false,"quoteReady":false,"adoptedValues":0,
+    "next":"Resolve the tax/condition/future-price terms explicitly or use a documented separate planning scenario; no generic tractor-offer search and no silent residual/horizon/interest defaults"
+  }
+}

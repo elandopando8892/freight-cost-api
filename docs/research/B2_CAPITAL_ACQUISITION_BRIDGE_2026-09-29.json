@@ -1,0 +1,64 @@
+{
+  "artifact": "FCM_B2_CAPITAL_ACQUISITION_BRIDGE",
+  "cutDate": "2026-09-29",
+  "baseHead": "4f5fc2de0c3d178dace917231e1092040dec21fd",
+  "status": "PUBLIC_OFFER_CONTRAST_NOT_CALIBRATED_CAPITAL",
+  "calibrated": false,
+  "quoteReady": false,
+  "adoptedValues": 0,
+  "sources": [
+    {"id":"RODAL_2021", "url":"https://rodaltruckfinancials.com/catalogo/freightliner-cascadia-2021--vhc-f8668c8f02", "observedDate":"2026-09-29", "type":"INDIVIDUAL_PUBLIC_SELLER_OFFER", "snapshotSha256":"e5c696969966369adcd50841d436941e319df279a942ac473e068fb7b4e43c31", "locator":"Descripción: precio de contado; encabezado redondeado; ficha técnica", "availability":"PUBLISHED_AVAILABLE_SUBJECT_TO_CONFIRMATION"},
+    {"id":"SCHNEIDER_20753", "url":"https://schneider.com/used-equipment/semi-trucks-for-sale/20753", "observedDate":"2026-09-29", "type":"INDIVIDUAL_PUBLIC_SELLER_OFFER", "snapshotSha256":null, "locator":"Stock 20753, precio, odómetro, condición y especificaciones", "capture":"WEB_TEXT_READ; direct shell HTML download failed; no local snapshot claimed", "availability":"CHECK_AVAILABILITY_NOT_CONFIRMED"},
+    {"id":"SFI_2021", "url":"https://sfitrucks.com/inventory/lease-freightliner/2021-freightliner-cascadia", "observedDate":"2026-09-29", "type":"PUBLIC_STARTING_PAYMENT_NOT_INDIVIDUAL_QUOTE", "snapshotSha256":"0c2b4bcb6d4f6d5ea87aedcfb0006cdfb71923a61f7f5ed25b2f9457e711c7c4", "locator":"2021 Cascadia: 0 available; weekly base, money down, lease length", "availability":"ZERO_ON_DIRECT_WEB_READ", "indexDiscrepancy":"Search index showed 1; direct page showed 0. Not treated as available stock."},
+    {"id":"SFI_MAINTENANCE", "url":"https://sfitrucks.com/maintenance-program", "observedDate":"2026-09-29", "type":"PROGRAM_BOUNDARY", "snapshotSha256":"1e86247e09dd17d8a78746776d34ada2cac028d5558dd71a8ac1d6f47d349130", "locator":"Managed Maintenance Account, weekly contributions, network and warranty recovery"},
+    {"id":"SFI_REQUIREMENTS", "url":"https://sfitrucks.com/requirements-to-lease-semi-truck", "observedDate":"2026-09-29", "type":"LEASE_PROGRAM_FAQ_NOT_EXECUTED_CONTRACT", "snapshotSha256":"a3cc2d5540851a9f918e214a9988ae0e93f69b59c460bea51353681650c687d5", "locator":"TRAC, end-of-lease remaining balance, early payoff and fees; deposit varies"},
+    {"id":"IAS16_BOUNDARY", "url":"https://www.ifrs.org/issued-standards/list-of-standards/ias-16-property-plant-and-equipment/", "observedDate":"2026-09-29", "type":"METHODOLOGICAL_COST_BOUNDARY_NOT_CARRIER_ACCOUNTING_ASSERTION", "snapshotSha256":null, "locator":"About: initial cost, non-refundable purchase taxes, directly attributable costs"},
+    {"id":"SCHNEIDER_FINANCING", "url":"https://schneider.com/used-equipment/financing", "observedDate":"2026-09-29", "type":"FINANCING_AVAILABILITY_NOT_NUMERICAL_TERMS", "snapshotSha256":null, "locator":"External financing; application, credit, down payment and history"}
+  ],
+  "acquisitionCards": [
+    {
+      "id":"MX_TRACTOR_PUBLIC_REFERENCE", "country":"MX", "sourceId":"RODAL_2021", "asset":"USED_2021_CASCADIA_DD15_MANUAL_18", "condition":"USED", "odometer":{"value":694920,"unit":"km"}, "location":"Nuevo León", "proposedTenure":"OWNED_FINANCING_UNRESOLVED", "proposalStatus":"NOT_ADOPTED",
+      "askingPrice":{"value":1198275.86,"currency":"MXN","currencyBasis":"EXPLICIT","taxTreatment":"PLUS_IVA","headerRoundedValue":1198276},
+      "discount":null, "nonRecoverablePurchaseTaxes":null, "directDeliveryAndPreparation":null, "capitalizableAcquisitionCost":null,
+      "remainingHorizonMonths":null, "netResidualAtEnd":null, "monthlyInterestExpense":null, "monthlyDepreciation":null, "fxRate":null,
+      "sourceMatchesTargetService":false,
+      "limitations":["Asking price is not executed purchase cost or a national median.","Tax recoverability and directly attributable costs are not established.","Calendar/model age and advertised odometer do not establish remaining economic life.","Financing offered subject to evaluation, without numerical terms."]
+    },
+    {
+      "id":"US_TRACTOR_PUBLIC_REFERENCE", "country":"US", "sourceId":"SCHNEIDER_20753", "asset":"USED_2021_CASCADIA_126_DD15_6X4", "condition":"USED", "stock":"20753", "odometer":{"value":531334,"unit":"mile"}, "location":"Carlisle, Pennsylvania", "sleeperInches":48, "proposedTenure":"OWNED_FINANCING_UNRESOLVED", "proposalStatus":"NOT_ADOPTED",
+      "askingPrice":{"value":45000,"currency":null,"publishedSymbol":"$","currencyBasis":"US_CONTEXT_INFERENCE_NOT_EXPLICIT_USD","taxTreatment":"NOT_STATED"},
+      "discount":null, "nonRecoverablePurchaseTaxes":null, "directDeliveryAndPreparation":null, "capitalizableAcquisitionCost":null,
+      "remainingHorizonMonths":null, "netResidualAtEnd":null, "monthlyInterestExpense":null, "monthlyDepreciation":null, "fxRate":null,
+      "sourceMatchesTargetService":false,
+      "historicalOfferDisposition":"Supplement, not overwrite, Houston Feb-2026 stock 501320; different unit, mileage, geography and 72-inch sleeper. No price-change or depreciation inference.",
+      "limitations":["Individual stock, not a market distribution.","Pennsylvania is not evidence of Texas or border-delivered price.","Availability, tax, condition inspection, financing and remaining life unconfirmed.","Dollar symbol in US seller context is not explicit currency certification."]
+    }
+  ],
+  "leaseContrast": {
+    "sourceId":"SFI_2021", "country":"US", "asset":"USED_2021_CASCADIA_126_DD15_72_INCH", "availableUnits":0,
+    "weeklyBasePayment":690, "publishedSymbol":"$", "currency":null, "currencyBasis":"US_CONTEXT_INFERENCE_NOT_EXPLICIT_USD", "leaseWeeks":52,
+    "annualBasePayment":35880, "averageMonthlyBasePayment":2990, "fourWeekPayment":2760,
+    "moneyDownAsLowAs":500, "moneyDownEconomicTreatment":"UNRESOLVED_NOT_AMORTIZED_EXPENSE", "remainingBuyoutBalance":null,
+    "classification":"TRAC_PROGRAM_CONTRAST_ACTUAL_CONTRACT_UNRESOLVED_NOT_PURE_OPERATING_RENT",
+    "maintenanceAccountContribution":null, "maintenanceExpenseIncluded":null, "insuranceIncluded":null, "trailerIncluded":false,
+    "allInMonthlyCost":null, "monthlyInterestExpense":null, "usableInOwnedProfile":false, "usableAsCurrentLeaseQuote":false,
+    "limitations":["Starting price and money-down minimum are not approved terms for an identified vehicle.","Four deferred weeks are not automatically forgiven payments.","Cash contributed to maintenance reserve is not itself consumed repair expense.","Remaining balance and early-payoff fees cannot be assumed zero.","No manufacturer warranty duration is translated into remaining useful life.","Carrier flexibility does not prove permission for MX-US interchange."]
+  },
+  "method": {
+    "monthsPerYear":12, "weeksForPublishedLease":52,
+    "acquisitionEquation":"A = executed purchase price after discounts + non-recoverable purchase taxes + directly attributable preparation/delivery + applicable initial obligations; unknown components remain unknown",
+    "depreciationEquation":"D_month = (A - net residual at the chosen economic endpoint) / remaining economic horizon months",
+    "ownedCapitalEquation":"Capital_month = D_month + interest expense for the same period; not principal repayment plus depreciation",
+    "publicAccountingPoliciesDisposition":"Keep B1_USED_CAPITAL_LIFECYCLE as contrasts. New-asset original-cost residual percentages and book/tax lives are not transferred to a used asking price or subtracted from model age.",
+    "doubleCountingRules":["Do not charge principal repayment as additional economic cost with depreciation.","Do not count a maintenance reserve contribution and the repair paid from that reserve twice.","Initial capitalizable preparation must not also be charged as recurring CVU for the same item.","A refundable deposit is cash tied up, not presumed rent expense.","The same loaded physical trailer must not be charged fully to both carrier legs."],
+    "targetPeriod":null, "transferToGovernedContract":false, "fxConversionPerformed":false, "distributionOrMedianEstimated":false
+  },
+  "sharedTrailer": {"physicalCase":"SAME_LOADED_DRY_VAN_INTERCHANGED_NO_TRANSLOAD", "owner":null, "tenure":null, "costBearer":null, "allocationBetweenLegs":null, "monthlyCapitalCost":null, "costKnownZero":false, "chargedFullToBothLegs":false},
+  "outputs":{"capitalMonthlyMX":null,"capitalMonthlyUS":null,"sharedTrailerCapital":null,"cfu":null,"cvu":null,"purchasePrice":null,"sellPrice":null},
+  "decision":{"B2":"PARTIAL", "B1":"OPEN", "E1":"OPEN", "businessGatesClosed":0,"businessGatesTotal":4,"next":"Consolidate public-supported remaining-life/net-residual scenarios with explicit planning assumptions and uncertainty per used asset; one shared-trailer cost bearer/allocation before combined D2D capital. Do not repeat generic asking-price searches."},
+  "unchangedFiles": [
+    {"file":"B2_PAYROLL_CAPITAL_CONTRACT_TEMPLATE_2026-09-29.json","sha256":"cabfda00873356406d838306bfa87b912eccd9a6026449c0ebb26046acd8bd85"},
+    {"file":"B2_PUBLIC_REFERENCE_COMPONENTS_LEDGER_2026-09-29.json","sha256":"e57cdd449f0a285f9758ded2ac438838d38edc6eef6e06ccb082d9238a8a6d60"},
+    {"file":"B2_REFERENCE_PROFILE_EXPOSURE_2026-09-29.json","sha256":"336c00c88d3e13f64ce6706905cf926142885bc591c7355b3f7a666508bb7857"}
+  ]
+}

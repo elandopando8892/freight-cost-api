@@ -1,0 +1,42 @@
+{
+  "artifact": "FCM_PUBLIC_ADMIN_WAGE_WEB_READER_EXTRACTION",
+  "observedAt": "2026-10-01",
+  "capture": "STRUCTURED_READOUT_NOT_ORIGINAL_HTTP_RESPONSE",
+  "directHttpArchiveUnavailable": "BLS and Trayecto returned HTTP 403 to the ordinary archive request; no bypass attempted",
+  "sources": [
+    {
+      "id": "BLS_ADMIN", "url": "https://www.bls.gov/news.release/ocwage.t01.htm",
+      "capture": "PRIMARY_PAGE_WEB_READER_TABLE_AND_TARGETED_ROW_READS",
+      "referencePeriod": "2025-May", "metric": "NATIONAL_ALL_INDUSTRY_MEAN_ANNUAL_WORKER_WAGES_NOT_EMPLOYER_TOTAL",
+      "rows": [
+        {"role": "DISPATCHER", "occupation": "Dispatchers, except police, fire, and ambulance", "annualUsd": 54740},
+        {"role": "TRAFFIC_MANAGER", "occupation": "Transportation, storage, and distribution managers", "annualUsd": 121600},
+        {"role": "OPERATIONS_MANAGER", "occupation": "General and operations managers", "annualUsd": 134940},
+        {"role": "SALES_MANAGER", "occupation": "Sales managers", "annualUsd": 164350},
+        {"role": "SAFETY_MANAGER", "occupation": "Occupational health and safety specialists", "annualUsd": 93860},
+        {"role": "TRACKING_CS", "occupation": "Customer service representatives", "annualUsd": 46590},
+        {"role": "BILLING_ADMIN", "occupation": "Billing and posting clerks", "annualUsd": 51070}
+      ],
+      "limitations": ["Not Laredo or trucking-only wages; approximate functional mappings", "Safety specialist is not a manager; customer service is not satellite monitoring", "Annual/12 is a wage reference, not observed calendar-month compensation; benefits and FTE unknown"]
+    },
+    {
+      "id": "MX_TRACKING", "url": "https://careers.trayecto.com/monitorista-satelital-CBlgyOklPF8f/",
+      "capture": "PRIMARY_PAGE_WEB_READER_DIRECT_READ",
+      "locator": "Monthly salary header and role description",
+      "publishedMonthlyMxn": {"low": 15000, "high": 16000},
+      "location": "General Escobedo, Nuevo Leon", "role": "TRACKING_CS",
+      "mapping": "SATELLITE_MONITORING_ONLY_NOT_COMPLETE_TRACKING_AND_CUSTOMER_SERVICE",
+      "shiftHoursPublished": 8, "shiftType": "ROTATING", "absolutePublicationDate": null,
+      "availabilityConfirmed": false, "benefitsPublishedAs": "Statutory benefits without quantified employer amount",
+      "limitations": ["Advertised salary, not paid payroll; gross/net basis not explicit", "Not CDMX or Nuevo Laredo wage; no geographic adjustment invented", "One FTE does not establish continuous service or a whole staffed shift rota", "Relative posting age and inconsistent indexed availability are not a confirmed current vacancy"]
+    },
+    {
+      "id": "MX_BILLING_SEARCH_ONLY", "url": "https://careers.trayecto.com/auxiliar-de-facturacion-y-cobranza-97LVJPBem15h/",
+      "capture": "SEARCH_INDEX_PRIMARY_URL_ONLY_DIRECT_PAGE_FAILED",
+      "reportedMonthlyMxn": 17000, "location": "Cienega de Flores, Nuevo Leon",
+      "includedInCalculations": false,
+      "reason": "Direct reader failed twice and ordinary HTTP archive returned 403; do not promote indexed preview to verified wage input"
+    }
+  ],
+  "calibrated": false, "adoptedValues": 0
+}

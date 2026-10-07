@@ -13,8 +13,10 @@ import {
   compatibleBases, preferredGovernedBase, activeVersionFor,
   costBaseReadiness, costBaseReadinessDetail, Field, CostBaseSelector,
   CostBaseLineageNotice, CalculationContextPanel, ResultSkeleton, QuoteErrorState, Result,
+  validate,
 } from './quote-shared'
 import type { QuoteDraft } from './use-quote-draft'
+import { TripFuelPanel } from './trip-fuel-panel'
 
 // Progressive-disclosure steps: one decision at a time, with microcopy.
 const STEPS = [
@@ -96,7 +98,7 @@ export function QuoteWizard({ draft, costBases = [], initialQuote }: { draft: Qu
   // Only the lane step has required fields.
   const validateStep = (s: number): boolean => {
     if (s !== 0) return true
-    const e: FormErrors = {}
+    const e: FormErrors = validate(form)
     if (!form.outboundLocation.trim()) e.outboundLocation = 'Campo requerido: captura un código postal o una ciudad.'
     if (!form.inboundLocation.trim()) e.inboundLocation = 'Campo requerido: captura un código postal o una ciudad.'
     if (form.fxRate) {
@@ -138,7 +140,7 @@ export function QuoteWizard({ draft, costBases = [], initialQuote }: { draft: Qu
               <Button onClick={next}>Continuar →</Button>
             ) : (
               <Button onClick={() => quote.mutate()} disabled={quote.isPending}>
-                {quote.isPending ? 'Calculando…' : result ? 'Recalcular' : 'Generar tarifa'}
+                {quote.isPending ? 'Resolviendo…' : result ? 'Recalcular' : 'Revisar y calcular'}
               </Button>
             )}
           </div>
@@ -157,6 +159,11 @@ export function QuoteWizard({ draft, costBases = [], initialQuote }: { draft: Qu
         <div className="grid gap-4 xl:col-span-2">
           {quote.isPending ? (
             <ResultSkeleton />
+          ) : draft.fuelReview && !result ? (
+            <div className="grid gap-3">
+              <TripFuelPanel key={draft.fuelReview.contextHash} review={draft.fuelReview} busy={quote.isPending} onConfirm={draft.acceptFuel}/>
+              {quote.isError && <QuoteErrorState error={quote.error} onRetry={()=>quote.mutate()}/>}
+            </div>
           ) : result ? (
             <Result
               draft={draft}
@@ -223,6 +230,9 @@ function LaneStep({ form, errors, set, locations, costBases }: StepProps & { err
   const [showAdvanced, setShowAdvanced] = useState(false)
   return (
     <>
+      <Field label="Fecha del servicio" error={errors.serviceDate} hint="El combustible se revisará para esta ruta y fecha.">
+        <Input type="date" value={form.serviceDate} onChange={e=>set('serviceDate',e.target.value)}/>
+      </Field>
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Origen (remitente)" error={errors.outboundLocation} hint="Lugar donde se origina la carga.">
           <LocationInput value={form.outboundLocation} onChange={(v) => set('outboundLocation', v)} suggestions={locations} placeholder="Ej. 30901 o Augusta, GA" ariaInvalid={Boolean(errors.outboundLocation)} />

@@ -1,0 +1,45 @@
+{
+  "model": "FCM_PUBLIC_BORDER_YARD_LINK_FORECAST_V1",
+  "reviewedAt": "2026-10-03T00:53:00Z",
+  "scope": "MX_SAKBE_REFERENCE_POINT_TO_US_REFERENCE_YARD_PLANNING_TRANSFER",
+  "usReferenceYard": "18702 Metropolitan Road, Laredo, TX 78045",
+  "publishedBridgeProximityMiles": 5,
+  "internationalMileKm": 1.609344,
+  "linkDistanceKmPerMovementHypothesis": 8.04672,
+  "nationalApproachMinutesPerMovementHypothesis": 14,
+  "distanceTransfer": "ROUNDED_ADVERTISED_BRIDGE_PROXIMITY_TRANSFERRED_TO_WHOLE_REFERENCE_LINK_INCLUDING_SPAN_NOT_MEASURED_GATE_TO_GATE",
+  "clockTransfer": "PRIOR_PUBLIC_US_POI_APPROACH_TIME_TRANSFERRED_OUTSIDE87MIN_COMPLETE_CROSSING_NO_OVERLAP_ASSUMED_NOT_OBSERVED",
+  "mxSakbeApproachAddedAgain": false,
+  "bridgeSpanAddedAgain": false,
+  "usPostalLegAddedAgain": false,
+  "sourceEndpointMatched": false,
+  "reverseGeometryObserved": false,
+  "truckRouteValidated": false,
+  "source": {
+    "id": "OUTPOST_REPRESENTATIVE_PROPERTY_PROXIMITY",
+    "url": "https://www.cityfeet.com/cont/listing/18702-metropolitan-rd-laredo-tx-78045/cs34964524",
+    "capture": "PRIMARY_REPRESENTATIVE_WEB_READER_NOT_ARCHIVED",
+    "locator": "Description at18702Metropolitan: immediate access toMinesRd,5miles fromWorldTradeBridge; representativeAriBixhorn atOutpost. Published endpoints, direction, measurement method and date absent."
+  },
+  "yardIdentityUrl": "https://outpost.us/locations/laredo-metropolitan/",
+  "priorEvidence": {
+    "file": "docs/research/B2_BORDER_APPROACH_CONTRAST_2026-10-02.md",
+    "sha256": "e5bf512cd0fc6577adce879ec488404ab00184dd631ca58317dbda1ba89d25b3"
+  },
+  "assumptions": [
+    "A public reference link is explicitly defined for an economic sensitivity, not an actual route, gate, selected carrier or contracted yard.",
+    "The advertised5miles are approximate bridge proximity without defined endpoints. Transferring that value to the entire cross-border link is a declared spatial hypothesis, not a measured international itinerary.",
+    "The link includes the bridge span by hypothesis. Neither historical297.5mMexican span,977ft inventory span nor planned expansion length is added separately.",
+    "The14minutes came from the earlier public US-yard toUS-side bridgePOI candidate, not the international crossing. It is transferred as an extra national approach outside the historical87minute complete crossing. Actual overlap is not established.",
+    "SAKBE already includes the Mexican access road. Do not add5.640km or useSIMACO as an unpriced additional detour; the reference loop returns to the same SAKBE reference point.",
+    "Postal US road starts at the same US reference yard, so the link is not added to US road mileage. The Mexican tractor carries it using the existing Mexican fuel purchase price and declared constant consumption, not a geographic fuel-tax claim.",
+    "Network: one loaded north link and one compulsory bobtail south link. Dedicated: those plus one bobtail north and one attached-empty south link; reverse distance and approach time symmetry are declared, not observed.",
+    "Expected network7.61percent empty share applies only to the existing long-road reference, not the new link. Mandatory border loops are additive, not a second empty-share multiplier.",
+    "The shared box gets the loaded link and dedicated attached-empty link only. It never receives either bobtail link or their parallel clocks, and administration remains one pool.",
+    "Composite maintenance, lubricants and tires apply only to attached kilometers. Tractor-only bobtail wear remains unpriced, not zero; no arbitrary tractor/trailer split or proxy treated as calibrated.",
+    "Prospective task scheduling includes approach in each crossing task envelope; duty, meal days, fixed MAX allocation, idle-capacity reserve, DEF and insurance exposure must be recomputed, not incremented after totals.",
+    "The old unresolved-link scenario remains available and is the unchanged default. Explicit public-link forecast is a comparison, not operational adoption or full CFU/CVU certification."
+  ],
+  "quoteReady": false,
+  "adoptedOperationalValues": 0
+}

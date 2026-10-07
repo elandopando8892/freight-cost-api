@@ -1,0 +1,18 @@
+{
+  "model":"FCM_ADMIN_ALLOCATED_STOCK_REFERENCE_V1",
+  "reviewedAt":"2026-10-02T16:50:20Z",
+  "source":{"id":"WERNER_2025_TRUCKING_OFFICE_STOCK","url":"https://www.sec.gov/Archives/edgar/data/793074/000079307426000071/wern-20251231.htm","locator":"Human Capital Employee Count and TTS year-end equipment table; both December31,2025. Office1465, tractors7100=6785company+315contractor. Not average7437, not entire logistics headcount.","capture":"PRIMARY_WEB_READER_NOT_ORIGINAL_HTTP"},
+  "observation":{"date":"2025-12-31","officePersons":1465,"companyTractors":6785,"contractorTractors":315,"totalTractors":7100},
+  "projection":{"referencePeriod":"2026-10","modeledPowerUnits":2,"workedHoursPerAllocatedPersonMonth":160,"hoursAreDeclaredNotObserved":true,"functionalWeightBasis":"EXISTING_ROLE_FTE_WEIGHTS_NORMALIZED_TO_ONE_NOT_OBSERVED_WERNER_ROLES","payrollGeography":"US_CENTRAL_ADMIN_PROXY_NOT_MX_EMPLOYER_COST","namedTmsAccounts":2,"accountQuantityBasis":"ONE_NAMED_CONTROL_OWNER_PER_NATIONAL_LEG_NOT_ONE_PER_FUNCTION_OR_FRACTIONAL_PERSON"},
+  "assumptions":[
+    "The published office/tractor stock ratio is a scale proxy for allocation across a shared administrative network, not staffing requirement or measured FTE. Contractor tractors remain in the matched TTS denominator; no claim of a matched owned-only fleet.",
+    "160 worked hours per allocated office-person month is the existing declared planning convention, not Werner work schedules or BLS paid hours. Multiplying a stock by this assumption produces modeled hours, not observed payroll.",
+    "Existing seven functional weights only distribute the modeled hours. They do not establish seven hires, seven licenses, seven desks, seven phones or24/7 human coverage.",
+    "ECEC hourly total compensation is retained by occupation group with its benefits already included. No second FICA, health, paid leave, retirement or employer multiplier.",
+    "Two named TMS accounts are declared for two leg-control owners with access to multiple functions. They are not inferred from the office-person ratio or proof of an actual roster. Price69USD/account/month comes from the existing verified public Basic plan.",
+    "This alternative changes no pilot vehicle/entity counts, UCR bracket, cargo policy, trailer quantity or legal registrant. It replaces only the administrative payroll/TMS components in a separate projection, never the original sensitivity.",
+    "Werner TTS is a mixed-service large network. Transfer to a binational dryvan53 reference is uncertain and explicit, not calibrated or observed XBF staffing. Retain3.7 functional-equivalent sensitivity for comparison, not a demonstrated saving.",
+    "Office, mobile, yard, monitoring and taxes must be reconciled separately against actual modeled person/account quantities; the old seven-seat company model is not automatically joined to this alternative."
+  ],
+  "decision":"PUBLIC_STOCK_SCALE_TRANSFER_AS_EXPLICIT_PROSPECTIVE_ADMIN_COMPONENT_NOT_COMPLETE_COST"
+}

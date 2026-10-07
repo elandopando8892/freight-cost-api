@@ -1,0 +1,65 @@
+{
+  "model": "FCM_SHARED_BOX_TX_RECURRING_REFERENCE_V1",
+  "verifiedAt": "2026-10-02T05:47:24Z",
+  "referenceYear": 2026,
+  "physicalBoxCount": 1,
+  "jurisdiction": "TX_WEBB",
+  "scenario": "EXISTING_ELIGIBLE_TOKEN_COMMERCIAL_SEMITRAILER_ANNUAL_COUNTY_RENEWAL",
+  "registrationTermMonths": 12,
+  "paymentBasis": "IN_PERSON_NON_ELECTRONIC_MODEL",
+  "inspectionBasis": "ANNUAL_COMMERCIAL_DECAL_STATION_MAXIMUM",
+  "currency": "USD",
+  "fees": {
+    "annualTokenBaseUsd": 15,
+    "annualCountyAggregateUsd": 20,
+    "annualRenewalProcessingUsd": 4.75,
+    "annualInspectionStationMaximumUsd": 40,
+    "annualInspectionStateUsd": 22
+  },
+  "sources": [
+    {
+      "id": "TX_TOKEN_2026",
+      "url": "https://www.txdmv.gov/motor-carriers/commercial-fleet-registration/token-trailers",
+      "locator": "Fees and Payment Information: annual base; eligibility must be modeled separately",
+      "archive": {"file":"docs/research/sources/TX_TOKEN_TRAILERS_REVIEW_20261001.html","sha256":"5a9b721fae87afd5b41197ea20dba992a757c10fe51f5de7fc42267fc3bd6b2f"}
+    },
+    {
+      "id": "TX_COUNTY_2026",
+      "url": "https://www.txdmv.gov/sites/default/files/body-files/FeeChart_1C.pdf",
+      "locator": "Page 1; 2026 validity header; Webb county USD20 aggregate",
+      "archive": {"file":"docs/research/sources/TX_COUNTY_FEES_2026_REVIEW_20261001.pdf","sha256":"d539ca2482cf59d19b152a7fc95f5edcc670af3b6e8b8c4b170267b52a66e29d"}
+    },
+    {
+      "id": "TX_REGISTRATION_MANUAL_AUG2026",
+      "url": "https://www.txdmv.gov/sites/default/files/body-files/Motor_Vehicle_Registration_Manual_Book_298.pdf",
+      "locator": "Printed 1-3 P&H includes automation/mail; 2-19 token; 11-1/11-7 trailer responsibility exception; 22-10 CDEC state USD22",
+      "archive": {"file":"docs/research/sources/TX_REGISTRATION_MANUAL_AUG2026_REVIEW_20261001.pdf","sha256":"2573584413034d036611b9d24e1c6c7cfc1e5e7b2f045f42378bd1e11437065c"}
+    },
+    {
+      "id": "TX_DPS_STATION_MAXIMUM",
+      "url": "https://www.dps.texas.gov/section/vehicle-inspection/cost-inspection",
+      "locator": "Commercial USD40 at station; not total state plus station",
+      "archive": null
+    },
+    {
+      "id": "TX_DPS_COMMERCIAL_CLASSIFICATION",
+      "url": "https://www.dps.texas.gov/section/vehicle-inspection/inspection-criteria-commercial-inspection",
+      "locator": "March19 2026 criteria include qualifying towed interstate commercial vehicles",
+      "archive": null
+    }
+  ],
+  "nonAdditiveTreatments": [
+    "USD20 county figure already aggregates county charges; do not add another child-safety fee",
+    "USD4.75 renewal processing includes automation and mail; do not add USD1 automation again",
+    "TexasSure financial-responsibility fee is not modeled for a semitrailer under manual trailer exception; this does not remove insurance cost",
+    "Commercial inspection uses USD40 station maximum plus USD22 state, not USD50 statutory subtotal nor USD7.50 noncommercial replacement",
+    "No extra full box charge by country; entity UCR and self-propelled HVUT belong elsewhere"
+  ],
+  "limitations": [
+    "Texas registration is a research alternative, not selected pilot ownership or registration",
+    "Annual existing-unit renewal with qualifying commercial inspection; not title, acquisition, replacement plate, TxFLEET electronic checkout or multiyear renewal",
+    "Station maximum is a supported planning assumption, not a paid invoice",
+    "Mexico entry, authorization, customs and trip-specific border treatment unresolved; no unknown cost converted to zero",
+    "No overweight, hazmat or reefer scenario; no current carrier legal eligibility certified"
+  ]
+}

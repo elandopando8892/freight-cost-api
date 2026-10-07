@@ -12,7 +12,8 @@ function fixture() {
     return {
       parameters: { country, serviceDate: '2026-09-29', baseRevision: `TEST-${country}`,
         parameters: PARAMETER_DEFINITIONS.filter(p => needed.has(p.key)).map(p => ({
-          key: p.key, value: p.defaultValue, unit: p.unit, evidenceIds: ['test'], derivation: 'Synthetic' })),
+          key: p.key, value: p.field === 'Qty Recapeadas' ? 0 : p.defaultValue, unit: p.unit,
+          evidenceIds: ['test'], derivation: 'Synthetic installed positions; no additive retread row' })),
         evidence: [{ id: 'test', url: 'https://example.org/test', locator: 'Fixture', country,
           equipment: 'TRACTOR_DRY_VAN_SINGLE', observedAt: '2026-09-01', validFrom: '2026-09-01', validUntil: '2026-09-30', limitations: 'Not economic evidence' }] },
       trip: { loadedKm: datum(100, 'km'), emptyKm: datum(20, 'km'), cycleDays: datum(1, 'days'), tollsUsd: datum(0, 'USD') },
@@ -45,6 +46,15 @@ describe('D2D benchmark assembly', () => {
     const result = calculateBenchmarkD2D(input)
     expect(result.travelOrder).toEqual(['us', 'border', 'mx'])
     expect(result.legs.us.parameterLineage.country).toBe('US')
+  })
+  it.each(['mx', 'us'] as const)('propagates the %s tire-method gap instead of emitting D2D totals', leg => {
+    const input = fixture()
+    input[leg].parameters.parameters.find(p => p.key === 'fcm.v3.cost-tires.qty-recapeadas')!.value = 8
+    const result = calculateBenchmarkD2D(input)
+    expect(result.status).toBe('INCOMPLETE')
+    expect(result.costs).toBeNull()
+    expect(result.issues).toContainEqual({ field: `${leg}.COST_TIRES__Qty Recapeadas`, code: 'RETREAD_POSITION_OR_LIFECYCLE_REQUIRED' })
+    expect(result.legs[leg].leg).toBeNull()
   })
   it.each(['duplicate-coverage', 'duplicate-id', 'missing', 'expired', 'country', 'date', 'parameter', 'trip'] as const)('blocks %s', failure => {
     const input = fixture()
@@ -131,7 +141,7 @@ describe('owned D2D scenario composition', () => {
 })
 
 describe('shared trailer D2D', () => {
-  it.each([[], ['MAINTENANCE'], ['TIRES'], ['MAINTENANCE', 'TIRES']])('accounts for leased monthly inclusions %j once', (...concepts) => {
+  it.each([[], ['MAINTENANCE'], ['TIRES'], ['MAINTENANCE', 'TIRES']] as string[][])('accounts for leased monthly inclusions %j once', (...concepts) => {
     const input = sharedFixture()
     input.sharedTrailer.costAgreement.tenure = 'LEASED'
     input.sharedTrailer.costAgreement.fixedCostBasis = 'LEASE_RENT'
@@ -232,5 +242,96 @@ describe('shared trailer D2D', () => {
     expect(calculateBenchmarkD2D(input).sharedTrailer!.costs!.cvuUsd).toBe(0)
     input.sharedTrailer.totalKm.unit = 'miles'
     expect(() => calculateBenchmarkD2D(input)).toThrow()
+  })
+})
+
+// Computational research only: these durations are not the DF/Fort Smith benchmark.
+const attachmentFixture = () => {
+  const days = (value:number) => ({value,unit:'days',evidenceIds:['test'],derivation:'Synthetic serial phase, not operating evidence'})
+  return { model:'FCM_SERIAL_TRAILER_ATTACHMENT_V1',timeBasis:'COMPATIBLE_ELAPSED_DAYS_NOT_DRIVING_HOURS',
+    scope:'SERIAL_PHASES_NO_OVERLAP_OR_DUPLICATED_BORDER_WAIT',mxTractorReference:'QA-MX-TRACTOR',usTractorReference:'QA-US-TRACTOR',
+    mxAttachedDays:days(0.5),borderDetachedDays:days(0.25),usAttachedDays:days(0.5),
+    evidenceIds:['test'],derivation:'Synthetic two tractors, one box. Corporate identity does not establish this allocation.' }
+}
+
+describe('research-only binational trailer exposure', () => {
+  it('does not force the box to follow detached tractor returns or their empty kilometres', () => {
+    const input = sharedFixture()
+    input.mx.trip.cycleDays.value = 2; input.us.trip.cycleDays.value = 3
+    input.sharedTrailer.cycleDays.value = 1.5; input.sharedTrailer.totalKm.value = 200
+    const before = calculateBenchmarkD2D(input)
+    expect(before.costs).toBeNull()
+    expect(before.issues).toContainEqual({field:'sharedTrailer.cycleDays',code:'TRAILER_TIME_BELOW_LEG_CYCLES'})
+    const after = calculateBenchmarkD2D(input,attachmentFixture())
+    expect(after.status).toBe('BENCHMARK_ESTIMATE')
+    expect(after.legs).toEqual(before.legs)
+    expect(after.sharedTrailer!.costs).toMatchObject({cfuByTimeUsd:75,cfuUsd:75,cvuUsd:30,productionCostUsd:105})
+    expect(after.trailerAttachment).toMatchObject({minimumTrailerDays:1.25,calibrated:false,assumptionsVerified:false})
+    const cents = [after.legs.mx.leg!.costs!.productionCostUsd,after.legs.us.leg!.costs!.productionCostUsd,105,150.25]
+      .reduce((sum,value) => sum + Math.round(value*100),0)
+    expect(after.costs!.productionCostUsd).toBe(cents/100)
+    expect(after.purchaseCostUsd).toBeNull(); expect(after.sellPriceUsd).toBeNull(); expect(after.calibrated).toBe(false)
+  })
+  it('preserves old outputs and accepts serial phases in either travel direction', () => {
+    const input = sharedFixture()
+    expect(calculateBenchmarkD2D(input,undefined)).toEqual(calculateBenchmarkD2D(input))
+    const forward = calculateBenchmarkD2D(input,attachmentFixture())
+    const backward = calculateBenchmarkD2D({...input,direction:'US_TO_MX'},attachmentFixture())
+    expect(backward.costs).toEqual(forward.costs)
+    expect(backward.travelOrder).toEqual(['us','border','mx'])
+    expect(forward.trailerAttachment!.evidenceCoverage.mxAttachedDays).toEqual(['test'])
+  })
+  it.each(['one-tractor','tractor-is-trailer','mx-time','us-time','box-time','unknown-reference','duplicate-reference','expired','no-shared-box'] as const)
+    ('fails closed for incompatible exposure: %s', kind => {
+      const input = sharedFixture(), attachment = attachmentFixture()
+      if (kind === 'one-tractor') attachment.usTractorReference = attachment.mxTractorReference
+      if (kind === 'tractor-is-trailer') attachment.mxTractorReference = input.sharedTrailer.assetReference
+      if (kind === 'mx-time') attachment.mxAttachedDays.value = 2
+      if (kind === 'us-time') attachment.usAttachedDays.value = 2
+      if (kind === 'box-time') input.sharedTrailer.cycleDays.value = 1
+      if (kind === 'unknown-reference') attachment.borderDetachedDays.evidenceIds = ['unknown']
+      if (kind === 'duplicate-reference') attachment.evidenceIds = ['test','test']
+      if (kind === 'expired') input.sharedTrailer.evidence[0].validUntil = '2026-09-28'
+      if (kind === 'no-shared-box') input.assetAllocation = 'SEPARATE_TRACTOR_TRAILER_PER_LEG'
+      const result = calculateBenchmarkD2D(input,attachment)
+      expect(result.status).toBe('INCOMPLETE'); expect(result.costs).toBeNull(); expect(result.issues.length).toBeGreaterThan(0)
+      if (kind === 'one-tractor') expect(result.issues).toContainEqual({field:'trailerAttachment.tractorReferences',code:'ONE_TRACTOR_TWO_NATIONAL_BUDGETS_UNSUPPORTED'})
+    })
+  it('does not replace missing national cycles or accept zero loaded attachment time', () => {
+    const input = sharedFixture(), attachment = attachmentFixture()
+    expect(calculateBenchmarkD2D({...input,mx:{...input.mx,trip:{...input.mx.trip,cycleDays:null}}},attachment).costs).toBeNull()
+    attachment.mxAttachedDays.value = 0
+    expect(calculateBenchmarkD2D(input,attachment).issues).toContainEqual({field:'trailerAttachment.mxAttachedDays',code:'ZERO_LOADED_ATTACHMENT_TIME'})
+  })
+  it('requires an evidenced detached zero and rejects injected price, units and incomplete partitions', () => {
+    const input = sharedFixture(), attachment = attachmentFixture()
+    attachment.borderDetachedDays.value = 0
+    expect(calculateBenchmarkD2D(input,attachment).status).toBe('BENCHMARK_ESTIMATE')
+    expect(() => calculateBenchmarkD2D(input,{...attachment,borderDetachedDays:{...attachment.borderDetachedDays,evidenceIds:[]}})).toThrow()
+    expect(() => calculateBenchmarkD2D(input,{...attachment,borderDetachedDays:{...attachment.borderDetachedDays,unit:'hours'}})).toThrow()
+    expect(() => calculateBenchmarkD2D(input,{...attachment,mxAttachedDays:null})).toThrow()
+    expect(() => calculateBenchmarkD2D(input,{...attachment,productionCostUsd:1})).toThrow()
+    expect(() => calculateBenchmarkD2D(input,{...attachment,usAttachedDays:{...attachment.usAttachedDays,value:-1}})).toThrow()
+    expect(() => calculateBenchmarkD2D(input,{...attachment,usAttachedDays:{...attachment.usAttachedDays,value:Infinity}})).toThrow()
+  })
+  it('keeps the optional research argument out of HTTP/form payload schemas', () => {
+    const input = sharedFixture(), owned = ownedFixture(), attachment = attachmentFixture()
+    expect(() => calculateBenchmarkD2D({...input,trailerAttachment:attachment})).toThrow()
+    expect(() => calculateOwnedD2DScenarios({...owned,trailerAttachment:attachment})).toThrow()
+    expect(() => calculateOwnedD2DScenarios({...owned,trailer:{...owned.trailer,trailerAttachment:attachment}})).toThrow()
+  })
+  it('preserves evidence namespacing in owned scenarios, without inventing a cost basis', () => {
+    const input = ownedFixture()
+    input.route.mx.trip.cycleDays.value = 2; input.route.us.trip.cycleDays.value = 3
+    input.trailer.cycleDays.value = 1.5
+    const result = calculateOwnedD2DScenarios(input,attachmentFixture())
+    expect(result.status).toBe('SCENARIO_ONLY')
+    const scenario = result.scenarios![0].result
+    expect(scenario.trailerAttachment!.evidenceCoverage).toEqual({declaration:['trip:test'],
+      mxAttachedDays:['trip:test'],borderDetachedDays:['trip:test'],usAttachedDays:['trip:test']})
+    expect(scenario.sharedTrailer!.costs!.cfuUsd).toBe(24.75)
+    expect(result.calibrated).toBe(false)
+    const bad = attachmentFixture(); bad.evidenceIds = ['not-in-trip-dossier']
+    expect(calculateOwnedD2DScenarios(input,bad).scenarios).toBeNull()
   })
 })

@@ -12,6 +12,7 @@ export type PreviewCapture = {
   service: string
   equipment: EquipmentSpec
   fxRate: number | null
+  serviceDate?: string | null
 }
 
 export type PreviewLineage = {
@@ -48,7 +49,8 @@ export function verifiedPreviewData(preview: { capture: unknown; lineage: unknow
     || !equal(result.fxRateUsed, preview.snapshot.output.fxRateUsed)
     || !equal(result.commercial?.costFloorUsd, preview.snapshot.output.costFloorUsd)
     || !equal(result.commercial?.recommendedSellUsd, preview.snapshot.output.recommendedSellUsd)
-    || capture.operation !== result.operation || capture.service !== preview.snapshot.input.service) {
+    || capture.operation !== result.operation || capture.service !== preview.snapshot.input.service
+    || (preview.snapshot.input.usaLeg?.fuelReview && capture.serviceDate !== preview.snapshot.input.usaLeg.fuelReview.serviceDate)) {
     throw Object.assign(new Error('La vista previa y su cálculo no coinciden. Calcula de nuevo.'), { statusCode: 409 })
   }
   return { capture, lineage, snapshot: preview.snapshot, result }

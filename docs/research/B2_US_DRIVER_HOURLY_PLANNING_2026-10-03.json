@@ -1,0 +1,95 @@
+{
+  "model": "FCM_US_DRIVER_HOURLY_MIE_PLANNING_V1",
+  "reviewedOn": "2026-10-03",
+  "capture": "DIRECT_PRIMARY_WEB_READER_EXTRACT_NOT_ORIGINAL_DOCUMENT_ARCHIVE",
+  "referencePeriod": "2026-10",
+  "wage": {
+    "period": "2025-05",
+    "occupation": "Heavy and tractor-trailer truck drivers",
+    "soc": "53-3032",
+    "population": "US_NATIONAL_WAGE_AND_SALARY_EMPLOYEES_NOT_OWNER_OPERATORS",
+    "meanHourlyUsd": 28.71,
+    "meanAnnualUsd": 59710,
+    "hourlyInputNotAnnualDividedBy2080": true,
+    "basis": "STRAIGHT_TIME_GROSS_INCLUDES_PRODUCTION_INCENTIVES_EXCLUDES_PREMIUM_AND_EMPLOYER_BENEFITS"
+  },
+  "employerCostFactor": {
+    "period": "2026-06",
+    "occupationGroup": "Transportation and material moving occupations",
+    "population": "US_PRIVATE_INDUSTRY_ALL_WORKERS_IN_GROUP_NOT_TRUCK_DRIVER_ONLY",
+    "totalHourlyUsd": 36.38,
+    "wagesHourlyUsd": 24.97,
+    "benefitsHourlyUsd": 11.41,
+    "paidLeaveHourlyUsd": 2.13,
+    "supplementalPayHourlyUsd": 1.31,
+    "insuranceHourlyUsd": 3.51,
+    "retirementHourlyUsd": 1.47,
+    "legallyRequiredHourlyUsd": 3.00,
+    "workerCompensationIncludedInThisPeriod": true,
+    "futureSeriesBoundaryMustBeRevalidated": true,
+    "basis": "COST_PER_HOUR_WORKED_TOTAL_DIVIDED_BY_WAGES_NOT_BENEFIT_PERCENT_ADDED_TO_TOTAL"
+  },
+  "mealAndIncidentals": {
+    "notice": "2026-60",
+    "effectiveFrom": "2026-10-01",
+    "publishedTransportationConusUsdPerDay": 80,
+    "allocation": "DECLARED_ALLOWANCE_PER_STARTED_24H_ASSIGNED_US_CYCLE_BLOCK_NOT_TAX_CALENDAR_DAY_SUBSTANTIATION",
+    "lodging": "SLEEPER_CAB_ORDINARY_REFERENCE_SCOPE_NO_ROUTINE_HOTEL_CHARGE",
+    "otherIncidentalRateAdded": false,
+    "deductionOrTaxSavingsComputed": false,
+    "carrierReimbursementObserved": false
+  },
+  "timePolicy": {
+    "scope": "ONE_EQUIVALENT_HOURLY_COMPENSATED_US_DRIVER_POSITION_PER_ASSIGNED_DUTY_NOT_MONTHLY_GUARANTEE",
+    "paid": "NOMINAL_LOADED_AND_EMPTY_DRIVING_PLUS_MOVEMENT_BREAKS_TERMINAL_HANDLING_HANDOFF_AND_ORDINARY_DUTY_SYNCHRONIZATION_WAIT",
+    "unpaid": "NOMINAL_MOVEMENT_OFF_DUTY_PLUS_DECLARED_RECOVERY_REST",
+    "synchronizationWait": "DECLARED_COMPENSATED_REFERENCE_NOT_MEASURED_ON_DUTY_LOG_OR_ON_CALL_PAY_BENCHMARK",
+    "paidLeaveAndPremiumsAddedAgain": false,
+    "weeklyDutyOrLaborComplianceProven": false
+  },
+  "formula": "mean_driver_hourly_wage * (group_total_hourly_compensation / group_hourly_wages) * declared_paid_worker_hours + 80 * started_US_assignment_24h_blocks",
+  "replacesMileageAggregate": true,
+  "extraAtRiPerDiemOrBonusesOrStatutoryPercentAdded": false,
+  "scope": "DECLARED_ORDINARY_US_EMPLOYEE_COMPENSATION_AND_MIE_SCENARIO_NOT_OBSERVED_CARRIER_COST",
+  "sources": [
+    {
+      "id": "BLS_OEWS_MAY2025_DRIVER",
+      "url": "https://www.bls.gov/news.release/archives/ocwage_05152026.htm",
+      "locator": "May2025 Table1; Heavy and tractor-trailer truck drivers; mean hourly28.71, annual59710; technical concepts distinguish gross straight-time wage and excluded premiums/benefits. Direct HTML reader.",
+      "period": "2025-05"
+    },
+    {
+      "id": "BLS_ECEC_JUNE2026_OCCUPATION",
+      "url": "https://www.bls.gov/news.release/archives/ecec_09092026.htm",
+      "locator": "June2026 Table4, all-private occupational group Transportation and material moving occupations (not goods-producing/service/industry subrows): total36.38, wage24.97, benefits11.41. Release09Sep2026 retains workers compensation; December2026 series will remove it.",
+      "period": "2026-06"
+    },
+    {
+      "id": "BLS_ECEC_CONCEPTS",
+      "url": "https://www.bls.gov/opub/hom/ecec/concepts.htm",
+      "locator": "Total/wages/benefits, five benefit categories and cost-per-hour-worked denominator; deadhead included; room/board and on-call excluded. Direct HTML reader.",
+      "period": "CONCEPTS_READ_2026-10-03"
+    },
+    {
+      "id": "IRS_NOTICE2026_60_TRANSPORTATION_MIE",
+      "url": "https://www.irs.gov/pub/irs-drop/n-26-60.pdf",
+      "locator": "Notice2026-60 Section3, printedpage2: transportation CONUS80USD/day; Section6, printedpage8: effective01Oct2026. Direct primary PDF text reader; screenshot calls did not expose image pixels in this tool surface.",
+      "period": "EFFECTIVE_2026-10-01"
+    }
+  ],
+  "limitations": [
+    "Mean OEWS job wage multiplied by broader ECEC group total/wage ratio is a declared transfer, not a joint observation, local price or matched53ft carrier calibration.",
+    "Different source periods are retained without implicit inflation or a service-date claim. Other geography, fleet size and compensation contracts require review.",
+    "Benefits are a total planning envelope, not individual tax or bonus microvalues. Do not add FICA, workers compensation, retirement, premiums or ATRI bonuses a second time.",
+    "Assigned hourly position, paid breaks and synchronization wait are declared operating hypotheses; no actual payroll guarantee, paid waiting contract, ELD or weekly labor/HOS compliance is established.",
+    "Ordinary recovery rest/sleeper time is not multiplied by hourly wage. Away-time blocks remain a separate meal/incidental quantity.",
+    "IRS amount is a public substantiation reference transferred into a declared employer allowance, not a required reimbursement, market-average meal bill or lodging price.",
+    "Started24h assignment blocks are a planning expense policy, not real calendar first/last-day tax allocation. No80percent deduction, tax benefit or tax eligibility is inferred.",
+    "Reference assumes sleeper cab, no routine hotel, no extraordinary travel or on-call compensation. Actual required lodging, changing driver assignments or guarantee contracts need a new applicable scope, not automatic zero.",
+    "No MX remuneration/admin/asset costs are included. The old mileage aggregate, including its unsplit per diem, is replaced wholly rather than retained alongside this allowance.",
+    "A documented complete component under these ordinary planning assumptions does not establish a complete D2D estimate or production quote readiness."
+  ],
+  "calibrated": false,
+  "quoteReady": false,
+  "adoptedValues": 0
+}

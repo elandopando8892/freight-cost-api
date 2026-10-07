@@ -1,0 +1,27 @@
+{
+  "artifact":"FCM_B2_MX_DRIVING_STAGE_REFERENCE",
+  "reviewedAt":"2026-10-01T22:03:00-06:00",
+  "status":"CONDITIONAL_DRIVING_STAGE_NOT_PILOT_CYCLE",
+  "sources":[
+    {"id":"NOM087_RULES","url":"https://sidof.segob.gob.mx/notas/docFuente/5529381","archive":{"file":"docs/research/sources/NOM087_DRIVING_RULES_20261001.html","sha256":"50b74e73ecdc5e242f5af5441d918e86ee242c07490dcb34479b4c053ffcbea2"},"locator":"Carga: sections4.1,4.2,4.6,4.7 and8.3.2","observation":"Half-hour pauses after five driving hours; maximum14 driving hours in24; eight-hour continuous pause for14-hour driving routes. Driving limits do not establish employment/overtime compliance or cycle-time averages"},
+    {"id":"NOM087_CURRENT_STATUS","url":"https://platiica.economia.gob.mx/normalizacion/nom-087-sct-2-2017/","archive":{"file":"docs/research/sources/NOM087_STATUS_20261001.html","sha256":"a984de8ebab7c149164b4b2f085b8bf9eb32b250ad8e0bd9f2a4be7d28aae3b7"},"locator":"Current primary catalog: Estado de la Norma Vigente; revision confirmation2023","observation":"2026 normalization program lists replacement work; a project or planned cancellation is not completed substitution"},
+    {"id":"FMCSA_HOS_SCOPE","url":"https://www.fmcsa.dot.gov/regulations/hours-service/summary-hours-service-regulations","archive":null,"locator":"Primary reader property-carrying column, not passenger; page updated2022-03-28","observation":"US11h driving/14h window/10h reset, half-hour break after8h cumulative driving,60/70 in7/8 days. Not applied to MX; no US route time retained","directArchiveStatus":"DOWNLOAD_FAILED","scopeOnlyNoUsNumericStage":true},
+    {"id":"PAMT_SCOPE_RECHECK","url":"https://www.sec.gov/Archives/edgar/data/798287/000143774926026560/ptsi20260630_10q.htm","archive":null,"locator":"Consolidated and segment salaries/wages/benefits; mixed truckload and brokerage","observation":"Combined salaries do not identify an office-only payroll pool compatible with the MX monitor salary hypothesis"}
+  ],
+  "reusedPins":[
+    {"id":"sakbeMxDetail","file":"docs/research/B2_SAKBE_MX_LIVE_DETAIL_2026-09-30.json","sha256":"731cb21c1f7bfe2196ab90b12d56a91d4ebd4b1ef5b698ce73209341958b2970"},
+    {"id":"googleUsReceipt","file":"docs/research/B2_GOOGLE_BASIC_LIVE_RECEIPT_2026-09-30.json","sha256":"38ac14333857627c86defeaa76ef82f604fc307837234929b2dd5c5e218980f8"}
+  ],
+  "comparison":[
+    {"method":"IDEAL_MINUTES_DIVIDED_BY24_AS_CYCLE_DAYS","decision":"REJECT","reason":"Omits pauses, overnight rest, duty/handling, border, return and actual truck conditions"},
+    {"method":"EXPLICIT_DRIVING_CLOCK_STAGE","decision":"ADAPT_WITH_NO_CYCLE_ADOPTION","reason":"Adds dated public driving-rule structure and distinguishes ten-hour planning hypothesis from fourteen-hour legal-cap sensitivity; existing serial-box and MAX allocation unchanged"},
+    {"method":"OPTIMIZATION_OR_DISPATCH_SOLVER","decision":"REJECT_FOR_THIS_SCOPE","reason":"User needs mapped routes and economic estimation, not routing optimization; no new infrastructure/provider"}
+  ],
+  "scenarios":[
+    {"scenarioId":"MX_NOMINAL_DRIVING_TEN_HOUR_BLOCK","country":"MX","drivingTimeBasis":"SAKBE_IDEAL_TIME_ASSUMED_AS_DRIVING_SENSITIVITY_NOT_TRUCK_OBSERVATION","drivingHoursPer24HourBlock":10,"blockHours":24,"breakAfterDrivingHours":5,"breakHours":0.5,"freshDriverAtStartHypothesis":true,"excludesHandlingBorderReturnAndOtherDuty":true},
+    {"scenarioId":"MX_NOMINAL_DRIVING_FOURTEEN_HOUR_CAP","country":"MX","drivingTimeBasis":"SAKBE_IDEAL_TIME_ASSUMED_AS_DRIVING_SENSITIVITY_NOT_TRUCK_OBSERVATION","drivingHoursPer24HourBlock":14,"blockHours":24,"breakAfterDrivingHours":5,"breakHours":0.5,"freshDriverAtStartHypothesis":true,"excludesHandlingBorderReturnAndOtherDuty":true}
+  ],
+  "policy":{"tenHourBlockIsPlanningHypothesisNotPublishedAverage":true,"fourteenHourCapNotLaborPermission":true,"fullBlocksRepeatEvery24HoursNotDrivePlusEightHourReset":true,"terminalPauseOrResetNotAdded":true,"actualTruckTimeCanDifferFromIdealTime":true,"notALowerBoundOrDeliveryPromise":true,"nominalRouteIsNotOperationalEndpointApproval":true,"sameDriverWholeD2DInferred":false,"boxInheritsTractorReturn":false,"adminFleetQuantityInvented":false,"googleDistanceInferredFromReceipt":false},
+  "remaining":["US route distance/time unavailable in stored receipt: fresh permitted route review required; do not fabricate or retain provider data outside licensed terms","Truck-compatible endpoints/routes and actual driving-time model not established","Handling, frontier phases, waiting windows, loaded/empty return and tractor release not quantified","Neither stage is complete tractor cycle or serial shared-box exposure; no admin assignment denominator yet","Complete compatible fixed pool and variables still required for CFU/CVU"],
+  "actualMxCycleDays":null,"actualUsCycleDays":null,"sharedTrailerCycleDays":null,"adminAllocationAmount":null,"adoptedValues":0,"quoteReady":false
+}

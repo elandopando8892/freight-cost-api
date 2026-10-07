@@ -17,6 +17,9 @@ next-env.d.ts
 .env.*.local
 *.env.local
 
+# Scoped Windows-encrypted local review credential and non-content usage markers
+/.fcm-local-review/
+
 # Prisma local artifacts
 # Migration SQL is intentionally versioned; only local database files are ignored.
 **/*.db

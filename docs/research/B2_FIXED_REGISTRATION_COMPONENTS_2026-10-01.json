@@ -1,0 +1,160 @@
+{
+  "artifact": "FCM_B2_PUBLIC_REGISTRATION_COMPONENTS",
+  "observedAt": "2026-10-01",
+  "purpose": "Document published components, not a complete carrier budget or adopted parameters",
+  "pins": [
+    {"file":"docs/research/B2_D2D_READINESS_CASE_2026-09-30.json","sha256":"a897778d6f907b1041895f9bcace01cd91654cd2cb51dc9abc0570369024d28b"},
+    {"file":"docs/research/B2_BINATIONAL_OWN_RELAY_SELECTED.json","sha256":"9e169339515fb467f5207748d3c0676bed1dbb6cfb30b01f0696b56ccfd4a775"},
+    {"file":"docs/research/B2_BINATIONAL_FIXED_BUDGET_WORKSHEET_2026-10-01.json","sha256":"63629b174897277ce5501f833e9c24a40fdd24e4c2e323e8663366e2a1a24b80"}
+  ],
+  "sources": [
+    {
+      "id":"UCR_FINAL_RULE",
+      "url":"https://www.federalregister.gov/documents/2026/09/01/2026-17893/fees-for-the-unified-carrier-registration-plan-and-agreement",
+      "locator":"Printed page 56072, final regulatory tables in sections 367.40 and 367.50",
+      "publicationDate":"2026-09-01",
+      "effectiveDate":"2026-10-01",
+      "capture":"ARCHIVED_HTML",
+      "archive":{"file":"docs/research/sources/UCR_FINAL_RULE_20260901_REVIEW_20261001.html","sha256":"8c9b12543893261091906e2104511cc35924e714818b9c07f02f9a3af1a9cd6f"}
+    },
+    {
+      "id":"TX_TOKEN",
+      "url":"https://www.txdmv.gov/motor-carriers/commercial-fleet-registration/token-trailers",
+      "locator":"Do You Qualify?; Fees and Payment Information; More Information",
+      "publicationDate":null,
+      "effectiveDate":null,
+      "capture":"ARCHIVED_HTML",
+      "archive":{"file":"docs/research/sources/TX_TOKEN_TRAILERS_REVIEW_20261001.html","sha256":"5a9b721fae87afd5b41197ea20dba992a757c10fe51f5de7fc42267fc3bd6b2f"}
+    },
+    {
+      "id":"TX_IRP",
+      "url":"https://www.txdmv.gov/motor-carriers/commercial-fleet-registration/apportioned-registration",
+      "locator":"Fees and Payment Information: distance percentages per jurisdiction",
+      "publicationDate":null,
+      "effectiveDate":null,
+      "capture":"ARCHIVED_HTML",
+      "archive":{"file":"docs/research/sources/TX_IRP_REVIEW_20261001.html","sha256":"25872beed92607eb00ae291cbf0da2c5622e8b2106ca53a51f4f8c8d9bb40a9c"}
+    },
+    {
+      "id":"FMCSA_AUTHORITY",
+      "url":"https://www.fmcsa.dot.gov/faq/what-cost-obtaining-operating-authority-mcffmx-number",
+      "locator":"FAQ body: individual operating authority fees; last updated May 20, 2023",
+      "publicationDate":"2023-05-20",
+      "effectiveDate":null,
+      "capture":"LIVE_WEB_READ_ARCHIVE_GET_403",
+      "archive":null
+    },
+    {
+      "id":"SICT_FEE_TABLE",
+      "url":"https://micrs.sct.gob.mx/index.php/transporte-y-medicina-preventiva/autotransporte-federal/tramites-y-servicios/requisito-y-costos-de-los-tramites",
+      "locator":"Rows 12 SCT-03-008-A and 44 SCT-03-039-A",
+      "publicationDate":null,
+      "effectiveDate":null,
+      "capture":"ARCHIVED_HTML",
+      "archive":{"file":"docs/research/sources/SICT_DGAF_FEE_TABLE_REVIEW_20261001.html","sha256":"2227d08d582356853ebe12b992786d446dd1bd6a89a12fcec4d52d0eb8540715"}
+    }
+  ],
+  "ucr": {
+    "sourceId":"UCR_FINAL_RULE",
+    "currency":"USD",
+    "unit":"entity/registration-year",
+    "bracketBasis":"Commercial motor vehicles owned or operated, as defined in the regulatory table; not number of legs in this quote",
+    "schedules":[
+      {"registrationYear":2026,"section":"367.40","rows":[
+        {"bracket":"B1","vehicleRange":"0-2","annualUsd":46},
+        {"bracket":"B2","vehicleRange":"3-5","annualUsd":138},
+        {"bracket":"B3","vehicleRange":"6-20","annualUsd":276},
+        {"bracket":"B4","vehicleRange":"21-100","annualUsd":963},
+        {"bracket":"B5","vehicleRange":"101-1,000","annualUsd":4592},
+        {"bracket":"B6","vehicleRange":"1,001 and above","annualUsd":44836}
+      ]},
+      {"registrationYear":2027,"section":"367.50","rows":[
+        {"bracket":"B1","vehicleRange":"0-2","annualUsd":55},
+        {"bracket":"B2","vehicleRange":"3-5","annualUsd":167},
+        {"bracket":"B3","vehicleRange":"6-20","annualUsd":333},
+        {"bracket":"B4","vehicleRange":"21-100","annualUsd":1163},
+        {"bracket":"B5","vehicleRange":"101-1,000","annualUsd":5548},
+        {"bracket":"B6","vehicleRange":"1,001 and above","annualUsd":54165}
+      ]}
+    ],
+    "monthlyNormalization":"annualUsd / 12; preserve annual basis, do not multiply a prematurely rounded monthly display by 12",
+    "applicableRegistrantCount":null,
+    "selectedBracket":null,
+    "selectedRegistrationYear":null,
+    "allocatedMonthlyUsd":null,
+    "limitations":"Reference group is not an identified registrant. Same binational group does not establish one legal registrant. Do not charge the entity fee once per tractor, trailer or trip; applicability and allocation remain unselected. Article effective date is not the registration year. Recheck subsequent amendments before use."
+  },
+  "tokenTrailer": {
+    "sourceId":"TX_TOKEN",
+    "currency":"USD",
+    "annualBaseUsd":15,
+    "monthlyBaseReferenceUsd":1.25,
+    "normalization":"15 / 12; for a prepaid term y, base cash = 15*y and service months = 12*y",
+    "allowedTermYears":[1,2,3,4,5],
+    "scope":"One eligible semitrailer registration, not all trailer ownership costs",
+    "eligibility":"Gross weight greater than 6,000 lb; qualifying tractor and plate type. A 53-foot length alone does not certify eligibility or Texas registration.",
+    "creditCardSurcharge":{"fixedUsd":0.25,"percent":2.25},
+    "localFeesUsd":null,
+    "selectedPaymentMethod":null,
+    "selectedTermYears":null,
+    "compatibleRegistrationProfile":null,
+    "completeMonthlyPermitUsd":null,
+    "limitations":"Base only, excludes applicable local fees and other registration/title/compliance costs. Non-expiring plates do not mean perpetual paid registration. Same trailer must not be billed again for the US leg. No actual registration jurisdiction selected."
+  },
+  "authority": {
+    "sourceId":"FMCSA_AUTHORITY",
+    "currency":"USD",
+    "feePerIndividualAuthorityUsd":300,
+    "chargeBasis":"ONE_TIME_NONREFUNDABLE_APPLICATION",
+    "recurringAnnualUsd":null,
+    "monthlyRecurringUsd":null,
+    "selectedNewAuthorityCount":null,
+    "amortizationMonths":null,
+    "limitations":"Opening event, not an annual USD 300 renewal or automatic USD 25/month. Neither a new applicant nor an existing authority has been identified. An explicit setup-cost scenario and horizon would be needed to amortize."
+  },
+  "mxPermitObservations": [
+    {
+      "sourceId":"SICT_FEE_TABLE","procedure":"SCT-03-008-A","currency":"MXN",
+      "scope":"Expedition of federal general freight service permit",
+      "feeByApplicationChannel":{"IN_PERSON":5078.8,"ELECTRONIC":3873.42},
+      "chargeBasis":"ISSUANCE_EVENT_NOT_ESTABLISHED_ANNUAL_RENEWAL",
+      "feeValidityYear":null,"selectedChannel":null,"monthlyUsd":null,
+      "status":"PUBLISHED_OBSERVATION_VALIDITY_UNRESOLVED",
+      "limitations":"Undated table is not proof of 2026 tariff validity. Do not sum alternative channels or convert to monthly USD without period, FX basis and cost treatment."
+    },
+    {
+      "sourceId":"SICT_FEE_TABLE","procedure":"SCT-03-039-A","currency":"MXN",
+      "scope":"General freight trailer hauling in US border strip/crossings, not Mexico DF long-haul authorization",
+      "feeByApplicationChannel":{"IN_PERSON":948.55,"ELECTRONIC":307.89},
+      "chargeBasis":"ISSUANCE_EVENT_NOT_ESTABLISHED_ANNUAL_RENEWAL",
+      "feeValidityYear":null,"selectedChannel":null,"monthlyUsd":null,
+      "status":"PUBLISHED_OBSERVATION_VALIDITY_UNRESOLVED",
+      "limitations":"Separate procedure and coverage, not an interchangeable long-haul fee or automatic extra charge. Applicable entity and validity unresolved."
+    }
+  ],
+  "mxHistoricalIndexConflict": {
+    "url":"https://www.gob.mx/tramites/ficha/expedicion-del-permiso-para-el-servicio-de-autotransporte-federal-de-carga-general/SCT1699",
+    "capture":"SEARCH_INDEX_ONLY_LIVE_OPEN_FAILED",
+    "indexedFeesMxn":{"IN_PERSON":4858,"ELECTRONIC":3705},
+    "limitations":"Different indexed amounts, no verified validity year or live body. Not current evidence and not averaged with the archived table.",
+    "selectedCurrentFee":null
+  },
+  "irp": {
+    "sourceId":"TX_IRP",
+    "basis":"Distance percentages for the vehicle or fleet in each jurisdiction; reporting-period method rather than this one-way quote distance",
+    "annualUsd":null,
+    "monthlyUsd":null,
+    "limitations":"Base jurisdiction, registered weight, reporting distance or authorized average-distance basis, registration period and compatible profile unresolved. A flat Texas combination-plate figure is not the complete apportioned registration budget. Other taxes/compliance costs are not inferred zero."
+  },
+  "capitalFreshness": [
+    {"url":"https://rodaltruckfinancials.com/catalogo/freightliner-cascadia-2021--vhc-f8668c8f02","status":"LIVE_ASKING_PRICE_OBSERVED","askingMxnBeforeVat":1198275.86,"limitations":"Used 2021 Cascadia offer, 694920 km; not a transaction, capitalizable acquisition total, residual value or complete monthly depreciation. Availability subject to seller confirmation."},
+    {"url":"https://schneider.com/used-equipment/semi-trucks-for-sale/20753","status":"LIVE_404_PREVIOUS_REFERENCE_HISTORICAL_ONLY","askingPrice":null,"limitations":"Keep original September 29 observation intact. Do not present earlier 45000 with unresolved currency as a current available USD acquisition anchor."}
+  ],
+  "outcome": {
+    "numericalCoverage":"12 year/bracket fees, one trailer annual base and one authority application fee; two MX procedure/channel observations with unresolved validity",
+    "completeMonthlyFixedBudgetUsd":null,
+    "cfuUsd":null,"cvuUsd":null,
+    "calibrated":false,"quoteReady":false,"adoptedValues":0,
+    "limitations":"Components are research evidence only. No complete permit row or capital/insurance/overhead budget is inferred from these numbers. No DB, canonical input, pricing-engine, UI or external configuration write."
+  }
+}

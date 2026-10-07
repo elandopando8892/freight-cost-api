@@ -1,0 +1,29 @@
+{
+  "artifact":"FCM_B2_MONITORING_COVERAGE_REFERENCE",
+  "reviewedAt":"2026-10-01T21:52:48-06:00",
+  "status":"PUBLIC_SERVICE_COVERAGE_AND_EXPLICIT_CAPACITY_SCENARIO_NOT_OBSERVED_ROSTER",
+  "sources":[
+    {"id":"LFT_COVERAGE_2026","url":"https://www.diputados.gob.mx/LeyesBiblio/pdf/LFT.pdf","archive":{"file":"docs/research/sources/LFT_COVERAGE_REVIEW_20261001.pdf","sha256":"12f09393a1951a91c3f57f579bf611b034edf1a5f78cdbfb828e23ff3a9acbf7"},"locator":"Physical pages 22,23,24,454 fully rendered and visually reviewed; reform 2026-05-14; May 1 decree transitory weekly limits","observation":"2026 48 weekly hours; daily 8 day/7 night/7.5 mixed; continuous break at least half hour; six workdays then paid weekly rest; first-year 12 vacation workdays; Sunday premium and holiday additional pay remain separate"},
+    {"id":"TRAYECTO_CONTINUOUS_MONITORING","url":"https://trayecto.com/forumtrayecto/wp-content/uploads/2023/04/FAQ-Trayecto.pdf","archive":null,"locator":"Primary web reader physical page 3, 2023 FAQ; not a current staffing measurement","observation":"Carrier advertises satellite monitoring 24 hours seven days; no monitor count or units per employee published","originalHttpResponseArchived":false,"directDownloadStatus":"BLOCKED_INCIDENT_PAGE","webScreenshotStatus":"CACHE_MISS","carrierRosterVerified":false},
+    {"id":"TRAYECTO_MONITOR_WAGE_RECHECK","url":"https://careers.trayecto.com/monitorista-satelital-CBlgyOklPF8f/","archive":null,"locator":"Primary web reader, salary header and rotating eight-hour schedule; publication absolute date not established","observation":"General Escobedo NL monthly advertised MXN 15000-16000; gross/net unresolved; eight-hour rotating schedule is not evidence that each night shift is legally eight hours","reusedReadoutRef":"facilityStaffing#/sources/3"}
+  ],
+  "comparison":[
+    {"approach":"ONE_EMPLOYEE_SALARY_COMPONENT","decision":"KEEP_HISTORICAL_NOT_CONTINUOUS_COVERAGE","reason":"Existing one-FTE arithmetic neither covers 8760 hours nor establishes a fleet workload"},
+    {"approach":"INTERNAL_CONTINUOUS_SEAT_CAPACITY","decision":"ADAPT_EXISTING_EMPLOYER_AND_STAFFING_HELPERS","reason":"Reuses benchmark wages and statutory components; explicit coverage, leave and break assumptions give a reproducible staffing quantity without inventing carrier facts"},
+    {"approach":"EXTERNAL_MONITORING_FEE_PER_UNIT","decision":"DEFER_NO_COMPATIBLE_VERIFIED_FEE_AND_SERVICE_SCOPE","reason":"An external subscription is not automatically equivalent to internal tracking/customer-service duties; no new provider or activation"}
+  ],
+  "scenario":{
+    "scenarioId":"MX_ONE_SEAT_CONTINUOUS_CONSERVATIVE_2026",
+    "year":2026,"concurrentSeats":1,"coverageHoursPerDay":24,"coverageDaysPerWeek":7,
+    "paidShiftHours":6,"paidWorkdaysPerWeek":6,"breakReliefHoursPerWorkday":0.5,
+    "annualVacationWorkdays":12,"additionalUnavailableWorkdays":0,
+    "additionalUnavailableBasis":"Scenario excludes sickness, training and other absence; zero is an explicit sensitivity input, not observed absence",
+    "compensationHypothesis":"FULL_MONTHLY_WAGE_NOT_PRORATED_BY_SHIFT_HOURS",
+    "holidaysPolicy":"CONTINUOUS_SERVICE_HOLIDAYS_WORKED_PREMIUM_UNRESOLVED",
+    "illustrativeNotCarrierFacts":true
+  },
+  "quantityPolicy":{"oneConcurrentSeatIsScenarioNotBenchmarkHeadcount":true,"sixHourShiftIsDesignHypothesisNotPublishedVacancySchedule":true,"annualizedWeeklyRestNotExactCalendarRoster":true,"roundedEmployeesNotProofOfFeasibleRota":true,"vacationSalaryNotAddedAgain":true,"salarySourceGrossNetUnresolved":true,"sameFullMonthlyWageForShorterShiftExplicitHypothesis":true,"sourceGeographyUnchanged":"General Escobedo, Nuevo Leon","capacityMeasuredInSeatHoursNotTruckKilometres":true},
+  "integration":{"role":"TRACKING_CS","economicExpenseId":"GROUP_ADMIN_COMPANY_SINGLE_POOL","employeeComponentRef":"mxWorkRisk#/scenario","localPayrollTaxRef":"nlPayrollTax#/scenario","endpointsAreAlternativesNotAdditive":true,"componentPeriod":"October 2026 contributions plus annual-average benefit and NL tax accrual; not annualized October contributions or actual October payroll","allocateOnceBeforeResources":true,"modelFleetQuantity":null,"monitoredUnitsPerSeat":null,"resourceAllocationShares":null},
+  "remaining":["Validate feasible daily rota, break relief and leave scheduling; annual capacity alone is insufficient","Sunday/mandatory-holiday compensation and resulting SBC/tax effects not priced; no zero-cost claim","Source gross/net, benefits and risk registration remain public-model hypotheses","One concurrent seat is not established workload capacity for a specified fleet; no units per monitor inferred","Other administrative roles, facilities, supported pool exposure and allocation driver remain incomplete"],
+  "adoptedValues":0,"quoteReady":false,"externalChanges":false
+}

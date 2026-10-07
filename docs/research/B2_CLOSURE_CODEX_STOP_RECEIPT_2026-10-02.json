@@ -1,0 +1,23 @@
+{
+  "source":"operator_observation",
+  "writer_stopped_confirmed":true,
+  "lease_id":"237b3e74ea60444bb96c7f59efb3ba22",
+  "outcome":"paused",
+  "checkpoint":"docs/research/B2_CLOSURE_CODEX_CHECKPOINT_2026-10-02.md; latest17:40-17:43UTC public MXdriver review changes next action: variable/mixed LSS instead of fixed-wage helper or default CANACAR factor. Primary CANACAR index includes later2025factor revision;2026notice members-only, no eligibility/amount adopted. Documentation-only continuation; code remains BBVA sensitivity validated220tests/TSC before it. B2 cost incomplete, goal active. Writer stopped and tool processes complete; SAME60min budget from16:46:22UTC, no restart. Next implementation needs a separately confirmed budget, no Claude/agents/providers.",
+  "execution_observed":true,
+  "observed_model":"gpt-6.1-sol",
+  "observed_effort":"high",
+  "model_evidence_source":"HUMAN_SELECTOR_CONFIRMATION_IN_THIS_CHAT_NOT_AUTOMATIC_RETURNED_MODEL_METADATA",
+  "runtime_model_metadata_observed":false,
+  "test_evidence":[
+    "LATEST17:43UTC documentation-only evidence/implementation contract added to checkpoint. No code changes or repeated tests; root/test hashes unchanged. Public CANACAR index and members-only2026notice read; failed IMSS HTML reads retained, no retries, monetary/legal values not adopted.",
+    "LATEST 2026-10-02 17:36UTC:220PASS/one affected root test file, including7new cases; strict TSCexit0 after last code edit. No code changes after validation.",
+    "LATEST17:37UTC readback:8box financing sensitivities, principal504000/630000MXN, cash alternatives separate, original61pins and six outputsnull. git diff --checkPASS; branch/HEAD unchanged. No live tool processes remain.",
+    "Current rootSHA256dc5cb3972ad3bfcb01de32e67318729d6ed8edb1e53cb030d6db03f97f083599; testSHA2563da472177db2f4087a57852ffc89529ee4cbd1fb1a8773323397a187d377f7f0. Previous hashes below are earlier checkpoints, not current.",
+    "Node Vitest final 2026-10-02 17:22UTC:372PASS/11files, exit0; session3315 completed; previous session21115 exit0.",
+    "Files: benchmark-admin-scale, benchmark-pilot-physical-cycle, benchmark-binational-reference-budget, benchmark-central-admin-pool, benchmark-company-service-pool, benchmark-pilot-cycle-exposure, benchmark-pilot-variable, benchmark-pilot-road-border, mx-toll-reconciliation, d2d-border-evidence, d2d-route-evidence-link.",
+    "Node strict TSC on two libraries, consolidation and three affected tests:exit0 after final code edit.",
+    "Readback twice identical17:23:09UTC;61pins, source/monthly/physical quantities checked; full outputsnull, no external effects. git diff --check exit0.",
+    "No live authenticated SaaS/DB/UI/operator or production validation; no complete CFU/CVU accepted."
+  ]
+}

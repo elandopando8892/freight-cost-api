@@ -1,0 +1,9 @@
+{
+  "source":"explicit_user_instruction",
+  "selected_at":"2026-10-02T16:46:22Z",
+  "executor":"codex",
+  "model":"gpt-6.1-sol",
+  "effort":"high",
+  "supported_selection_evidence":"Human reply confirmo following explicit request to select Codex6.1Sol/high in supported Desktop selector. Manual user confirmation; selector not automatically observable. This record does not switch the host model.",
+  "effective_selection_confirmed":true
+}

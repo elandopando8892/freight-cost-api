@@ -1,0 +1,88 @@
+{
+  "artifact": "FCM_B2_US_RECURRING_COMPLIANCE_REFERENCE",
+  "observedAt": "2026-10-01",
+  "status": "CONDITIONAL_PUBLIC_COMPONENT_NOT_COMPLETE_PERMITS",
+  "sources": [
+    {
+      "id": "IRS_FORM2290_202607",
+      "url": "https://www.irs.gov/pub/irs-pdf/f2290.pdf",
+      "locator": "Tax Computation, printed page 2, physical PDF page 4, columns 1(a)/1(b), U/V",
+      "archive": {
+        "file": "docs/research/sources/IRS_F2290_202607_REVIEW_20261001.pdf",
+        "sha256": "9c2f33cc603ad4d3c6fb98a26f6a58ff0aa88893c9aba8e10258b37d193407c4"
+      }
+    },
+    {
+      "id": "IRS_INSTRUCTIONS2290_202607",
+      "url": "https://www.irs.gov/instructions/i2290",
+      "locator": "Who Must File; Taxable Gross Weight; Used Vehicles; Part II; Partial-Period Table I row V",
+      "archive": {
+        "file": "docs/research/sources/IRS_I2290_202607_REVIEW_20261001.html",
+        "sha256": "bb4ff8296bc2f4b5204b84cff7abad5134a547bf3a85cd2914196c5685e1c7b6"
+      }
+    }
+  ],
+  "hvut": {
+    "currency": "USD",
+    "referenceTaxPeriod": { "start": "2026-07-01", "end": "2027-06-30", "months": 12 },
+    "budgetFamily": "PERMITS",
+    "componentBasis": "FIXED_REGISTRATION_COMPLIANCE_TAX_REFERENCE_ONLY",
+    "chargeUnit": "SELF_PROPELLED_TAXABLE_VEHICLE",
+    "trailerWeightIncludedInCombination": true,
+    "standaloneTrailerCharge": false,
+    "categories": [
+      { "category": "U", "minimumLbInclusive": 74001, "maximumLbInclusive": 75000, "annualNonLoggingUsd": 540 },
+      { "category": "V", "minimumLbExclusive": 75000, "maximumLbInclusive": null, "annualNonLoggingUsd": 550, "annualLoggingUsdNotApplicableToDryVan": 412.5 }
+    ],
+    "conditionalCategory": "V",
+    "conditionalVehicleTaxableWeightLb": 80000,
+    "weightIsModelAssumptionNotVerifiedTaxableWeight": true,
+    "partialNonLoggingTableV": [
+      { "firstUseMonth": "2026-07", "coveredMonths": 12, "publishedCashTaxUsd": 550 },
+      { "firstUseMonth": "2026-08", "coveredMonths": 11, "publishedCashTaxUsd": 504.17 },
+      { "firstUseMonth": "2026-09", "coveredMonths": 10, "publishedCashTaxUsd": 458.33 },
+      { "firstUseMonth": "2026-10", "coveredMonths": 9, "publishedCashTaxUsd": 412.5 },
+      { "firstUseMonth": "2026-11", "coveredMonths": 8, "publishedCashTaxUsd": 366.67 },
+      { "firstUseMonth": "2026-12", "coveredMonths": 7, "publishedCashTaxUsd": 320.83 },
+      { "firstUseMonth": "2027-01", "coveredMonths": 6, "publishedCashTaxUsd": 275 },
+      { "firstUseMonth": "2027-02", "coveredMonths": 5, "publishedCashTaxUsd": 229.17 },
+      { "firstUseMonth": "2027-03", "coveredMonths": 4, "publishedCashTaxUsd": 183.33 },
+      { "firstUseMonth": "2027-04", "coveredMonths": 3, "publishedCashTaxUsd": 137.5 },
+      { "firstUseMonth": "2027-05", "coveredMonths": 2, "publishedCashTaxUsd": 91.67 },
+      { "firstUseMonth": "2027-06", "coveredMonths": 1, "publishedCashTaxUsd": 45.83 }
+    ],
+    "unknownEligibility": {
+      "legalRegistrant": null,
+      "taxableGrossWeightLb": null,
+      "firstTaxableUseMonth": null,
+      "usPublicHighwayMilesInTaxPeriod": null,
+      "suspensionEligible": null,
+      "sellerTaxPaidOrSuspendedEvidence": null,
+      "applicableUsedVehicleRule": null,
+      "taxPeriodSelectedForPilot": null
+    },
+    "interpretation": {
+      "foreignRegistrationIsNotAutomaticExemption": true,
+      "listingGvwIsNotTaxableGrossWeight": true,
+      "odometerHistoryIsNotUsHighwayTaxPeriodMiles": true,
+      "serviceDateIsNotFirstTaxableUseMonth": true,
+      "privateSellerPaidTaxRuleAppliedToDealerListing": false,
+      "cashTaxDividedByCoveredMonthsNotAlwaysTwelve": true,
+      "publishedCashRoundingPreserved": true,
+      "mayNotDuplicateExistingIncludedTaxes": true,
+      "ucrIrpAndHvutHaveDifferentUnitsAndPeriods": true
+    },
+    "selected": false,
+    "eligibleForResourceBudget": false,
+    "appliedToPilot": false,
+    "fullMonthlyPermitUsd": null
+  },
+  "remainingForPermits": [
+    "Explicit public-model legal registrants, taxable weight, first use, suspension and applicable used-vehicle rule",
+    "IRP registration base, weight and jurisdiction fleet-distance schedule, not a single trip split",
+    "UCR entity/year/bracket allocation, trailer jurisdiction/full fees and MX current recurring scope",
+    "Exclude authority opening events from recurring total; reconcile overlaps before completing any budget row"
+  ],
+  "externalEffects": false,
+  "adoptedValues": 0
+}

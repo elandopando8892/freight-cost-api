@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="es-es" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+	<meta name="author" content="Iracema Mirón">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="generator" content="Joomla! - Open Source Content Management">
+	<title>Requisito y Costos de los Trámites</title>
+	<link href="/media/system/images/joomla-favicon.svg" rel="icon" type="image/svg+xml">
+	<link href="/media/system/images/favicon.ico" rel="alternate icon" type="image/vnd.microsoft.icon">
+	<link href="/media/system/images/joomla-favicon-pinned.svg" rel="mask-icon" color="#000">
+
+    <link href="/media/system/css/joomla-fontawesome.min.css?71a104" rel="lazy-stylesheet"><noscript><link href="/media/system/css/joomla-fontawesome.min.css?71a104" rel="stylesheet"></noscript>
+	<link href="/media/templates/site/cassiopeia/css/template.min.css?71a104" rel="stylesheet">
+	<link href="/media/templates/site/cassiopeia/css/global/colors_standard.min.css?71a104" rel="stylesheet">
+	<link href="/media/templates/site/cassiopeia/css/vendor/joomla-custom-elements/joomla-alert.min.css?0.4.1" rel="stylesheet">
+	<style>:root {
+		--hue: 214;
+		--template-bg-light: #f0f4fb;
+		--template-text-dark: #495057;
+		--template-text-light: #ffffff;
+		--template-link-color: var(--link-color);
+		--template-special-color: #001B4C;
+		
+	}</style>
+
+    <script type="application/json" class="joomla-script-options new">{"joomla.jtext":{"ERROR":"Error","MESSAGE":"Mensaje","NOTICE":"Notificación","WARNING":"Advertencia","SUCCESS":"Éxito","JCLOSE":"Cerrar","JOK":"OK","JOPEN":"Abrir"},"system.paths":{"root":"","rootFull":"https:\/\/micrs.sct.gob.mx\/","base":"","baseFull":"https:\/\/micrs.sct.gob.mx\/"},"csrf.token":"04badf2626fab2a61b60809bce5e2942"}</script>
+	<script src="/media/system/js/core.min.js?a3d8f8"></script>
+	<script src="/media/templates/site/cassiopeia/js/template.min.js?71a104" type="module"></script>
+	<script src="/media/system/js/messages.min.js?9a4811" type="module"></script>
+	<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://micrs.sct.gob.mx/#/schema/Organization/base","name":"Portal SICT","url":"https://micrs.sct.gob.mx/"},{"@type":"WebSite","@id":"https://micrs.sct.gob.mx/#/schema/WebSite/base","url":"https://micrs.sct.gob.mx/","name":"Portal SICT","publisher":{"@id":"https://micrs.sct.gob.mx/#/schema/Organization/base"}},{"@type":"WebPage","@id":"https://micrs.sct.gob.mx/#/schema/WebPage/base","url":"https://micrs.sct.gob.mx/index.php/transporte-y-medicina-preventiva/autotransporte-federal/tramites-y-servicios/requisito-y-costos-de-los-tramites","name":"Requisito y Costos de los Trámites","isPartOf":{"@id":"https://micrs.sct.gob.mx/#/schema/WebSite/base"},"about":{"@id":"https://micrs.sct.gob.mx/#/schema/Organization/base"},"inLanguage":"es-ES"},{"@type":"Article","@id":"https://micrs.sct.gob.mx/#/schema/com_content/article/69","name":"Requisito y Costos de los Trámites","headline":"Requisito y Costos de los Trámites","inLanguage":"es-ES","isPartOf":{"@id":"https://micrs.sct.gob.mx/#/schema/WebPage/base"}}]}</script>
+
+
+  <!-- CSS -->
+     <link href="https://framework-gb.cdn.gob.mx/gm/v3/assets/images/favicon.ico" rel="shortcut icon">
+     <link href="https://framework-gb.cdn.gob.mx/gm/v3/assets/styles/main.css" rel="stylesheet">
+  <link href="https://framework-gb.cdn.gob.mx/gm/accesibilidad/css/gobmx-accesibilidad.min.css" rel="stylesheet">
+</head>
+
+<body id="top" class="site com_content wrapper-static view-article no-layout no-task itemid-1001">
+    <header class="header container-header full-width">
+
+        
+        
+        
+            </header>
+
+    <div class="site-grid">
+        
+        
+        
+        
+        <div class="grid-child container-component">
+            
+            
+            <div id="system-message-container" aria-live="polite"></div>
+
+            <main>
+                <div class="com-content-article item-page">
+    <meta itemprop="inLanguage" content="es-ES">
+    
+    
+        
+        
+    
+    
+        
+                                                <div class="com-content-article__body">
+        <!DOCTYPE html>
+<html lang="en">
+<head>
+  <!--CÓDIGO PARA PAGINACIÓN Y BARRA DE BÚSQUEDA-->
+    <link href="https://cdn.datatables.net/2.3.2/css/dataTables.bootstrap5.css" rel="stylesheet"/>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.bootstrap5.js"></script>
+  <!-- FIN DEL CÓDIGO-->
+   <style>
+       body:not(.has-sidebar-left) .site-grid .container-component {
+          /* grid-column-start: main-start; */
+          grid-column-start: full-start;
+          padding: 0 0 0 15%;
+      }
+       ul.pagination {
+}
+.dt-paging ul.pagination {
+    display: inline-flex;
+}
+     </style>
+</head>
+  <body>    
+  <h1>Requisitos y Costos de los Trámites</h1> 
+<table id="example" class="table">
+<thead>
+<tr>
+<th>No.</th>
+<th>HOMOCLAVE</th>
+<th>NOMBRE OFICIAL DEL TRAMITE</th>
+<th>MODALIDAD</th>
+<th>COSTO</th>
+<th>REQUISITOS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>SCT-03-001</td>
+<td>Modificación de la tarjeta de circulación</td>
+<td>N/A</td>
+<td>$302.06</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-001">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>2</td>
+<td>SCT-03-002</td>
+<td>Reposición de tarjeta de circulación y/o placas metálicas de identificación</td>
+<td>N/A</td>
+<td>$302.06 (T. Circulación) $1,297.75 (Reposición Placas) $483.73 (Transporte privado)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-002">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>3</td>
+<td>SCT-03-003-A</td>
+<td>Canje de placas metálicas de identificación vehicular asignadas a las unidades que operan en los servicios de autotransporte federal de carga.</td>
+<td>Servicios de autotransporte federal de carga general o especializada para el transporte de objetos indivisibles de gran peso y/o volumen, fondos y valores, grúas industriales y automóviles sin rodar en vehículo tipo góndola, servicios auxiliares, empresas arrendadoras destinados a estos servicios o empresas fabricantes, distribuidoras o trasladistas de vehículos nuevos.</td>
+<td>$2,647.42 (Automotores) $1,318.99 (Remolques y Semirremolques)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-003-A">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>4</td>
+<td>SCT-03-003-B</td>
+<td>Canje de placas metálicas de identificación vehicular asignadas a las unidades que operan en los servicios de autotransporte federal de pasaje y turismo</td>
+<td>Pasaje: De lujo, ejecutivo, de primera, económico, mixto, transportación terrestre de pasajeros de y hacia los puertos marítimos y aeropuertos. Turismo: Turístico de lujo, turístico de excursión y chofer-guía</td>
+<td>$2,647.42 (Automotores)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-003-B">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>5</td>
+<td>SCT-03-003-C</td>
+<td>Canje de placas metálicas de identificación vehicular asignadas a las unidades que operan en los servicios de autotransporte federal de carga especializada para el transporte de materiales, residuos, remanentes y desechos peligrosos.</td>
+<td>Carga especializada para el transporte de materiales, residuos, remanentes y desechos peligrosos</td>
+<td>$2,647.42 (Automotores) $1,318.99 (Remolques y Semirremolques)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-003-C">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>6</td>
+<td>SCT-03-004-A/td&gt;</td>
+<td>Expedición de placas de traslado a empresas trasladistas de vehículos nuevos.</td>
+<td>Expedición de placas de traslado a empresas trasladistas de vehículos nuevos.</td>
+<td>$212.35 (Suscripción convenio anual) $1,057.08 (Renta Mensual) $1,283.58 (Expedición Placas Metálicas)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-004-A">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>7</td>
+<td>SCT-03-004-B</td>
+<td>Expedición de placas de traslado a empresas fabricantes o distribuidoras de vehículos nuevos.</td>
+<td>Fabricantes o distribuidores de vehículos nuevos</td>
+<td>$212.35 (Suscripción convenio anual) $1,057.08 (Renta Mensual) $1,283.58 (Expedición Placas Metálicas)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-004-B">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>8</td>
+<td>SCT-03-005-A</td>
+<td>Expedición del permiso para la prestación del servicio de autotransporte federal de pasajeros, para personas morales.</td>
+<td>Personas morales</td>
+<td>$5,078.8 (Presencial) $3,873.42 (Electrónico)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-005-A">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>9</td>
+<td>SCT-03-005-B</td>
+<td>Expedición del permiso para la prestación del servicio de autotransporte federal de pasajeros, para personas físicas</td>
+<td>Personas físicas</td>
+<td>$5,078.8 (Presencial) $3,873.42 (Electrónico)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-005-B">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>10</td>
+<td>SCT-03-007-A</td>
+<td>Expedición del permiso para la prestación del servicio de autotransporte federal internacional de turismo, para personas morales.</td>
+<td>Personas morales</td>
+<td>$5,078.8 (Presencial) $3,873.42 (Electrónico)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-007-A">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>11</td>
+<td>SCT-03-007-B</td>
+<td>Expedición del permiso para la prestación del servicio de autotransporte federal internacional de turismo, para personas físicas.</td>
+<td>Personas físicas</td>
+<td>$5,078.8 (Presencial) $3,873.42 (Electrónico)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-007-B">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>12</td>
+<td>SCT-03-008-A</td>
+<td>Expedición del permiso para el servicio de autotransporte federal de carga general.</td>
+<td>Carga general</td>
+<td>$5,078.8 (Presencial) $3,873.42 (Electrónico)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-008-A">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>13</td>
+<td>SCT-03-008-B</td>
+<td>Expedición del permiso para el servicio de autotransporte federal de carga especializada.</td>
+<td>Carga especializada para el transporte de materiales, residuos, remanentes y desechos peligrosos</td>
+<td>$5,078.8 (Presencial) $3,873.42 (Electrónico)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-008-B">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>14</td>
+<td>SCT-03-009</td>
+<td>Expedición del permiso para el transporte privado de personas por las vías generales de comunicación.</td>
+<td>N/A</td>
+<td>$2,701.63 (Presencial) $315.0 (Electrónico)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-009">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>15</td>
+<td>SCT-03-010</td>
+<td>Baja del vehículo, dado de alta al amparo de un permiso para prestar el servicio de autotransporte federal, servicio auxiliar, transporte privado o empresa arrendadora.</td>
+<td>N/A</td>
+<td>$295.19</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-010">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>16</td>
+<td>SCT-03-011-A</td>
+<td>Expedición del permiso para la construcción de terminal de autotransporte federal de pasajeros.</td>
+<td>Personas morales</td>
+<td>$3,013.09</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-011-A">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>17</td>
+<td>SCT-03-011-B</td>
+<td>Expedición del permiso para la construcción de terminal de autotransporte federal de pasajeros.</td>
+<td>Personas físicas</td>
+<td>$3,013.09</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-011-B">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>18</td>
+<td>SCT-03-012-A</td>
+<td>Expedición del permiso para prestar el servicio auxiliar de arrastre en las vías generales de comunicación, para personas morales.</td>
+<td>Personas morales</td>
+<td>$5,078.8 (Presencial) $3,873.42 (Electrónico)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-012-A">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>19</td>
+<td>SCT-03-012-B</td>
+<td>Expedición del permiso para prestar el servicio auxiliar de arrastre en las vías generales de comunicación, para personas físicas.</td>
+<td>Personas físicas</td>
+<td>$5,078.8 (Presencial) $3,873.42 (Electrónico)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-012-B">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>20</td>
+<td>SCT-03-013-A</td>
+<td>Expedición del permiso para prestar el servicio auxiliar de arrastre y salvamento en las vías generales de comunicación, para personas morales.</td>
+<td>Personas morales</td>
+<td>$5,078.8 (Presencial) $3,873.42 (Electrónico)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-013-A">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>21</td>
+<td>SCT-03-013-B</td>
+<td>Expedición del permiso para prestar el servicio auxiliar de arrastre y salvamento en las vías generales de comunicación, para personas físicas.</td>
+<td>Personas físicas</td>
+<td>$5,078.8 (Presencial) $3,873.42 (Electrónico)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-013-B">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>22</td>
+<td>SCT-03-014-A</td>
+<td>Expedición del permiso para prestar el servicio auxiliar de depósito de vehículos para persona moral.</td>
+<td>Personas morales</td>
+<td>$948.55 (Presencial) $307.89 (Electrónico)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-014-A">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>23</td>
+<td>SCT-03-014-B</td>
+<td>Expedición del permiso para prestar el servicio auxiliar de depósito de vehículos, para persona física.</td>
+<td>Personas físicas</td>
+<td>$948.55 (Presencial) $307.89 (Electrónico)/td&gt;</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-014-B">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>24</td>
+<td>SCT-03-015</td>
+<td>Expedición del permiso complementario a transportistas de pasajeros autorizados por autoridades estatales o municipales.</td>
+<td>N/A</td>
+<td>$948.55 (Presencial) $307.89 (Electrónico)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-015">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>25</td>
+<td>SCT-03-018-A</td>
+<td>Expedición del permiso especial por un solo viaje para el traslado de objetos indivisibles de gran peso y/o volumen de hasta 90 toneladas de carga útil.</td>
+<td>N/A</td>
+<td>$948.55 (Presencial) $307.89 (Electrónico)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-018-A">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>26</td>
+<td>SCT-03-018-B</td>
+<td>Expedición del permiso especial para el traslado de objetos indivisibles de gran peso y/o volumen de más de 90 toneladas.</td>
+<td>N/A</td>
+<td>$948.55 (Presencial) $307.89 (Electrónico)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-018-B">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>27</td>
+<td>SCT-03-018-C</td>
+<td>Expedición del permiso especial para el tránsito de grúas industriales con peso máximo de noventa toneladas.</td>
+<td>N/A</td>
+<td>$948.52 (Presencial) $307.89 (Electrónico)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-018-C">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>28</td>
+<td>SCT-03-019</td>
+<td>Solicitud para obtener el permiso derivado de la aprobación como unidad de verificación.</td>
+<td>En materia de emisiones contaminantes o condiciones físico-mecánicas.</td>
+<td>$1,805.03</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-019">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>29</td>
+<td>SCT-03-020</td>
+<td>Autorización para la cesión de derechos y obligaciones de los permisos relacionados en actividades del autotransporte federal.</td>
+<td>N/A</td>
+<td>$3,173.56</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-020">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>30</td>
+<td>SCT-03-022</td>
+<td>Registro de horarios para la prestación del servicio de autotransporte federal de pasajeros</td>
+<td>N/A</td>
+<td>Trámite gratuito</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-022">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>31</td>
+<td>SCT-03-023</td>
+<td>Aviso de celebración de enrolamiento que regule su operación suscrito entre permisionarios</td>
+<td>N/A</td>
+<td>Trámite gratuito</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-023">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>32</td>
+<td>SCT-03-024</td>
+<td>Expedición del Permiso para la Operación y Explotación de Terminal de Autotransporte Federal de Pasajeros</td>
+<td>N/A</td>
+<td>$18,213.19 (Central) $3,246.69 (Individual)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-024">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>33</td>
+<td>SCT-03-026-A</td>
+<td>Solicitud de placas metálicas del servicio federal para empresas arrendadoras de automóviles de uso particular</td>
+<td>N/A</td>
+<td>$4,199.92 (Presencial) vehículo motriz $3,588.16 (Electrónico) vehículo motriz</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-026-A">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>34</td>
+<td>SCT-03-026-B</td>
+<td>Solicitud de placas metálicas del servicio federal para empresas arrendadoras servicio público federal</td>
+<td>N/A</td>
+<td>$4,199.92 Vehículo Motriz (Presencial) $3,588.16 Vehículo Motriz (Electrónico) $2,997.81 Unidad de Arrastre (Presencial) $2,386.06 Unidad de Arrastre (Electrónico)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-026-B">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>35</td>
+<td>SCT-03-028-A</td>
+<td>Expedición de la Licencia Federal Digital de Conductor</td>
+<td>Nacional</td>
+<td>$204.87 (Licencia Federal Digital)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-028-A">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>36</td>
+<td>SCT-03-028-B</td>
+<td>Expedición de la Licencia Federal Digital de Conductor</td>
+<td>Internacional</td>
+<td>$204.87 (Licencia Federal Digital)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-028-B">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>37</td>
+<td>SCT-03-032</td>
+<td>Renovación de Licencia Federal Digital de Conductor</td>
+<td>N/A</td>
+<td>$204.87 (Licencia Federal Digital)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-032">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>38</td>
+<td>SCT-03-033</td>
+<td>Duplicado de Licencia Federal Digital de Conductor</td>
+<td>N/A</td>
+<td>$199.87 (Licencia Federal Digital)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-033">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>39</td>
+<td>SCT-03-035</td>
+<td>Oficio de liberación de vehículo en depósito</td>
+<td>N/A</td>
+<td>Trámite gratuito</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-035">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>40</td>
+<td>SCT-03-036</td>
+<td>Reconocimiento de la Secretaría de Comunicaciones y Transportes como Instructor de Conductores del Servicio de Autotransporte Federal y Transporte Privado</td>
+<td>N/A</td>
+<td>Trámite gratuito</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-036">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>41</td>
+<td>SCT-03-037-A</td>
+<td>Cambio o categoría adicional de la licencia federal de conductor, categorías “A”, “B”, “C” y “F”</td>
+<td>Categorías “A”, “B”, “C” y “F”</td>
+<td>$204.87 (Licencia Federal Digital)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-037-A">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>42</td>
+<td>SCT-03-037-B</td>
+<td>Cambio o categoría adicional de la licencia federal de conductor, categoría “D”</td>
+<td>Categoría “D”</td>
+<td>$204.87 (Licencia Federal Digital)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-037-B">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>43</td>
+<td>SCT-03-037-C</td>
+<td>Cambio o categoría adicional de la licencia federal de conductor, categoría “E”</td>
+<td>Categoría “E”</td>
+<td>$204.87 (Licencia Federal Digital)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-037-C">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>44</td>
+<td>SCT-03-039-A</td>
+<td>Expedición de permiso para prestar el servicio de autotransporte federal de carga general cuyo ámbito de aplicación comprende la franja fronteriza con los Estados Unidos de América</td>
+<td>Transporte o arrastre de remolques y/o semirremolques en los cruces fronterizos, para carga general</td>
+<td>$948.55 (Presencial) $307.89 (Electrónico)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-039-A">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>45</td>
+<td>SCT-03-039-B</td>
+<td>Expedición de permiso para prestar el servicio de autotransporte federal de carga especializada cuyo ámbito de aplicación comprende la franja fronteriza con los Estados Unidos de América</td>
+<td>Transporte o arrastre de remolques y/o semirremolques en los cruces fronterizos, de carga especializada para el transporte de materiales y residuos peligrosos</td>
+<td>$948.55 (Presencial) $307.89 (Electrónico)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-039-B">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>46</td>
+<td>SCT-03-040-A</td>
+<td>Expedición de permiso para prestar el servicio de autotransporte federal de carga especializada de materiales y residuos peligrosos para personas morales.</td>
+<td>N/A</td>
+<td>$5,078.80 (Presencial) Motriz $3,873.42 (Electrónico) Motriz</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-040-A">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>47</td>
+<td>SCT-03-040-B</td>
+<td>Expedición de permiso para prestar el servicio de autotransporte federal de carga especializada de materiales y residuos peligrosos, para personas físicas.</td>
+<td>N/A</td>
+<td>$5,078.80 (Presencial) Motriz $3,873.42 (Electrónico) Motriz</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-040-B">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>48</td>
+<td>SCT-03-041</td>
+<td>Expedición de permiso para prestar el servicio de autotransporte federal de turismo, chofer-guía.</td>
+<td>N/A</td>
+<td>$5,078.80 (Presencial) Motriz $3,873.42 (Electrónico) Motriz</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-041">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>49</td>
+<td>SCT-03-042-A</td>
+<td>Expedición de permiso para transportación terrestre de pasajeros de y hacia los puertos marítimos y aeropuertos, para personas morales.</td>
+<td>N/A</td>
+<td>$5,078.80 (Presencial) Motriz $3,873.42 (Electrónico) Motriz</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-042-A">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>50</td>
+<td>SCT-03-042-B</td>
+<td>Expedición de permisos para prestar el servicio de autotransporte federal de transportación terrestre de o hacia puertos marítimos y aeropuertos, para personas físicas.</td>
+<td>N/A</td>
+<td>$5,078.80 (Presencial) Motriz $3,873.42 (Electrónico) Motriz</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-042-B">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>51</td>
+<td>SCT-03-043-A</td>
+<td>Expedición de permiso para el transporte privado de carga, para personas morales.</td>
+<td>N/A</td>
+<td>$2,701.63 (Exp. permiso) $1,583.27 (Exp. Tarjeta) $974.48 (Alta vehículo) $315.00 (Alta electrónico) $5,259.38 (Combo)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-043-A">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>52</td>
+<td>SCT-03-043-B</td>
+<td>Expedición de permiso para el transporte privado de carga, para personas físicas.</td>
+<td>N/A</td>
+<td>$2,701.63 (Exp. permiso) $1,583.27 (Exp. Tarjeta) $974.48 (Alta vehículo) $315.00 (Alta electrónico) $5,259.38 (Combo)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-043-B">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>53</td>
+<td>SCT-03-044-A</td>
+<td>Expedición de permiso para el transporte privado de carga especializada de materiales, residuos, remanentes y desechos peligrosos, para personas morales.</td>
+<td>N/A</td>
+<td>$2,947.06 (Exp. permiso) $1,583.27 (Exp. Tarjeta) $974.48 (Alta vehículo) $315.00 (Alta electrónico) $5,504.8 (Combo)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-044-A">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>54</td>
+<td>SCT-03-044-B</td>
+<td>Expedición de permiso para el transporte privado de carga especializada de materiales, residuos, remanentes y desechos peligrosos, para personas físicas.</td>
+<td>N/A</td>
+<td>$2,947.06 (Exp. permiso) $1,583.27 (Exp. Tarjeta) $974.48 (Alta vehículo) $315.00 (Alta electrónico) $5,504.8 (Combo)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-044-B">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>55</td>
+<td>SCT-03-045-A</td>
+<td>Alta de vehículos adicionales al permiso para prestar el servicio de autotransporte federal de carga.</td>
+<td>Carga</td>
+<td>$4,199.92 Presencial (Alta Unida motriz) $3,588.16 (Electrónico) Unidad Motriz $2,997.81 Presencial (Alta Unidad Arrastre) $2,386.06 (Electrónico) $1,183.96 Presencial (Alta v. en arrendamiento) $572.2 (Electrónico)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-045-A">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>56</td>
+<td>SCT-03-045-B</td>
+<td>Alta de vehículos para el servicio de autotransporte federal de pasajeros en sus diversas modalidades.</td>
+<td>Pasaje</td>
+<td>$4,199.92 Presencial (Alta Unida motriz) $3,588.16 (Electrónico) Unidad Motriz</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-045-B">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>57</td>
+<td>SCT-03-045-C</td>
+<td>Alta de vehículos adicionales al permiso para la prestación del servicio de autotransporte federal de turismo.</td>
+<td>Turismo</td>
+<td>$4,199.92 Presencial (Alta Unida motriz) $3,588.16 (Electrónico) Unidad Motriz</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-045-C">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>58</td>
+<td>SCT-03-045-D</td>
+<td>Alta de vehículos adicionales al permiso de transporte privado de personas y carga.</td>
+<td>Transporte Privado de Personas y Carga</td>
+<td>$1,583.27 (Exp.Tarjeta) $974.48 (Alta vehículo)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-045-D">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>59</td>
+<td>SCT-03-046-A</td>
+<td>Reconocimiento de la SCT para operar un centro de capacitación y Adiestramiento de Conductores del Servicio de Autotransporte Federal y Transporte Privado.</td>
+<td>N/A</td>
+<td>Trámite gratuito</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-046-A">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>60</td>
+<td>SCT-03-046-B</td>
+<td>Reconocimiento de la SCT para operar como Centro de Capacitación y Adiestramiento de Conductores del Servicio de Autotransporte Federal y Transporte Privado.</td>
+<td>N/A</td>
+<td>Trámite gratuito</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-046-B">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>61</td>
+<td>SCT-03-047</td>
+<td>Registro de tarifas de Autotransporte de Pasaje.</td>
+<td>N/A</td>
+<td>Trámite gratuito</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-047">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>62</td>
+<td>SCT-03-049</td>
+<td>Queja por cobro excesivo de tarifas en servicios de arrastre, arrastre y salvamento y depósito de vehículos.</td>
+<td>N/A</td>
+<td>Trámite gratuito</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-049">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>63</td>
+<td>SCT-03-050</td>
+<td>Quejas por no respetar la tarifa especial para personas adultas mayores afiliadas a INAPAM.</td>
+<td>N/A</td>
+<td>Trámite gratuito</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-050">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>64</td>
+<td>SCT-03-051-A</td>
+<td>Expedición del permiso para la operación y explotación del servicio internacional de autotransporte federal de carga, para personas morales.</td>
+<td>Personas morales.</td>
+<td>$5,078.8 (Presencial) Motriz $3,873.42 (Electrónico)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-051-A">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>65</td>
+<td>SCT-03-051-B</td>
+<td>Expedición del permiso para la operación y explotación del servicio de autotransporte federal de carga internacional, para personas físicas.</td>
+<td>Personas físicas.</td>
+<td>$5,078.8 (Presencial) Motriz $3,873.42 (Electrónico)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-051-B">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>66</td>
+<td>SCT-03-052</td>
+<td>Alta de vehículos adicionales al permiso para prestar el servicio de autotransporte federal de carga internacional.</td>
+<td>Servicio internacional de carga.</td>
+<td>$4,199.92 Presencial (Alta Unida motriz) $3,588.16 (Electrónico) Unidad Motriz $2,997.81 Presencial (Alta Unidad Arrastre) $2,386.06 (Electrónico) $1,183.96 Presencial (Alta v. en arrendamiento) $572.2 (Electrónico)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-052">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>67</td>
+<td>SCT-03-053</td>
+<td>Modificación de la tarjeta de circulación para el servicio de autotransporte internacional de carga.</td>
+<td>N/A</td>
+<td>$302.06</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-053">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>68</td>
+<td>SCT-03-054</td>
+<td>Autorización especial para utilizar un camino de menor clasificación cuando no estén conectados dos ejes o tramos de un mismo eje de transporte.</td>
+<td>N/A</td>
+<td>$841.96</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-054">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>69</td>
+<td>SCT-03-055</td>
+<td>Dictamen sobre condiciones de seguridad a vehículos del servicio de autotransporte federal de pasajeros, de turismo o transporte privado de pasajeros, para utilizar un camino de menor clasificación para cumplir con su ruta o recorrido</td>
+<td>N/A</td>
+<td>$928.06</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-055">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>70</td>
+<td>SCT-03-056</td>
+<td>Autorización especial para utilizar un camino de menor clasificación para llegar o salir de una planta productora o centro logístico y/o de transferencia.</td>
+<td>N/A</td>
+<td>$841.96</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-056">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>71</td>
+<td>SCT-03-057</td>
+<td>Permiso especial para transitar con vehículos que transporten pasajeros o cargas de hasta 4.50 metros de altura.</td>
+<td>N/A</td>
+<td>$829.04</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-057">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>72</td>
+<td>SCT-03-058</td>
+<td>Expedición del permiso para el servicio de autotransporte federal de turismo.</td>
+<td>Turístico de lujo, turístico y de excursión</td>
+<td>$5,078.8 (Presencial) Motriz $3,873.42 (Electrónico) Motriz</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-058">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>73</td>
+<td>SCT-03-060-A</td>
+<td>Autorización expresa para circular en los caminos y puentes de jurisdicción federal con configuraciones de tractocamión doblemente articulado.</td>
+<td>Remolque y Semirremolque</td>
+<td>$1,220.34</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-060-A">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>74</td>
+<td>SCT-03-060-B</td>
+<td>Autorización expresa para circular en los caminos y puentes de jurisdicción federal con configuraciones de tractocamión doblemente articulado.</td>
+<td>Tractocamión</td>
+<td>$1,201.60</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-03-060-B">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>75</td>
+<td>SCT-2019-064-012- A</td>
+<td>Baja de Autorización Expresa.</td>
+<td>N/A</td>
+<td>Trámite gratuito</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-2019-064-012-A">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>76</td>
+<td>SCT-2021-064-003- A</td>
+<td>Obtención de placas metálicas de identificación para vehículos diagnóstico</td>
+<td>N/A</td>
+<td>$212.35 (Suscripción convenio anual) $1,057.08 (Renta Mensual) $1,283.58 (Expedición Placas Metálicas)</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-2021-064-003-A">Consulta aquí</a></td>
+</tr>
+<tr>
+<td>77</td>
+<td>SCT-2025-064-002-A</td>
+<td>Registro y modificación de personas físicas y morales ante la SICT.</td>
+<td>N/A</td>
+<td>Trámite gratuito</td>
+<td><a href="https://www.catalogonacional.gob.mx/FichaTramite?traHomoclave=SCT-2025-064-002-A">Consulta aquí</a></td>
+</tr>
+</tbody>
+</table>
+  </body>
+    <!--CÓDIGO PARA PAGINACIÓN Y BARRA DE BÚSQUEDA-->
+   
+<script>
+  $('#example').dataTable({
+
+    "language": {
+
+        "sProcessing":    "Procesando...",
+
+        "sLengthMenu":    "Mostrar _MENU_ registros",
+
+        "sZeroRecords":   "No se encontraron resultados",
+
+        "sEmptyTable":    "Ningún dato disponible en esta tabla",
+
+        "sInfo":          "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+
+        "sInfoEmpty":     "Mostrando registros del 0 al 0 de un total de 0 registros",
+
+        "sInfoFiltered":  "(filtrado de un total de _MAX_ registros)",
+
+        "sInfoPostFix":   "",
+
+        "sSearch":        "Buscar:",
+
+        "sUrl":           "",
+
+        "sInfoThousands":  ",",
+
+        "sLoadingRecords": "Cargando...",
+
+        "oPaginate": {
+
+            "sFirst":    "Primero",
+
+            "sLast":    "Último",
+
+            "sNext":    "Siguiente",
+
+            "sPrevious": "Anterior"
+
+        },
+
+        "oAria": {
+
+            "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+
+            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+
+        }
+
+    }
+
+});
+  </script>
+  <!-- FIN DEL CÓDIGO-->
+</html>     </div>
+
+        
+                                        </div>
+
+            </main>
+            
+        </div>
+
+        
+        
+            </div>
+
+    
+    
+    
+
+  <!-- JS -->
+     <script src="https://framework-gb.cdn.gob.mx/gm/v3/assets/js/gobmx.js"></script>
+  <script src="https://framework-gb.cdn.gob.mx/gm/accesibilidad/js/gobmx-accesibilidad.min.js"></script>
+</body>
+
+</html>

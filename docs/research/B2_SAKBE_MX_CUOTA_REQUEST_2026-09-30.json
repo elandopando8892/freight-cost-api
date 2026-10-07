@@ -1,0 +1,10 @@
+{
+  "origin": {"id": 2656, "label": "Plaza de la Constitución, Cuauhtémoc"},
+  "destination": {"id": 301105, "label": "Puerto Fronterizo Nuevo Laredo III, Nuevo Laredo"},
+  "mode": "cuota",
+  "axles": 5,
+  "additionalAxles": 0,
+  "equipmentConfirmed": false,
+  "direction": "MX_TO_US",
+  "candidateOnly": true
+}

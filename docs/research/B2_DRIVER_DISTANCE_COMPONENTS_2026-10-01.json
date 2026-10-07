@@ -1,0 +1,77 @@
+{
+  "artifact":"FCM_B2_DRIVER_DISTANCE_COMPONENTS",
+  "reviewedAt":"2026-10-01T22:43:00-06:00",
+  "status":"PUBLIC_PAY_COMPONENTS_NOT_COMPLETE_EMPLOYER_COST",
+  "reusedPins":[
+    {"id":"laborBridge","file":"docs/research/B2_LABOR_COMPENSATION_BRIDGE_2026-09-29.json","sha256":"321c07a2b208b41b8f6be256cafed9ff521ef083ad3751ba56402b081f4f00aa"},
+    {"id":"pilotAssetLabor","file":"docs/research/B1_PILOT_ASSET_LABOR_EVIDENCE_2026-09-29.json","sha256":"ba33bcbdf4fcfabef81c926c76e7ed3dd58f8792bffe44177817aea4d1cc716f"}
+  ],
+  "mxSource":{
+    "id":"TRAYECTO_QUERETARO_DIRECT_RECHECK",
+    "url":"https://careers.trayecto.com/operador-sencillo-caja-seca-xI1ywOf9L4-o/",
+    "archive":null,
+    "capture":"DIRECT_PRIMARY_WEB_READER_TEXT",
+    "locator":"Salary weekly5500-8000MXN; description per-km loaded/empty2.10, weekly6000-8000 approximation, benefits",
+    "relativePublicationLabel":"hace29dias",
+    "absolutePublicationDateVerified":false,
+    "availabilityEmployerConfirmed":false,
+    "htmlDownloadStatus":"HTTP403_NO_ARCHIVE",
+    "profile":"FIFTH_WHEEL_SINGLE_DRY_VAN_LONG_DISTANCE",
+    "baseLocation":"Queretaro",
+    "routes":["Irapuato-Chihuahua","Irapuato-Hermosillo"],
+    "trailerLengthFeet":null,
+    "rateMxnPerPaidLoadedKm":2.1,
+    "rateMxnPerPaidEmptyKm":2.1,
+    "rateCurrencyBasis":"INFERRED_FROM_EXPLICIT_SAME_PAGE_MXN_SALARY",
+    "grossNet":null,
+    "completeEmployerCost":false
+  },
+  "mxDistanceHypothesis":{
+    "basis":"FORWARD_CANDIDATE_PHYSICAL_KM_ASSUMED_PAID_ONCE_NOT_OBSERVED_PAYROLL",
+    "paidToPhysicalKmRatio":1,
+    "includesEmptyReturn":false,
+    "weeklySalaryAddedAgain":false,
+    "monthlyVouchersAdded":false,
+    "administrativeEmployerBurdenTransferred":false,
+    "impliedDriverFleetProductivityAllowed":false
+  },
+  "usSource":{
+    "id":"ATRI2025",
+    "url":"https://truckingresearch.org/wp-content/uploads/2025/07/ATRI-Operational-Costs-of-Trucking-07-2025.pdf",
+    "archive":{"file":"docs/research/sources/ATRI_OPSCOST_2025_REVIEW_20261001.pdf","sha256":"581b91b68a76f232102a63f543eff92bb59c9478556b164d84d2be85118902f8"},
+    "locator":"Figure7 printed24/PDF27 and survey Q5-Q6 printed58/PDF61, visually inspected; methodology printed7-8/PDF10-11",
+    "operationsYear":2024,
+    "publicationYear":2025,
+    "metric":"REPORTED_COMPANY_DRIVER_WAGES_PLUS_BENEFITS",
+    "compensationBoundary":"BASE_PAY_AND_STANDARD_BENEFITS_EXCLUDES_INCENTIVES_AND_BONUSES",
+    "travelExpenseReview":{
+      "reviewedAt":"2026-10-02T20:20:14Z",
+      "locator":"Survey Q5 footnote2, printed58/PDF61; includes employer medical contributions, per diem and other standard financial benefits, excludes incentives/bonuses",
+      "benefitsDefinition":"INCLUDES_REPORTED_PER_DIEM_WHEN_PROVIDED_UNSPLIT",
+      "perDiemRateSeparatelyIdentified":false,
+      "everyCarrierProvidesPerDiemConfirmed":false,
+      "waitingPaySeparatelyIdentified":false
+    },
+    "statutoryChargesCompletelyIdentified":false,
+    "target53FootProfileConfirmed":false,
+    "newer2026FullReportVerified":false
+  },
+  "policy":{
+    "groupsAreAlternativesNotAdditive":true,
+    "noFleetGroupAutomaticallySelected":true,
+    "sampleCarrierFiguresUsedAsBenchmark":false,
+    "mxPayAndImtVariableSubtotalCombined":false,
+    "usExtraEcecOrFederalTaxesAdded":false,
+    "noFxOrUsDistanceInvented":true,
+    "noCompleteEmployerCostOrCvuClaim":true
+  },
+  "remaining":[
+    "MX gross/net, guarantee, additional benefits and variable/mixed SBC basis; offer rate does not establish employer total",
+    "State/risk/paid duties and matching productive exposure; no administrative monitor payroll transplanted to driver",
+    "US fleet-size group/profile/date applicability and separately handled bonuses/incentives/statutory charges without duplication",
+    "US stage distance/time and paid/physical mapping absent; empty return and waiting cannot be set to zero",
+    "Fuel and maintenance/tires current53ft applicability, fixed pools and single-box/admin allocation still required for full pilot estimate"
+  ],
+  "adoptedValues":0,
+  "quoteReady":false
+}

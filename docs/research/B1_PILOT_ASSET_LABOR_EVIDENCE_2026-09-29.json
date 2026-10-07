@@ -1,0 +1,136 @@
+{
+  "schema": "fcm.b1.pilot-asset-labor-evidence.v1",
+  "cutDate": "2026-09-29",
+  "pilot": "THIRD_PARTY_D2D_DRY_VAN_MX_US_INTERCHANGE_NO_TRANSLOAD",
+  "head": "4f5fc2de0c3d178dace917231e1092040dec21fd",
+  "status": "RESEARCH_CONTRAST_ONLY",
+  "calibrated": false,
+  "quoteReady": false,
+  "adoptedValues": 0,
+  "businessGatesComplete": 0,
+  "businessGatesTotal": 4,
+  "canonicalInventory": { "required": 135, "documented": 135, "candidate": 3, "contrast": 47, "missingEvidence": 85, "adopted": 0 },
+  "sources": [
+    {
+      "id": "RODAL",
+      "url": "https://rodaltruckfinancials.com/catalogo/freightliner-cascadia-2021--vhc-f8668c8f02",
+      "authority": "COMMERCIAL_OFFER_PUBLISHER_NOT_STATISTICAL_AUTHORITY",
+      "capture": "DIRECT_PUBLIC_HTML_HTTP_200",
+      "sha256": "e289d168bbd179fbce5c9a934846ab289fb587721953e89bc5d0b7b50fafa221",
+      "publicationDate": null,
+      "observedDate": "2026-09-29",
+      "rawResponseArchived": false
+    },
+    {
+      "id": "PRICESALES",
+      "url": "https://www.pricesales.com/productos/caja-seca-utility-2015-53-pies-puertas-de-libro-suspension-de-aire-7/",
+      "authority": "COMMERCIAL_OFFER_PUBLISHER_NOT_STATISTICAL_AUTHORITY",
+      "capture": "DIRECT_PUBLIC_HTML_HTTP_200",
+      "sha256": "8dbcd7c9e83f7d64727237c3923051584ef840932976b03b07d8706a3cde2322",
+      "publicationDate": null,
+      "observedDate": "2026-09-29",
+      "rawResponseArchived": false
+    },
+    {
+      "id": "SELECTRUCKS",
+      "url": "https://www.selectruckhouston.com/pdf/specials-february-2026-revised.pdf",
+      "authority": "COMMERCIAL_DEALER_OFFER",
+      "capture": "DIRECT_PUBLIC_PDF_TEXT_AND_VISUAL",
+      "sha256": "0c2fcdea85f7e2988dd98a73f9701a989a1276eb945a17833a5f1dd37ebe6561",
+      "publicationMonthInferredFromFilename": "2026-02",
+      "printedDateConfirmed": false,
+      "observedDate": "2026-09-29",
+      "rawResponseArchived": false
+    },
+    {
+      "id": "GREATDANE",
+      "url": "https://buygreatdane.com/trailer/great-dane-dry-van-53-composite-plate-dry-van-2027-vj901576/",
+      "authority": "MANUFACTURER_DEALER_OFFER",
+      "capture": "DIRECT_PUBLIC_HTML_HTTP_200",
+      "sha256": "8d5f4c2ae7eebcd35b8843592e9fb222575b1d6cdce9091e7cecb22cfa947eff",
+      "publicationDate": null,
+      "observedDate": "2026-09-29",
+      "rawResponseArchived": false
+    },
+    {
+      "id": "ATRI2025",
+      "url": "https://truckingresearch.org/wp-content/uploads/2025/07/ATRI-Operational-Costs-of-Trucking-07-2025.pdf",
+      "authority": "PUBLIC_INDUSTRY_RESEARCH_AGGREGATE_NOT_GOVERNMENT_PRICE_FEED",
+      "capture": "DIRECT_PUBLIC_PDF_TEXT_AND_VISUAL_TABLES",
+      "sha256": "581b91b68a76f232102a63f543eff92bb59c9478556b164d84d2be85118902f8",
+      "publicationYear": 2025,
+      "operationsYear": 2024,
+      "observedDate": "2026-09-29",
+      "rawResponseArchived": false,
+      "newerReleaseNotice": "https://truckingresearch.org/2026/07/new-atri-report-details-accelerating-costs-and-low-profitability-despite-cuts/",
+      "newerFullReportObtained": false
+    }
+  ],
+  "assetOffers": [
+    {
+      "id": "MX-T", "sourceId": "RODAL", "market": "MX", "asset": "TRACTOR", "condition": "USED", "modelYear": 2021,
+      "model": "Freightliner Cascadia", "locator": "vhc-f8668c8f02", "location": "Nuevo Leon",
+      "odometer": { "value": 694920, "unit": "km" },
+      "engine": "DD15 450 HP", "transmission": "manual 18 speed", "confirmedAxleCount": null,
+      "askingPrice": { "value": 1198275.86, "currency": "MXN", "currencyBasis": "PUBLISHER_EXPLICIT", "taxBasis": "PLUS_IVA" },
+      "capitalizableCost": null, "remainingLifeMonths": null, "futureResidual": null,
+      "status": "CONTRAST_NOT_ACQUISITION_COST", "canonicalKey": "fcm.v3.cost-capital.pu-tracto",
+      "limitations": ["CONFIGURATION_PARTIAL", "TAX_TREATMENT_UNVERIFIED", "CONDITION_DELIVERY_PREPARATION_UNKNOWN", "AVAILABILITY_AND_TRANSACTION_NOT_CONFIRMED"]
+    },
+    {
+      "id": "MX-R", "sourceId": "PRICESALES", "market": "MX", "asset": "DRY_VAN_TRAILER", "condition": "USED", "modelYear": 2015,
+      "model": "Utility 4000D-X", "locator": "stock 11713", "lengthFeet": 53, "location": "Nuevo Laredo, Tamaulipas",
+      "doorType": "SWING", "suspension": "AIR", "suspensionBrand": null, "confirmedAxleCount": null,
+      "askingPrice": { "value": 280000, "currency": "MXN", "currencyBasis": "PUBLISHER_EXPLICIT", "taxBasis": "PLUS_IVA", "deliveryBasis": "LAB_NUEVO_LAREDO" },
+      "capitalizableCost": null, "remainingLifeMonths": null, "futureResidual": null,
+      "status": "CONTRAST_NOT_ACQUISITION_COST", "canonicalKey": "fcm.v3.cost-capital.pu-remolque",
+      "qualityIssue": { "searchSnapshotPrice": 295000, "directPrice": 280000, "difference": 15000, "historicalPriceChangeProven": false, "conflictingSuspensionBrands": ["HENDRICKSON", "MERITOR"] },
+      "limitations": ["CONFIGURATION_PARTIAL", "SUSPENSION_BRAND_CONFLICT", "TAX_TREATMENT_UNVERIFIED", "CONDITION_PREPARATION_UNKNOWN", "AVAILABILITY_AND_TRANSACTION_NOT_CONFIRMED"]
+    },
+    {
+      "id": "US-T", "sourceId": "SELECTRUCKS", "market": "US", "asset": "TRACTOR", "condition": "USED", "modelYear": 2021,
+      "model": "Freightliner Cascadia 126", "locator": "PDF page 1, stock 501320", "location": "Houston, Texas",
+      "odometer": { "value": 509000, "unit": "mile" },
+      "engine": "DD15 400 HP", "transmission": "DT12", "sleeperInches": 72, "wheelbaseInches": 227, "confirmedAxleCount": null,
+      "askingPrice": { "value": 59995, "currency": "USD", "currencyBasis": "INFERRED_US_DEALER_DOLLAR_SYMBOL_CONFIRM_REQUIRED", "taxBasis": "UNKNOWN" },
+      "capitalizableCost": null, "remainingLifeMonths": null, "futureResidual": null,
+      "status": "HISTORICAL_CONTRAST_NOT_ACQUISITION_COST", "canonicalKey": "fcm.v3.cost-capital.pu-tracto",
+      "limitations": ["HISTORICAL_FLYER_NOT_CURRENT_AVAILABILITY", "CURRENCY_CONFIRMATION_REQUIRED", "TAX_DELIVERY_PREPARATION_UNKNOWN", "WARRANTY_INCLUSION_NOT_CONFIRMED"]
+    },
+    {
+      "id": "US-R", "sourceId": "GREATDANE", "market": "US", "asset": "DRY_VAN_TRAILER", "condition": "NEW", "modelYear": 2027,
+      "model": "Great Dane Composite Plate Dry Van", "locator": "VIN 1GR1P0629VJ901576", "location": "Dealer Total Trailers, Missouri",
+      "lengthFeet": 53, "widthInches": 102, "doorType": "SWING", "suspension": "AIR_RIDE", "axleConfiguration": "TANDEM",
+      "askingPrice": { "value": 42900, "currency": "USD", "currencyBasis": "INFERRED_US_DEALER_DOLLAR_SYMBOL_CONFIRM_REQUIRED", "taxBasis": "FET_AND_OTHER_TAX_INCLUSIONS_UNKNOWN" },
+      "capitalizableCost": null, "remainingLifeMonths": null, "futureResidual": null,
+      "status": "CONTRAST_NOT_ACQUISITION_COST", "canonicalKey": "fcm.v3.cost-capital.pu-remolque",
+      "limitations": ["CURRENCY_CONFIRMATION_REQUIRED", "FET_TAX_DELIVERY_PREPARATION_REGISTRATION_UNKNOWN", "MODEL_YEAR_NOT_ACQUISITION_DATE", "AVAILABILITY_AND_TRANSACTION_NOT_CONFIRMED"]
+    }
+  ],
+  "laborContrast": {
+    "sourceId": "ATRI2025", "referenceMarket": "US", "operationsYear": 2024,
+    "sector": "TRUCKLOAD", "locator": { "figure": 7, "printedPage": 24, "pdfPage": 27 },
+    "metric": "REPORTED_COMPANY_DRIVER_WAGES_PLUS_BENEFITS",
+    "sizeGroupWeighted": false, "dryVanOnlyConfirmed": false, "pilotCohortConfirmed": false,
+    "completeEmployerCostConfirmed": false, "hourlyPayConversionsPresentInReport": true,
+    "surveyDefinition": { "locator": "printed page 58 / PDF page 61, questions 5 and 6", "basePayAndStandardBenefits": true, "bonusesRequestedSeparately": true, "allStatutoryChargesConfirmed": false },
+    "transform": { "expression": "usdPerKm = usdPerMile / kmPerMile", "kmPerMile": 1.60934, "factorBasis": "CURRENT_ENGINE_APPROXIMATION", "displayDecimals": 6, "inflationAdjustment": null },
+    "groups": [
+      { "fleetSize": "LT_26", "usdPerMile": 0.817, "usdPerKm": 0.507661525842892 },
+      { "fleetSize": "26_TO_100", "usdPerMile": 0.872, "usdPerKm": 0.5418370263586315 },
+      { "fleetSize": "101_TO_250", "usdPerMile": 0.790, "usdPerKm": 0.49088446195334734 },
+      { "fleetSize": "251_TO_1000", "usdPerMile": 0.843, "usdPerKm": 0.5238172169957871 },
+      { "fleetSize": "GT_1000", "usdPerMile": 1.058, "usdPerKm": 0.6574123553754956 }
+    ],
+    "nationalMultiSectorControl": { "locator": "Table 8, printed page 15 / PDF page 18", "wagesUsdPerMile": 0.798, "benefitsUsdPerMile": 0.197, "sumUsdPerMile": 0.995, "combinedWithTruckloadGroups": false },
+    "canonicalKey": "fcm.v3.labor.tarifa-operador-us", "status": "CONTRAST_ONLY", "adopted": false,
+    "mxRate": null, "monthlyCfuDerived": false, "rangeIsConfidenceInterval": false
+  },
+  "excluded": [
+    { "source": "https://www.maximinc.com/trailer-284497-2026-great-dane-champion-cs1", "reason": "CANADA_LOCATION_NOT_US_PURCHASE_MARKET_DESPITE_USD_PRICE" },
+    { "source": "https://www.penskeusedtrucks.com/make/freightliner/place/us/mo/kansas-city/", "reason": "DYNAMIC_LISTING_RECORDS_NOT_REVERIFIED_IN_DIRECT_HTML" }
+  ],
+  "missingForAdoption": ["PILOT_COHORT_AND_ASSET_RESPONSIBILITY", "CAPITALIZABLE_ACQUISITION_COST", "REMAINING_LIFE_AND_FUTURE_RESIDUAL", "OWNERSHIP_AND_FINANCE_IF_APPLICABLE", "MX_FORMAL_DRIVER_COMPENSATION_AND_EXPOSURE", "US_BENEFIT_BONUS_STATUTORY_SCOPE_AND_FRESHNESS", "ADMINISTRATIVE_FTE_COST_ALLOCATION", "COMPATIBLE_PRODUCTIVE_KM_AND_DAYS"],
+  "activeEngineChanged": false, "databaseAccessed": false, "authenticatedOperationalTest": false,
+  "deployed": false, "businessOperationsExecuted": false, "applicationAiCalls": 0
+}

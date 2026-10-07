@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { api } from '@/lib/api'
+import { costBasesHref } from '@/lib/cost-base-navigation'
 import { notFound } from 'next/navigation'
 import { Editor, type Param, type Grouped } from './editor'
 import { defaultProfile, type CostBaseProfile } from '../../cost-bases/cost-base-profile'
@@ -101,6 +102,7 @@ export default async function AssumptionsEditorPage(
   return (
     <main className="mx-auto w-full max-w-[1440px] px-3 py-4 sm:px-4">
       <header className="mb-4 border-b pb-3">
+        {set.costBase && <Link prefetch={false} href={costBasesHref(set.costBase.id)} className="mb-2 inline-flex min-h-11 items-center text-sm text-primary underline underline-offset-2">← Volver a esta base</Link>}
         <div className="mb-1 flex flex-wrap items-center gap-2 text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
           <span>Control de costos</span>
           <span aria-hidden="true">/</span>
@@ -128,7 +130,7 @@ export default async function AssumptionsEditorPage(
           {readOnlyReason === 'PERMISSION' ? (
             'Modo consulta: sólo un administrador puede modificar versiones de supuestos.'
           ) : canEdit ? (
-            <>Esta versión está {readOnlyReason === 'PUBLISHED' ? 'publicada' : 'archivada'} y no puede modificarse. Crea un nuevo borrador desde{' '}<Link href="/cost-bases" className="font-medium text-foreground underline underline-offset-2">Bases de costo</Link> para realizar cambios.</>
+            <>Esta versión está {readOnlyReason === 'PUBLISHED' ? 'publicada' : 'archivada'} y no puede modificarse. Crea un nuevo borrador desde{' '}<Link prefetch={false} href={costBasesHref(set.costBase?.id)} className="font-medium text-foreground underline underline-offset-2">Bases de costo</Link> para realizar cambios.</>
           ) : (
             <>Esta versión está {readOnlyReason === 'PUBLISHED' ? 'publicada' : 'archivada'} y no puede modificarse. Solicita a un administrador que cree un nuevo borrador.</>
           )}

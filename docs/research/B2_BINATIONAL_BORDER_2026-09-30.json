@@ -1,0 +1,79 @@
+{
+  "artifact": "FCM_B2_BINATIONAL_BORDER_RESEARCH",
+  "cutDate": "2026-09-30",
+  "mode": "RESEARCH_ONLY_NO_BORDER_ADOPTION",
+  "casePin": {
+    "file": "docs/research/B2_D2D_READINESS_CASE_2026-09-30.json",
+    "sha256": "a897778d6f907b1041895f9bcace01cd91654cd2cb51dc9abc0570369024d28b"
+  },
+  "confirmations": {
+    "bridge": "NUEVO_LAREDO_III_WORLD_TRADE_BRIDGE",
+    "bridgeChosenByUser": true,
+    "axles": 5,
+    "equipment": "DRY_VAN_53",
+    "operatingScenario": "SAME_BINATIONAL_COMPANY",
+    "scenarioBasis": "USER_ASSUMPTION_NOT_IDENTIFIED_CARRIER",
+    "carrier": null,
+    "serviceDate": null,
+    "tractorChangeRequired": null,
+    "returnLeg": null
+  },
+  "sources": [
+    {
+      "id": "SICT_BRIDGE_III",
+      "url": "https://app.sct.gob.mx/sibuac_internet/ControllerUI?action=cmdDatosOperRepDet&idVia=86",
+      "locator": "Informacion de las Vias / Puente Nuevo Laredo III / Tarifas vigentes / Camiones 5 Ejes. Web reader Sep 30; raw GET timed out, no original archived.",
+      "archive": null
+    },
+    {
+      "id": "LAREDO_2026_O_114",
+      "url": "https://cityoflaredo.legistar.com/View.ashx?GUID=EBC8CE44-5BEF-446A-A2FA-CE782B0A8891&ID=15587923&M=F",
+      "locator": "Final Reading 2026-O-114, PDF page 3, sections 1 and 2; southbound scope, current commercial 4.75 USD/axle, first 0.50 increase Jan 1 2027. Full page visually reviewed. Metadata title timeline differs from final attachment.",
+      "archive": {
+        "file": "docs/research/sources/LAREDO_2026_O_114_REVIEW_20260930.pdf",
+        "sha256": "f99da8ee6812eef56a91393b4b26acf09a29972782453e0b05b7f15cb0db8725"
+      }
+    },
+    {
+      "id": "SAIA_MEXICO_SCOPE",
+      "url": "https://www.saiasecure.com/webservice/bol/Create.asp",
+      "locator": "Response Document / Notes applicable to specific states / MX: drayage Laredo-Nuevo Laredo and US/MX customs brokerage excluded; accessorials and cargo liability also treated separately. Documentation read only, no BOL/API request submitted.",
+      "archive": {
+        "file": "docs/research/sources/SAIA_MEXICO_EXCLUSIONS_REVIEW_20260930.html",
+        "sha256": "7b4b7078166efe6a80b760d7d7e0c4652d9e95d2417e561e673016f529b9d106"
+      }
+    }
+  ],
+  "mexicanBridgeObservation": {
+    "sourceId": "SICT_BRIDGE_III",
+    "amountMxn": 144,
+    "class": "C5",
+    "effectiveFrom": null,
+    "taxes": "UNVERIFIED",
+    "directionVerified": false,
+    "adopted": false
+  },
+  "excludedUsBridgeObservation": {
+    "sourceId": "LAREDO_2026_O_114",
+    "direction": "US_TO_MX",
+    "publishedUsdPerAxle": 4.75,
+    "nextAdjustmentFrom": "2027-01-01",
+    "nextIncreaseUsdPerAxle": 0.5,
+    "adopted": false
+  },
+  "scopeComparator": {
+    "sourceId": "SAIA_MEXICO_SCOPE",
+    "conclusion": "Reuse explicit inclusion/exclusion practice; this service's public documentation does not establish a binational FTL 53-foot crossing or internal handoff cost. Shipment/container/ramp charges are not a comparable per-trailer full crossing benchmark.",
+    "comparableFtlAmountUsd": null,
+    "adopted": false
+  },
+  "handoff": {
+    "bridgeMxn": null,
+    "bridgeUsd": null,
+    "crossingUsd": null,
+    "interchangeUsd": null,
+    "borderCharges": null
+  },
+  "adoptionEligible": false,
+  "quoteReady": false
+}

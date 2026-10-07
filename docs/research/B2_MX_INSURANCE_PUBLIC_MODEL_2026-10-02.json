@@ -1,0 +1,31 @@
+{
+  "model": "FCM_MX_TRACTOR_INSURANCE_PUBLIC_MODEL_V1",
+  "reviewedAt": "2026-10-02T08:32:00Z",
+  "referencePeriod": "2026-10",
+  "profileReference": "MX_USED_CASCADIA2021_MANUAL_D2D_OWN_RELAY_REFERENCE_V1",
+  "year": 2021,
+  "coverage": "AMPLIA",
+  "annualGrossMxn": 116952,
+  "measurementDate": "2026-09-24",
+  "taxBasis": "PUBLISHED_GROSS_REFERENCE_NO_TAX_CREDIT_DEDUCTION",
+  "territory": "MX_DOMESTIC_TRACTOR_ONLY",
+  "paymentModes": ["CASH", "FINANCED"],
+  "modelAssumptions": [
+    "Apply the broker's published Cascadia 2021 Amplia category price to one Mexican planning tractor, not an observed policy for the RODAL VIN, DD15 engine, manual transmission or insured value.",
+    "The year table uses the same version across years but does not publish its exact version or 2021 insured value. Do not scale the 2022 premium by asking-price ratio or substitute a 2022 row.",
+    "116952MXN is the published annual total rounded to whole pesos. The 30% convenio discount, policy right790MXN and IVA are already included. No further discount or fee is applied.",
+    "Use gross premium as an explicit planning measurement without deducting a tax credit. Actual VAT recoverability and net economic expense remain unknown, not asserted as zero.",
+    "Cash and asset-financed alternatives use the same annual coverage reference; premium installment finance and lender-specific requirements are not modeled.",
+    "The source excludes the trailer and cargo. US, border, interchange, trailer and merchandise coverage are not proved by this domestic tractor benchmark and remain separate unresolved conditions.",
+    "Normalize annual/12 once, then convert with the dated Banxico FIX reference and round USD monthly cents only. Not a monthly invoice, current insurer quote, canonical parameter or negotiated tariff."
+  ],
+  "source": {
+    "id": "TIMI_CASCADIA2021_YEAR_TABLE",
+    "url": "https://timi.mx/guias/cuanto-cuesta-seguro-tractocamion",
+    "locator": "Year table caption measured24Sep2026, row2021, Freightliner Cascadia Amplia116952MXN/year. Includes convenio, policy right790 and IVA; trailer and cargo excluded.",
+    "archive": {
+      "file": "docs/research/sources/TIMI_TRACTOR_YEAR_TABLE_20261002.html",
+      "sha256": "1bb4c29d3f3238af712af34b7ccf28e6899581d3915d5ddcdffb44bb4ade4114"
+    }
+  }
+}

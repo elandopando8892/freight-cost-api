@@ -31,8 +31,13 @@ import { pilotStagingRoutes } from "./modules/pilot/pilot-staging.routes.js";
 import { assistantRoutes } from "./modules/assistant/assistant.routes.js";
 import { scenarioRoutes } from "./modules/scenarios/scenario.routes.js";
 import { scenarioReviewRoutes } from "./modules/scenario-reviews/scenario-reviews.routes.js";
+import { googleRouteReviewRoutes } from "./modules/routing/google-route-review.routes.js";
+import type { GoogleReviewBudget } from "./modules/routing/google-route-review.routes.js";
+import { assertLocalReadEnvironment, localReadRequestAllowed } from "./config/local-read-review.js";
 
-export function buildApp() {
+export function buildApp(options: { localReadOnlyReview?: boolean; localGoogleReviewBudget?: GoogleReviewBudget } = {}) {
+  if (options.localGoogleReviewBudget && !options.localReadOnlyReview) throw new Error('Scoped read runtime required');
+  if (options.localReadOnlyReview) assertLocalReadEnvironment(process.env, !!options.localGoogleReviewBudget);
   const app = Fastify({
     trustProxy: env.NODE_ENV === "production",
     logger:
@@ -50,6 +55,19 @@ export function buildApp() {
             },
           },
   });
+
+  // A dedicated launcher opts in; ordinary local/hosted servers are unchanged.
+  // Reject effects before authentication, which may otherwise provision data.
+  if (options.localReadOnlyReview) {
+    app.addHook("onRequest", async (request, reply) => {
+      if (!localReadRequestAllowed(request.method, request.url, !!options.localGoogleReviewBudget)) {
+        return reply.status(403).header("Cache-Control", "no-store").send({
+          code: "LOCAL_READ_ONLY",
+          error: "Este runtime local sólo permite las consultas de revisión autorizadas.",
+        });
+      }
+    });
+  }
 
   // Plugins
   app.register(helmet);
@@ -132,6 +150,10 @@ export function buildApp() {
   app.register(lanesRoutes);
   app.register(engineRoutes);
   app.register(benchmarkRoutes);
+  app.register(googleRouteReviewRoutes, options.localGoogleReviewBudget ? {
+    budget: options.localGoogleReviewBudget,
+    allowedRequest: { origin: 'Laredo, TX, USA', destination: 'Fort Smith, AR 72916, USA' },
+  } : {});
   app.register(partnerCostRoutes);
   app.register(quotesRoutes);
   app.register(productionRoutes);

@@ -1,0 +1,16 @@
+{
+  "artifact":"FCM_B2_INSURANCE_EMPLOYER_COMPONENTS",
+  "reviewedAt":"2026-10-01T19:07:19-06:00",
+  "status":"RESEARCH_FORMULAS_AND_PARTIAL_PUBLIC_COMPONENTS_NOT_CALIBRATION",
+  "reusedRefs":["capitalInsurance#/mxInsurance","capitalInsurance#/usInsurance","capitalInsurance#/sharedTrailerInsurance","facilityStaffing#/staffingScenarios","payrollComparators#/roleCrosswalkUS"],
+  "sources":[
+    {"id":"SSA_EMPLOYER_2026","url":"https://www.ssa.gov/oact/cola/cbb.html","locator":"2026 contribution base and OASDI/HI employee-employer rates","evidence":"OFFICIAL_WEB_READER_OBSERVATION_NOT_LOCAL_ORIGINAL","archive":null,"originalDownload":"ACCESS_DENIED_NO_RETRY","crawlRecencyShown":"today","taxYear":2026},
+    {"id":"PROGRESSIVE_AVERAGE_RECHECK","url":"https://www.progressivecommercial.com/commercial-auto-insurance/truck-insurance/commercial-truck-insurance-cost/","locator":"2025 transport national monthly average","evidence":"OFFICIAL_INSURER_WEB_READER_OBSERVATION","observationYear":2025,"transportMonthlyUsd":926,"matchedPilotQuote":false}
+  ],
+  "insurancePolicy":{"annualAmountDivisor":12,"termAmountDivisor":"termMonths required","monthlyAverageDivisor":1,"actualBillingIsUnknown":true,"mxGrossNotVatNet":true,"packagesAreAlternativesNotSum":true,"liabilityLimitsAreNotPremiums":true,"sharedTrailerChargedOnce":true,"ownGroupIsNotSameLegalInsured":true,"premiumPerOwnedBox":null,"crossBorderCoverageConfirmed":false,"matchedMonthlyInsuranceBudgetUsd":null},
+  "usEmployerRule":{"ruleYear":2026,"socialSecurityRate":0.062,"socialSecurityCapUsd":184500,"medicareRate":0.0145,"capIsPerEmployee":true,"scope":"EMPLOYER_OASDI_AND_HI_ONLY"},
+  "usEmployerScenario":{"id":"US_EXISTING_DISPATCHER_BILLING_WAGE_PROXY_WITH_2026_TAX_COMPONENT","staffingScenarioId":"US_ONE_DISPATCHER_ONE_BILLING_WAGE_COMPONENT","taxYear":2026,"roles":["DISPATCHER","BILLING_ADMIN"],"employeeCountPerRoleAssumption":1,"annualWageFullyTaxableHypothesis":true,"wageObservationYear":2025,"taxAndWagesAreSameObservedPeriod":false,"actualStaffingConfirmed":false,"fullEmployerBenefitRatioApplied":false,"knownTaxComponentIsEmployerTotalOrLowerBound":false},
+  "mxEmployer":{"salaryGrossNetKnown":false,"sbcKnown":false,"riskClassPremiumKnown":false,"imssInfonavitIsnBenefitsComplete":false,"monthlyEmployerTotalMxn":null,"universalUsBurdenApplied":false,"next":"Compatible public gross salary, SBC/benefit/risk/state-tax scenario required; do not invent a universal percentage"},
+  "remaining":["MX/US compatible insurance package, territory, value, tax/term/fees and unique box owner/custody still required","US FUTA/SUTA/workers compensation and employer benefits plus actual scenario staffing remain unresolved; MX gross/SBC/risk/local tax separate","Budget/capacity/cycle and driver variable cost cannot use wage-only, FICA-only or national premiums as complete calibrated inputs"],
+  "adoptedValues":0,"completeBudgetRows":0,"quoteReady":false,"externalChanges":false
+}

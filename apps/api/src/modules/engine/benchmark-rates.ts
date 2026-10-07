@@ -20,6 +20,19 @@ const definitions = new Map(PARAMETER_DEFINITIONS.map(p => [`${p.section}__${p.f
 const byKey = new Map(PARAMETER_DEFINITIONS.map(p => [p.key, p]))
 const tirePositions = ['Direccion', 'Traccion', 'Recapeadas', 'Remolque'] as const
 
+/** A retread is a tire/casing condition, not a fourth physical axle position.
+ * The twelve legacy inputs cannot identify replacement positions or successive
+ * casing stages. Never infer that allocation from their labels or prices. */
+export const BENCHMARK_TIRE_METHOD = Object.freeze({
+  id: 'FCM_POSITIONAL_INSTALLED_TIRES_WITHOUT_ADDITIVE_RETREAD_V1',
+  physicalPositions: Object.freeze(['Direccion', 'Traccion', 'Remolque'] as const),
+  positiveStandaloneRetreadRow: 'REQUIRES_EXPLICIT_POSITION_OR_LIFECYCLE' as const,
+  lifecycleAlternative: 'apps/api/src/modules/cost-bases/tire-lifecycle-economics.ts',
+  publicAggregateIsAlternativeNotAdditionalExpense: true,
+  legacyWorkbookFormulaChanged: false,
+  calibrated: false,
+})
+
 function formulas(country: 'MX' | 'US', tractorOnly = false) {
   const p = (m: Record<string, number>, section: string, field: string) => m[`${section}__${field}`]
   return {
@@ -40,6 +53,9 @@ function formulas(country: 'MX' | 'US', tractorOnly = false) {
       } })
       return deriveMaintTiresPerKm(maintenanceOnly)
     } },
+    // deriveBenchmarkRates rejects a positive standalone retread row before
+    // executing this formula. Keep its dependencies explicit, including the
+    // zero disposition, without silently dropping any canonical inventory key.
     tiresUsdPerKm: { unit: 'USD/km', run: (m: Record<string, number>) => tirePositions.filter(position => !tractorOnly || position !== 'Remolque').reduce((sum, position) =>
       sum + p(m, 'COST_TIRES', `Qty ${position}`) * p(m, 'COST_TIRES', `PU ${position}`) / p(m, 'COST_TIRES', `Life KM ${position}`), 0) },
     driverUsdPerKm: { unit: 'USD/km', run: (m: Record<string, number>) => p(m, 'LABOR', `Tarifa Operador ${country}`) / 1.60934 },
@@ -91,7 +107,7 @@ export function deriveBenchmarkRates(raw: unknown) {
   }
   for (const item of input.parameters) if (!byKey.has(item.key)) issues.push({ field: item.key, code: 'UNKNOWN_PARAMETER' })
   const envelope = { model: 'FCM_BENCHMARK_RATES_V1', country: input.country, baseRevision: input.baseRevision,
-    requirements, calibrated: false, sourceStatus: 'DOCUMENTED_UNVERIFIED', lineage: input }
+    requirements, tireMethod: BENCHMARK_TIRE_METHOD, calibrated: false, sourceStatus: 'DOCUMENTED_UNVERIFIED', lineage: input }
   if (issues.length) return { ...envelope, status: 'INCOMPLETE', issues, rates: null }
   const values = new Proxy({} as Record<string, number>, { get(_target, field: string) {
     const definition = definitions.get(field)
@@ -107,6 +123,13 @@ export function deriveBenchmarkRates(raw: unknown) {
   for (const field of positiveFields) if (!(values[field] > 0)) issues.push({ field, code: 'NON_POSITIVE_DENOMINATOR' })
   for (const field of ['COST_CAPITAL__LTV Asset Financing', 'GENERAL_BASE__Índice de Operatividad']) {
     if (values[field] > 1) issues.push({ field, code: 'INVALID_FRACTION' })
+  }
+  if (values['COST_TIRES__Qty Recapeadas'] > 0) {
+    issues.push({ field: 'COST_TIRES__Qty Recapeadas', code: 'RETREAD_POSITION_OR_LIFECYCLE_REQUIRED' })
+  }
+  for (const position of BENCHMARK_TIRE_METHOD.physicalPositions.filter(p => !tractorOnly || p !== 'Remolque')) {
+    const field = `COST_TIRES__Qty ${position}`
+    if (!Number.isInteger(values[field])) issues.push({ field, code: 'NON_INTEGER_PHYSICAL_TIRE_QUANTITY' })
   }
   const asset = values['COST_CAPITAL__Qty Tracto'] * values['COST_CAPITAL__PU Tracto'] + (tractorOnly ? 0 : values['COST_CAPITAL__Qty Remolque'] * values['COST_CAPITAL__PU Remolque'])
   const residual = values['COST_CAPITAL__Qty Rescue Tracto'] * values['COST_CAPITAL__PU Rescue Tracto'] + (tractorOnly ? 0 : values['COST_CAPITAL__Qty Rescue Remolque'] * values['COST_CAPITAL__PU Rescue Remolque'])

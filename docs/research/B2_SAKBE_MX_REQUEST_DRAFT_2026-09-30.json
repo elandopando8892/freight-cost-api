@@ -1,0 +1,10 @@
+{
+  "origin": {"id": null, "label": "Mexico, DF - pending explicit selection of INEGI destination"},
+  "destination": {"id": null, "label": "Nuevo Laredo - pending explicit selection of commercial bridge"},
+  "mode": "optima",
+  "axles": 5,
+  "additionalAxles": 0,
+  "equipmentConfirmed": false,
+  "direction": "MX_TO_US",
+  "candidateOnly": true
+}

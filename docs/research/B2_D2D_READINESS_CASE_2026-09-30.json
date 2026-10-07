@@ -1,0 +1,19 @@
+{
+  "artifact": "FCM_B2_D2D_PUBLIC_REFERENCE_READINESS_CASE",
+  "cutDate": "2026-09-30",
+  "baseHead": "4f5fc2de0c3d178dace917231e1092040dec21fd",
+  "caseReference": "D2D_PUBLIC_REFERENCE_MEXICO_DF_FORT_SMITH_72916_DRAFT_20260930",
+  "direction": "MX_TO_US",
+  "route": {
+    "mxEndpoint": "Mexico, DF",
+    "mxGateway": "Nuevo Laredo",
+    "usGateway": "Laredo",
+    "usEndpoint": "Fort Smith, AR 72916"
+  },
+  "routeSelectionSource": "USER_CONFIRMED_CORRIDOR_NOT_CALCULATED_ITINERARY",
+  "mode": "LOCAL_DRAFT_NO_ADOPTION_OR_PERSISTENCE",
+  "consolidation": {
+    "file": "docs/research/B2_FIXED_EXPOSURE_TRAILER_CONSOLIDATION_2026-09-30.json",
+    "sha256": "242f778385ab18c84f70b2ca9d720520548abe84a7e5c64ab5573a0801d9aa51"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "artifact":"FCM_B2_SHARED_BOX_CAPITAL_EXPOSURE_SENSITIVITY",
+  "reviewedAt":"2026-10-01T23:04:00-06:00",
+  "status":"ONE_BOX_MOVEMENT_PROJECTION_NOT_COMPLETE_CAPITAL_OR_CFU",
+  "physicalScope":"OWN_MX_US_RELAY_SAME_TRAILER",
+  "physicalBoxCount":1,
+  "capacityScenario":{
+    "basis":"EXPLICIT_HISTORICAL_TRACTOR_TO_ONE_BOX_CAPACITY_SENSITIVITY_NOT_OBSERVED",
+    "sourceId":"IMT_PT260_CASE",
+    "sourceRef":"exposure#/sources/0",
+    "annualKm":120000,"annualOperatingDays":300,"monthsPerYear":12,
+    "normalization":"ONE_REFERENCE_BOX_NOT_CARRIER_FLEET_SIZE",
+    "assumption":"For sensitivity only, reuse the historical tractor mean-month kilometres and operating days as one physical box's nominal capacity. Not observed dryvan53 box productivity or a same-cohort budget. Explicit transfer; not auto-selected for CFU.",
+    "actualProductiveBoxCapacityConfirmed":false
+  },
+  "capitalScenario":{
+    "sourceRef":"trailerOverhead#/trailerTaxSensitivity",
+    "assetRef":"mxUsedMarket#/trailerMarketContrast",
+    "kind":"REUSE_FOUR_PUBLISHED_PRICE_TAX_ALTERNATIVES_NO_SELECTION",
+    "unknownAcquisitionDisposalFinanceCorrectionsSetToZero":false,
+    "priceGapIsNetResidualOrCompleteCapital":false,
+    "holdingAnalogyIsRemainingLife":false
+  },
+  "phasePolicy":{
+    "scope":"FORWARD_MOVEMENT_ONLY_NOT_RESOURCE_CYCLE",
+    "mxDistanceRef":"sakbeMxDetail#/observations/detailTotals/distanceKm",
+    "mxElapsedRef":"mxDrivingStage#/scenarios",
+    "usDistanceKm":null,"usMovementElapsedHours":null,"borderDetachedHours":null,
+    "noUnknownPhaseSetToZero":true,
+    "noTractorReturnsTransferredToBox":true,
+    "oneMaxAfterSerialComposition":true,
+    "prefixAmountsMayBeAdded":false
+  },
+  "benchmarkDecision":{
+    "adapt":"Existing tax contrasts and MAX allocator, one box sensitivity, source-linked phases; no new pricing engine",
+    "reject":["Treat tractor historical averages as measured current box capacity","Apply full box fixed charge to each national leg","Add separate phase MAX results","Treat partial price-gap or MX prefix as complete capital or a CFU floor"],
+    "newInfrastructure":false
+  },
+  "remaining":["Matched current box capital/acquisition/net residual/financing and insurance/permits","Supported box productive capacity and temporal definition","US/border/waiting/empty/full serial box cycle","Complete tractor budgets and one administrative pool, then all CFU/CVU and pilot total"],
+  "calibrated":false,"quoteReady":false,"adoptedValues":0
+}

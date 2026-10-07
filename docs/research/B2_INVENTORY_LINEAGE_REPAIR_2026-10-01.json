@@ -1,0 +1,13 @@
+{
+  "artifact":"FCM_B2_INVENTORY_LINEAGE_REPAIR",
+  "cutDate":"2026-10-01",
+  "baseHead":"4f5fc2de0c3d178dace917231e1092040dec21fd",
+  "status":"LOCAL_DOCUMENTARY_LINEAGE_REPAIRED_NOT_ECONOMIC_ACCEPTANCE",
+  "historicalRegister":{"file":"docs/C1_B1_PARAMETER_SOURCE_REGISTER_2026-09-29.md","expectedAndRestoredSha256":"a31864f52ce5cd3d9f111056ec4dc58181587e99258614f1e2636e61ff992f0a","previousModifiedSha256":"053bade3f362b1df56a95cd0f535ace3ac4beae19343f950967ca746d650e3b3"},
+  "currentRevision":{"file":"docs/C1_B1_PARAMETER_SOURCE_REGISTER_2026-10-01.md","sha256":"151b3d09d963c749de24038466a91fd868d7bf7c5c1536b93e08e0db18a69314","preservesLaterInsuranceAdapterDocumentation":true},
+  "changeReview":{"changedKey":"fcm.v3.cost-insurance.periodo-de-poliza","changedEconomicFields":0,"datedAssemblyAndDownstreamPinsChanged":false,"historicalBytesReconstructionMatchedExpectedHashBeforeEdit":true,"currentRevisionOnlyHeaderAndOneDocumentationRowChanged":true},
+  "inventory":{"required":135,"documented":135,"candidate":3,"contrast":47,"missingEvidence":85,"adopted":0,"requirementsSha256":"9c8510de32dbdd8a9a86f99f571f1e41171f683ce005106eeb26fbae1e46001d"},
+  "nextEconomicReview":{"jurisdiction":"Nuevo Leon for public General Escobedo monitoring scenario only","sources":[{"url":"https://www.hcnl.gob.mx/trabajo_legislativo/leyes/leyes/ley_de_hacienda_del_estado_de_nuevo_leon/","evidence":"PRIMARY_HTML_WEB_READER_OBSERVATION","publishedRateFraction":0.03,"locator":"article157; registry last reform January2023","effective2026Confirmed":false},{"url":"https://nl.gob.mx/es/boletines/respalda-mesa-para-construccion-de-la-paz-paquete-presupuestal-2026-en-seguridad","evidence":"PRIMARY_GOVERNMENT_PROPOSAL_NOT_ENACTMENT","proposedRateFraction":0.04,"effective2026Confirmed":false}],"adoptedRate":null,"computedIsnMxn":null,"next":"verify promulgation/effective date and applicable paid remuneration/exemptions, not SBC or all employer components"},
+  "verification":{"uniqueTargetedTests":391,"failedTests":0,"strictTypecheck":"PASS","currentInventoryAuditIssues":0,"referenceBudgetPins":28,"completeBudgetRows":0,"businessOutputsRemainNull":true},
+  "calibrated":false,"quoteReady":false,"adoptedValues":0,"externalChanges":false
+}

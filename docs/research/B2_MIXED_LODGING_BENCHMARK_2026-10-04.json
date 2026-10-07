@@ -1,0 +1,36 @@
+{
+  "model": "FCM_B2_MIXED_LODGING_BENCHMARK_V1",
+  "observedOn": "2026-10-04",
+  "capture": "PRIMARY_WEB_TEXT_EXTRACT_NOT_ORIGINAL_ARCHIVE",
+  "caseReference": "MEXICO_DF_FORT_SMITH_72916_WTB_OWN_RELAY",
+  "countryScope": "BOTH_MX_AND_US",
+  "restPolicy": {
+    "id": "CONDITIONAL_REST_WITHOUT_FIXED_HOTEL_QUOTA",
+    "humanInstruction": "el estándar",
+    "interpretation": "PLANNING_RECOMMENDATION_NOT_MEASURED_MARKET_SHARE",
+    "rule": "Pensión/parking como alternativa de descanso sólo con instalaciones para dormir y sitio adecuados verificados. Hotel por excepción documentada o falta de esas condiciones; si la evidencia falta, conservar pendiente y no costo cero.",
+    "universalHotelPercentageEstablished": false,
+    "automaticHotelNights": null,
+    "mxSleeperVerifiedByThisResearch": false,
+    "legalComplianceCertified": false,
+    "sourceUrl": "https://www.fmcsa.dot.gov/regulations/under-sleeper-berth-provisions-driver-takes-7-hours-sleeper-berth-later-takes-duty",
+    "sourceBoundary": "FMCSA distingue descanso off-duty en hotel y sleeper; no establece mezcla hotel/pensión, tarifa ni estándar de compra del carrier. Aplicación económica binacional es recomendación, no mandato normativo."
+  },
+  "candidates": [
+    {"id":"MX_PENSION_KM405","country":"MX","concept":"RIG_PARKING","amount":260,"currency":"MXN","unit":"RIG_24H","priceKind":"PUBLISHED_OPERATOR_PRICE","location":"CUAUTITLAN_IZCALLI","url":"https://pensiondetrailers40-5.com/","locator":"Precios, Trailer: tracto y remolque o remolque mayor a9metros; 260 por24h.","effectiveFrom":null,"effectiveUntil":null,"taxAndFeesKnown":false,"roomOrParkingBundleVerified":false,"limitations":"Sin tarifa septiembre ni impuestos acreditados; una plaza para el conjunto, no por activo. No prueba alojamiento del operador."},
+    {"id":"MX_HOTEL_REAL_INN","country":"MX","concept":"HOTEL_ROOM","amount":94,"currency":"USD","unit":"ADVERTISED_ROOM_RATE_UNSPECIFIED_PERIOD","priceKind":"ADVERTISED_STARTING_PRICE","location":"NUEVO_LAREDO","url":"https://www.grupocaminoreal.com/real-inn-nuevo-laredo","locator":"Habitaciones: anuncio Tarifa desde94USD.","effectiveFrom":null,"effectiveUntil":null,"taxAndFeesKnown":false,"roomOrParkingBundleVerified":false,"limitations":"No tarifa final por noche o septiembre, ni cuarto/parking para tractor+caja verificado; hotel de negocios, no muestra representativa de hotel de paso."},
+    {"id":"MX_HOTEL_SAN_PEDRO","country":"MX","concept":"HOTEL_ROOM","amount":null,"currency":"MXN","unit":"ROOM_NIGHT","priceKind":"NO_PUBLISHED_PRICE","location":"FEDERAL57_KM108_MATEHUALA_SALTILLO","url":"https://hotelsanpedroexpress.com/hotel/","locator":"Hotel sobre Federal57; habitaciones y estacionamiento privado, página sin importe.","effectiveFrom":null,"effectiveUntil":null,"taxAndFeesKnown":false,"roomOrParkingBundleVerified":false,"limitations":"Importe, inclusión de tractor+caja y precio septiembre desconocidos; moneda es target pendiente, no precio observado."},
+    {"id":"US_PARKING_TOWSON","country":"US","concept":"RIG_PARKING","amount":10,"currency":"USD","unit":"PUBLISHED_PARKING_DAY","priceKind":"PUBLISHED_MARKETPLACE_PRICE","location":"FORT_SMITH_5103_TOWSON_AVE","url":"https://truckparkingclub.com/us/arkansas/fort-smith","locator":"Lista por ciudad, 5103TowsonAve:10USD por día.","effectiveFrom":null,"effectiveUntil":null,"taxAndFeesKnown":false,"roomOrParkingBundleVerified":false,"limitations":"No precio septiembre, fees o reserva; día publicado no demostrado como bloque24h. Sin cuarto incluido ni COI/custodia verificados."},
+    {"id":"US_PARKING_N4TH","country":"US","concept":"RIG_PARKING","amount":12,"currency":"USD","unit":"PUBLISHED_PARKING_DAY","priceKind":"PUBLISHED_MARKETPLACE_PRICE","location":"FORT_SMITH_1600_N4TH_ST","url":"https://truckparkingclub.com/us/arkansas/fort-smith","locator":"Lista por ciudad, 1600N4thSt:12USD por día.","effectiveFrom":null,"effectiveUntil":null,"taxAndFeesKnown":false,"roomOrParkingBundleVerified":false,"limitations":"No factura, fees, disponibilidad o precio septiembre. No convertir día publicado a24h ni sumar por tractor y caja separados."},
+    {"id":"US_PARKING_S6TH","country":"US","concept":"RIG_PARKING","amount":12.5,"currency":"USD","unit":"PUBLISHED_PARKING_DAY","priceKind":"PUBLISHED_MARKETPLACE_PRICE","location":"FORT_SMITH_1400_S6TH_ST","url":"https://truckparkingclub.com/us/arkansas/fort-smith","locator":"Lista por ciudad, 1400S6thSt:12.50USD por día.","effectiveFrom":null,"effectiveUntil":null,"taxAndFeesKnown":false,"roomOrParkingBundleVerified":false,"limitations":"Precio de lista, no factura final ni histórico septiembre; parking, no alojamiento del operador."},
+    {"id":"US_GSA_FY2026_CONTRAST","country":"US","concept":"HOTEL_ROOM","amount":110,"currency":"USD","unit":"FEDERAL_MAXIMUM_LODGING_ALLOWANCE_NIGHT","priceKind":"GOVERNMENT_REIMBURSEMENT_CONTRAST_ONLY","location":"STANDARD_CONUS_NOT_VERIFIED_ZIP72916","url":"https://www.gsa.gov/policy-regulations/regulations/federal-travel-regulation/ftr-and-related-files/gsa-per-diem-bulletin-ftr-2601","locator":"FTR26-01: lodging estándar110USD, ejercicio1oct2025–30sep2026; techo de reembolso.","effectiveFrom":"2025-10-01","effectiveUntil":"2026-09-30","taxAndFeesKnown":false,"roomOrParkingBundleVerified":false,"limitations":"Sin impuestos. No tarifa comercial ni hotel confirmado para operador, ZIP o ruta; no adoptar como gasto obligatorio del carrier."}
+  ],
+  "hotelShare": null,
+  "cycleNightCounts": null,
+  "selectedRateIds": [],
+  "completeLodgingCvuUsd": null,
+  "calibrated": false,
+  "quoteReady": false,
+  "adoptedValues": 0,
+  "externalWrites": false
+}

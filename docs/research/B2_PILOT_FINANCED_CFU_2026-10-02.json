@@ -1,0 +1,18 @@
+{
+ "model":"FCM_THREE_RESOURCE_FINANCED_PILOT_COMPONENTS_V1","reviewedAt":"2026-10-02T19:29:00Z","referencePeriod":"2026-10",
+ "scope":"SAME_OWN_MX_US_RELAY_ONE_BOX_AND_SAME_KNOWN_CYCLE_EXPOSURE",
+ "measurement":"REPLACE_THREE_CASH_CAPITAL_LINES_WITH_PUBLIC_FINANCE_COMPONENTS_NOT_DEBT_SERVICE",
+ "sourceRefs":["usProspectiveCapital#/modelAssumptions","mxProspective#/finance","boxProspective#/modelAssumptions","mxDriverForecast#/assumptions","pilotPhysicalCycle#/assumptions","https://www.bbva.mx/empresas/productos/financiamiento/creditos-a-corto-y-largo-plazo/credito-simple-pyme.html#tasas-comisiones","https://www.usmfcu.org/auto-loans#SEMI_TRUCK_USED"],
+ "planningAssumptions":[
+  "Cash/financed comparisons retain the same asset profiles, known distances/time/capacity, driver/road variables and administrative pool. Neither alternative is actual XBF debt or selected into a cost base.",
+  "Reuse accepted prospective market-value use measurement and existing public debt arithmetic; replace three asset capital rows once, never add whole debt payments or principal to depreciation.",
+  "US9percent nominal is an independent planning assumption, not published9percentAPR converted or a matched loan. Existing90percent reference balance/72remaining months, mean interest36months retained.",
+  "MX11.5/15.7percent nominal are existing independent historical-context assumptions, not current offers. Existing80percent balance/60remaining months, mean interest24months retained. DTFS current reader2Oct2026 yielded no extractable terms; do not refresh expired offers into current loans.",
+  "Box8public sensitivities preserve24month annuity,80/100percent net-value balance and15/38percent fixed-rate boundaries. BBVA primary rates1percent opening+IVA and fixed-asset12-60months reverified2Oct2026; approval/actual debt not established.",
+  "Box acquisition-value tax treatment and opening-fee VAT treatment are separate explicit sensitivities; neither is an observed tax credit or cash financing of purchaseVAT. Reuse the economic fee spread24months, not the gross upfront payment as monthly expense.",
+  "Each representative monthly capital is rounded once to cents before joining the existing cent-valued cash resource budget. Original capital comparisons remain untouched. Different24/36month mean horizons are disclosed, not first-period bills or identical repayment schedules.",
+  "Reuse existing resource-specific MAX(km exposure,time exposure). Capital funding changes no exposure denominator, physical cycle or labor calendar. The same one box and group administration remain charged once.",
+  "32monthly financed variants yield128independent cycle/rest comparisons against8existing cash rows. Count is a sensitivity grid, not new sprints, a market confidence interval, simultaneous expenses or an implied min/max price range.",
+  "Remaining coverage/journey/wait/DEF/idle/territorial/company/permit and finance ancillary/equity return limits remain unknown; neither completeCFU/CVU/D2D nor quote readiness is asserted. No new origination, purchase, account, provider, data change or deployment."
+ ],"adoptedValues":0,"quoteReady":false
+}

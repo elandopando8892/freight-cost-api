@@ -1,0 +1,70 @@
+{
+  "artifact": "FCM_B2_RESOURCE_ECONOMIC_PROFILE_REFERENCE",
+  "observedAt": "2026-10-01",
+  "baseHead": "4f5fc2de0c3d178dace917231e1092040dec21fd",
+  "status": "PARTIAL_PUBLIC_MODEL_PROFILES_NOT_ADOPTED_FIXED_BUDGET",
+  "physicalScope": "OWN_MX_US_RELAY_SAME_TRAILER",
+  "paymentModes": ["CASH", "FINANCED"],
+  "resourceCountInServiceIsNotFleetSize": true,
+  "groupFleetQuantities": null,
+  "groupMonthlyBudgetUsd": null,
+  "resources": [
+    {"resourceId":"MX_TRACTOR","proposedProfileReference":"MX_USED_CASCADIA2021_MANUAL_D2D_OWN_RELAY_REFERENCE_V1","askingSourceId":"RODAL_MX_2021","normalization":"PER_REFERENCE_ASSET_NOT_SELECTED_FLEET","currency":"MXN","capitalFormula":"(capitalizableAcquisitionMxn - netResidualMxn)/plannedHoldingMonths + scenarioInterestMxn + separatelySupportedFeeAllocationMxn","capitalMethodRef":"capitalInsurance#/capitalMethod","capitalComplete":false,"exposureRefs":["exposure#/sources/0"],"exposureInterpretation":"IMT historical 10000 km and 25 operating days per average month remain contrast only, not current dryvan productive capacity.","usedResidualMethodConfirmed":false},
+    {"resourceId":"US_TRACTOR","proposedProfileReference":"US_USED_CASCADIA2021_SLEEPER_D2D_OWN_RELAY_REFERENCE_V1","askingSourceId":"RYDER_US_SLEEPER_526505","normalization":"PER_REFERENCE_ASSET_NOT_SELECTED_FLEET","currency":"USD","capitalFormula":"askingAnchor*(1-retention)/plannedHoldingMonths + (capitalizableAcquisitionUsd-askingAnchor+disposalCostUsd)/plannedHoldingMonths + scenarioInterestUsd + separatelySupportedFeeAllocationUsd","capitalMethodRef":"capitalInsurance#/usConditionalValueLoss","capitalComplete":false,"exposureRefs":["dryVanCapacity#/observations","dryVanDenominator#/recommendation"],"exposureInterpretation":"Three dated PAMT proxy contrasts plus one-VIN odometer history; neither is productive asset-days or a forward mileage guarantee.","usedResidualMethodConfirmed":false},
+    {"resourceId":"SHARED_TRAILER","proposedProfileReference":"ONE_UTILITY4000DX2021_DRYVAN53_SHARED_MX_US_REFERENCE_V1","askingSourceId":"UTILITY_MX_2021","normalization":"PER_REFERENCE_ASSET_NOT_SELECTED_FLEET","currency":"MXN","capitalFormula":"(capitalizableAcquisitionMxn - netResidualMxn)/plannedHoldingMonths + scenarioInterestMxn + separatelySupportedFeeAllocationMxn","capitalMethodRef":"mxUsedMarket#/trailerMarketContrast","capitalComplete":false,"exposureRefs":["resourceExposure#/exposurePlan/resources/2"],"exposureInterpretation":"Own serial box cycle and capacity required; tractor km, stock ratios or two full national charges cannot supply it.","usedResidualMethodConfirmed":false}
+  ],
+  "usHistoricalUse": {
+    "sourceId": "RYDER_US_SLEEPER_526505",
+    "sourceUrl": "https://www.ryder.com/en-us/used-trucks/inventory/oklahoma/oklahoma-city/tractor/tandem-axle-sleeper-tractor/2021/freightliner-mercedes/new-cascadia-px12664/526505",
+    "sourceArchive": {"file":"docs/research/sources/RYDER_SLEEPER526505_REVIEW_20261001.html","sha256":"99708b73688f59d6d3d25fd1dbf9e0cb9ff2d703c32eee1e8946e05d529b7070"},
+    "captureKind": "STRUCTURED_EXTRACTION_FROM_EXISTING_ORIGINAL_HTML_RECHECKED_WITH_PRIMARY_WEB_READER",
+    "locator": "VEH-526505 / Maintenance History / Date and Mileage rows and disclaimer",
+    "vin": "3AKJHHDR6MSNB0628",
+    "odometerUnit": "mile",
+    "records": [
+      {"date":"2024-09-03","odometerMiles":553292},
+      {"date":"2024-11-18","odometerMiles":601570},
+      {"date":"2025-01-27","odometerMiles":658257},
+      {"date":"2025-04-23","odometerMiles":720575},
+      {"date":"2025-06-19","odometerMiles":760042},
+      {"date":"2025-10-20","odometerMiles":842610},
+      {"date":"2026-03-30","odometerMiles":868507}
+    ],
+    "normalizationDaysPerYear": 365,
+    "normalizationMonthsPerYear": 12,
+    "normalizationMeaning": "Historical elapsed-calendar-day rate, scaled to 365/12 days; not an observed calendar month or an operating/productive-day rate.",
+    "listingOdometerIsLatest": false,
+    "listingOdometerUsedAsChronologyEndpoint": false,
+    "recordsAuthenticateFutureUsageOrCondition": false,
+    "loadEmptyDriverOrTerritorySplitKnown": false,
+    "limitations": ["One publicly advertised asset, not a representative carrier sample or the operationally selected tractor.","Manufacturer disclaimer says preventive entries only, not all maintenance or repairs; source publication is not independent odometer certification.","Lower recent rate may reflect many causes; do not infer downtime, defect, disposal, operating-day count or team drivers.","Latest listed maintenance reading exceeds the vehicle headline mileage; not proof of current odometer or availability.","Historical usage cannot establish survival over the next 36 months or future net resale price."]
+  },
+  "jointUsCapitalExposure": {
+    "planningHoldingMonths": 36,
+    "holdingKind": "REUSED_CONDITIONAL_PLANNING_WINDOW_NOT_REMAINING_LIFE",
+    "capitalMethodPin": {"file":"docs/research/B2_USED_RESIDUAL_SHARED_CYCLE_2026-09-29.json","sha256":"678bf40a4058577e8b7aca738781af7b61f5100f8eacc68257701dda387bd40e"},
+    "capitalMethodSourceUrl": "https://publications.anl.gov/anlpubs/2021/05/167399.pdf",
+    "capitalMethodLocator": "Eq 3.8 and Table 3.11, printed pp59-60 / PDF pp90-91",
+    "capitalMethodAndHistoricalUseAreSameSample": false,
+    "assumption": "Hold each chosen mileage proxy constant only for a sensitivity over 36 months. Apply the historical US sleeper proportional age/mileage model to the asking anchor. Age/mileage economics share the same scenario mileage; no inference that datasets are jointly observed.",
+    "periodObservationIds": ["FY2025", "H12026", "Q22026"],
+    "vinContrasts": ["FULL_PUBLISHED_HISTORY", "LATEST_PUBLISHED_INTERVAL"],
+    "currentOdometerAddedToIncrementalExponent": false,
+    "insuranceAddedToCapital": false,
+    "productiveAssetDays": null,
+    "completeFixedBudgetUsd": null,
+    "completeCapitalUsd": null,
+    "adoptedValues": 0
+  },
+  "groupAllocation": {
+    "poolChargedOnce": true,
+    "shares": null,
+    "equalThirdsInvented": false,
+    "fleetSizeFromServiceCounts": false,
+    "unknownEmployerBenefitsOrExpensesSetToZero": false
+  },
+  "calibrated": false,
+  "quoteReady": false,
+  "adoptedValues": 0,
+  "externalChanges": false
+}

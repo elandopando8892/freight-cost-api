@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "project_id": "freight-cost-model",
+  "sprint_id": "b2-closure-20261002",
+  "task_id": "public-cost-closure",
+  "workspace": "D:/andre/worktrees/freight-cost-model/cost-tires-release-20260927",
+  "goal": "Complete auditable public-reference D2D costs for Mexico DF to Fort Smith via World Trade Bridge, own tractor relay and one dryvan53 box, cash/financed and network/dedicated empty alternatives. Do not substitute subtotal for complete output.",
+  "acceptance": "Conserved resource/cycle/admin/box amounts; compatible CFU/CVU; no unknown zero; reproducible local source pins, deterministic tests and error cases. If an indispensable public component remains unsubstantiated, identify it and leave B2 incomplete.",
+  "instructions": "User confirmed Codex6.1Sol/high in this chat following request to select it. Manual declaration, not automatic selector observation. One Codex writer/integrator/verifier. Preserve dirty files and old sensitivities. Use existing benchmark and pure helpers. No DB/Auth/users/infra/migrations/providers/AI application calls/business/publish/deploy/branches. No Claude or agents. Changes only in D worktree.",
+  "recommendation": "Selected Codex gpt-6.1-sol/high for existing-context economic/physical integration. Claude Sonnet alternative requires new human choice, Max evidence and transfer; Fable escalation not justified. Quotas/cost cannot be inferred from token counters.",
+  "stop_conditions": "60 minutes from 2026-10-02T16:46:22Z including15minute verification reserve. No automatic retries or auxiliary calls; one repair per diagnosed failure, max2distinct failures before reevaluation. Stop at missing indispensable public evidence, authority expansion, concurrent changes or limit. Zero percentage fields are unquantified reserves, not proof of free or absent capacity.",
+  "context_review": {"classification":"sanitized","reviewed_by":"Codex","reviewed_at":"2026-10-02T16:49:14Z"},
+  "writable_files": [
+    "apps/api/scripts/lib/reference-admin-scale.ts",
+    "apps/api/scripts/lib/reference-pilot-physical-cycle.ts",
+    "apps/api/scripts/consolidate-binational-reference-budget.ts",
+    "apps/api/tests/benchmark-admin-scale.test.ts",
+    "apps/api/tests/benchmark-pilot-physical-cycle.test.ts",
+    "apps/api/tests/benchmark-binational-reference-budget.test.ts",
+    "docs/research/B2_ADMIN_SCALE_PUBLIC_MODEL_2026-10-02.json",
+    "docs/research/B2_PILOT_PHYSICAL_CYCLE_2026-10-02.json",
+    "docs/research/B2_CLOSURE_CODEX_CHECKPOINT_2026-10-02.md",
+    "docs/SPRINT_STATUS.md",
+    "docs/C1_MVP_BUSINESS_SPRINTS_2026-09-29.md"
+  ],
+  "context_files": [],
+  "test_commands": [["C:/Users/andre/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe","node_modules/vitest/vitest.mjs","run","apps/api/tests/benchmark-admin-scale.test.ts","apps/api/tests/benchmark-pilot-physical-cycle.test.ts","apps/api/tests/benchmark-binational-reference-budget.test.ts"]],
+  "budget": {"session_minutes":60,"max_steps":90,"max_prompt_bytes":6500,"automatic_retries":0,"reserve_percent":{"five_hour":0,"weekly":0,"fable":0}}
+}

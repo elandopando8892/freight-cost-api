@@ -1,0 +1,751 @@
+{
+  "artifact": "FCM_SAKBE_MX_DETAIL_CANDIDATE",
+  "status": "INCOMPLETE",
+  "provider": "INEGI_SAKBE_V3_1",
+  "retrievedAt": "2026-09-30T17:18:33.152Z",
+  "country": "MX",
+  "direction": "MX_TO_US",
+  "currency": "MXN",
+  "request": {
+    "origin": {
+      "id": 2656,
+      "label": "Plaza de la Constitución, Cuauhtémoc"
+    },
+    "destination": {
+      "id": 301105,
+      "label": "Puerto Fronterizo Nuevo Laredo III, Nuevo Laredo"
+    },
+    "mode": "optima",
+    "axles": 5,
+    "additionalAxles": 0,
+    "equipmentConfirmed": false,
+    "direction": "MX_TO_US",
+    "candidateOnly": true,
+    "sakbeVehicleClass": "8"
+  },
+  "observations": {
+    "summary": null,
+    "geometry": null,
+    "segments": [
+      {
+        "index": 0,
+        "instruction": "Inicia recorrido en Calle 5 de Febrero",
+        "distanceMeters": 0,
+        "idealMinutes": 0,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 1,
+        "instruction": "Continúe por Calle 5 de Febrero en dirección al sur",
+        "distanceMeters": 93.2778358004319,
+        "idealMinutes": 0.1865556716008638,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 2,
+        "instruction": "Gire a la derecha en Calle República de Uruguay",
+        "distanceMeters": 711.9714700532597,
+        "idealMinutes": 1.4239429401065193,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 3,
+        "instruction": "Gire a la derecha en Eje vial Central Lázaro Cárdenas",
+        "distanceMeters": 4373.648907568794,
+        "idealMinutes": 6.375315073722761,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 4,
+        "instruction": "Tome el Enlace ligeramente a la derecha",
+        "distanceMeters": 143.82679165934402,
+        "idealMinutes": 0.21574018748901602,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 5,
+        "instruction": "Continúe por Avenida Insurgentes Norte",
+        "distanceMeters": 1479.6327158474426,
+        "idealMinutes": 1.775559259016931,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 6,
+        "instruction": "Tome el Enlace ligeramente a la izquierda",
+        "distanceMeters": 145.88246383530068,
+        "idealMinutes": 0.21882369575295102,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 7,
+        "instruction": "Gire a la derecha en Avenida Insurgentes Norte",
+        "distanceMeters": 2562.1472529486755,
+        "idealMinutes": 3.074576703538411,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 8,
+        "instruction": "Continúe por Carretera 85 México - Pachuca",
+        "distanceMeters": 3787.6214310804644,
+        "idealMinutes": 3.00989380038147,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 9,
+        "instruction": "Continúe por Carretera 85 México - Tizayuca",
+        "distanceMeters": 10443.34391277744,
+        "idealMinutes": 7.124906975704509,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 10,
+        "instruction": "Tome el Enlace a la derecha",
+        "distanceMeters": 123.74906966501925,
+        "idealMinutes": 0.37124720899505775,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 11,
+        "instruction": "Cruce la caseta México - Pachuca",
+        "distanceMeters": 51.66030796982344,
+        "idealMinutes": 0.15498092390947033,
+        "observedTollMxn": 137,
+        "tollPoint": {
+          "type": "Point",
+          "coordinates": [
+            -99.037447206,
+            19.602232434
+          ]
+        },
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 12,
+        "instruction": "Continúe por el Enlace",
+        "distanceMeters": 466.94267632165156,
+        "idealMinutes": 1.4008280289649546,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 13,
+        "instruction": "Continúe por Carretera Circuito Exterior Mexiquense Bicentenario",
+        "distanceMeters": 10729.668183696293,
+        "idealMinutes": 10.812609453313486,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 14,
+        "instruction": "Cruce la caseta Tultepec",
+        "distanceMeters": 99.2556646146,
+        "idealMinutes": 0.07444174846094999,
+        "observedTollMxn": 454,
+        "tollPoint": {
+          "type": "Point",
+          "coordinates": [
+            -99.080286593,
+            19.693962517
+          ]
+        },
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 15,
+        "instruction": "Continúe por Carretera Circuito Exterior Mexiquense Bicentenario",
+        "distanceMeters": 23712.90096278829,
+        "idealMinutes": 17.784675722091215,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 16,
+        "instruction": "Cruce la caseta Jorobas",
+        "distanceMeters": 203.2687148429497,
+        "idealMinutes": 0.15245153613221227,
+        "observedTollMxn": 642,
+        "tollPoint": {
+          "type": "Point",
+          "coordinates": [
+            -99.23989321,
+            19.820061446
+          ]
+        },
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 17,
+        "instruction": "Continúe por Carretera Circuito Exterior Mexiquense Bicentenario",
+        "distanceMeters": 440.5476186055282,
+        "idealMinutes": 0.3304107139541462,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 18,
+        "instruction": "Continúe por Carretera 57 México - Querétaro",
+        "distanceMeters": 92715.18238615208,
+        "idealMinutes": 54.461093762699285,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 19,
+        "instruction": "Cruce la caseta Palmillas (5)",
+        "distanceMeters": 381.93496779177474,
+        "idealMinutes": 0.22916098067506482,
+        "observedTollMxn": 482,
+        "tollPoint": {
+          "type": "Point",
+          "coordinates": [
+            -99.928986485,
+            20.296235719
+          ]
+        },
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 20,
+        "instruction": "Continúe por Carretera 57 México - Querétaro",
+        "distanceMeters": 43790.72641310554,
+        "idealMinutes": 26.274435847863337,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 21,
+        "instruction": "Continúe por el Enlace",
+        "distanceMeters": 1053.621937327432,
+        "idealMinutes": 2.107243874654864,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 22,
+        "instruction": "Continúe por Carretera 57 Libramiento Noreste de Querétaro",
+        "distanceMeters": 19770.401787396204,
+        "idealMinutes": 11.862241072437723,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 23,
+        "instruction": "Cruce la caseta Chichimequillas",
+        "distanceMeters": 17.055801403,
+        "idealMinutes": 0.0102334808418,
+        "observedTollMxn": 121,
+        "tollPoint": {
+          "type": "Point",
+          "coordinates": [
+            -100.34371517,
+            20.705619246
+          ]
+        },
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 24,
+        "instruction": "Continúe por Carretera 57 Libramiento Noreste de Querétaro",
+        "distanceMeters": 17073.121492881237,
+        "idealMinutes": 10.24387289572874,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 25,
+        "instruction": "Gire a la derecha en Carretera 57 Querétaro - San Luis Potosí",
+        "distanceMeters": 155783.2815870254,
+        "idealMinutes": 93.21895458879591,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 26,
+        "instruction": "Gire a la derecha en Avenida Benito Juárez",
+        "distanceMeters": 91.16496228278294,
+        "idealMinutes": 0.10939795473933953,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 27,
+        "instruction": "Tome el Enlace ligeramente a la derecha",
+        "distanceMeters": 994.9054914538333,
+        "idealMinutes": 1.49235823718075,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 28,
+        "instruction": "Continúe ligeramente a la derecha en Carretera 57 Libramiento Oriente de San Luis Potosí",
+        "distanceMeters": 9636.858708410859,
+        "idealMinutes": 5.292573904502848,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 29,
+        "instruction": "Cruce la caseta San Nicolás de los Jassos",
+        "distanceMeters": 161.16476796187942,
+        "idealMinutes": 0.24174715194281915,
+        "observedTollMxn": 299,
+        "tollPoint": {
+          "type": "Point",
+          "coordinates": [
+            -100.825041089,
+            22.129831608
+          ]
+        },
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 30,
+        "instruction": "Continúe por Carretera 57 Libramiento Oriente de San Luis Potosí",
+        "distanceMeters": 21719.24654397543,
+        "idealMinutes": 11.91024460665313,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 31,
+        "instruction": "Gire a la izquierda en Carretera 57 Ventura - El Peyote",
+        "distanceMeters": 27145.625995435323,
+        "idealMinutes": 14.80670508841927,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 32,
+        "instruction": "Cruce la caseta Ventura - El Peyote",
+        "distanceMeters": 486.2964843146731,
+        "idealMinutes": 0.2652526278080035,
+        "observedTollMxn": 328,
+        "tollPoint": {
+          "type": "Point",
+          "coordinates": [
+            -100.65627527,
+            22.520642886
+          ]
+        },
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 33,
+        "instruction": "Continúe por Carretera 57 Ventura - El Peyote",
+        "distanceMeters": 7358.62817324786,
+        "idealMinutes": 4.013797185407924,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 34,
+        "instruction": "Continúe por Carretera 57 San Luis Potosí - Matehuala",
+        "distanceMeters": 120559.80613832654,
+        "idealMinutes": 66.22791097787545,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 35,
+        "instruction": "Continúe por Carretera 57 Libramiento de Matehuala",
+        "distanceMeters": 9616.581420219187,
+        "idealMinutes": 5.245408047392283,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 36,
+        "instruction": "Cruce la caseta Matehuala",
+        "distanceMeters": 133.885474516,
+        "idealMinutes": 0.07302844064509091,
+        "observedTollMxn": 144,
+        "tollPoint": {
+          "type": "Point",
+          "coordinates": [
+            -100.607200645,
+            23.664204003
+          ]
+        },
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 37,
+        "instruction": "Continúe por Carretera 57 Libramiento de Matehuala",
+        "distanceMeters": 4668.178352851886,
+        "idealMinutes": 2.5462791015555744,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 38,
+        "instruction": "Continúe por Carretera 57 Matehuala - Ent. Puerto México",
+        "distanceMeters": 191059.8144120023,
+        "idealMinutes": 124.10438443026975,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 39,
+        "instruction": "Continúe por Carretera 57 Puerto México - Ojo Caliente",
+        "distanceMeters": 1855.6474017693,
+        "idealMinutes": 1.99237775877195,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 40,
+        "instruction": "Cruce la caseta Los Chorros",
+        "distanceMeters": 121.494172235,
+        "idealMinutes": 0.1822412583525,
+        "observedTollMxn": 306,
+        "tollPoint": {
+          "type": "Point",
+          "coordinates": [
+            -100.731940493,
+            25.186824872
+          ]
+        },
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 41,
+        "instruction": "Continúe por Carretera 57 Puerto México - Ojo Caliente",
+        "distanceMeters": 32263.140840279928,
+        "idealMinutes": 19.033976294622178,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 42,
+        "instruction": "Continúe por Carretera 57 Libramiento Oriente Saltillo",
+        "distanceMeters": 11179.92046818657,
+        "idealMinutes": 6.0981384371926755,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 43,
+        "instruction": "Cruce la caseta La Carbonera",
+        "distanceMeters": 305.913834295,
+        "idealMinutes": 0.1668620914336364,
+        "observedTollMxn": 0,
+        "tollPoint": {
+          "type": "Point",
+          "coordinates": [
+            -100.868181786,
+            25.510927645
+          ]
+        },
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 44,
+        "instruction": "Continúe por Carretera 57 Libramiento Oriente Saltillo",
+        "distanceMeters": 8291.552008620887,
+        "idealMinutes": 4.52266473197503,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 45,
+        "instruction": "Tome el Enlace ligeramente a la derecha",
+        "distanceMeters": 1372.442795398847,
+        "idealMinutes": 2.0586641930982705,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 46,
+        "instruction": "Continúe ligeramente a la derecha en Carretera 40 Saltillo - Monterrey",
+        "distanceMeters": 4617.3489427928225,
+        "idealMinutes": 3.4630117070946174,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 47,
+        "instruction": "Continúe por el Enlace",
+        "distanceMeters": 671.300878441,
+        "idealMinutes": 1.0069513176615001,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 48,
+        "instruction": "Continúe por Carretera 40 Saltillo - Monterrey",
+        "distanceMeters": 27288.30411423598,
+        "idealMinutes": 14.88452951685599,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 49,
+        "instruction": "Tome el Enlace a la derecha",
+        "distanceMeters": 54.198857227107084,
+        "idealMinutes": 0.10839771445421417,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 50,
+        "instruction": "Cruce la caseta Periférico",
+        "distanceMeters": 44.13261444878488,
+        "idealMinutes": 0.08826522889756976,
+        "observedTollMxn": 338,
+        "tollPoint": {
+          "type": "Point",
+          "coordinates": [
+            -100.577303635,
+            25.696032031
+          ]
+        },
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 51,
+        "instruction": "Continúe por el Enlace",
+        "distanceMeters": 807.2899666849025,
+        "idealMinutes": 1.614579933369805,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 52,
+        "instruction": "Continúe por Carretera 100 Periférico del Área Metropolitana de Monterrey",
+        "distanceMeters": 15356.550060885047,
+        "idealMinutes": 11.834364984847456,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 53,
+        "instruction": "Cruce la caseta Caseta Lincoln",
+        "distanceMeters": 18.555786090220366,
+        "idealMinutes": 0.02783367913533055,
+        "observedTollMxn": 595,
+        "tollPoint": {
+          "type": "Point",
+          "coordinates": [
+            -100.463440873,
+            25.79040089
+          ]
+        },
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 54,
+        "instruction": "Continúe por Carretera 100 Periférico del Área Metropolitana de Monterrey",
+        "distanceMeters": 22522.241459575347,
+        "idealMinutes": 21.400195312520548,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 55,
+        "instruction": "Continúe por el Enlace",
+        "distanceMeters": 619.0574930167933,
+        "idealMinutes": 1.2381149860335865,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 56,
+        "instruction": "Continúe por Carretera 85 Monterrey - Nuevo Laredo",
+        "distanceMeters": 79035.80109779548,
+        "idealMinutes": 45.6659701335186,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 57,
+        "instruction": "Cruce la caseta Sabinas",
+        "distanceMeters": 93.895156251692,
+        "idealMinutes": 0.14084273437753797,
+        "observedTollMxn": 658,
+        "tollPoint": {
+          "type": "Point",
+          "coordinates": [
+            -100.00706949,
+            26.512119797
+          ]
+        },
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 58,
+        "instruction": "Continúe por Carretera 85 Monterrey - Nuevo Laredo",
+        "distanceMeters": 92339.68734172183,
+        "idealMinutes": 55.0819670631446,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 59,
+        "instruction": "Cruce la caseta Entronque Ex-Garita",
+        "distanceMeters": 25.481106651545876,
+        "idealMinutes": 0.015288663990927525,
+        "observedTollMxn": 266,
+        "tollPoint": {
+          "type": "Point",
+          "coordinates": [
+            -99.613932708,
+            27.270521277
+          ]
+        },
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 60,
+        "instruction": "Continúe por Carretera 85 Monterrey - Nuevo Laredo",
+        "distanceMeters": 3564.5987308931853,
+        "idealMinutes": 2.592151547172922,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 61,
+        "instruction": "Tome el Enlace ligeramente a la derecha",
+        "distanceMeters": 1188.406311153244,
+        "idealMinutes": 1.7826094667298658,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 62,
+        "instruction": "Continúe por Carretera 85 Libramiento de Nuevo Laredo II",
+        "distanceMeters": 31658.13871665252,
+        "idealMinutes": 21.10542581110168,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 63,
+        "instruction": "Continúe por Carretera Puente Internacional Laredo III",
+        "distanceMeters": 5242.693267471379,
+        "idealMinutes": 4.0927936470274275,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 64,
+        "instruction": "Gire a la izquierda en Retorno U N/A",
+        "distanceMeters": 55.862000105,
+        "idealMinutes": 0.16758600031499998,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 65,
+        "instruction": "Gire a la izquierda en Carretera Puente Internacional Laredo III",
+        "distanceMeters": 195.9362516375,
+        "idealMinutes": 0.29390437745625003,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      },
+      {
+        "index": 66,
+        "instruction": "¡Haz llegado a tu destino!",
+        "distanceMeters": 0,
+        "idealMinutes": 0,
+        "observedTollMxn": 0,
+        "tollPoint": null,
+        "observedExtraAxleChargeMxn": 0
+      }
+    ],
+    "detailTotals": {
+      "distanceKm": 1124.5764209526735,
+      "idealMinutes": 709.8829924923754,
+      "observedTollsMxn": 4770
+    }
+  },
+  "issues": [
+    "SUMMARY_NOT_REQUESTED",
+    "ROUTE_GEOMETRY_UNAVAILABLE",
+    "SUMMARY_DETAIL_RECONCILIATION_PENDING",
+    "UNCONFIRMED_ENDPOINTS_BRIDGE_AND_EQUIPMENT",
+    "TRUCK_RESTRICTIONS_NOT_CERTIFIED",
+    "TOLL_VIGENCY_MOVEMENT_TAX_PAYMENT_PENDING",
+    "IDEAL_TIME_NOT_OPERATING_CYCLE",
+    "NOT_ADOPTED_TRIP_INPUTS",
+    "ZERO_AT_TOLL_POINT_UNVERIFIED"
+  ],
+  "serviceDate": null,
+  "tariffEffectiveDate": null,
+  "taxes": "UNVERIFIED",
+  "paymentMethod": null,
+  "handoff": {
+    "loadedKm": null,
+    "emptyKm": null,
+    "cycleDays": null,
+    "tollsUsd": null
+  },
+  "calibrated": false,
+  "quoteReady": false,
+  "productionReady": false,
+  "adoptedValues": 0,
+  "attribution": "INEGI - API de Ruteo SAKBE",
+  "documentation": "https://www.inegi.org.mx/servicios/Ruteo/Default.html"
+}

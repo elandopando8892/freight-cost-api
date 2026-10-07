@@ -1,0 +1,27 @@
+{
+  "artifact": "FCM_BLS_ECEC_ADMIN_PRIMARY_WEB_READER_EXTRACTION",
+  "observedAt": "2026-10-02T09:15:44Z",
+  "capture": "STRUCTURED_PRIMARY_WEB_READER_READOUT_NOT_ORIGINAL_HTTP_RESPONSE",
+  "referencePeriod": "2026-June",
+  "ownership": "PRIVATE_INDUSTRY",
+  "geography": "US_NATIONAL",
+  "unit": "USD_PER_HOUR_WORKED",
+  "sourceUrl": "https://www.bls.gov/news.release/ecec.t04.htm",
+  "locator": "Table4 first Occupational group block, immediately after Private industry workers; NOT Goods-producing, Manufacturing or Professional-business-services nested blocks.",
+  "rows": [
+    {"id":"OFFICE_ADMIN","label":"Office and administrative support occupations","total":36.73,"wages":25.22,"benefits":11.51},
+    {"id":"MANAGEMENT_BUSINESS_FINANCIAL","label":"Management, business, and financial occupations","total":88.63,"wages":59.85,"benefits":28.78},
+    {"id":"PROFESSIONAL_RELATED","label":"Professional and related occupations","total":73.69,"wages":50.98,"benefits":22.71}
+  ],
+  "technicalNoteUrl": "https://www.bls.gov/news.release/ecec.tn.htm",
+  "technicalNoteLocator": "Technical note definition of hourly worked denominator and five benefit categories; last modified September9 2026.",
+  "benefitCategories": ["PAID_LEAVE","SUPPLEMENTAL_PAY","INSURANCE","RETIREMENT_SAVINGS","LEGALLY_REQUIRED"],
+  "legallyRequiredIncludes": ["SOCIAL_SECURITY","MEDICARE","FEDERAL_STATE_UNEMPLOYMENT","WORKERS_COMPENSATION"],
+  "limitations": [
+    "National occupational-group means, not Laredo trucking pay or a matched employer policy; no MX benefit applicability.",
+    "Per hour worked, not per paid hour. Explicit monthly worked-hours quantities are required; annual OEWS salary must not be multiplied by an ECEC ratio in this model.",
+    "Rounded published total cost can differ from the sum of rounded components; use published total as model cost without fabricating greater source precision.",
+    "Repeated occupation labels in nested industry blocks have different figures. Search snippets showed38.92 and39.33; neither is the national first-block office row36.73 used here.",
+    "Mapping canonical roles to broad occupation groups and staffing quantities are declared planning assumptions, not observed carrier staffing or legal compliance certification."
+  ]
+}

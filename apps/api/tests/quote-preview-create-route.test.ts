@@ -48,18 +48,41 @@ describe('server-issued route calculation preview', () => {
   afterEach(async () => { await app.close() })
 
   it('binds capture, resolved legs, FX, policy and benchmark to the same tenant preview', async () => {
-    const response = await app.inject({ method: 'POST', url: '/engine/quote-by-route', payload: {
+    const capture = {
       outboundLocation: 'Monterrey', inboundLocation: 'Dallas', operation: 'D2D Export',
-      service: 'One Way', equipment, fxRate: 18.75,
+      service: 'One Way', equipment, fxRate: 18.75, serviceDate: '2026-09-30',
+    }
+    const review = await app.inject({ method: 'POST', url: '/engine/route-inputs', payload: capture })
+    expect(review.statusCode,review.body).toBe(200)
+    expect(prisma.quoteCalculationPreview.create).not.toHaveBeenCalled()
+    const response = await app.inject({ method: 'POST', url: '/engine/quote-by-route', payload: {
+      ...capture,tripFuel:{mode:'REFERENCE',contextHash:review.json().fuel.contextHash,provisionalAccepted:true},
     } })
-    expect(response.statusCode).toBe(200)
+    expect(response.statusCode, response.body).toBe(200)
     expect(response.json()).toMatchObject({ previewId: 'preview-1', fxRateUsed: 18.75,
       resolved: { mexLeg: { returnKm: 240 }, usaLeg: { marketRpm: 2.5 } } })
     expect(prisma.quoteCalculationPreview.create).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({
-      orgId: 'org-1', capture: expect.objectContaining({ origin: 'Monterrey', destination: 'Dallas', fxRate: 18.75 }),
+      orgId: 'org-1', capture: expect.objectContaining({ origin: 'Monterrey', destination: 'Dallas', fxRate: 18.75,serviceDate:'2026-09-30' }),
       snapshot: expect.objectContaining({ input: expect.objectContaining({ policy: 'OPERATIONAL_V3', fxRate: 18.75,
-        mexLeg: expect.objectContaining({ returnKm: 240 }), usaLeg: expect.objectContaining({ marketRpm: 2.5 }) }) }),
+        mexLeg: expect.objectContaining({ returnKm: 240 }), usaLeg: expect.objectContaining({ marketRpm: 2.5,
+          fuelReview:expect.objectContaining({serviceDate:'2026-09-30',priceUsdGal:5.152,mode:'REFERENCE',provisional:true}) }) }) }),
     }) }))
+  })
+
+  it.each(['missing-date','missing-confirmation','stale-context'])('rejects %s without creating a preview',async failure=>{
+    const capture={outboundLocation:'Monterrey',inboundLocation:'Dallas',operation:'D2D Export',service:'One Way',equipment,
+      fxRate:18.75,serviceDate:'2026-09-30'}
+    const payload:Record<string,unknown>={...capture}
+    if(failure==='missing-date')delete payload.serviceDate
+    if(failure==='stale-context'){
+      const review=await app.inject({method:'POST',url:'/engine/route-inputs',payload:capture})
+      expect(review.statusCode,review.body).toBe(200)
+      payload.serviceDate='2026-09-29'
+      payload.tripFuel={mode:'REFERENCE',contextHash:review.json().fuel.contextHash,provisionalAccepted:true}
+    }
+    const response=await app.inject({method:'POST',url:'/engine/quote-by-route',payload})
+    expect(response.statusCode,response.body).toBe(failure==='stale-context'?409:422)
+    expect(prisma.quoteCalculationPreview.create).not.toHaveBeenCalled()
   })
 
   it('never writes a preview for an invalid required route', async () => {

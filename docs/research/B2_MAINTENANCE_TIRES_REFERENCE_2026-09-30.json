@@ -1,0 +1,361 @@
+{
+  "artifact": "FCM_B2_MAINTENANCE_TIRES_RESEARCH",
+  "cutDate": "2026-09-30",
+  "baseHead": "4f5fc2de0c3d178dace917231e1092040dec21fd",
+  "status": "PARTIAL_CONTRAST_NO_GO_TARGET_ALLOCATION",
+  "calibrated": false,
+  "quoteReady": false,
+  "adoptedValues": 0,
+  "units": {
+    "kmPerInternationalMile": 1.609344,
+    "analysisOnly": true
+  },
+  "sources": [
+    {
+      "id": "IMT_PT881",
+      "country": "MX",
+      "file": "docs/research/sources/IMT_PT881_2025.pdf",
+      "sha256": "816728964103158f0a99f44c41bbe5d2bb7240c33e35651fcbd90c0b391412f4",
+      "url": "https://imt.mx/archivos/Publicaciones/PublicacionTecnica/pt881.pdf",
+      "referencePeriod": "2025",
+      "locator": "Table 4.2, printed 51 / physical PDF 61; T3-S2 International 9200i Cummins ISX 450HP, aluminium 40ft trailer, 1100-20 tyres",
+      "kind": "OFFICIAL_TECHNICAL_MODEL",
+      "limitations": [
+        "Base road conditions and economic prices 2025, not used 2021 target carrier accounting or route-specific rate.",
+        "Outputs per 1000 vehicle-km; unit quantities/coefficients rounded, not installed prices/lifetimes by position.",
+        "Tractor/trailer costs combined; no source-backed split or D2D shared-trailer assignment."
+      ]
+    },
+    {
+      "id": "TTI_UMR2025_C",
+      "country": "US",
+      "file": "docs/research/sources/TTI_UMR2025_APPENDIX_C.pdf",
+      "sha256": "3f85f5c053f87f8a1dbc90f9c6fbd11ce00c88d60b95dcf242cb6fc93e0b5cd1",
+      "url": "https://static.tti.tamu.edu/tti.tamu.edu/documents/mobility-report-2025-appx-c.pdf",
+      "referencePeriod": "2024",
+      "locator": "Exhibit C-3 printed 5 / PDF 7; method printed 5-6 / PDF 7-8",
+      "kind": "RESEARCH_AGGREGATE_ESTIMATE",
+      "limitations": [
+        "TTI 2024 estimates from ATRI through 2023, not observed ATRI 2024/2025 and not a 2026 calibrated price.",
+        "General commercial truck modeling for value of delay; not target dry-van cohort or a private carrier tariff.",
+        "No position-specific tyre lifecycle or separate tractor/trailer allocation; lubricant/DEF breakdown not established."
+      ]
+    },
+    {
+      "id": "ATRI_MC_FORM2026",
+      "country": "US",
+      "file": "docs/research/sources/ATRI_MC_FORM2026.pdf",
+      "sha256": "a9be75541e94c031f71f4a7081cd06eab39bcea165202eddad199998ed8ad5d9",
+      "url": "https://truckingresearch.org/wp-content/uploads/2026/02/2026-Ops-Cost-Motor-Carrier-Form.pdf",
+      "referencePeriod": "2025",
+      "locator": "Question 3, page 2 of 8; combo scope and total cost-bearing mileage, sample zero instruction is not an observed zero",
+      "kind": "METHOD_ONLY_NO_PRICES",
+      "limitations": [
+        "Survey instructions establish a boundary, not numeric prices or evidence TTI applies exactly the 2026 questionnaire.",
+        "Includes labor and roadside repairs, excludes tows and tyre expenses from R&M; tyres include purchase/maintenance/retread/replacement.",
+        "OO/IC mileage excluded when their costs are not reported; no filled form or submission."
+      ]
+    }
+  ],
+  "records": [
+    {
+      "id": "MX_LABOR",
+      "country": "MX",
+      "sourceId": "IMT_PT881",
+      "kind": "MAINT_LABOR",
+      "value": 2010.02,
+      "unit": "MXN/1000vehicle-km",
+      "referencePeriod": "2025",
+      "assetScope": "TRACTOR_AND_TRAILER_COMPOSITE_UNSPLIT",
+      "use": "PUBLIC_CONTRAST_NOT_BASE_INPUT",
+      "includes": [
+        "MAINT_LABOR"
+      ],
+      "excludes": [
+        "MAINT_PARTS",
+        "LUBRICANTS",
+        "TIRES",
+        "FUEL",
+        "DRIVER",
+        "CAPITAL",
+        "OVERHEAD"
+      ]
+    },
+    {
+      "id": "MX_PARTS",
+      "country": "MX",
+      "sourceId": "IMT_PT881",
+      "kind": "MAINT_PARTS",
+      "value": 3607.52,
+      "unit": "MXN/1000vehicle-km",
+      "referencePeriod": "2025",
+      "assetScope": "TRACTOR_AND_TRAILER_COMPOSITE_UNSPLIT",
+      "use": "PUBLIC_CONTRAST_NOT_BASE_INPUT",
+      "includes": [
+        "MAINT_PARTS"
+      ],
+      "excludes": [
+        "MAINT_LABOR",
+        "LUBRICANTS",
+        "TIRES",
+        "FUEL",
+        "DRIVER",
+        "CAPITAL",
+        "OVERHEAD"
+      ]
+    },
+    {
+      "id": "MX_LUBRICANTS",
+      "country": "MX",
+      "sourceId": "IMT_PT881",
+      "kind": "LUBRICANTS",
+      "value": 279.67,
+      "unit": "MXN/1000vehicle-km",
+      "referencePeriod": "2025",
+      "assetScope": "TRACTOR_AND_TRAILER_COMPOSITE_UNSPLIT",
+      "use": "PUBLIC_CONTRAST_NOT_BASE_INPUT",
+      "includes": [
+        "LUBRICANTS"
+      ],
+      "excludes": [
+        "MAINT_LABOR",
+        "MAINT_PARTS",
+        "TIRES",
+        "FUEL",
+        "DRIVER",
+        "CAPITAL",
+        "OVERHEAD"
+      ]
+    },
+    {
+      "id": "MX_TIRES",
+      "country": "MX",
+      "sourceId": "IMT_PT881",
+      "kind": "TIRES",
+      "value": 969.96,
+      "unit": "MXN/1000vehicle-km",
+      "referencePeriod": "2025",
+      "assetScope": "TRACTOR_AND_TRAILER_COMPOSITE_UNSPLIT",
+      "use": "PUBLIC_CONTRAST_NOT_BASE_INPUT",
+      "includes": [
+        "TIRES"
+      ],
+      "excludes": [
+        "MAINT_LABOR",
+        "MAINT_PARTS",
+        "LUBRICANTS",
+        "FUEL",
+        "DRIVER",
+        "CAPITAL",
+        "OVERHEAD"
+      ]
+    },
+    {
+      "id": "US_MAINT",
+      "country": "US",
+      "sourceId": "TTI_UMR2025_C",
+      "kind": "MAINT_AGGREGATE",
+      "value": 0.212,
+      "unit": "USD/vehicle-mile",
+      "referencePeriod": "2024",
+      "assetScope": "TRACTOR_AND_TRAILER_COMPOSITE_UNSPLIT",
+      "use": "PUBLIC_CONTRAST_NOT_BASE_INPUT",
+      "includes": [
+        "MAINTENANCE_AGGREGATE"
+      ],
+      "excludes": [
+        "TIRES",
+        "FUEL",
+        "DRIVER",
+        "CAPITAL",
+        "OVERHEAD"
+      ]
+    },
+    {
+      "id": "US_TIRES",
+      "country": "US",
+      "sourceId": "TTI_UMR2025_C",
+      "kind": "TIRES",
+      "value": 0.048,
+      "unit": "USD/vehicle-mile",
+      "referencePeriod": "2024",
+      "assetScope": "TRACTOR_AND_TRAILER_COMPOSITE_UNSPLIT",
+      "use": "PUBLIC_CONTRAST_NOT_BASE_INPUT",
+      "includes": [
+        "TIRES_AGGREGATE"
+      ],
+      "excludes": [
+        "MAINTENANCE_AGGREGATE",
+        "FUEL",
+        "DRIVER",
+        "CAPITAL",
+        "OVERHEAD"
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "id": "MX_IMT_MODEL",
+      "country": "MX",
+      "sourceId": "IMT_PT881",
+      "recordIds": [
+        "MX_LABOR",
+        "MX_PARTS",
+        "MX_LUBRICANTS",
+        "MX_TIRES"
+      ],
+      "costScope": "COMPOSITE_COMBO_NOT_D2D_SUM",
+      "countryComparisonAllowed": false,
+      "targetMatched": false
+    },
+    {
+      "id": "US_TTI_ESTIMATE",
+      "country": "US",
+      "sourceId": "TTI_UMR2025_C",
+      "recordIds": [
+        "US_MAINT",
+        "US_TIRES"
+      ],
+      "costScope": "COMPOSITE_COMBO_NOT_D2D_SUM",
+      "countryComparisonAllowed": false,
+      "targetMatched": false
+    }
+  ],
+  "printedPrecision": {
+    "mx": {
+      "lubricantsLitersPer1000Km": 5.45,
+      "lubricantsMxnPerLiter": 51.3,
+      "laborHoursPer1000Km": 30.48,
+      "laborMxnPerHour": 65.95,
+      "partsPercentOfVehicleRounded": 0.27,
+      "vehiclePriceMxn": 1321263,
+      "tireEquivalentNewPer1000KmRounded": 0.33,
+      "newTireMxn": 2926.73,
+      "rule": "PRESERVE_PRINTED_COSTS_NOT_ROUNDED_RECONSTRUCTION"
+    }
+  },
+  "methodBoundary": {
+    "surveySourceId": "ATRI_MC_FORM2026",
+    "rmIncludes": [
+      "MAINT_LABOR",
+      "ROADSIDE_REPAIRS"
+    ],
+    "rmExcludes": [
+      "TIRES",
+      "TOWS"
+    ],
+    "tiresInclude": [
+      "PURCHASE",
+      "MAINTENANCE",
+      "RETREAD",
+      "REPLACEMENT"
+    ],
+    "denominator": "TOTAL_COST_BEARING_VEHICLE_MILES_WITH_MATCHED_COST_POPULATION",
+    "ttiExactSameBoundaryVerified": false
+  },
+  "engineBridge": {
+    "maintenanceSection": "COST_MAINT",
+    "tiresSection": "COST_TIRES",
+    "maintenanceKeys": 31,
+    "tireKeys": 12,
+    "maintenanceFormula": "sum(qty*unitCost/intervalKm) + exclusive reserves (coolant normalized by 100000km)",
+    "tiresFormula": "quantityPhysicalPosition * expectedLifecycleCost / expectedLifecycleKm; retread is sequential, not extra wheel",
+    "legacyRisk": "COST_TIRES Recapeadas is an additive legacy row; V3 workbook has PU permutation. Do not populate it from fractional VOC equivalents.",
+    "existingLifecycleModule": "apps/api/src/modules/cost-bases/tire-lifecycle-economics.ts",
+    "existingBoundaryModule": "apps/api/src/modules/engine/benchmark-public-reference-components.ts",
+    "integrated": false,
+    "parameterExpansionAllowed": false,
+    "impliedInstalledPricesAllowed": false,
+    "defaultsAdopted": false
+  },
+  "countryCards": [
+    {
+      "country": "MX",
+      "maintenanceUsdPerKm": null,
+      "tiresUsdPerKm": null,
+      "pilotCvuUsd": null,
+      "fxMxnPerUsd": null,
+      "tractorOnlyRate": null,
+      "trailerOnlyRate": null,
+      "allocationShares": null,
+      "status": "NO_GO_TARGET_PROFILE_AND_ALLOCATION",
+      "blockingItems": [
+        "Applicable profile/age/route, 2025 price basis/tax/FX and current planning assumptions.",
+        "Installed price/life/retread/casing per physical position or a compatible supported aggregate model.",
+        "Tractor-trailer split, cost bearer and shared-trailer settlement."
+      ]
+    },
+    {
+      "country": "US",
+      "maintenanceUsdPerKm": null,
+      "tiresUsdPerKm": null,
+      "pilotCvuUsd": null,
+      "fxMxnPerUsd": null,
+      "tractorOnlyRate": null,
+      "trailerOnlyRate": null,
+      "allocationShares": null,
+      "status": "NO_GO_TARGET_PROFILE_AND_ALLOCATION",
+      "blockingItems": [
+        "Target compatible public planning assumption, period and cost inclusions; TTI aggregate is a contrast.",
+        "Lubricants/DEF/tows outside or inside selected maintenance contract need explicit mapping.",
+        "Tractor-trailer split, position-specific lifecycle or applicable aggregate and cost-bearing mileage."
+      ]
+    }
+  ],
+  "sharedTrailer": {
+    "rule": "ONE_PHYSICAL_CYCLE_THEN_ALLOCATE",
+    "comboRatesAddableAcrossCountries": false,
+    "arbitraryHalfSplitAllowed": false,
+    "costBearer": null,
+    "settlementShares": null
+  },
+  "decision": {
+    "researchCutClosed": true,
+    "economicFamilyClosed": false,
+    "B1": "OPEN",
+    "B2": "PARTIAL",
+    "businessGatesClosed": 0,
+    "businessGatesTotal": 4,
+    "nextCut": "FIXED_EXPOSURE_TRAILER_CONSOLIDATION",
+    "reopenOnlyWith": "Specific supported compatible planning model or asset/inclusion split, not another generic price search"
+  },
+  "unchangedFiles": [
+    {
+      "file": "docs/research/B2_ECONOMIC_REFERENCE_CARDS_2026-09-30.json",
+      "sha256": "3b7fc38bdbef7b6692a18b50c785f601eb91956e1d958ce186e5d613c3894b1e"
+    },
+    {
+      "file": "docs/research/B2_PUBLIC_REFERENCE_COMPONENTS_LEDGER_2026-09-29.json",
+      "sha256": "e57cdd449f0a285f9758ded2ac438838d38edc6eef6e06ccb082d9238a8a6d60"
+    },
+    {
+      "file": "docs/research/B2_PAYROLL_CAPITAL_CONTRACT_TEMPLATE_2026-09-29.json",
+      "sha256": "cabfda00873356406d838306bfa87b912eccd9a6026449c0ebb26046acd8bd85"
+    },
+    {
+      "file": "docs/C1_B1_PARAMETER_SOURCE_REGISTER_2026-09-29.md",
+      "sha256": "a31864f52ce5cd3d9f111056ec4dc58181587e99258614f1e2636e61ff992f0a"
+    },
+    {
+      "file": "docs/research/B2_FUEL_PRICE_PERFORMANCE_REFERENCE_2026-09-30.json",
+      "sha256": "8824dcdb1180e28c9b7950bb4b77155b94edce78410f6a392a3cdaecc8c80be1"
+    },
+    {
+      "file": "docs/FCM_TIRE_IMT_PT881_2025.json",
+      "sha256": "f00c12019d64c43de973e30b2e670e47aa503bc68d4967fae176e780b0a92222"
+    },
+    {
+      "file": "docs/FCM_TIRE_TTI_US_REFERENCE_2026-09-28.json",
+      "sha256": "f4f10ff0c08f3dd6bc3f3fc89d1f21e46500482f6b5272a5f6304d4a3e1fe296"
+    }
+  ],
+  "externalChanges": {
+    "database": false,
+    "auth": false,
+    "users": false,
+    "infrastructure": false,
+    "deployment": false,
+    "businessOperations": false,
+    "applicationAi": false
+  }
+}

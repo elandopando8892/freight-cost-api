@@ -1,0 +1,24 @@
+{
+  "artifact":"FCM_B2_IRP_SEPARABLE_REGISTRATION",
+  "reviewedAt":"2026-10-01",
+  "status":"DATED_REGISTRATION_ONLY_NOT_COMPLETE_FEES",
+  "sourceArchive":{"file":"docs/research/sources/IRP_FEE_TEST_GUIDELINES_2026_REVIEW_20261001.xlsx","sha256":"5db191bc435844030366c5edd0b44401b7f832f73edc67ef587b30475b3f9df1"},
+  "sourceUrl":"https://www.irponline.org/resource/collection/A35CA2A0-300D-4785-B21C-329509828DD9/2026_Fee_Test_Guidelines__06_08_26.xlsx",
+  "profile":{"operation":"HAUL_FOR_HIRE","termMonths":12,"gvwLb":80000,"currency":"USD","effectiveDateOfReference":"2026-01-01","referenceVehicleModelYear":2022,"compatibleWithPilotConfirmed":false},
+  "rules":[
+    {"id":"CA","locator":"California C48:C52, B39:A45","baseCell":"C50","baseRegistrationUsd":1942,"separatePublishedCharges":[{"cell":"C48","label":"Registration","annualUsd":118},{"cell":"C49","label":"CVRA","annualUsd":122},{"cell":"C51","label":"CTIP","annualUsd":3}],"unresolved":"VLF acquisition/fiscal age and rounding; published extras retained separately, not a complete fee"},
+    {"id":"CO","locator":"Colorado B28:E36","baseCell":"E35","baseRegistrationUsd":2350,"separatePublishedCharges":[{"cell":"E33","label":"Bridge safety","annualUsd":32},{"cell":"E36","label":"Road safety","annualUsd":39}],"unresolved":"MSRP/ownership age factor; E32 age fee uses inconsistent percent 0.165 vs 1.695, excluded"},
+    {"id":"KY","locator":"Kentucky B50:G66","baseCell":"G53","baseRegistrationUsd":1440,"separatePublishedCharges":[],"unresolved":"Ad valorem purchase date and purchase-year factor; plate-only reporter conflicts with inclusive example"},
+    {"id":"MS","locator":"Mississippi B28:D35","baseCell":"D31","baseRegistrationUsd":1512,"separatePublishedCharges":[],"unresolved":"Schedule two 1119.05 tied to model2022; compatibility with2021 not established"},
+    {"id":"NV","locator":"Nevada B38:G56","baseCell":"G41","baseRegistrationUsd":1360,"separatePublishedCharges":[],"unresolved":"BGST factory/chart maximum and compatible model-year factor"},
+    {"id":"SC","locator":"SouthCarolina B28:B33","baseCell":"B31","baseRegistrationUsd":800,"separatePublishedCharges":[],"unresolved":"RUF purchase value and model-year applicability"},
+    {"id":"WV","locator":"West Virginia B28:G38","baseCell":"E32","baseRegistrationUsd":1131.25,"separatePublishedCharges":[],"unresolved":"Purchase price/first-year ad valorem applicability"},
+    {"id":"WY","locator":"Wyoming E29:E33 (Test2)","baseCell":"E29","baseRegistrationUsd":907.5,"separatePublishedCharges":[],"unresolved":"Excise1540 basis/profile not established; not a generic flat charge"}
+  ],
+  "excludedIds":["FL","ID","NE","UT","VT"],
+  "registrationReferenceIsCompletePermit":false,
+  "unknownChargesAreZero":false,
+  "allCompatibleCurrentFeesConfirmed":false,
+  "remaining":["Five registration bases remain unmapped/conflicted: FL ID NE UT VT","Dependent value charges, current effective date, legal registrant/profile, extra fees and rounding remain unresolved across the IRP family","Complete fixed budget, capacity/cycle and variable costs still required before CFU/CVU or pricing"],
+  "adoptedValues":0,"quoteReady":false,"externalChanges":false
+}

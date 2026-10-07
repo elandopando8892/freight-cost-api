@@ -1,14 +1,17 @@
 import { randomUUID } from 'node:crypto'
 import { Prisma, PrismaClient, type Role } from '@prisma/client'
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { TireCalibrationPersistence } from '../src/modules/cost-bases/tire-calibration-persistence'
 import { buildTireCalibrationProposal, verifyTireCalibrationProposal } from '../src/modules/cost-bases/tire-calibration-proposal'
 import { setTireCalibrationTenantContext } from '../src/modules/cost-bases/tire-calibration-tenant-context'
 import { reviewTireCohortRecord } from '../src/modules/cost-bases/tire-cohort'
 import { TireCohortSourcePersistence } from '../src/modules/cost-bases/tire-cohort-source-persistence'
+import {readTireTestEnvironment} from './fixtures/tire-test-environment.js'
 
-const adminUrl = process.env.FCM_TEST_ADMIN_DATABASE_URL
-const appUrl = process.env.FCM_TEST_DATABASE_URL
+// These workflows include many actual DB roundtrips and rejected transactions.
+// Bound the integration case, not the production transaction (still unchanged).
+vi.setConfig({testTimeout:30000,hookTimeout:30000})
+const {adminUrl,appUrl}=readTireTestEnvironment(process.env)
 for (const [name, value] of [['FCM_TEST_ADMIN_DATABASE_URL', adminUrl], ['FCM_TEST_DATABASE_URL', appUrl]] as const) {
   if (!value || !/^postgresql:\/\/[^@]+@127\.0\.0\.1:\d+\/fcm_tire_s8(?:\?|$)/.test(value)) {
     throw new Error(`${name} must target the disposable loopback fcm_tire_s8 database`)

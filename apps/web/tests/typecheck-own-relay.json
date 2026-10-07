@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": { "incremental": false },
+  "include": [
+    "../next-env.d.ts",
+    "../lib/own-relay-review.ts",
+    "../app/(app)/cost-bases/own-relay-review.tsx"
+  ],
+  "exclude": ["../node_modules"]
+}

@@ -1,0 +1,272 @@
+{
+  "artifact": "FCM_B2_FUEL_REFERENCE_RESEARCH",
+  "cutDate": "2026-09-30",
+  "baseHead": "4f5fc2de0c3d178dace917231e1092040dec21fd",
+  "status": "PARTIAL_CONTRAST_NO_GO_PILOT_PAIR",
+  "calibrated": false,
+  "quoteReady": false,
+  "adoptedValues": 0,
+  "units": {
+    "litersPerUsGallon": 3.785411784,
+    "kmPerInternationalMile": 1.609344,
+    "analysisOnlyNotEngineChange": true,
+    "reference": "https://www.nist.gov/document/2023-nist-handbook-44-appendix-c-0"
+  },
+  "sources": [
+    {
+      "id": "PROFECO_20260928",
+      "url": "https://www.gob.mx/profeco/prensa/profeco-presenta-mapa-de-calor-para-identificar-los-precios-de-los-24-productos-de-la-canasta-pacic-por-cadena-comercial?idiom=es-MX",
+      "country": "MX",
+      "capture": "PRIMARY_OFFICIAL_INDEXED_EXCERPT_ONLY",
+      "publishedDate": "2026-09-28",
+      "locator": "Indexed official paragraph: national diesel average as of 25 September; not selected station extrema",
+      "file": null,
+      "sha256": null,
+      "limitations": [
+        "Direct web read returned 403; shell HTTP 200 was Challenge Validation, not report content. No direct-body or raw snapshot claim.",
+        "National average is not a station/corridor/contract/net carrier price; product grade and tax recoverability are not established."
+      ]
+    },
+    {
+      "id": "EIA_PADD3_20260928",
+      "url": "https://www.eia.gov/dnav/pet/PET_PRI_GND_DCUS_R30_W.htm",
+      "country": "US",
+      "capture": "DIRECT_PUBLIC_WEB_TABLE",
+      "publishedDate": "2026-09-29",
+      "locator": "Diesel (On-Highway) All Types and ULSD, observation 09/28/26; Dollars per Gallon Including Taxes",
+      "file": null,
+      "sha256": null,
+      "limitations": [
+        "PADD3 Gulf Coast, not a chosen corridor, terminal/discounted carrier price or purchase.",
+        "Raw response not archived; release and observation read directly on 30 September."
+      ]
+    },
+    {
+      "id": "IMT_PT881_2025",
+      "url": "https://imt.mx/archivos/Publicaciones/PublicacionTecnica/pt881.pdf",
+      "country": "MX",
+      "capture": "DIRECT_PDF_TEXT_AND_VISUAL",
+      "publishedDate": "2025",
+      "locator": "Annex 2, Table A.2, printed page 71 / PDF page 81, two T3-S2 rows and footnotes; not the modeled 2025 vehicle cost table",
+      "file": "docs/research/sources/IMT_PT881_2025.pdf",
+      "sha256": "816728964103158f0a99f44c41bbe5d2bb7240c33e35651fcbd90c0b391412f4",
+      "limitations": [
+        "Historical training field records 2001-2014; model years 1995/1996, not the proposed used 2021 carrier profile.",
+        "Body type and per-direction loaded/empty split are not established; roundtrip case not assumed loaded throughout."
+      ]
+    },
+    {
+      "id": "ORNL_TM2011_471",
+      "url": "https://info.ornl.gov/sites/publications/files/Pub33386.pdf",
+      "country": "US",
+      "capture": "DIRECT_PDF_TEXT_AND_VISUAL",
+      "publishedDate": "2011-10",
+      "locator": "Main-report Table 7, printed page 29 / PDF page 41; methodology pp.3-5, not Appendix C terrain definitions or rounded Figure 34 coefficients",
+      "file": "docs/research/sources/ORNL_TM2011_471.pdf",
+      "sha256": "cea0f251cdc12f285c8d1648569cadead67b4e3314752d568640cda2a28d664a",
+      "limitations": [
+        "2006-2008 data, six 2005 Volvos; flat grade -1% to +1% and about 65 mph, not full mixed route/idle/dwell cycle.",
+        "Weights are measured and model-estimated; lighter total-weight bin not certified empty, body type not certified dry van in reviewed section.",
+        "Printed MPG rounded; raw trip panel and an individual paired loaded-empty experiment not reconstructed."
+      ]
+    }
+  ],
+  "prices": [
+    {
+      "id": "MX_NATIONAL_REPORTED",
+      "sourceId": "PROFECO_20260928",
+      "country": "MX",
+      "value": 27,
+      "unit": "MXN/liter",
+      "observationDate": "2026-09-25",
+      "geography": "MEXICO_NATIONAL_REPORTED_AVERAGE",
+      "product": "DIESEL_GRADE_UNSPECIFIED",
+      "taxBasis": "REPORTED_RETAIL_RECOVERABILITY_UNRESOLVED",
+      "verification": "PRIMARY_INDEXED_EXCERPT_ONLY",
+      "use": "PUBLIC_CONTRAST_NOT_CARRIER_PRICE"
+    },
+    {
+      "id": "US_PADD3_RETAIL",
+      "sourceId": "EIA_PADD3_20260928",
+      "country": "US",
+      "value": 5.955,
+      "unit": "USD/US-gallon",
+      "observationDate": "2026-09-28",
+      "geography": "GULF_COAST_PADD3",
+      "product": "ON_HIGHWAY_ALL_TYPES_ULSD",
+      "taxBasis": "INCLUDING_TAXES_RECOVERABILITY_UNRESOLVED",
+      "verification": "DIRECT_PAGE_READ",
+      "use": "PUBLIC_CONTRAST_NOT_CARRIER_PRICE"
+    }
+  ],
+  "performance": [
+    {
+      "id": "MX_T3S2_30T",
+      "sourceId": "IMT_PT881_2025",
+      "country": "MX",
+      "value": 1.47,
+      "unit": "km/liter",
+      "loadStatus": "ROUNDTRIP_LOAD_DECLARED_SPLIT_UNRESOLVED",
+      "route": "Veracruz-Perote-Veracruz",
+      "modelYear": 1996,
+      "payloadTonnes": 30,
+      "speedKmh": 44.5,
+      "weightBinLb": null,
+      "averageWeightLb": null,
+      "sourceDistanceMiles": null,
+      "sourceFuelUsGallons": null,
+      "observationPeriod": "2001-2014",
+      "conditions": "Historical training roundtrip; no paired loaded/empty split or dry-van body confirmation.",
+      "emptyConfirmed": false,
+      "targetProfileMatched": false
+    },
+    {
+      "id": "MX_T3S2_20T",
+      "sourceId": "IMT_PT881_2025",
+      "country": "MX",
+      "value": 2.01,
+      "unit": "km/liter",
+      "loadStatus": "ROUNDTRIP_LOAD_DECLARED_SPLIT_UNRESOLVED",
+      "route": "Veracruz-Casablanca-Veracruz",
+      "modelYear": 1995,
+      "payloadTonnes": 20,
+      "speedKmh": 42.31,
+      "weightBinLb": null,
+      "averageWeightLb": null,
+      "sourceDistanceMiles": null,
+      "sourceFuelUsGallons": null,
+      "observationPeriod": "2001-2014",
+      "conditions": "Different route/unit/load from 30t row: not a controlled payload effect or uncertainty interval.",
+      "emptyConfirmed": false,
+      "targetProfileMatched": false
+    },
+    {
+      "id": "US_ORNL_LIGHT_BIN",
+      "sourceId": "ORNL_TM2011_471",
+      "country": "US",
+      "value": 9.5,
+      "unit": "mile/US-gallon",
+      "loadStatus": "TOTAL_WEIGHT_BIN_NOT_EMPTY_CERTIFIED",
+      "route": null,
+      "modelYear": 2005,
+      "payloadTonnes": null,
+      "speedKmh": 104.60736,
+      "weightBinLb": [
+        30000,
+        40000
+      ],
+      "averageWeightLb": 34285,
+      "sourceDistanceMiles": 505.9,
+      "sourceFuelUsGallons": 53,
+      "observationPeriod": "2006-2008",
+      "conditions": "Main-report Table 7: flat -1% to +1% grade, average 65 mph; not route/cycle MPG.",
+      "emptyConfirmed": false,
+      "targetProfileMatched": false
+    },
+    {
+      "id": "US_ORNL_HEAVY_BIN",
+      "sourceId": "ORNL_TM2011_471",
+      "country": "US",
+      "value": 7.9,
+      "unit": "mile/US-gallon",
+      "loadStatus": "TOTAL_WEIGHT_BIN_NOT_EMPTY_CERTIFIED",
+      "route": null,
+      "modelYear": 2005,
+      "payloadTonnes": null,
+      "speedKmh": 104.60736,
+      "weightBinLb": [
+        70000,
+        80000
+      ],
+      "averageWeightLb": 73248,
+      "sourceDistanceMiles": 1363.1,
+      "sourceFuelUsGallons": 172.3,
+      "observationPeriod": "2006-2008",
+      "conditions": "Main-report Table 7: heavy gross-weight bin, not certified target pilot payload/equipment.",
+      "emptyConfirmed": false,
+      "targetProfileMatched": false
+    }
+  ],
+  "countryCards": [
+    {
+      "country": "MX",
+      "loadedKmPerLiter": null,
+      "emptyKmPerLiter": null,
+      "dieselUsdPerLiter": null,
+      "pilotFuelUsdPerKm": null,
+      "pilotFuelTripUsd": null,
+      "fxMxnPerUsd": null,
+      "routeSelected": false,
+      "status": "NO_GO_MATCHED_LOADED_EMPTY_PAIR",
+      "blockingItems": [
+        "Matched loaded-empty reference for dry van proposed profile/cycle.",
+        "Direct confirmation of national price paragraph or another authoritative current reference; product/geography/tax/FX for chosen scenario."
+      ]
+    },
+    {
+      "country": "US",
+      "loadedKmPerLiter": null,
+      "emptyKmPerLiter": null,
+      "dieselUsdPerLiter": null,
+      "pilotFuelUsdPerKm": null,
+      "pilotFuelTripUsd": null,
+      "fxMxnPerUsd": null,
+      "routeSelected": false,
+      "status": "NO_GO_MATCHED_LOADED_EMPTY_PAIR",
+      "blockingItems": [
+        "Compatible declared loaded-empty states; light gross-weight bin alone is not empty.",
+        "Target route speed/grade/idle/dwell and geography/inclusion treatment for selected public model."
+      ]
+    }
+  ],
+  "engineBridge": {
+    "fuelPriceMXKey": "fcm.v3.fuel.diesel-mx",
+    "fuelPriceUSKey": "fcm.v3.fuel.diesel-us-border",
+    "fxKey": "fcm.v3.finance.tipo-de-cambio",
+    "loadedKey": "fcm.v3.fuel.rendimiento-cargado",
+    "emptyKey": "fcm.v3.fuel.rendimiento-vacio",
+    "usInputUnit": "USD/L",
+    "performanceInputUnit": "km/L",
+    "formula": "priceUsdPerLiter * (loadedKm/loadedKmPerLiter + emptyKm/emptyKmPerLiter)",
+    "integrated": false,
+    "adoptionPerformed": false,
+    "inclusionPolicy": "Fuel/surcharge already inside another cost block must not be added again; idle/auxiliary requires explicit boundary, not default zero."
+  },
+  "decision": {
+    "B1": "OPEN",
+    "B2": "PARTIAL",
+    "businessGatesClosed": 0,
+    "businessGatesTotal": 4,
+    "researchCutClosed": true,
+    "economicFamilyClosed": false,
+    "nextCut": "MAINTENANCE_TIRES_EXCLUSIVE_COST_PER_KM",
+    "reopenFuelOnlyWith": "Specific matched public loaded-empty study or explicitly supported/reviewed planning model for the target profile; no generic national-MPG search loop."
+  },
+  "unchangedFiles": [
+    {
+      "file": "docs/research/B2_ECONOMIC_REFERENCE_CARDS_2026-09-30.json",
+      "sha256": "3b7fc38bdbef7b6692a18b50c785f601eb91956e1d958ce186e5d613c3894b1e"
+    },
+    {
+      "file": "docs/research/B2_PUBLIC_REFERENCE_COMPONENTS_LEDGER_2026-09-29.json",
+      "sha256": "e57cdd449f0a285f9758ded2ac438838d38edc6eef6e06ccb082d9238a8a6d60"
+    },
+    {
+      "file": "docs/research/B2_PAYROLL_CAPITAL_CONTRACT_TEMPLATE_2026-09-29.json",
+      "sha256": "cabfda00873356406d838306bfa87b912eccd9a6026449c0ebb26046acd8bd85"
+    },
+    {
+      "file": "docs/C1_B1_PARAMETER_SOURCE_REGISTER_2026-09-29.md",
+      "sha256": "a31864f52ce5cd3d9f111056ec4dc58181587e99258614f1e2636e61ff992f0a"
+    }
+  ],
+  "externalChanges": {
+    "database": false,
+    "auth": false,
+    "users": false,
+    "infrastructure": false,
+    "deployment": false,
+    "businessOperations": false,
+    "applicationAi": false
+  }
+}

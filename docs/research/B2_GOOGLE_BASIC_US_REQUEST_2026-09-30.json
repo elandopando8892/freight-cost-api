@@ -1,0 +1,8 @@
+{
+  "origin": "Laredo, TX, USA",
+  "destination": "Fort Smith, AR 72916, USA",
+  "intermediates": [],
+  "candidateOnly": true,
+  "endpointsConfirmed": false,
+  "truckRouteValidated": false
+}

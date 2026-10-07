@@ -1,0 +1,460 @@
+{
+  "artifact": "FCM_B2_MX_TOLL_RECONCILIATION",
+  "cutDate": "2026-09-30",
+  "baseHead": "4f5fc2de0c3d178dace917231e1092040dec21fd",
+  "mode": "RESEARCH_ONLY_NO_TOLL_ADOPTION",
+  "routeLinkPin": {
+    "file": "docs/research/B2_D2D_SAKBE_ROUTE_LINK_2026-09-30.json",
+    "sha256": "7364257720572f9471beb4da250ca2cb2917821419c2cc742f9147099dcf2053"
+  },
+  "sources": [
+    {
+      "id": "CAPUFE",
+      "url": "https://iave.capufe.gob.mx/assets/Doc/Tarifas-vigentes-2026.pdf",
+      "authority": "OPERATOR",
+      "access": "ARCHIVED",
+      "file": "docs/research/B2_ROUTE_CAPUFE_TARIFFS_SOURCE_2026-09-30.pdf",
+      "sha256": "89166b501dd5b9f75bc9572e3da841b854e6942c35d89dae1d06747ac399cbf1",
+      "locator": "Pages 1/4 visually reviewed; C5, MXN including IVA, effective 13 Apr 2026; reused original archive."
+    },
+    {
+      "id": "CEM",
+      "url": "https://www.circuitoexterior.mx/rutas-y-tarifas/",
+      "authority": "OPERATOR",
+      "access": "ARCHIVED",
+      "file": "docs/research/sources/CEM_TARIFFS_20260930.html",
+      "sha256": "2ab2159c642dc56ddc6405d9ab13aaf42e9388847776aaf53cac49ffbf634347",
+      "locator": "T1 Tultepec by origin; T0 Jorobas Carga 5. Original archive reused; displayed values reread with web reader."
+    },
+    {
+      "id": "REANL",
+      "url": "https://reanl.com.mx/nosotros/tarifas/",
+      "authority": "OPERATOR",
+      "access": "ARCHIVED",
+      "file": "docs/research/sources/REANL_TARIFFS_20260930.html",
+      "sha256": "494801bd3e2cc2e2bf90215be7a8dc0ddfffc0aaa70164f13833606f7ae50a87",
+      "locator": "PAMM, Camiones 5 y 6, Principal/Auxiliar/Entronque Lincoln; 8 Feb 2026. Original archive reused; values reread."
+    },
+    {
+      "id": "MRO",
+      "url": "https://www.mronoreste.mx/",
+      "authority": "OPERATOR",
+      "access": "ARCHIVED",
+      "file": "docs/research/sources/MRO_TARIFFS_REVIEW_20260930.html",
+      "sha256": "78e1cac105159ac8a8d3150ef519792186487edd08ff62dcf9a0d60e42a7f66f",
+      "locator": "SABINAS section: MTY-LA GLORIA versus SAB-LA GLORIA, Camion 5 y 6; effective date not supplied in the extracted table."
+    },
+    {
+      "id": "VIAPASS",
+      "url": "https://www.viapass.com.mx/Portal_web/tarifas",
+      "authority": "PAYMENT_PROVIDER",
+      "access": "ARCHIVED",
+      "file": "docs/research/sources/VIAPASS_TARIFFS_REVIEW_20260930.html",
+      "sha256": "ad77c970c7bd9fe2dba3eeb387dbb18e3f1b66055bb95cf6f69f78052c5c2368",
+      "locator": "Monterrey-Nuevo Laredo, CASETA MONTERREY, C5. Name/movement binding to Entronque Ex-Garita not established; no operator/date certification."
+    },
+    {
+      "id": "SICT_LOSLP",
+      "url": "https://app.sct.gob.mx/sibuac_internet/ControllerUI?action=CmdTarifaRep1&radioSel=1&selectVia=43",
+      "authority": "GOVERNMENT",
+      "access": "WEB_READER_UNARCHIVED",
+      "file": null,
+      "sha256": null,
+      "locator": "Tarifa vigente con IVA: Libramiento Oriente de San Luis Potosi, five axles, 13 Apr 2026. Web reader returned table; independent direct HTTP timed out, no local original archived."
+    },
+    {
+      "id": "SICT_MXPACHUCA",
+      "url": "https://app.sct.gob.mx/sibuac_internet/ControllerUI?action=cmdDatosOperRepDet&idVia=56",
+      "authority": "GOVERNMENT",
+      "access": "WEB_READER_UNARCHIVED",
+      "file": null,
+      "sha256": null,
+      "locator": "Tarifas vigentes, Camiones 5 Ejes; Mexico-Lecheria/Texcoco and Mexico-Huehuetoca. Direct archive timed out; no effective date in this view."
+    },
+    {
+      "id": "CAMS",
+      "url": "https://operadoravial.com/tarifas/",
+      "authority": "OPERATOR",
+      "access": "ARCHIVED",
+      "file": "docs/research/sources/CAMS_TARIFFS_REVIEW_20260930.html",
+      "sha256": "6d4e96b9c762a7dd4220e5dd530a0b6cd1f6b95590d95ea2511d86b37c7dfcc5",
+      "locator": "Caseta 3 Plaza de cobro Periferico; Camiones 5-6; date 13 April 2026 and IVA in tariff introduction."
+    },
+    {
+      "id": "META_VENTURA",
+      "url": "https://meta-api.valoran.mx/rates?bypassID=7",
+      "authority": "OPERATOR",
+      "access": "ARCHIVED",
+      "file": "docs/research/sources/META_VENTURA_RATES_REVIEW_20260930.json",
+      "sha256": "76bd543d81f446d584e570b56b591ad81b2392185ec68e866c3990f5b56786d1",
+      "locator": "Public endpoint used by autopistasmeta.mx TabsSection; bypass 7 Ventura-El Peyote identified in public /bypasses; rate id89 C5 price328. updated_at is not effectiveFrom."
+    },
+    {
+      "id": "SICT_MATEHUALA",
+      "url": "https://app.sct.gob.mx/sibuac_internet/ControllerUI?action=CmdTarifaRep1&radioSel=1&selectVia=176",
+      "authority": "GOVERNMENT",
+      "access": "WEB_READER_UNARCHIVED",
+      "file": null,
+      "sha256": null,
+      "locator": "Libramiento de Matehuala 14.200 km; Camiones 5 ejes; 13 April 2026, IVA included. Web reader only, no pinned original."
+    },
+    {
+      "id": "SICT_CARBONERA",
+      "url": "https://app.sct.gob.mx/sibuac_internet/ControllerUI?action=CmdTarifaRep1&radioSel=1&selectVia=31",
+      "authority": "GOVERNMENT",
+      "access": "WEB_READER_UNARCHIVED",
+      "file": null,
+      "sha256": null,
+      "locator": "Puerto Mexico-Ent.La Carbonera, full section C5; not identity of the zero-cost SAKBE plaza on Libramiento Oriente Saltillo."
+    }
+  ],
+  "rows": [
+    {
+      "segmentIndex": 11,
+      "instruction": "Cruce la caseta México - Pachuca",
+      "observedMxn": 137,
+      "coverageGroup": "MX_PACHUCA_ACCESS",
+      "alternatives": [
+        {
+          "sourceId": "SICT_MXPACHUCA",
+          "movement": "Mexico-Lecheria/Texcoco",
+          "class": "C5",
+          "amountMxn": 137,
+          "effectiveFrom": null,
+          "taxes": "UNVERIFIED",
+          "paymentMethod": null
+        },
+        {
+          "sourceId": "SICT_MXPACHUCA",
+          "movement": "Mexico-Huehuetoca",
+          "class": "C5",
+          "amountMxn": 137,
+          "effectiveFrom": null,
+          "taxes": "UNVERIFIED",
+          "paymentMethod": null
+        }
+      ],
+      "movementConfirmed": false,
+      "note": "Government C5 numeric match for two movements, not full Ojo de Agua tariff. Exact plaza/access and effective date pending; source not archived."
+    },
+    {
+      "segmentIndex": 14,
+      "instruction": "Cruce la caseta Tultepec",
+      "observedMxn": 454,
+      "coverageGroup": "CEM_TULTEPEC",
+      "alternatives": [
+        {
+          "sourceId": "CEM",
+          "movement": "T1 Tultepec, origen entronque Lecheria-Texcoco",
+          "class": "C5_C6",
+          "amountMxn": 454,
+          "effectiveFrom": null,
+          "taxes": "UNVERIFIED",
+          "paymentMethod": null
+        },
+        {
+          "sourceId": "CEM",
+          "movement": "T1 Tultepec, origen entronque Hank Gonzalez",
+          "class": "C5_C6",
+          "amountMxn": 538,
+          "effectiveFrom": null,
+          "taxes": "UNVERIFIED",
+          "paymentMethod": null
+        }
+      ],
+      "movementConfirmed": false,
+      "note": "Matching amount does not select entry/exit. Date of the T0 table must not be assigned to T1."
+    },
+    {
+      "segmentIndex": 16,
+      "instruction": "Cruce la caseta Jorobas",
+      "observedMxn": 642,
+      "coverageGroup": "JOROBAS_SHARED_COVERAGE",
+      "alternatives": [
+        {
+          "sourceId": "CEM",
+          "movement": "T0 Jorobas-Entronque Zumpango",
+          "class": "C5",
+          "amountMxn": 642,
+          "effectiveFrom": "2026-03-22",
+          "taxes": "UNVERIFIED",
+          "paymentMethod": null
+        },
+        {
+          "sourceId": "CEM",
+          "movement": "T0 Jorobas-Dist. Santa Ines",
+          "class": "C5",
+          "amountMxn": 861,
+          "effectiveFrom": "2026-03-22",
+          "taxes": "UNVERIFIED",
+          "paymentMethod": null
+        }
+      ],
+      "movementConfirmed": false,
+      "note": "CEM movement differs from CAPUFE Jorobas-Tepeji; do not append another charge or aggregate without coverage review."
+    },
+    {
+      "segmentIndex": 19,
+      "instruction": "Cruce la caseta Palmillas (5)",
+      "observedMxn": 482,
+      "coverageGroup": "TEPEJI_PALMILLAS",
+      "alternatives": [
+        {
+          "sourceId": "CAPUFE",
+          "movement": "Tepeji-Palmillas",
+          "class": "C5",
+          "amountMxn": 482,
+          "effectiveFrom": "2026-04-13",
+          "taxes": "IVA_INCLUDED",
+          "paymentMethod": null
+        }
+      ],
+      "movementConfirmed": false,
+      "note": "Palmillas BIS is alternative, not another toll; whole Mexico-Queretaro aggregate must not be added."
+    },
+    {
+      "segmentIndex": 23,
+      "instruction": "Cruce la caseta Chichimequillas",
+      "observedMxn": 121,
+      "coverageGroup": "LIBRAMIENTO_NORESTE_QUERETARO",
+      "alternatives": [
+        {
+          "sourceId": "CAPUFE",
+          "movement": "Ent. Aut. Mex. Qro.-Ent. Qro. SLP.",
+          "class": "C5",
+          "amountMxn": 121,
+          "effectiveFrom": "2026-04-13",
+          "taxes": "IVA_INCLUDED",
+          "paymentMethod": null
+        }
+      ],
+      "movementConfirmed": false,
+      "note": "Published whole bypass and plaza represent overlapping coverage, not two independent charges."
+    },
+    {
+      "segmentIndex": 29,
+      "instruction": "Cruce la caseta San Nicolás de los Jassos",
+      "observedMxn": 299,
+      "coverageGroup": "LIBRAMIENTO_ORIENTE_SLP",
+      "alternatives": [
+        {
+          "sourceId": "SICT_LOSLP",
+          "movement": "Libramiento Oriente de San Luis Potosi, 33.760 km",
+          "class": "C5",
+          "amountMxn": 299,
+          "effectiveFrom": "2026-04-13",
+          "taxes": "IVA_INCLUDED",
+          "paymentMethod": null
+        }
+      ],
+      "movementConfirmed": false,
+      "note": "Government road tariff matches numerically; plaza/movement mapping and operator confirmation still pending. Web reader is not a pinned original."
+    },
+    {
+      "segmentIndex": 32,
+      "instruction": "Cruce la caseta Ventura - El Peyote",
+      "observedMxn": 328,
+      "coverageGroup": "VENTURA_PEYOTE",
+      "alternatives": [
+        {
+          "sourceId": "META_VENTURA",
+          "movement": "Ventura-El Peyote, bypass7 rate89 C5",
+          "class": "C5",
+          "amountMxn": 328,
+          "effectiveFrom": null,
+          "taxes": "UNVERIFIED",
+          "paymentMethod": null
+        }
+      ],
+      "movementConfirmed": false,
+      "note": "Operator public JSON C5 numeric match. updated_at 2026-04-14T20:56:11.802Z is record modification, not legally effective date. Taxes/payment/service applicability pending; no PASE extrapolation."
+    },
+    {
+      "segmentIndex": 36,
+      "instruction": "Cruce la caseta Matehuala",
+      "observedMxn": 144,
+      "coverageGroup": "MATEHUALA_MOVEMENT_PENDING",
+      "alternatives": [
+        {
+          "sourceId": "SICT_MATEHUALA",
+          "movement": "Libramiento de Matehuala, 14.200 km",
+          "class": "C5",
+          "amountMxn": 125,
+          "effectiveFrom": "2026-04-13",
+          "taxes": "IVA_INCLUDED",
+          "paymentMethod": null
+        }
+      ],
+      "movementConfirmed": false,
+      "note": "Primary government C5 tariff conflicts with SAKBE144. Do not repair provider amount or adopt125 until movement/class/service date and operator corroboration; web original unarchived."
+    },
+    {
+      "segmentIndex": 40,
+      "instruction": "Cruce la caseta Los Chorros",
+      "observedMxn": 306,
+      "coverageGroup": "CARBONERA_PUERTO_MEXICO",
+      "alternatives": [
+        {
+          "sourceId": "CAPUFE",
+          "movement": "Los Chorros (D), La Carbonera-Puerto Mexico",
+          "class": "C5",
+          "amountMxn": 306,
+          "effectiveFrom": "2026-04-13",
+          "taxes": "IVA_INCLUDED",
+          "paymentMethod": null
+        }
+      ],
+      "movementConfirmed": false,
+      "note": "Huachichil intermediate and full section are alternatives; do not add an intermediate automatically."
+    },
+    {
+      "segmentIndex": 43,
+      "instruction": "Cruce la caseta La Carbonera",
+      "observedMxn": 0,
+      "coverageGroup": "CARBONERA_PUERTO_MEXICO",
+      "alternatives": [
+        {
+          "sourceId": "SICT_CARBONERA",
+          "movement": "Puerto Mexico-Ent.La Carbonera, full-section contrast only",
+          "class": "C5",
+          "amountMxn": 306,
+          "effectiveFrom": "2026-04-13",
+          "taxes": "IVA_INCLUDED",
+          "paymentMethod": null
+        }
+      ],
+      "movementConfirmed": false,
+      "note": "Zero remains unsupported. Government full-section name does not identify SAKBE La Carbonera plaza on Libramiento Oriente Saltillo; not a payable alternative, duplicate proof or automatic replacement306."
+    },
+    {
+      "segmentIndex": 50,
+      "instruction": "Cruce la caseta Periférico",
+      "observedMxn": 338,
+      "coverageGroup": "CAMS_PERIFERICO",
+      "alternatives": [
+        {
+          "sourceId": "CAMS",
+          "movement": "Ojo Caliente 2-Periferico",
+          "class": "C5_C6",
+          "amountMxn": 338,
+          "effectiveFrom": "2026-04-13",
+          "taxes": "IVA_INCLUDED",
+          "paymentMethod": null
+        },
+        {
+          "sourceId": "CAMS",
+          "movement": "Periferico-Morones Prieto",
+          "class": "C5_C6",
+          "amountMxn": 221,
+          "effectiveFrom": "2026-04-13",
+          "taxes": "IVA_INCLUDED",
+          "paymentMethod": null
+        },
+        {
+          "sourceId": "CAMS",
+          "movement": "Ojo Caliente 2-Morones Prieto",
+          "class": "C5_C6",
+          "amountMxn": 559,
+          "effectiveFrom": "2026-04-13",
+          "taxes": "IVA_INCLUDED",
+          "paymentMethod": null
+        }
+      ],
+      "movementConfirmed": false,
+      "note": "Operator Caseta3 numeric match; not PAMM Lincoln. Access/exit and service date remain unconfirmed. Resident-only Jonuco fares excluded, full and partial movements not summed."
+    },
+    {
+      "segmentIndex": 53,
+      "instruction": "Cruce la caseta Caseta Lincoln",
+      "observedMxn": 595,
+      "coverageGroup": "PAMM_LINCOLN",
+      "alternatives": [
+        {
+          "sourceId": "REANL",
+          "movement": "Caseta Principal Lincoln",
+          "class": "C5_C6",
+          "amountMxn": 595,
+          "effectiveFrom": "2026-02-08",
+          "taxes": "UNVERIFIED",
+          "paymentMethod": null
+        },
+        {
+          "sourceId": "REANL",
+          "movement": "Auxiliar Lincoln",
+          "class": "C5_C6",
+          "amountMxn": 364,
+          "effectiveFrom": "2026-02-08",
+          "taxes": "UNVERIFIED",
+          "paymentMethod": null
+        },
+        {
+          "sourceId": "REANL",
+          "movement": "Entronque Lincoln",
+          "class": "C5_C6",
+          "amountMxn": 238,
+          "effectiveFrom": "2026-02-08",
+          "taxes": "UNVERIFIED",
+          "paymentMethod": null
+        }
+      ],
+      "movementConfirmed": false,
+      "note": "Camiones, not Autobuses. Numeric match does not approve Principal or add all three movements."
+    },
+    {
+      "segmentIndex": 57,
+      "instruction": "Cruce la caseta Sabinas",
+      "observedMxn": 658,
+      "coverageGroup": "MRO_SABINAS",
+      "alternatives": [
+        {
+          "sourceId": "MRO",
+          "movement": "SABINAS section, MTY-LA GLORIA",
+          "class": "C5_C6",
+          "amountMxn": 658,
+          "effectiveFrom": null,
+          "taxes": "UNVERIFIED",
+          "paymentMethod": null
+        },
+        {
+          "sourceId": "MRO",
+          "movement": "SABINAS section, SAB-LA GLORIA",
+          "class": "C5_C6",
+          "amountMxn": 303,
+          "effectiveFrom": null,
+          "taxes": "UNVERIFIED",
+          "paymentMethod": null
+        }
+      ],
+      "movementConfirmed": false,
+      "note": "Same plaza has different movement amounts. Effective date/tax/payment and exact access remain pending; cannot sum alternatives."
+    },
+    {
+      "segmentIndex": 59,
+      "instruction": "Cruce la caseta Entronque Ex-Garita",
+      "observedMxn": 266,
+      "coverageGroup": "EX_GARITA_ID_PENDING",
+      "alternatives": [
+        {
+          "sourceId": "VIAPASS",
+          "movement": "CASETA MONTERREY, Monterrey-Nuevo Laredo",
+          "class": "C5",
+          "amountMxn": 266,
+          "effectiveFrom": null,
+          "taxes": "UNVERIFIED",
+          "paymentMethod": "VIAPASS_TAG"
+        }
+      ],
+      "movementConfirmed": false,
+      "note": "Payment-provider numerical contrast only. Name/scope mismatch remains; not an operator-verified tariff for this toll point."
+    }
+  ],
+  "handoff": {
+    "tollsMxn": null,
+    "tollsUsd": null,
+    "serviceDate": null,
+    "crossingUsd": null,
+    "interchangeUsd": null
+  },
+  "adoptionEligible": false,
+  "quoteReady": false
+}

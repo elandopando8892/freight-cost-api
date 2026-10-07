@@ -1,0 +1,50 @@
+{
+  "model":"FCM_PILOT_ROAD_BORDER_PUBLIC_SCENARIOS_V1",
+  "reviewedAt":"2026-10-02T15:43:00Z",
+  "referenceDate":"2026-10-02",
+  "scope":"OWN_MX_US_RELAY_SAME_TRAILER",
+  "handoffSideHypothesis":"US_SIDE_NOT_ACTUAL_SELECTED_YARD",
+  "mxTractorAxlesHypothesis":3,
+  "attachedCombinationAxles":5,
+  "mxNorthboundBobtailTariffMxn":65,
+  "mxNorthboundBobtailSource":{"url":"https://app.sct.gob.mx/sibuac_internet/ControllerUI?action=cmdDatosOperRepDet&idVia=86","locator":"Camiones3Ejes65; Camiones5Ejes144. Web reader2Oct, no original HTML archive; direction/effective date unverified.","capture":"PRIMARY_WEB_READER_NOT_ARCHIVED"},
+  "mxForwardSelections":[
+    {"segmentIndex":11,"sourceId":"SICT_MXPACHUCA","alternativeIndex":0},
+    {"segmentIndex":14,"sourceId":"CEM","alternativeIndex":0},
+    {"segmentIndex":16,"sourceId":"CEM","alternativeIndex":0},
+    {"segmentIndex":19,"sourceId":"CAPUFE","alternativeIndex":0},
+    {"segmentIndex":23,"sourceId":"CAPUFE","alternativeIndex":0},
+    {"segmentIndex":29,"sourceId":"SICT_LOSLP","alternativeIndex":0},
+    {"segmentIndex":32,"sourceId":"META_VENTURA","alternativeIndex":0},
+    {"segmentIndex":36,"sourceId":"SICT_MATEHUALA","alternativeIndex":0},
+    {"segmentIndex":40,"sourceId":"CAPUFE","alternativeIndex":0},
+    {"segmentIndex":50,"sourceId":"CAMS","alternativeIndex":0},
+    {"segmentIndex":53,"sourceId":"REANL","alternativeIndex":0},
+    {"segmentIndex":57,"sourceId":"MRO","alternativeIndex":0},
+    {"segmentIndex":59,"sourceId":"VIAPASS","alternativeIndex":0}
+  ],
+  "unpricedMxTollSegments":[43],
+  "dedicatedReturnRoadPolicy":"SAME_SELECTED_C5_MOVEMENTS_REVERSED_AS_HYPOTHESIS_NOT_REVERSE_ROUTE_OBSERVATION",
+  "networkBobtailRoadPolicy":"NO_DISTANCE_PRORATING_OF_C5_TOLLS",
+  "borderTimeline":{
+    "NETWORK_EXPECTED_EMPTY_PROXY":["MX_LOADED_NORTH","MX_BOBTAIL_SOUTH"],
+    "DEDICATED_EMPTY_SAME_BOX_RETURN":["MX_LOADED_NORTH","MX_BOBTAIL_SOUTH","MX_BOBTAIL_NORTH","MX_ATTACHED_EMPTY_SOUTH"]
+  },
+  "assumptions":[
+    "US-side handoff is a prospective reference alternative, not selection of a real yard/carrier or permission to cross.",
+    "Both own national tractors are preserved; MX crosses north with the box, returns south bobtail. In dedicated return MX crosses north bobtail to recover the same box, then south attached. US tractor stays US; no third crossing tractor invented.",
+    "Three-axle bobtail and five-axle attached combo are explicit vehicle hypotheses, not an observed tractor registration.",
+    "Each selected public movement is a prospective transfer to the SAKBE candidate based on the reconciled alternatives, not operator-certified road geometry or numeric-match approval.",
+    "Matehuala government125 replaces provider144 only inside this scenario. The original4770 provider sum is never overwritten.",
+    "La Carbonera zero is unverified. Full PuertoMexico-Carbonera306 already overlaps LosChorros; do not add it as another plaza or assume zero.",
+    "Potential Jorobas-Tepeji coverage, intermediate plazas, dates/tax/payment and truck legality remain unresolved, not zero.",
+    "Dedicated attached return assumes same movements/C5rates. Network MX bobtail road fees cannot be estimated by multiplying five-axle forward total by empty-distance share.",
+    "Northbound144 attached and65bobtail use SICT displayed tariffs with direction/date/tax unverified, transferred explicitly; southbound4.75 per commercial axle uses archived ordinance before1Jan2027, not a northbound US charge.",
+    "Bridge toll is not a full drayage/interchange/customs fee. Internal handoff incremental services remain unresolved; no external partner fee or Saia shipment/container fee reused.",
+    "Additional MX border bobtail km and duty/dwell are not yet in the legacy cycle/variable estimates. Keep quantities/costs null and recompute exposure before completeCFU/CVU.",
+    "US inland toll itinerary and complete Mexican road total remain unresolved, not zero; sums are components, not lower bounds or a quotation."
+  ],
+  "selected":false,
+  "adoptedValues":0,
+  "quoteReady":false
+}

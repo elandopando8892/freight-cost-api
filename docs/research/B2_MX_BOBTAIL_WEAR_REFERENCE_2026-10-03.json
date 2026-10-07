@@ -1,0 +1,74 @@
+{
+  "model": "FCM_MX_BOBTAIL_C3_WEAR_SENSITIVITY_V1",
+  "reviewedAt": "2026-10-03T01:08:38Z",
+  "scope": "UNMATCHED_NON_ARTICULATED_PUBLIC_MODEL_TRANSFER_TO_MX_BOBTAIL_ONLY",
+  "source": {
+    "id": "IMT_PT881_C3",
+    "url": "https://imt.mx/archivos/Publicaciones/PublicacionTecnica/pt881.pdf",
+    "archive": {
+      "file": "docs/research/sources/IMT_PT881_2025.pdf",
+      "sha256": "816728964103158f0a99f44c41bbe5d2bb7240c33e35651fcbd90c0b391412f4"
+    },
+    "inputLocator": "Table 3.25, printed pages 37-38, physical PDF pages 47-48",
+    "outputLocator": "Table 4.4, printed page 53, physical PDF page 63",
+    "period": "2025",
+    "taxBasis": "NET_NATIONAL_ECONOMIC_MODEL_EXCLUDING_IVA_ISAN_NOT_VERIFIED_TARGET_INVOICE"
+  },
+  "sourceVehicle": {
+    "configuration": "C3_NON_ARTICULATED",
+    "makeModel": "International 4400 2025 / Navistar DT466",
+    "horsepower": 250,
+    "axles": 3,
+    "tires": 10,
+    "tireSpecification": "1100-20",
+    "rigidBodyFeet": 23,
+    "emptyVehicleKg": 6939.7,
+    "payloadKg": 17554.3,
+    "annualKm": 150000,
+    "ageKm": 500000,
+    "hasSemitrailer": false,
+    "hasRigidBody": true,
+    "rigidBodyWearSeparable": false,
+    "baseRoad": "FLAT_STRAIGHT_GOOD_IRI_2_M_PER_KM"
+  },
+  "target": {
+    "resourceId": "MX_TRACTOR",
+    "vehicle": "Cascadia 2021 / DD15 450 HP",
+    "movement": "BOBTAIL_WITHOUT_SHARED_TRAILER",
+    "matchedVehicle": false,
+    "matchedPayload": false,
+    "matchedTireLifecycle": false,
+    "observedBobtailRate": false,
+    "biasDirectionKnown": false
+  },
+  "printedCostsMxnPer1000VehicleKm": {
+    "maintenanceLabor": 820.06,
+    "maintenanceParts": 1696.51,
+    "lubricants": 172.97,
+    "tires": 690.69
+  },
+  "calculationPolicy": "USE_PRINTED_EXPENSES_NOT_ROUNDED_PHYSICAL_OUTPUTS_NO_COMPOSITE_SPLIT",
+  "included": ["MAINTENANCE_LABOR", "MAINTENANCE_PARTS", "LUBRICANTS", "TIRES"],
+  "excluded": ["FUEL", "DRIVER", "CAPITAL_DEPRECIATION", "CAPITAL_INTEREST", "OVERHEAD", "SHARED_TRAILER"],
+  "transfer": "APPLY_UNCHANGED_2025_NET_C3_COST_PER_KM_TO_FORECAST_BOBTAIL_KM_WITHOUT_INFLATION_OR_VAT_ADJUSTMENT",
+  "assumptions": [
+    "C3 is a rigid heavy truck, not the Cascadia tractor; this contrast is not tractor-only calibration.",
+    "The public model includes its rigid body and loaded configuration; those effects cannot be separated.",
+    "No semitrailer is included in this sensitivity, but this does not prove a matched tractor-only amount.",
+    "Use only MX bobtail kilometres; the attached tractor-box composite continues covering attached kilometres.",
+    "Fuel and driver compensation already cover all MX tractor kilometres and must not be added again.",
+    "No change to box, US tractor, capital, administration, capacity, time or yard allocation is made here.",
+    "No fifty-fifty or ten-eighteenths split of the T3S2 composite is supported or applied.",
+    "The four printed monetary expenses are used; rounded quantities times rounded prices would differ.",
+    "The 2025 net model is transferred without invented inflation, fees or a claim of invoice tax recovery.",
+    "The October 1 2026 FIX translates MXN to USD but does not make source periods a joint cohort.",
+    "The link forecast and postal road reference must be enabled explicitly for this optional sensitivity.",
+    "The unpriced default and actual tractor-only amount remain null; no unknown is certified as zero."
+  ],
+  "actualTractorOnlyCostUsd": null,
+  "completeCfuUsd": null,
+  "completeCvuUsd": null,
+  "completeD2DCostUsd": null,
+  "quoteReady": false,
+  "adoptedValues": 0
+}

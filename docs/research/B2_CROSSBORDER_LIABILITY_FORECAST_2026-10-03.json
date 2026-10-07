@@ -1,0 +1,88 @@
+{
+  "model": "FCM_MX_CROSSBORDER_PRIMARY_LIABILITY_TRANSFER_V1",
+  "reviewedAt": "2026-10-03T01:31:00Z",
+  "scope": "UNMATCHED_US_PRIMARY_LIABILITY_ANNUAL_POOL_TRANSFER_TO_ONE_MX_TRACTOR",
+  "source": {
+    "id": "FULL_COVERAGE_PRIMARY_LIABILITY_20260320",
+    "url": "https://myfullcoverage.com/blog/primary-liability-insurance-for-truckers",
+    "publicationDate": "2026-03-20",
+    "locator": "How Much Does Primary Liability Insurance Cost?; new-authority Indiana owner-operators 2025 book-of-business range and experienced-operator range; What Is NOT Covered? excludes own truck and cargo.",
+    "capture": "PRIMARY_WEB_READER_NOT_ARCHIVED",
+    "premiumDenominator": "OWNER_OPERATOR_ANNUAL_PRIMARY_LIABILITY_NOT_EXPLICIT_PER_TRUCK",
+    "sourceUnitCount": null,
+    "sampleSize": null,
+    "taxesFeesSeparatelyPublished": false
+  },
+  "cohorts": [
+    {
+      "id": "NEW_AUTHORITY_INDIANA_2025",
+      "sourcePeriod": "2025",
+      "annualPremiumUsdEndpoints": [7500, 12000],
+      "operatorHistory": "NEW_AUTHORITY",
+      "location": "INDIANA",
+      "observationalClaim": "BROKER_BOOK_OF_BUSINESS_RANGE_NO_SAMPLE_OR_JOINT_ASSET_MATCH"
+    },
+    {
+      "id": "EXPERIENCED_CLEAN_2PLUS_YEARS",
+      "sourcePeriod": null,
+      "annualPremiumUsdEndpoints": [5000, 9000],
+      "operatorHistory": "CLEAN_RECORD_AND_2PLUS_YEARS",
+      "location": "NOT_SEPARATELY_STATED",
+      "observationalClaim": "BROKER_TYPICAL_PRICE_STATEMENT_NOT_DATED_MATCHED_COHORT"
+    }
+  ],
+  "target": {
+    "resourceId": "MX_TRACTOR",
+    "planningAnnualLiabilityPools": 1,
+    "coverage": "COMMERCIAL_PRIMARY_AUTO_LIABILITY_ONLY",
+    "sourceForeignDomicileMatched": false,
+    "sourceCommercialZoneMatched": false,
+    "sourceUnitDenominatorMatched": false,
+    "insuredLimitMatched": false,
+    "operatorHistorySelected": false,
+    "actualEligibilityVerified": false,
+    "actualAnnualPremiumUsd": null
+  },
+  "application": "ANNUAL_PREMIUM_TIMES_EXISTING_MX_MAX_RESOURCE_EXPOSURE_OVER12",
+  "excluded": ["PHYSICAL_DAMAGE", "CARGO", "SHARED_BOX", "US_TRACTOR", "TEMPORARY_PREMIUM", "NON_TRUCKING_LIABILITY"],
+  "otherReviewedSources": [
+    {
+      "id": "QPI_FOREIGN_PROGRAM_SCOPE_NO_PRICE",
+      "url": "https://www.qualitaspremier.com/Home/Products?lang=en",
+      "capture": "PRIMARY_WEB_READER_NOT_ARCHIVED",
+      "decision": "SCOPE_ONLY_NOT_A_PREMIUM"
+    },
+    {
+      "id": "PROGRESSIVE_PRIMARY_PAGE_COMBINED_PRICE",
+      "url": "https://www.progressivecommercial.com/commercial-auto-insurance/primary-liability-insurance/",
+      "capture": "PRIMARY_WEB_READER_NOT_ARCHIVED",
+      "decision": "REJECT926MONTHLY_COMBINED_LIABILITY_PHYSICAL_DAMAGE_NOT_STANDALONE_LIABILITY"
+    },
+    {
+      "id": "STRONGTIE_INTERNAL_PRICE_CONFLICT",
+      "url": "https://www.strongtieinsurance.com/company-driver-vs-owner-operator-who-is-responsible-for-what-coverage/",
+      "capture": "PRIMARY_WEB_READER_NOT_ARCHIVED",
+      "decision": "REJECT_UNRESOLVED_SCOPE_CONFLICT_8000TO16000_VS5000TO12000_ON_SAME_PAGE"
+    }
+  ],
+  "assumptions": [
+    "This optional foreign-liability planning reserve uses domestic US reference cohorts, not a Mexican crossborder premium or a verified policy.",
+    "Apply the owner-operator annual range to one planning MX tractor pool without inferring a per-power-unit sample denominator.",
+    "New-authority Indiana and experienced clean-record observations remain distinct alternatives; the pilot carrier history is not selected.",
+    "The 2025 period is explicit only for the new-authority book-of-business claim; do not relabel the experienced range as 2025 or 2026.",
+    "Published endpoints are sensitivity choices, not market bounds, medians, calibrated prices or a forecast probability distribution.",
+    "Transfer the annual premium unchanged: no invented foreign-country, commercial-zone, mileage, claim, tax or inflation multiplier.",
+    "Annual pool allocation reuses MAX(MXcycleKm/MXmonthlyKm, MXelapsedDays/24)/12; no extra certificate or bridge multiplier.",
+    "Only MX foreign primary liability is represented here; domestic MX package, existing US package and one box policy remain separate.",
+    "Source excludes own truck and cargo; do not subtract or add physical damage to isolate this liability-only reference.",
+    "Annual and temporary foreign liability are mutually exclusive alternatives; no temporary price is published or inferred from annual/365.",
+    "Taxes, fees, deductible, insured limit, risk acceptance and actual coverage remain unverified, not zero-valued facts.",
+    "The same planning expense applies across cash and financing modes; debt payment does not multiply an annual liability premium.",
+    "The unpriced default preserves prior costs. Complete CFU, CVU and D2D outputs remain null; no business operation or policy purchase occurs."
+  ],
+  "completeCfuUsd": null,
+  "completeCvuUsd": null,
+  "completeD2DCostUsd": null,
+  "quoteReady": false,
+  "adoptedValues": 0
+}

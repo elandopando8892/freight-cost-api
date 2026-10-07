@@ -1,0 +1,368 @@
+{
+  "artifact": "FCM_B2_LABOR_COMPENSATION_BRIDGE",
+  "cutDate": "2026-09-29",
+  "baseHead": "4f5fc2de0c3d178dace917231e1092040dec21fd",
+  "status": "PARTIAL_PUBLIC_REFERENCE_NOT_EMPLOYER_TOTAL_CALIBRATION",
+  "validationDate": "2026-09-30",
+  "employmentModel": "EMPLOYEE_REFERENCE_BRANCH_PROPOSED_NOT_CARRIER_CLASSIFICATION",
+  "calibrated": false,
+  "quoteReady": false,
+  "adoptedValues": 0,
+  "kmPerMile": 1.60934,
+  "sources": [
+    {
+      "id": "MX_TRAYECTO_CIENEGAFLORES",
+      "url": "https://careers.trayecto.com/operador-5ta-rueda-GKZvj9NRHO9o/",
+      "country": "MX",
+      "kind": "EMPLOYER_ADVERTISEMENT",
+      "capture": "WEB_READER_DIRECT_URL_TEXT",
+      "publicationDate": null,
+      "absolutePublicationDateVerified": false,
+      "publicationAgeLabel": "hace 1 año",
+      "currentVacancyAvailabilityVerified": false,
+      "rawResponseArchived": false,
+      "locator": "Description: single fifth wheel dry van, per-km pay and monthly grocery vouchers; header annual salary",
+      "limitations": [
+        "Annual header conflicts with pay scheme; do not relabel as monthly.",
+        "MXN of rate and vouchers inferred from same page currency context, not repeated explicitly beside each amount.",
+        "Direct page read is not employer confirmation, paid payroll or matching D2D/interchange cohort."
+      ]
+    },
+    {
+      "id": "US_ECEC_TRANSPORT_2026Q2",
+      "url": "https://www.bls.gov/news.release/ecec.t04.htm",
+      "country": "US",
+      "kind": "OFFICIAL_SECTOR_COMPENSATION_AGGREGATE",
+      "referencePeriod": "2026-June",
+      "releaseDate": "2026-09-09",
+      "locator": "Table 4, Transportation and warehousing industry",
+      "rawResponseArchived": false,
+      "limitations": [
+        "All occupations in transportation and warehousing; not truckload-only, driver-only or dry-van pilot.",
+        "Dollar entries published rounded to cents; their sum need not equal separately rounded total.",
+        "Do not combine this benefit-to-wage ratio with OEWS occupation wages or ATRI trucking exposure as an observed cohort."
+      ]
+    },
+    {
+      "id": "US_ECEC_DEFINITIONS",
+      "url": "https://www.bls.gov/ecec/questions-and-answers.htm",
+      "country": "US",
+      "kind": "OFFICIAL_METRIC_DEFINITION",
+      "locator": "Calculation methods: wage and benefit scope; exclusions; using ECEC",
+      "limitations": [
+        "Benefit categories differ among programs. ATRI benefits are not certified equivalent to ECEC employer-total coverage."
+      ]
+    },
+    {
+      "id": "US_IRS_P15_2026",
+      "url": "https://www.irs.gov/publications/p15",
+      "country": "US",
+      "kind": "TAX_RULE_NOT_EFFECTIVE_EMPLOYER_RATE",
+      "referencePeriod": "2026",
+      "locator": "What is new; section 9 social security/Medicare; section 14 FUTA",
+      "limitations": [
+        "Coverage and taxable wages, year-to-date bases, exemptions, state rates and credits must be established.",
+        "No tax filing, payroll determination or legally effective carrier rate performed."
+      ]
+    },
+    {
+      "id": "US_BLS_DRIVER_2025",
+      "url": "https://www.bls.gov/ooh/transportation-and-material-moving/heavy-and-tractor-trailer-truck-drivers.htm",
+      "country": "US",
+      "kind": "OFFICIAL_OCCUPATIONAL_WAGE_MEDIAN",
+      "referencePeriod": "2025-May",
+      "locator": "Pay: truck transportation median, SOC 53-3032",
+      "limitations": [
+        "Wage median only, not employer cost; no conversion using another population's mileage."
+      ]
+    },
+    {
+      "id": "ATRI_TRUCKLOAD_2024_REUSED",
+      "url": "https://truckingresearch.org/wp-content/uploads/2025/07/ATRI-Operational-Costs-of-Trucking-07-2025.pdf",
+      "country": "US",
+      "kind": "REUSED_HISTORICAL_SECTOR_CONTRAST",
+      "referencePeriod": "2024",
+      "localReference": "B1_PILOT_ASSET_LABOR_EVIDENCE_2026-09-29.json",
+      "limitations": [
+        "Five truckload fleet-size groups; dry van not established; wages plus benefits not certified complete employer cost; newer full report not obtained."
+      ]
+    }
+  ],
+  "mxDriver": {
+    "profile": "MX_THIRD_PARTY_D2D_DRY_VAN_REFERENCE_UNRESOLVED",
+    "adoptedCompensationBasis": null,
+    "offer": {
+      "ratePerPaidLoadedKm": 2.1,
+      "ratePerPaidEmptyKm": 2.1,
+      "rateCurrency": "MXN",
+      "currencyBasis": "INFERRED_FROM_EXPLICIT_PAGE_SALARY_CURRENCY",
+      "monthlyGroceryVouchers": 3430,
+      "headerSalary": {
+        "min": 22000,
+        "max": 24000,
+        "currency": "MXN",
+        "publishedPeriod": "ANNUAL",
+        "periodConflict": true,
+        "inferredMonthlySalary": null
+      },
+      "payIsGrossOrNet": null,
+      "guaranteeOrAdditionalFixedWage": null,
+      "otherBenefits": "MENTIONED_NOT_COSTED",
+      "costBurdenIncludesVouchersConfirmed": false,
+      "pilotApplicabilityConfirmed": false
+    },
+    "normalizedWageOnlyMxnPerPaidMile": 3.379614,
+    "equations": {
+      "advertisedWages": "2.10 * (paidLoadedKm + paidEmptyKm); no extra salary from conflicting header",
+      "partialPackage": "2.10 * (paidLoadedKm + paidEmptyKm) + 3430 * eligibleOperatorMonths; only if vouchers are additional and eligibility is established",
+      "employerTotal": "attributableWages + nonIncludedBenefits + employerSocialContributions + housing + applicablePayrollTaxes + otherEmployerCosts",
+      "vehicleRate": "attributableEmployerTotalMxn / samePeriodVehicleKm / applicableMxnPerUsd"
+    },
+    "requiredPublicModelAssumptions": [
+      "Employment classification, employer benefit inclusions and eligibility; gross/net and any fixed/minimum wage guarantee.",
+      "Paid operator km versus total vehicle km and allocation to tractors/operators in the same period.",
+      "SBC regime/integration and contributions by branch, risk premium and days from reviewed MX legal dossier.",
+      "Applicable payroll state/tax base and FX date/rule; no countrywide universal burden."
+    ],
+    "employerTotalMxnPerKm": null,
+    "driverUsdPerKm": null,
+    "administrativeBurdenTransferred": false
+  },
+  "usDriver": {
+    "profile": "US_THIRD_PARTY_D2D_DRY_VAN_REFERENCE_UNRESOLVED",
+    "adoptedCompensationBasis": null,
+    "blsWageMedian": {
+      "annualUsd": 60320,
+      "referencePeriod": "2025-May",
+      "sector": "TRUCK_TRANSPORTATION",
+      "employerTotal": false,
+      "convertedUsingAtriMiles": false
+    },
+    "historicalTruckloadRateRange": {
+      "minUsdPerMile": 0.79,
+      "maxUsdPerMile": 1.058,
+      "minUsdPerKm": 0.49088446195334734,
+      "maxUsdPerKm": 0.6574123553754956,
+      "kind": "BETWEEN_FLEET_SIZE_GROUPS_NOT_CONFIDENCE_INTERVAL",
+      "selectedFleetSizeGroup": null,
+      "completeEmployerCostConfirmed": false,
+      "extraEcecBenefitsAdded": false
+    },
+    "employerTotalUsdPerKm": null,
+    "driverUsdPerKm": null
+  },
+  "usSectorBenefitContrast": {
+    "referencePeriod": "2026-June",
+    "sector": "TRANSPORTATION_AND_WAREHOUSING_ALL_OCCUPATIONS",
+    "unit": "USD/hour-worked",
+    "wages": 32.95,
+    "benefits": 16.9,
+    "total": 49.86,
+    "publishedBenefitsShareOfTotalPct": 33.9,
+    "benefitToWageRatio": 0.5128983308042487,
+    "benefitToTotalRatio": 0.3389490573606097,
+    "roundedComponentTotal": 49.85,
+    "componentVsPublishedTotalDifference": 0.01,
+    "benefitComponents": {
+      "paidLeave": 3.35,
+      "supplementalPay": 1.7,
+      "insurance": 5.31,
+      "retirementSavings": 2.72,
+      "legallyRequired": 3.82
+    },
+    "legallyRequiredAlreadyInsideBenefits": true,
+    "transferredToDriverOrAdmin": false
+  },
+  "usFederalRules": {
+    "year": 2026,
+    "employerSocialSecurityRate": 0.062,
+    "socialSecurityAnnualTaxableWageCap": 184500,
+    "employerMedicareRate": 0.0145,
+    "medicareWageCap": null,
+    "additionalMedicareEmployerShare": 0,
+    "additionalMedicareEmployeeRate": 0.009,
+    "futaGrossRate": 0.06,
+    "futaAnnualTaxableWageCap": 7000,
+    "maximumPotentialCreditRate": 0.054,
+    "afterMaximumCreditRate": 0.006,
+    "maximumCreditAssumed": false,
+    "effectiveFutaRate": null,
+    "stateUnemploymentRate": null,
+    "workersCompensationRate": null,
+    "employerSocialSecurityPeriodEquation": "0.062 * min(currentCoveredTaxableWages, max(184500 - priorYtdCoveredTaxableWages, 0))",
+    "employerMedicarePeriodEquation": "0.0145 * currentCoveredMedicareWages",
+    "futaPeriodEquation": "effectiveFutaRate * min(currentFutaTaxableWages, max(7000 - priorYtdFutaTaxableWages, 0)); rate unknown until credit applicability",
+    "addedToAtriOrEcecBenefits": false
+  },
+  "administration": {
+    "method": null,
+    "sharedBurdenAdopted": null,
+    "roles": [
+      {
+        "role": "DISPATCHER",
+        "quantityKey": "fcm.v3.cost-payroll.qty-despachador",
+        "wageKey": "fcm.v3.cost-payroll.pu-despachador",
+        "unit": "USD/month/FTE",
+        "usOccupationProxy": "Dispatchers, except police, fire, and ambulance",
+        "proxyFit": "BROAD",
+        "proxyValuesReusedAsCarrierCost": false,
+        "mxFte": null,
+        "usFte": null,
+        "mxEmployerMonthlyUsdPerFte": null,
+        "usEmployerMonthlyUsdPerFte": null
+      },
+      {
+        "role": "TRAFFIC_MANAGER",
+        "quantityKey": "fcm.v3.cost-payroll.qty-jefe-trafico",
+        "wageKey": "fcm.v3.cost-payroll.pu-jefe-trafico",
+        "unit": "USD/month/FTE",
+        "usOccupationProxy": "Transportation, storage, and distribution managers",
+        "proxyFit": "FUNCTIONAL_PROXY",
+        "proxyValuesReusedAsCarrierCost": false,
+        "mxFte": null,
+        "usFte": null,
+        "mxEmployerMonthlyUsdPerFte": null,
+        "usEmployerMonthlyUsdPerFte": null
+      },
+      {
+        "role": "OPERATIONS_MANAGER",
+        "quantityKey": "fcm.v3.cost-payroll.qty-gerente-operaciones",
+        "wageKey": "fcm.v3.cost-payroll.pu-gerente-operaciones",
+        "unit": "USD/month/FTE",
+        "usOccupationProxy": "General and operations managers",
+        "proxyFit": "BROAD",
+        "proxyValuesReusedAsCarrierCost": false,
+        "mxFte": null,
+        "usFte": null,
+        "mxEmployerMonthlyUsdPerFte": null,
+        "usEmployerMonthlyUsdPerFte": null
+      },
+      {
+        "role": "SALES_MANAGER",
+        "quantityKey": "fcm.v3.cost-payroll.qty-gerente-comercial",
+        "wageKey": "fcm.v3.cost-payroll.pu-gerente-comercial",
+        "unit": "USD/month/FTE",
+        "usOccupationProxy": "Sales managers",
+        "proxyFit": "BROAD",
+        "proxyValuesReusedAsCarrierCost": false,
+        "mxFte": null,
+        "usFte": null,
+        "mxEmployerMonthlyUsdPerFte": null,
+        "usEmployerMonthlyUsdPerFte": null
+      },
+      {
+        "role": "SAFETY_MANAGER",
+        "quantityKey": "fcm.v3.cost-payroll.qty-safety-manager",
+        "wageKey": "fcm.v3.cost-payroll.pu-safety-manager",
+        "unit": "USD/month/FTE",
+        "usOccupationProxy": "Occupational health and safety specialists",
+        "proxyFit": "SPECIALIST_NOT_MANAGER",
+        "proxyValuesReusedAsCarrierCost": false,
+        "mxFte": null,
+        "usFte": null,
+        "mxEmployerMonthlyUsdPerFte": null,
+        "usEmployerMonthlyUsdPerFte": null
+      },
+      {
+        "role": "TRACKING_CS",
+        "quantityKey": "fcm.v3.cost-payroll.qty-tracking-cs",
+        "wageKey": "fcm.v3.cost-payroll.pu-tracking-cs",
+        "unit": "USD/month/FTE",
+        "usOccupationProxy": "Customer service representatives",
+        "proxyFit": "BROAD",
+        "proxyValuesReusedAsCarrierCost": false,
+        "mxFte": null,
+        "usFte": null,
+        "mxEmployerMonthlyUsdPerFte": null,
+        "usEmployerMonthlyUsdPerFte": null
+      },
+      {
+        "role": "BILLING_ADMIN",
+        "quantityKey": "fcm.v3.cost-payroll.qty-billing-admin",
+        "wageKey": "fcm.v3.cost-payroll.pu-billing-admin",
+        "unit": "USD/month/FTE",
+        "usOccupationProxy": "Billing and posting clerks",
+        "proxyFit": "BROAD",
+        "proxyValuesReusedAsCarrierCost": false,
+        "mxFte": null,
+        "usFte": null,
+        "mxEmployerMonthlyUsdPerFte": null,
+        "usEmployerMonthlyUsdPerFte": null
+      }
+    ],
+    "equations": [
+      "Sum FTE_role * (wage_role_month + nonIncludedEmployerBenefits_role_month)",
+      "Alternatively a reviewed combined ADMIN_PAYROLL + COMPANY block; not both."
+    ],
+    "mxDriverBurdenTransferred": false,
+    "usEcecRatioTransferred": false
+  },
+  "engineBridge": {
+    "laborMX": {
+      "key": "fcm.v3.labor.tarifa-operador-mx",
+      "canonicalUnit": "USD/mile",
+      "output": "driverUsdPerKm",
+      "requires": "Full attributable driver employer cost and matching vehicle exposure plus FX; 2.10 alone cannot populate total."
+    },
+    "laborUS": {
+      "key": "fcm.v3.labor.tarifa-operador-us",
+      "canonicalUnit": "USD/mile",
+      "output": "driverUsdPerKm",
+      "requires": "Declared complete total or reviewed historical reference with explicit exclusions; no automatic benefits/taxes uplift."
+    },
+    "adminBurden": {
+      "key": "fcm.v3.labor.carga-social",
+      "output": "monthlyFixedUsd",
+      "scope": "ADMINISTRATION_ONLY",
+      "defaultThirtyPercentAdopted": false
+    },
+    "policy": [
+      "WAGES_ONLY requires separately documented benefits.",
+      "EMPLOYER_TOTAL forbids adding benefits again.",
+      "Paid operator mileage is not automatically physical vehicle mileage.",
+      "Recurring monthly driver benefits amortized by consistent exposure are not repeated per leg or charged again to admin payroll.",
+      "Historical ATRI, sector ECEC and occupational OEWS are separate reference branches, not a pooled estimator."
+    ]
+  },
+  "rejectedCandidate": {
+    "url": "https://www.ruan.com/careers/driver-job/226-7198",
+    "directResolvedUrl": "https://www.ruan.com/careers/careers-drivers",
+    "reason": "Job-specific search snapshot redirected to generic careers. No job compensation values adopted from index."
+  },
+  "outputs": {
+    "mxDriverEmployerUsdPerKm": null,
+    "usDriverEmployerUsdPerKm": null,
+    "mxAdminFleetMonthUsd": null,
+    "usAdminFleetMonthUsd": null,
+    "cfuUsd": null,
+    "cvuUsd": null,
+    "purchaseCostUsd": null,
+    "sellPriceUsd": null
+  },
+  "decision": {
+    "B1": "OPEN",
+    "E1": "OPEN",
+    "B2": "PARTIAL",
+    "businessGatesClosed": 0,
+    "businessGatesTotal": 4,
+    "next": "Assemble the two MX/US partial economic reference cards by family: observed component, explicit model assumption, exclusion, missing item and subtotal eligibility. Preserve capital/labor gaps, then prioritize the remaining operating-cost families; no more generic wage-index work."
+  },
+  "unchangedFiles": [
+    {
+      "file": "B1_MX_DRIVER_EMPLOYER_COST_RULES_2026-09-29.json",
+      "sha256": "570937768fe0e4cc2f402f6b0fff0f3ea24af9fa51cf5af041f6597c21975176"
+    },
+    {
+      "file": "B1_PILOT_ASSET_LABOR_EVIDENCE_2026-09-29.json",
+      "sha256": "ba33bcbdf4fcfabef81c926c76e7ed3dd58f8792bffe44177817aea4d1cc716f"
+    },
+    {
+      "file": "B2_PAYROLL_CAPITAL_CONTRACT_TEMPLATE_2026-09-29.json",
+      "sha256": "cabfda00873356406d838306bfa87b912eccd9a6026449c0ebb26046acd8bd85"
+    },
+    {
+      "file": "B2_USED_RESIDUAL_SHARED_CYCLE_2026-09-29.json",
+      "sha256": "678bf40a4058577e8b7aca738781af7b61f5100f8eacc68257701dda387bd40e"
+    }
+  ]
+}

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Layers3, Pencil, Plus } from 'lucide-react'
@@ -11,6 +12,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { RelativeTime } from '@/components/relative-time'
 import { fetcher } from '@/lib/fetcher'
+import { costBasesHref, resolveCostBaseSelection } from '@/lib/cost-base-navigation'
+import { versionWizardHref } from '@/lib/cost-base-wizard-contract'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { CostBaseWizard, type CostBaseCreateBody, type CostBaseScope, type OperationalSegmentOption } from './cost-base-wizard'
 import type { CostBaseProfile } from './cost-base-profile'
@@ -162,12 +165,9 @@ function buildScopeCoverage(bases: CostBase[]): ScopeCoverage[] {
 
 export function CostBasesBoard({ initial, segments, canEdit }: { initial: CostBase[]; segments: OperationalSegmentOption[]; canEdit: boolean }) {
   const [bases, setBases] = useState(initial)
-  const [selectedBaseId, setSelectedBaseId] = useState(() => (
-    initial.find((base) => base.isDefault && base.status === 'ACTIVE')?.id ??
-    initial.find((base) => base.status === 'ACTIVE')?.id ??
-    initial[0]?.id ??
-    ''
-  ))
+  const searchParams = useSearchParams()
+  const { selectedBaseId, unavailable } = resolveCostBaseSelection(bases, searchParams.getAll('base'))
+  const selectBase = (id: string) => window.history.replaceState(null, '', costBasesHref(id))
   const [showCreate, setShowCreate] = useState(canEdit && initial.length === 0)
   const [createScope, setCreateScope] = useState<Scope>('CROSS_BORDER')
   const [versionAction, setVersionAction] = useState<{ kind: 'publish' | 'archive'; baseId: string; version: CostBaseVersion } | null>(null)
@@ -177,11 +177,11 @@ export function CostBasesBoard({ initial, segments, canEdit }: { initial: CostBa
   const [baseArchiveTarget, setBaseArchiveTarget] = useState<CostBase | null>(null)
   const coverage = buildScopeCoverage(bases)
   const readyScopeCount = coverage.filter((item) => item.status === 'READY').length
-  const selectedBase = bases.find((base) => base.id === selectedBaseId) ?? bases[0] ?? null
+  const selectedBase = bases.find((base) => base.id === selectedBaseId) ?? null
   const reviewScope = (scope: Scope) => {
     const firstBase = bases.find((base) => base.scope === scope && base.status !== 'ARCHIVED')
     if (!firstBase) return
-    setSelectedBaseId(firstBase.id)
+    selectBase(firstBase.id)
     requestAnimationFrame(() => document.getElementById('base-list')?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
   }
 
@@ -192,7 +192,7 @@ export function CostBasesBoard({ initial, segments, canEdit }: { initial: CostBa
       // A new base is still a draft. Its default preference becomes effective
       // only when a published version is activated, so keep the live default visible.
       setBases((items) => [base, ...items])
-      setSelectedBaseId(base.id)
+      selectBase(base.id)
       setShowCreate(false)
       toast.success(`Base ${base.code} creada`, { description: 'La versión 1 conserva el snapshot canónico y separa los parámetros no aplicables.' })
     },
@@ -292,6 +292,11 @@ export function CostBasesBoard({ initial, segments, canEdit }: { initial: CostBa
 
       <CoverageOverview coverage={coverage} onCreate={openCreate} onReview={reviewScope} canEdit={canEdit} />
 
+      {unavailable && <div role="alert" className="grid gap-3 rounded-lg border bg-card p-4 text-sm">
+        <p>La base solicitada no está disponible para esta cuenta. No se seleccionó otra base en su lugar.</p>
+        <Button variant="outline" className="min-h-11 w-fit" onClick={() => window.history.replaceState(null, '', costBasesHref())}>Ver bases disponibles</Button>
+      </div>}
+
       {showCreate && <CostBaseWizard key={createScope} initialScope={createScope} existingCodes={bases.map((base) => base.code)} segments={segments} pending={create.isPending} onSubmit={(body) => create.mutate(body)} />}
 
       {bases.length === 0 && !showCreate && (
@@ -304,7 +309,7 @@ export function CostBasesBoard({ initial, segments, canEdit }: { initial: CostBa
           segments={segments}
           base={selectedBase}
           selectedBaseId={selectedBase.id}
-          onSelect={setSelectedBaseId}
+          onSelect={selectBase}
           onNewVersion={(baseId) => newVersion.mutate(baseId)}
           onOpenImpact={openImpact}
           onVersionAction={(kind, baseId, version) => setVersionAction({ kind, baseId, version })}
@@ -598,7 +603,8 @@ function CostBaseWorkspace({
                   </div>
                   <div className="flex flex-wrap items-center justify-end gap-1">
                     <Button variant="ghost" size="xs" onClick={() => onOpenImpact(base, version)} disabled={pending.impact}>Impacto</Button>
-                    <Button variant="ghost" size="xs" render={<Link href={`/assumptions/${version.id}`} />}>{canEdit && version.status === 'DRAFT' ? 'Editar' : 'Ver'}</Button>
+                    <Button nativeButton={false} variant="ghost" size="xs" render={<Link href={`/assumptions/${version.id}`} />}>{canEdit && version.status === 'DRAFT' ? 'Editar' : 'Ver'}</Button>
+                    {base.operationalSegment === 'D2D_BINATIONAL_OWN' && version.applicabilityContext ? <Button nativeButton={false} variant="ghost" size="xs" render={<Link href={versionWizardHref(base.id, version.id)} />}>Armar supuestos</Button> : null}
                     {base.operationalSegment ? <Button variant="ghost" size="xs" onClick={() => onOpenCalibration(base.id, version.id)}>{canEdit && version.status === 'DRAFT' ? 'Calibrar' : 'Ver calibración'}</Button> : null}
                     {canEdit && version.status === 'DRAFT' && base.status !== 'ARCHIVED' ? (
                       <Button variant="ghost" size="xs" disabled={pending.transition} onClick={() => onVersionAction('publish', base.id, version)}>Publicar</Button>
@@ -630,8 +636,8 @@ function CostBaseWorkspace({
               <GovernanceLine label="Rutas vinculadas" value={String(base._count.lanes)} />
               <GovernanceLine label="Estado" value={BASE_STATUS_LABEL[base.status]} />
               <div className="mt-3 flex flex-wrap gap-2 border-t pt-3">
-                <Button variant="outline" size="sm" render={<Link href={`/catalog?base=${base.id}`} />}>Cobertura</Button>
-                {active ? <Button variant="outline" size="sm" render={<Link href={`/assumptions/${active.id}`} />}>Supuestos</Button> : null}
+                <Button nativeButton={false} variant="outline" size="sm" render={<Link href={`/catalog?base=${base.id}`} />}>Cobertura</Button>
+                {active ? <Button nativeButton={false} variant="outline" size="sm" render={<Link href={`/assumptions/${active.id}`} />}>Supuestos</Button> : null}
               </div>
               {(base.auditEvents?.length ?? 0) > 0 ? <BaseHistory events={base.auditEvents ?? []} /> : (
                 <p className="mt-3 border-t pt-3 text-muted-foreground">La bitácora inicia con el siguiente cambio gobernado.</p>

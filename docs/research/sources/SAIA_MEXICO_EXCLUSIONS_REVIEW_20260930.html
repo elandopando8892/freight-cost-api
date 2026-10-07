@@ -1,0 +1,1954 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"><HTML><HEAD>
+     <!-- FreeFind Begin No Index -->
+
+     <!-- Session-ID: "YVN2V156458431" -->
+
+     <!--       Node: "WC23" -->
+     <!--    Browser: "otherï¿½" -->
+     <!--      Agent: "Mozilla/5.0 (Windows NT 10.0; Microsoft Windows 10.0.26200; en-US) PowerShell/7.6.5" -->
+
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+<meta name=Keywords content="saia, saia motor freight, transportation, service, ship, track, tracing, trace, rates, pickup, proof, delivery, express, less than truckload, ltl, north america, standard ground, hauling, motor carrier, smf, bill lading, carrier, chemical, container, distribution, edi, expedited, export, special, hazmat, heavy load, import, international, supply chain, logistics, longhaul, ocean, pc resource, service center, small business, storage, warehousing, zip, claim, heavyload">
+<base href="https://www.SaiaSecure.com/">
+     <!-- FreeFind End No Index -->
+<title>Web Services: Bill of Lading <Create></title>
+     <!-- FreeFind Begin No Index -->
+<link href=/includes/saia.css rel=stylesheet>
+
+<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements --> 
+<!--[if lt IE 9]>
+<script src="/assets/js/html5.js"></script>
+<link href=/includes/ie8.css rel=stylesheet>
+<![endif]-->
+<script type="text/javascript" src="/assets/js/jquery.min.js"></script>
+<link href="/assets/css/colorbox.css" rel="stylesheet"/>
+<link href="/assets/css/lb.css" rel="stylesheet"/>
+<link href="/assets/css/selectric.css" rel="stylesheet"/>
+<link href="/assets/css/selectbox.css" rel="stylesheet"/>
+<link href="/assets/css/enhanced.css" type="text/css" rel="stylesheet" />
+<link href="/assets/css/print.css" media="print" rel="stylesheet"/>
+<link href="/assets/css/jquery-ui-1.9.2.custom.css" type="text/css" rel="stylesheet" />
+<link href=/includes/minimal.css rel=stylesheet>
+<link href=/includes/saia-jquery.css rel=stylesheet>
+
+<script type="text/javascript" src="/assets/js/jquery-ui-1.8.22.custom.min.js"></script>
+<script type="text/javascript" src="/assets/js/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="/assets/js/jquery.maskedinput-1.3.js"></script>
+<script type="text/javascript" src="/assets/js/jquery.colorbox.js"></script>
+
+<script type="text/javascript" src="/assets/js/jquery.selectric.js"></script>
+<script type="text/javascript" src="/assets/js/jquery.selectbox-0.5.js"></script>
+<script type="text/javascript" src="/assets/js/jQuery.fileinput.js"></script>
+<script type="text/javascript" src="/assets/js/SaiaVars.js"></script>
+<script type="text/javascript" src="/includes/saia.js"></script>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MWTC62K');</script>
+<!-- End Google Tag Manager -->
+
+
+<SCRIPT LANGUAGE="JavaScript"><!--
+function PrintScreen() {
+msgWindow = window.open('','newWin','scrollbars=yes,width=1,height=1,screenX=5000,screenY=1,top=1,left=5000');
+msgWindow.location.href = 'https://www.SaiaSecure.com/webservice/BOL/create.asp?ws=y?&Print=Y'
+self.opener = self;
+}
+//--></script>
+</HEAD>
+<body onload="" bgcolor=#ffffff link=#000000 vlink=#000000 alink=#0000ff  ><A NAME=TOP></A>
+
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MWTC62K"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+
+     <!-- FreeFind End No Index -->
+
+<form>
+<span id="hor-minimalist1">
+<h1>Web Services</h1>
+<br>
+<hr>
+
+<br>
+<h2>Setup Requirements</h2>
+
+
+<p>Saia Web Services require secure information. You must be registered for Saia Secure and the account must have
+a valid Contact Name, Local Phone Number. To register please by click the Login/Register Link on the top right of the Saia Home Page
+and complete required information. To update account information please login to SaiaSecure and click the
+Update Account Information link on the SaiaSecure home page.</p>
+
+
+
+<hr><br>
+<h2>General Programming Overview</h2>
+
+
+<p>All Request Documents have a required element called &lt;TestMode&gt;. TestMode must be set to Yes, this allows the exchange of generic information
+for testing applications without issuing live data. Once testing is complete switch to No to initiate live data.
+
+<br><Br>
+All Response Documents contain 4 error handling elements &lt;Code&gt;, &lt;Element&gt;, &lt;Fault&gt;,
+ and &lt;Message&gt;. Verification is required for each response. If the &lt;Code&gt; element contains a value
+then an error has occurred. Proceed to other elements for description information about the specific failure.
+
+<br><br>
+All Elements are case sensitive to ensure compatibility with existing programming languages. If casing is not
+correct the system will assume the element is missing and the action will fail during validation.
+
+<br><br>
+Adding the &lt;?xml version="1.0" encoding="utf-8"?&gt; prefix on the first line of the XML document is not mandatory
+within our Request Documents, however it is common practice. All Response XML Documents will contain this prefix.
+
+<br><br>
+When programming against Saia's XML Documents do not access the elements based on their position
+within the document. Access the element by name only. Saia reserves the right to 
+add new elements into this document at any location based on customer requests and
+requirements.</p>
+
+<br><br>
+<span style="background-color:yellow;">NEW</span> - Our new versioned URL endpoint now require a Header property to designate the version to run.
+<li>Property Name:  Api-Version</li>
+<li>Value:  (Version Abbreviation)</li>
+<li>Example: Api-Verion = V1</li></p>
+
+
+
+<hr><br>
+<h2>Web Service URL (Uniform Resource Locator)</h2>
+Below is a list of the URL links used to access Saia's Bill of Lading Web Service.
+
+<ul>
+	<li><p>SOAP</p><a href="http://www.saiasecure.com/webservice/BOL/soap.asmx">http://www.saiasecure.com/webservice/BOL/soap.asmx</a>
+	<br><br>
+	</li>
+	
+	<li><p>WSDL (Web Services Description Language)</p><a href="http://www.saiasecure.com/webservice/BOL/soap.asmx?wsdl">http://www.saiasecure.com/webservice/BOL/soap.asmx?wsdl</a>
+	<br><br>
+	</li>
+
+	<li><p>XML/HTTP/POST</p>http://www.saiasecure.com/webservice/BOL/xml.aspx
+	<br><br>
+	</li>
+
+	<li><p>XML/HTTP/GET</p>http://www.saiasecure.com/webservice/BOL/xml.aspx?ProcessXML=<i>XML Request Document</i>
+<br><br>
+</li>
+
+</ul>
+
+
+
+<br>
+<hr><br>
+<h2>Request Document - Bill of Lading &lt;Create&gt;</h2>
+
+<p>Below is a list of the elements and descriptions used to build a &lt;Create&gt; document/object to create a Bill of Lading.</p>
+
+<table border=0 cellpadding=6 cellspacing=1 width=100% >
+
+<tr>
+<th>Element / Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>MaxLength</th>
+<th>Description</th>
+</tr>
+
+<tr>
+<td class=Data valign=top><b>&lt;Create&gt</b></td>
+<td class=Data valign=top>Array</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top>Document Name</td>
+</tr>
+
+
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;UserID&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>20</td>
+<td class=Info valign=top>Saia Secure User ID</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Password&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>14</td>
+<td class=Info valign=top>Saia Secure Password</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;TestMode&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top>Testing Flag
+<pre>
+Y = Yes (Testing)
+<br>N = No  (Not Testing)
+</pre>
+<p>Note: This element is used to verify your request document is formatted correctly and contains valid data, once testing is complete switch to &lt;TestMode&gt;N&lt;/TestMode&gt;.</p>
+</td>
+</tr>
+
+
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;ShipmentDate&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>10</td>
+<td class=Info valign=top>Shipment Date
+<br><br>
+Format: YYYY-MM-DD, Local Date
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;BillingTerms&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>10</td>
+<td class=Info valign=top>Billing Terms
+<pre>
+Prepaid
+Collect
+</pre>
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;BLNumber&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>20</td>
+<td class=Info valign=top>Bill of Lading Number</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;ShipperNumber&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>20</td>
+<td class=Info valign=top>Shipper Reference Number
+<br/><br/>
+Note: Not applicable when VICS flag set to Yes
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;StoreNumber&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>20</td>
+<td class=Info valign=top>Store/Location Number</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;TrailerNumber&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>15</td>
+<td class=Info valign=top>Trailer Number</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;PONumber&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>20</td>
+<td class=Info valign=top>Purchase Order Number
+<br/><br/>
+Note: Not applicable when VICS flag set to Yes
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;DepartmentNumber&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>10</td>
+<td class=Info valign=top>Department Number
+<br/><br/>
+Note: Not applicable when VICS flag set to Yes
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;QuoteNumber&gt;</td>
+<td class=Data valign=top>Decimal</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>7, 0</td>
+<td class=Info valign=top>Quote Number
+<br/><br/>
+Note: This will add the Quote Number specified into the Special Instructions area.
+</td>
+</tr>
+
+
+
+
+
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Email&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>No Limit</td>
+<td class=Info valign=top>Send PDF Document to specified Email Addresses
+<br/><br/>
+Note: This option will accept a comma delimited list of email addresses and will automatically send 
+an attachment with a copy of the PDF document generated.
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;PrintRates&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top>Print Rates Flag
+<pre>
+Y = Yes
+N = No
+</pre>
+Note: Not applicable when VICS flag set to Yes
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Customs&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top>Customs Flag
+<pre>
+Y = Yes
+N = No
+</pre>
+Note: Specifying Yes on this flag indicates this shipment is an international shipment which would involve Customs.
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;GuaranteedDelivery&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>6</td>
+<td class=Info valign=top>Saia Guaranteed Delivery Options
+<pre>
+GSS12 = Delivery by 12pm (noon) - Saia Guaranteed 12
+GSS5  = Delivery by 5pm - Saia Guaranteed 5
+</pre>
+* Exemptions are as follows: Excessive length (over 16ft), sort and segregate requirements, appointment, poisonous shipments, residential deliveries, truckload moves, and collect (COD) shipments. 
+</td>
+</tr>
+
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;EmergencyPhone&gt;</td>
+<td class=Data valign=top>Decimal</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>10, 0</td>
+<td class=Info valign=top>Hazardous Emergency Phone Number
+<br/><br/>
+Note: If you do not specify a hazardous emergency contact number the system will default to 8004249300 for any hazardous shipments. This is the 24-hour CHEMTREC Emergency Phone Number.
+</td>
+
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;SpecialInstructions&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>No Limit</td>
+<td class=Info valign=top>Special Instructions
+</td>
+
+
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;VICS&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top>VICS Standard Bill of Lading Flag
+<pre>
+Y = Yes (use VICS format)
+N = No  (use SAIA format)
+</pre>
+</td>
+</tr>
+
+<tr>
+    <td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;FullValueCoverage&gt;</td>
+    <td class=Data valign=top>Decimal</td>
+    <td class=Data valign=top>No See note</td>
+    <td class=Data valign=top>9, 2</td>
+    <td class=Info valign=top>Full Value Coverage of shipment to be covered.
+        Note: Full Value Coverage is the entire covered amount being requested by you for carrier liability on the shipment. 
+ The amount that you request for Full Value Coverage replaces in its entirety all other carrier cargo liability limitations, including any 'per pound' limitations.
+ Unless special arrangements are made with Saia in advance of shipment, Full Value Coverage request cannot exceed $250,000.00 for new commodities, or 
+ $1000.00 per package for household Goods and Personal Effects, $50,000.00 on shipments originating in Mexico and is not available for certain prohibited 
+ commodities.  See Saia Rules Tariff Item 108 for all terms and conditions applicable to full value coverage.
+
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;WeightUnits&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>See Note</td>
+<td class=Data valign=top>3</td>
+<td class=Info valign=top>Weight Units of Measurement
+<br /><br />
+Note: The default of LBS is used if element is not specified.
+<pre>
+LBS = Pounds
+KGS = Kilograms
+</pre>
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;TotalCube&gt;</td>
+<td class=Data valign=top>Decimal</td>
+<td class=Data valign=top>See Note</td>
+<td class=Data valign=top>7, 2</td>
+<td class=Info valign=top>Total Cube
+<br /><br />
+Note: Total Cube is only required when calculating cube based rates. For example to our Offshore Markets such as
+Hawaii, Alaska, Mexico, Puerto Rico, etc... The Dimensions array below can also be specified 
+and the system will auto calculate the Total Cube element.
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;TotalCubeUnits&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>See Note</td>
+<td class=Data valign=top>4</td>
+<td class=Info valign=top>Total Cube Units of Measurement
+<br /><br />
+Note: The default of CUFT is used if element is not specified.
+<pre>
+CUFT = Cubic Feet
+CM   = Cubic Meters
+</pre>
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;DeclaredValue&gt;</td>
+<td class=Data valign=top>Decimal</td>
+<td class=Data valign=top>See Note</td>
+<td class=Data valign=top>9, 2</td>
+<td class=Info valign=top>Declared Value
+<br /><br />
+Note: Declared Value is only required when calculating cube based rates.
+</td>
+</tr>
+  <tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;ExcessiveLengthTotalInches&gt;</td>
+<td class=Data valign=top>string</td>
+<td class=Data valign=top>No. See Note</td>
+<td class=Data valign=top>3</td>
+<td class=Info valign=top>ExcessiveLengthTotalInches
+<br /><br />
+If using the accessorial ExcessiveLength, this is a required field. Excessive Length Total Inches is the length in inches.
+</td>
+</tr>
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;BorderLocation&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>See Note</td>
+<td class=Data valign=top>6</td>
+<td class=Info valign=top>U.S. Border Crossing Location Zipcode
+<br /><br />
+Note: This element is only useful for quotes with a Destination State outside the Continental United States. 
+The default U.S. Border Crossing Location Zipcode for the Destination State is used if element is not specified. 
+The purpose of this element is to set the zipcode which the freight will cross the U.S. border for 
+rating purposes. 
+<pre>
+98424 = Destination State: AK via Fife, Wa  (Default for AK)<br/>32201 = Destination State: DR via Jacksonville, Fl  (Default for DR)<br/>92833 = Destination State: GU via Orange, Ca  (Default for GU)<br/>92831 = Destination State: HI via Orange, Ca  (Default for HI)<br/>78040 = Destination State: MX via Laredo, Tx  (Default for MX)<br/>79905 = Destination State: MX via El Paso, Tx <br/>32201 = Destination State: PR via Jacksonville, Fl  (Default for PR)<br/>32201 = Destination State: VI via Jacksonville, Fl  (Default for VI)<br/>
+</pre>
+</td>
+</tr>
+
+
+
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;Shipper&gt;</b></td>
+<td class=Data valign=top>Array</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top>Details about the Shipper</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;AccountNumber&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>7</td>
+<td class=Info valign=top>Shipper Account Number
+<br/><br/>
+Note: The shipper location information is not required if you specify an Account Number as it will auto populate that 
+information from the account. If you specify both then the shipper location information will override the Account Number 
+specified if they are different and the Account Number will not be used. Only account numbers attached to your Saia 
+Secure UserID can be specified.
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;ContactName&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>30</td>
+<td class=Info valign=top>Shipper Contact Name / Company Name</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Address1&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>30</td>
+<td class=Info valign=top>Shipper Address 1</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Address2&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>30</td>
+<td class=Info valign=top>Shipper Address 2</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;City&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>20</td>
+<td class=Info valign=top>Shipper City</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;State&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>2</td>
+<td class=Info valign=top>Shipper State</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Zipcode&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>6</td>
+<td class=Info valign=top>Shipper Zipcode</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Zipcode4&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>4</td>
+<td class=Info valign=top>Shipper Zipcode 4</td>
+</tr>
+
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;/Shipper&gt;</b></td>
+<td class=Data valign=top>Array</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top></td>
+</tr>
+
+
+
+
+
+
+
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;Consignee&gt;</b></td>
+<td class=Data valign=top>Array</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top>Details about the Consignee</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;AccountNumber&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>7</td>
+<td class=Info valign=top>Consignee Account Number
+<br/><br/>
+Note: The consignee location information is not required if you specify an Account Number as it will auto populate that 
+information from the account. If you specify both then the consignee location information will override the Account Number 
+specified if they are different and the Account Number will not be used. Only account numbers attached to your Saia 
+Secure UserID can be specified.
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;ContactName&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>30</td>
+<td class=Info valign=top>Consignee Contact Name / Company Name</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Address1&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>30</td>
+<td class=Info valign=top>Consignee Address 1</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Address2&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>30</td>
+<td class=Info valign=top>Consignee Address 2</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;City&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>20</td>
+<td class=Info valign=top>Consignee City</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;State&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>2</td>
+<td class=Info valign=top>Consignee State
+<br><br>
+Note: Use a state of MX if the City and Zipcode are for Mexico.
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Zipcode&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>6</td>
+<td class=Info valign=top>Consignee Zipcode</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Zipcode4&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>4</td>
+<td class=Info valign=top>Consignee Zipcode 4</td>
+</tr>
+
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;/Consignee&gt;</b></td>
+<td class=Data valign=top>Array</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top></td>
+</tr>
+
+
+
+
+
+
+
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;BillTo&gt;</b></td>
+<td class=Data valign=top>Array</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top>Details about the Bill-To. This section is only required if Billing information is different from the Shipper/Consignee information.</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;AccountNumber&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>7</td>
+<td class=Info valign=top>Bill-To Account Number
+<br/><br/>
+Note: The bill-to location information is not required if you specify an Account Number as it will auto populate that 
+information from the account. If you specify both then the bill-to location information will override the Account Number 
+specified if they are different and the Account Number will not be used. Only account numbers attached to your Saia 
+Secure UserID can be specified.
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;ContactName&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>30</td>
+<td class=Info valign=top>Bill-To Contact Name / Company Name</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Address1&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>30</td>
+<td class=Info valign=top>Bill-To Address 1</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Address2&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>30</td>
+<td class=Info valign=top>Bill-To Address 2</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;City&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>20</td>
+<td class=Info valign=top>Bill-To City</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;State&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>2</td>
+<td class=Info valign=top>Bill-To State</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Zipcode&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>6</td>
+<td class=Info valign=top>Bill-To Zipcode</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Zipcode4&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>4</td>
+<td class=Info valign=top>Bill-To Zipcode 4</td>
+</tr>
+
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;/BillTo&gt;</b></td>
+<td class=Data valign=top>Array</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top></td>
+</tr>
+
+
+
+
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;Broker&gt;</b></td>
+<td class=Data valign=top>Array</td>
+<td class=Data valign=top>See Note</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top>Details about the US/MX Custom House Broker.
+<br /><br />
+Note: This information is only required for Mexico shipments. If you do not have this information please contact <a href="/cdn-cgi/l/email-protection#3547544150467546545c541b565a580a4640575f5056410860661a786d15764046415a58157d5a4046501577475a5e5047"><span class="__cf_email__" data-cfemail="fb899a8f9e88bb889a929ad5989496">[email&#160;protected]</span></a> for assistance.</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;CompanyName&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>24</td>
+<td class=Info valign=top>Broker Company Name</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Address1&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>24</td>
+<td class=Info valign=top>Broker Address 1</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Address2&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>24</td>
+<td class=Info valign=top>Broker Address 2</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Phone&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>24</td>
+<td class=Info valign=top>Broker Phone Number</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;ContactName&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>24</td>
+<td class=Info valign=top>Broker Contact Name</td>
+</tr>
+
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;/Broker&gt;</b></td>
+<td class=Data valign=top>Array</td>
+<td class=Data valign=top>See Note</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top></td>
+</tr>
+
+
+
+
+
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;COD&gt;</b></td>
+<td class=Data valign=top>Array</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top>Details about COD information if needed.</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;CompanyCheck&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top>C.O.D. Company Check Acceptable Flag
+<pre>
+Y = Yes
+N = No
+</pre>
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;BillingTerms&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>10</td>
+<td class=Info valign=top>C.O.D. Fee Billing Terms
+<pre>
+Prepaid
+Collect
+</pre>
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Amount&gt;</td>
+<td class=Data valign=top>Decimal</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>7, 2</td>
+<td class=Info valign=top>C.O.D. Amount</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;/COD&gt;</b></td>
+<td class=Data valign=top>Array</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top></td>
+</tr>
+
+
+
+
+
+
+
+
+
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;Details&gt;</b></td>
+<td class=Data valign=top>Array</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top>Collection of Commodities</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;DetailItem&gt;</b></td>
+<td class=Data valign=top>Array</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>No Limit</td>
+<td class=Info valign=top>Details describing each Commodity. You must specify at least one.</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;PONumber&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>20</td>
+<td class=Info valign=top>Purchase Order Number (Package)
+<br/><br/>
+Note: Not applicable when VICS flag set to No
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Class&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>6</td>
+<td class=Info valign=top>NMFC Class Code
+<br><br>
+Please contact your Traffic Department concerning NMFC class codes.
+<pre>
+50
+55
+60
+65
+70
+77.5
+85
+92.5
+100
+110
+125
+150
+175
+200
+250
+300
+400
+500
+</pre>
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Package&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>2</td>
+<td class=Info valign=top>Package Type
+<br><br>
+
+<pre>
+BD = Bundles <br>BG = Bags <br>BK = Buckets <br>BL = Bales <br>BR = Barrels <br>BS = Baskets <br>BX = Boxes <br>CN = Cans <br>CO = Coils <br>CR = Crates <br>CS = Cases <br>CT = Cartons <br>CY = Cylinders <br>DR = Drums <br>EA = Each <br>EN = Envelopes <br>JT = Joints <br>KT = Kits <br>LS = Loose <br>PC = Pieces <br>PK = Packages <br>PL = Pails <br>PT = Pallets <br>RE = Reels <br>RL = Rolls <br>SK = Skids <br>SP = Spools <br>SW = Shrink Wrapped Pallet <br>TB = Tote Bins <br>TK = Tanks <br>TU = Tubes <br>UT = Units 
+</pre>
+
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Pieces&gt;</td>
+<td class=Data valign=top>Decimal</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>5, 0</td>
+<td class=Info valign=top>Pieces</td>
+</tr>
+
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Weight&gt;</td>
+<td class=Data valign=top>Decimal</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>7, 0</td>
+<td class=Info valign=top>Weight
+<br /><br />
+Note: The units of measurement are based on the value specified in the WeightUnits element.
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;FoodItem&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top>Food Item Flag
+<pre>
+Y = Yes
+N = No
+</pre>
+Note: This flag cannot be set to Yes on a Hazardous shipment.
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Hazardous&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top>Hazardous
+<pre>
+Y = Yes
+N = No
+</pre>
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;UNHazmatID&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>6</td>
+<td class=Info valign=top>UN Hazmat ID
+<br/><br/>
+Note: This is required if Hazardous is set to Yes. This ID typically starts with the letters UN or NA then followed by 4 numbers.
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;UNPackageGroup&gt;&nbsp;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>4</td>
+<td class=Info valign=top>UN Package Group
+<br/><br/>
+Note: This is required if Hazardous is set to Yes unless the UN Hazmat ID specified has no UN Package Group assigned. This is typically set to I, II, III, or an empty value depending on the commodity being shipped.
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;UNBulk&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top>UN Bulk
+<pre>
+Y = Yes
+N = No
+</pre>
+Note: This is required if Hazardous is set to Yes.
+</td>
+</tr>
+
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Description&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>No Limit</td>
+<td class=Info valign=top>Commodity Item Description
+<br/><br/>
+Note: If Hazardous is set to Yes this field will be auto populated with the first description attached to the supplied UN Hazmat ID and UN Package Group. If you specify a new description in this element it will override the auto populated hazmat description entirely.
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;/DetailItem&gt;</b></td>
+<td class=Data valign=top>Array</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>No Limit</td>
+<td class=Info valign=top>&nbsp;</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;/Details&gt;</b></td>
+<td class=Data valign=top>Array</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top>&nbsp;</td>
+</tr>
+
+
+
+
+
+
+
+
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;Accessorials&gt;</b></td>
+<td class=Data valign=top>Array</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top>Collection of Accessorial Items
+<br/><br/>
+Note: Not applicable when VICS flag set to Yes
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;AccessorialItem&gt;</b></td>
+<td class=Data valign=top>Array</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>No Limit</td>
+<td class=Info valign=top>Accessorial Item describing the specific accessorial to be added to the shipment.
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Code&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>50</td>
+<td class=Info valign=top>Accessorial Code
+<br><br>
+Note: This list does not contain all Saia Standard Charges only the most frequently used. 
+For all charges please refer to the current Saia 170 Rules & Special Charges. Please click
+the link for each code to view specific accessorial details. 
+<pre>
+<a href="https://www.saiasecure.com/rules/n_view.asp?item=885">SingleShipment</a>
+<a href="https://www.saiasecure.com/rules/n_view.asp?item=647-1">ArrivalNotice/Appointment</a>
+<a href="https://www.saiasecure.com/rules/n_view.asp?item=580">Marking/Tagging</a>
+<a href="https://www.saiasecure.com/rules/n_view.asp?item=1000">LimitedAccessLocationPU</a>
+<a href="https://www.saiasecure.com/rules/n_view.asp?item=1000">LimitedAccessLocation</a>
+<a href="https://www.saiasecure.com/rules/n_view.asp?item=575">LiftgateServicePU</a>
+<a href="https://www.saiasecure.com/rules/n_view.asp?item=575">LiftgateService</a>
+<a href="https://www.saiasecure.com/rules/n_view.asp?item=480">InBond</a>
+<a href="https://www.saiasecure.com/rules/n_view.asp?item=566">InsidePickup</a>
+<a href="https://www.saiasecure.com/rules/n_view.asp?item=566">InsideDelivery</a>
+<a href="https://www.saiasecure.com/rules/n_view.asp?item=670-25">ExcessiveLength</a>
+<a href="https://www.saiasecure.com/rules/n_view.asp?item=568">Hazardous</a>
+<a href="https://www.saiasecure.com/rules/n_view.asp?item=753">ResidentialPickup</a>
+<a href="https://www.saiasecure.com/rules/n_view.asp?item=753">ResidentialDelivery</a>
+<a href="/webservice/bol/SAIA-FinalMile_0120.pdf">RoomOfChoice</a>
+<a href="/webservice/bol/SAIA-FinalMile_0120.pdf">WhiteGlove</a>
+<a href="https://www.saiasecure.com/rules/n_view.asp?item=886">Sorting/Segregating</a>
+<a href="https://www.saiasecure.com/rules/n_view.asp?item=1032">BorderCrossing</a>
+<a href="https://www.saiasecure.com/rules/n_view.asp?item=1035">TradeShowPickup</a>
+<a href="https://www.saiasecure.com/rules/n_view.asp?item=1035">TradeShowDelivery</a>
+<a href="https://www.saiasecure.com/rules/n_view.asp?item=1018">GroceryWarehouse</a>
+</pre>
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;/AccessorialItem&gt;</b></td>
+<td class=Data valign=top>Array</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>No Limit</td>
+<td class=Info valign=top>&nbsp;</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;/Accessorials&gt;</b></td>
+<td class=Data valign=top>Array</td>
+<td class=Data valign=top>No</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top>&nbsp;</td>
+</tr>
+
+
+
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;Dimensions&gt;</b></td>
+<td class=Data valign=top>Array</td>
+<td class=Data valign=top>See Note</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top>Collection of Dimension Items
+<br /><br />
+Note: Dimensions are only required when calculating cube based rates. However if the TotalCube element is specified the individual
+dimensions are not required. If the individual dimensions are specified the TotalCube element will be auto calculated.
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;DimensionItem&gt;</b></td>
+<td class=Data valign=top>Array</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>10</td>
+<td class=Info valign=top>Dimension Item describing the specific rate quote cube information.
+<br><br>
+Note: Saia's rate quote system currently only supports 10 dimension items max.
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Length&gt;</td>
+<td class=Data valign=top>Decimal</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>7, 2</td>
+<td class=Info valign=top>Length
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Width&gt;</td>
+<td class=Data valign=top>Decimal</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>7, 2</td>
+<td class=Info valign=top>Width
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Height&gt;</td>
+<td class=Data valign=top>Decimal</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>7, 2</td>
+<td class=Info valign=top>Height
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Type&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>See Note</td>
+<td class=Data valign=top>2</td>
+<td class=Info valign=top>Type of Measurement
+<br /><br />
+Note: The default of IN is used if element is not specified.
+<pre>
+IN = Inches
+FT = Feet
+M  = Meters
+CM = Centimeters
+</pre>
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Units&gt;</td>
+<td class=Data valign=top>Decimal</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>2, 0</td>
+<td class=Info valign=top># of Units
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;/DimensionItem&gt;</b></td>
+<td class=Data valign=top>Array</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>10</td>
+<td class=Info valign=top>&nbsp;</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;/Dimensions&gt;</b></td>
+<td class=Data valign=top>Array</td>
+<td class=Data valign=top>See Note</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top>&nbsp;</td>
+</tr>
+
+
+
+
+<tr>
+<td class=Data valign=top><b>&lt;/Create&gt</b></td>
+<td class=Data valign=top>Array</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top>&nbsp;</td>
+</tr>
+
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br><Br>
+<hr><br>
+<h2>Response Document - Bill of Lading &lt;Response&gt;</h2>
+
+
+<p>Below is a list of the elements and descriptions used to read a &lt;Response&gt; document/object returned by
+our system to verify your request document/object has been processed successfully and retrieve 
+an auto generated freight bill pro number.
+<p style="font-size: 10pt; padding: 20px;">
+<strong>Notes applicable to specific states:</strong> <table cellpadding='5'><tr><td style='font-size: 10pt; font-family: beval, helvetica, arial, sans-serif; color: #666; font-weight: bold; vertical-align: top; text-align: left; padding: 6px 5;'>AK</td><td style='font-size: 10pt; font-family: beval, helvetica, arial, sans-serif; color: #666; vertical-align: top; padding: 6px 5;'>Rates are based on the options you entered. Total charges are estimated   based on information provided and may NOT include all applicable          accessorial charges from the Saia 170 D Rules Tariff. Guaranteed or       Expedited options are not available on non-direct shipments. Cargo        liability may be subject to limitations as outlined in the Saia 170 D     Rules Tariff. Please review Item 108 of the Saia 170 D Rules tariff       for more information.                                                     </td></tr><tr><td style='font-size: 10pt; font-family: beval, helvetica, arial, sans-serif; color: #66; font-weight: bold; vertical-align: top; text-align: left; padding: 6px 5;'>DR</td><td style='font-size: 10pt; font-family: beval, helvetica, arial, sans-serif; color: #666; vertical-align: top; padding: 6px 5;'>Rates are based on the options you entered. Total charges are estimated   based on information provided and may NOT include all applicable          accessorial charges from the Saia 170 D Rules Tariff. Guaranteed or       Expedited options are not available on non-direct shipments. Cargo        liability may be subject to limitations as outlined in the Saia 170 D     Rules Tariff. Please review Item 108 of the Saia 170 D Rules tariff       for more information.                                                     </td></tr><tr><td style='font-size: 10pt; font-family: beval, helvetica, arial, sans-serif; color: #66; font-weight: bold; vertical-align: top; text-align: left; padding: 6px 5;'>GU</td><td style='font-size: 10pt; font-family: beval, helvetica, arial, sans-serif; color: #666; vertical-align: top; padding: 6px 5;'>Rates are based on the options you entered. Total charges are estimated   based on information provided and may NOT include all applicable          accessorial charges from the Saia 170 D Rules Tariff. Guaranteed or       Expedited options are not available on non-direct shipments. Cargo        liability may be subject to limitations as outlined in the Saia 170 D     Rules Tariff. Please review Item 108 of the Saia 170 D Rules tariff       for more information.                                                     </td></tr><tr><td style='font-size: 10pt; font-family: beval, helvetica, arial, sans-serif; color: #66; font-weight: bold; vertical-align: top; text-align: left; padding: 6px 5;'>HI</td><td style='font-size: 10pt; font-family: beval, helvetica, arial, sans-serif; color: #666; vertical-align: top; padding: 6px 5;'>Rates are based on the options you entered. Total charges are estimated   based on information provided and may NOT include all applicable          accessorial charges from the Saia 170 D Rules Tariff. Guaranteed or       Expedited options are not available on non-direct shipments. Cargo        liability may be subject to limitations as outlined in the Saia 170 D     Rules Tariff. Please review Item 108 of the Saia 170 D Rules tariff       for more information.                                                     </td></tr><tr><td style='font-size: 10pt; font-family: beval, helvetica, arial, sans-serif; color: #66; font-weight: bold; vertical-align: top; text-align: left; padding: 6px 5;'>MX</td><td style='font-size: 10pt; font-family: beval, helvetica, arial, sans-serif; color: #666; vertical-align: top; padding: 6px 5;'>Unless otherwise mentioned, the Rate is based on pallets/units being      stackable. If pallets/units are not stackable per bill of lading          instructions, a W&R will be issued and the height will be based at        90" which will change the density/class and rate. The Mexico rates do     not include any border crossing drayage services between the Laredo,      TX and Nuevo Laredo, Tamaulipas gateway, nor do they include any          US/Mexico Customs Brokerage Services. All Taxes, Duties or Service        fees by US or Mexican Customs will be settled between Importer /          Exporter and their Customs Brokerage Company. The rates do not include    any accessorial fees such as loading, unloading, waiting times,           appointments, storage, etc. Rates in Mexico do not include Cargo          Liability Insurance. Cargo Liability Insurance is available while         freight is in Mexico for an additional cost of 1.0% of total commodity    value. If this option is required, it must be clearly stated on Original  Bill of Lading in 1" Black Letters. The cost may vary depending on        commodity and value. This service must be requested PRIOR to the          shipment moving in transit within Mexico. If the shipment is Hazardous    Material and not disclosed at time of rate request, the rate will not     be applicable.                                                            </td></tr><tr><td style='font-size: 10pt; font-family: beval, helvetica, arial, sans-serif; color: #66; font-weight: bold; vertical-align: top; text-align: left; padding: 6px 5;'>PR</td><td style='font-size: 10pt; font-family: beval, helvetica, arial, sans-serif; color: #666; vertical-align: top; padding: 6px 5;'>Rates are based on the options you entered. Total charges are estimated   based on information provided and may NOT include all applicable          accessorial charges from the Saia 170 D Rules Tariff. Guaranteed or       Expedited options are not available on non-direct shipments. Cargo        liability may be subject to limitations as outlined in the Saia 170 D     Rules Tariff. Please review Item 108 of the Saia 170 D Rules tariff       for more information.                                                     </td></tr><tr><td style='font-size: 10pt; font-family: beval, helvetica, arial, sans-serif; color: #66; font-weight: bold; vertical-align: top; text-align: left; padding: 6px 5;'>VI</td><td style='font-size: 10pt; font-family: beval, helvetica, arial, sans-serif; color: #666; vertical-align: top; padding: 6px 5;'>Rates are based on the options you entered. Total charges are estimated   based on information provided and may NOT include all applicable          accessorial charges from the Saia 170 D Rules Tariff. Guaranteed or       Expedited options are not available on non-direct shipments. Cargo        liability may be subject to limitations as outlined in the Saia 170 D     Rules Tariff. Please review Item 108 of the Saia 170 D Rules tariff       for more information.                                                     </td></tr></table>
+</p>
+</p>
+<table border=0 cellpadding=6 cellspacing=1 width=100% >
+
+<tr>
+<th>Element / Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>MaxLength</th>
+<th>Description</th>
+</tr>
+
+<tr>
+<td class=Data valign=top><b>&lt;Response&gt</b></td>
+<td class=Data valign=top>Array</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top>Document Name</td>
+</tr>
+
+
+
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Code&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>3</td>
+<td class=Info valign=top>See the <b>Error Code Documentation</b> at the end of this document</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Element&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>No Limit</td>
+<td class=Info valign=top>Name of the Element associated with an Error Code when available</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Fault&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top>Fault of the Error Code
+<pre>
+S = Server (Web Support must Correct)
+<br>C = Client (Customer must Correct)
+</pre>
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Message&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>No Limit</td>
+<td class=Info valign=top>Description of the Error Code returned</td>
+</tr>
+
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;TestMode&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top>Testing Flag
+<pre>
+Y = Yes (Testing)
+<br>N = No  (Not Testing)
+</pre>
+</td>
+</tr>
+
+
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;ProNumber&gt;</td>
+<td class=Data valign=top>Decimal</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>11, 0</td>
+<td class=Info valign=top>Pro Number</td>
+</tr>
+
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;CheckDigit&gt;</td>
+<td class=Data valign=top>Decimal</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>1, 0</td>
+<td class=Info valign=top>Check Digit</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;PDF&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>255</td>
+<td class=Info valign=top>Bill of Lading URL in PDF format
+<br/><br/>
+(Example) http://www.saiasecure.com/temp/bol77012345678/SAIA-BOL-77012345678.pdf
+<br/><br/>
+Note: The generated Bill of Lading PDF document retention period is 24 hours. 
+Please copy the document to your system if you require it to be available for a longer period of time.
+Due to web server load balancing only access the URL attached via the same client system that generated
+the web service request. Do not release the URL directly to end users as they may receive 404 Not Found 
+errors depending on which web cluster node they are routed through. The best practice would be to
+download the PDF document immediately after the response is received in the same backend process.
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;HTML&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>255</td>
+<td class=Info valign=top>Bill of Lading URL in HTML format
+<br/><br/>
+(Example) http://www.saiasecure.com/temp/bol77012345678/SAIA-BOL-77012345678.html
+<br/><br/>
+Note: The generated Bill of Lading HTML document retention period is 24 hours. 
+Please copy the document to your system if you require it to be available for a longer period of time.
+Due to web server load balancing only access the URL attached via the same client system that generated
+the web service request. Do not release the URL directly to end users as they may receive 404 Not Found 
+errors depending on which web cluster node they are routed through. The best practice would be to
+download the HTML document immediately after the response is received in the same backend process.
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Barcode&gt;</td>
+<td class=Data valign=top>String</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>255</td>
+<td class=Info valign=top>Barcode in GIF format
+<br/><br/>
+(Example) http://www.saiasecure.com/temp/bol77012345678/SAIA-BOL-77012345678.gif
+<br/><br/>
+Note: The generated Barcode image retention period is 24 hours. 
+Please copy the image to your system if you require it to be available for a longer period of time.
+Due to web server load balancing only access the URL attached via the same client system that generated
+the web service request. Do not release the URL directly to end users as they may receive 404 Not Found 
+errors depending on which web cluster node they are routed through. The best practice would be to
+download the Barcode image, if needed, immediately after the response is received in the same backend process.
+<br/><br/>
+The Barcode image generated does not include the Pro Number or Check Digit displayed as numbers. If you display
+the Saia pro number as well please display the Check Digit at the end as it is included in the barcode itself. Please
+see the PDF barcode generated as a visual reference guide.
+</td>
+</tr>
+
+
+<tr>
+<td class=Data valign=top><b>&lt;/Response&gt</b></td>
+<td class=Data valign=top>Array</td>
+<td class=Data valign=top>Yes</td>
+<td class=Data valign=top>1</td>
+<td class=Info valign=top>&nbsp;</td>
+</tr>
+
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br><Br>
+<hr><br>
+<h2>Secure Sockets Layer (HTTPS/SSL) <i>optional</i></h2>
+
+
+<p>To add additional internet security use the "HTTPS://" prefix instead of "HTTP://". This will encrypt and
+decrypt each request between systems using standard SSL Certificates.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br><Br>
+
+<hr><br>
+<h2>Sample Application Code</h2>
+
+
+<p>Below are a few samples of programming with a general overview of each interface.</p>
+
+
+<br><br>
+<table border=0 cellpadding=6 cellspacing=1 width=100% >
+
+<tr>
+<td valign=top WIDTH=50%>
+Visual Basic (ASP.NET)
+</td>
+<td valign=top WIDTH=20%><a   href="/WebService/BOL/vb_http.asp">XML/HTTP/POST</a></TD>
+<TD valign=top WIDTH=10%><a   href="/WebService/BOL/vb_soap.asp">SOAP</a></TD>
+<TD valign=top WIDTH=20%><a   href="/WebService/BOL/vb_soapxml.asp">XML/SOAP</a></TD>
+</tr>
+
+<tr>
+<td valign=top>
+C# (ASP.NET)<br>
+</td>
+<td><a   href="/WebService/BOL/cs_http.asp">XML/HTTP/POST</a></TD>
+<TD><a   href="/WebService/BOL/cs_soap.asp">SOAP</a></TD>
+<TD><a   href="/WebService/BOL/cs_soapxml.asp">XML/SOAP</a></TD>
+</tr>
+
+<tr>
+<td valign=top>
+Active Server Pages (ASP & VBScript)<br>
+</td>
+<td><a   href="/WebService/BOL/asp_http.asp">XML/HTTP/POST</a></TD>
+<TD>&nbsp;</TD>
+<TD>&nbsp;</TD>
+</tr>
+
+</table>
+
+
+
+
+
+
+
+
+<br>
+<hr><br>
+<h2>Error Code Documentation</h2>
+
+
+
+
+<p>Below is a general overview of Saia Error &lt;Code&gt;'s with descriptions to verify successful completion of requests. </p>
+
+
+<br><Br>
+
+<table border=0 cellpadding=6 cellspacing=1 width=100% >
+
+<tr>
+<th>ï¿½ï¿½&lt;Code&gt;ï¿½ï¿½</td>
+<th>Description</td>
+</tr>
+
+
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>IXD</b></font></td>
+<td class=Info valign=top>Invalid XML Document
+<br><br>
+The XML Document received was not formatted properly. The &lt;Message&gt; returned will contain additional information
+about the specific issue encountered. Please check that all required elements and casing are formated exactly
+as defined in the document specifications above. Also verify that proper start and ending element tags are correct.
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>IMC</b></font></td>
+<td class=Info valign=top>Invalid Method Called
+<br><br>
+The XML Request Document received contains a root element method name which is not valid. Please verify the
+name of the method and proper casing.
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>IED</b></font></td>
+<td class=Info valign=top>Invalid Element Data
+<br><Br>
+The element received contains invalid data. This error is returned when an element is required to contain
+a specific set of information. Such as Yes or No, or Prepaid or Collect.
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>IEL</b></font></td>
+<td class=Info valign=top>Invalid Element Data Length
+<br><Br>
+The element received contains data that does not meet the required length specifications. 
+If an element is
+defined as a String with max-length of "10", you cannot exceed 10 characters. 
+If an element is defined as
+a Decimal with a max-length of "4, 2", you cannot exceed 4 total digits with 2 of them being after the decimal point.
+If an element is defined as an Array with max-length of "5", you cannot pass more than 5 elements within the array.
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>IEF</b></font></td>
+<td class=Info valign=top>Invalid Element Data Format
+<br><br>
+The element received contains data that does not meet the required format. For example, all dates are in YYYY-MM-DD
+which translates to a 4 digit year, a 2 digit month, and a 2 digit day delimited with "-". All times are in HH:MM:SS format which 
+translates to a 2 digit hour, a 2 digit minute, and a 2 digit second in 24-hour format delimited with ":". 
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>IER</b></font></td>
+<td class=Info valign=top>Invalid Element Data Range
+<br><br>
+The element received contains data that does not meet the required range. (Range 1 to 10 = 1 lowest and 10 highest)
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>DNF</b></font></td>
+<td class=Info valign=top>Data Not Found
+<br><Br>
+The element received contains data which was not found in our system.
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>MRE</b></font></td>
+<td class=Info valign=top>Missing Required Element
+<br><br>
+The XML Document received is missing a required element.
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>USE</b></font></td>
+<td class=Info valign=top>Unexpected Server Exception
+<br><br>
+Saia's system has encountered an unexpected error while processing your request. Web Support has been 
+notified with the details of this issue and will have it corrected as soon as possible.<br><br>
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>U01</b></font></td>
+<td class=Info valign=top>UserID and Password Incorrect
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>U02</b></font></td>
+<td class=Info valign=top>UserID is Disabled
+<br><br>
+The specified UserID is currently listed as disabled. For more information please contact <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="8dfae8effef8fdfde2fff9cdfeece4eca3eee2e0">[email&#160;protected]</a>
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>U03</b></font></td>
+<td class=Info valign=top>UserID is Currently Being Setup
+<br><br>
+The specified UserID is currently being setup. This process generally takes up to 2 business days to complete.
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>U04</b></font></td>
+<td class=Info valign=top>Access Denied for Account Number Specified
+<br><br>
+The UserID supplied does not have access to the account number specified. Please contact your local Saia Sales Representative
+for more information.
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>U05</b></font></td>
+<td class=Info valign=top>UserID is Missing Information
+<br><Br>
+UserID is missing valid Contact Name, Local Phone Number, or E-mail Address. 
+To update contact information please login to Saia Secure and click the Update Account Information
+displayed at the bottom of all webpages.
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>U06</b></font></td>
+<td class=Info valign=top>Account Number Specified is Listed as Inactive
+<br><Br>
+The account number specified is currently listed as inactive, please contact your local Saia Sales Representative.
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>U07</b></font></td>
+<td class=Info valign=top>Account Number Specified Cannot be Used for this Function
+<br><br>
+Please contact <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="285f4d4a5b5d5858475a5c685b494149064b4745">[email&#160;protected]</a> for more information.
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>U08</b></font></td>
+<td class=Info valign=top>Web Service Disabled
+<br><br>
+Web Service requests have been disabled for the specified UserID. Please contact
+<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5c2b393e2f292c2c332e281c2f3d353d723f3331">[email&#160;protected]</a> for more information.
+</td>
+</tr>
+
+
+
+<tr>
+<th align=middle colspan=2><br>The following codes are application specific, descriptions will be different for each application.<br><bR></td>
+</td>
+</tr>
+
+
+
+
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>S03</b></font></td>
+<td class=Info valign=top>Shipper City, State, and Zipcode are invalid or do not match
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>S04</b></font></td>
+<td class=Info valign=top>Consignee City, State, and Zipcode are invalid or do not match
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>S05</b></font></td>
+<td class=Info valign=top>Shipment Date cannot be a past date
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>S06</b></font></td>
+<td class=Info valign=top>Shipper zipcode is a location within a restricted area. Please contact our Restricted Delivery Service Desk at 800-765-7242 extension 4145
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>S07</b></font></td>
+<td class=Info valign=top>Shipper zipcode is within an embargoed area and is currently not servicable
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>S09</b></font></td>
+<td class=Info valign=top>Consignee zipcode is a location within a restricted area. Please contact our Restricted Delivery Service Desk at 800-765-7242 extension 4145
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>S10</b></font></td>
+<td class=Info valign=top>Consignee zipcode is within an embargoed area and is currently not servicable
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>S11</b></font></td>
+<td class=Info valign=top>Due to high volume, the Saia origin terminal is not accepting pick-up requests at this time.  For more information please contact your local sales representative
+</td>
+</tr>
+
+<!--
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>S12</b></font></td>
+<td class=Info valign=top>Mexico shipments cannot be auto-generated with Print Rates set to Yes
+</td>
+</tr>
+-->
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>S13</b></font></td>
+<td class=Info valign=top>We can not generate rates to the specified Shipper City, State and Zipcode. Please contact our Rate Department at 800-950-7242 extension 2350
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>S14</b></font></td>
+<td class=Info valign=top>We can not generate rates to the specified Consignee City, State and Zipcode. Please contact our Rate Department at 800-950-7242 extension 2350
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>S15</b></font></td>
+<td class=Info valign=top>Shipment Date cannot be more than 30 days in the future
+</td>
+</tr>
+
+<!--
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>S16</b></font></td>
+<td class=Info valign=top>This point is not in our direct coverage for Mexico. Please contact rates@saia.com
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>S17</b></font></td>
+<td class=Info valign=top>Unable to auto generate from Mexico to Mexico. Please contact rates@saia.com
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>S18</b></font></td>
+<td class=Info valign=top>Unable to auto generate (specific accessorial) for Mexico. Please contact rates@saia.com
+</td>
+</tr>
+-->
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>S19</b></font></td>
+<td class=Info valign=top>Unable to auto generate with a COD Amount for Mexico Please contact <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b3c1d2c7d6c0f3c0d2dad29dd0dcde">[email&#160;protected]</a>
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>S20</b></font></td>
+<td class=Info valign=top>Unable to auto generate a Bill of Lading from Mexico to the location specified. Please contact <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b7c5d6c3d2c4f7c4d6ded699d4d8da">[email&#160;protected]</a>
+</td>
+</tr>
+
+
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>B01</b></font></td>
+<td class=Info valign=top>COD Amount limit is $15,000.00
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>B03</b></font></td>
+<td class=Info valign=top>Due to confidential agreement, disclosure of third party information is denied per customer request 
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>B04</b></font></td>
+<td class=Info valign=top>Rated Weight exceeds 20,000 lbs and bill of lading cannot be auto-generated with Print Rates set to Yes
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>B05</b></font></td>
+<td class=Info valign=top>Unable to auto-generate rates for the specified Account
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>B06</b></font></td>
+<td class=Info valign=top>Only Shipping Accounts can be selected for a Shipper or Consignee location, Bill To Accounts are not allowed
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>B07</b></font></td>
+<td class=Info valign=top>Shipment not GSS compliant: &lt;Reason&gt;
+<br><br>
+Note: Please refer to the current Saia 170 Rules & Special Charges for full details. <a href="http://www.saia.com/ResourcesContent.aspx?c=ruledetail&item=1020">GuaranteedDelivery</a>
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>B08</b></font></td>
+<td class=Info valign=top>Shipper, Consignee, or Bill-To Account Number is required
+<br/><br/>
+Note: If you specify both an Account Number and the Address information for a location. The system
+will attempt to verify the Address specified matches the Account Number Address information exactly. 
+If they do not match then the Account Number will be reset to an empty value which can also cause 
+this error to be generated. 
+</td>
+</tr>
+    
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>F01</b></font></td>
+<td class=Info valign=top>Full Value Coverage too high
+<br/><br/>
+ Value of invoice is greater than $250,000. If greater than $250,000, contact customer service.
+</td>
+</tr>
+    
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>H01</b></font></td>
+<td class=Info valign=top>The Food Item flag cannot be set to Yes on a Hazardous shipment
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>H02</b></font></td>
+<td class=Info valign=top>Saia does not transport &lt;UNHazmatID&gt; hazardous items
+</td>
+</tr>
+
+
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>V01</b></font></td>
+<td class=Info valign=top>Not applicable when VICS flag set to No
+</td>
+</tr>
+
+<tr>
+<td class=Data valign=top align=middle><font face=Verdana><b>V02</b></font></td>
+<td class=Info valign=top>Not applicable when VICS flag set to Yes
+</td>
+</tr>
+
+
+
+
+</table>
+
+
+<br><br>
+
+
+<hr><br>
+<h2>Additional Web Service Documentation Resources</h2>
+
+
+<p>Below is a list of external websites which contain more information on creating and consuming Web Services.</p>
+
+<br>
+
+<ul>
+
+<li><a href="http://msdn.microsoft.com/webservices/">Microsoft Web Services Developer Center</a></li>
+<li><a href="http://java.sun.com/webservices/">Sun Microsystems Java Web Services Developer Center</a></li>
+</ul>
+
+
+
+
+<br>
+<hr>
+
+<p>Disclaimer:
+<br><br>
+Saia Inc. authorizes the use of these Web Services solely to facilitate the exchange of information between Saia and the customer.  Unauthorized use of Saia, Inc. Web Services and information is strictly prohibited.  All services may be used for lawful purposes only.  No warranty, express or implied, is given relating to the accuracy of content and Saia, Inc. does not accept any liability for error or omission. 
+<br><br>
+Saia Inc. reserves the right to refuse or cancel these services at it’s sole discretion.  If any <a target="_blank" href='https://assets.ctfassets.net/kjv8gs2ccggb/3wmWcAxq5K7l71GIqTXW1p/301689755331dc821b4d6fece8ad8671/Saia_Acceptable_Use_Policy.pdf'>terms or conditions</a> are failed to be followed, results constitute grounds for immediate account deactivation.
+<br><br></p>
+
+</span>
+</form>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>

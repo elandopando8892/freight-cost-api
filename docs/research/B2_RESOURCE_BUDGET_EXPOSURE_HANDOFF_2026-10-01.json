@@ -1,0 +1,40 @@
+{
+  "artifact": "FCM_B2_RESOURCE_BUDGET_EXPOSURE_HANDOFF",
+  "cutDate": "2026-10-01",
+  "baseHead": "4f5fc2de0c3d178dace917231e1092040dec21fd",
+  "basis": "REUSE_EXISTING_RECONCILIATION_AND_MAX_ALLOCATOR_NO_PARAMETER_ADOPTION",
+  "physicalCase": {
+    "variant": "OWN_MX_US_RELAY_SAME_TRAILER",
+    "resourcesInOneService": {"MX_TRACTOR":1,"US_TRACTOR":1,"SHARED_TRAILER":1},
+    "doesNotEstablishCarrierFleetSize": true,
+    "groupReference": "PUBLIC_REFERENCE_BINATIONAL_OWN_RELAY_NOT_IDENTIFIED_CARRIER"
+  },
+  "exposurePlan": {
+    "model": "FCM_RESOURCE_FLEET_BUDGET_EXPOSURE_V1",
+    "groupReference": "PUBLIC_REFERENCE_BINATIONAL_OWN_RELAY_NOT_IDENTIFIED_CARRIER",
+    "referencePeriod": null, "serviceDate": null,
+    "budgetScope": null, "exposureBasis": null,
+    "resources": [
+      {"resourceId":"MX_TRACTOR","assetReference":"REFERENCE_MX_TRACTOR_DISTINCT","profileReference":null,"assetQuantity":null,"totalKmPerMonth":null,"productiveAssetDaysPerMonth":null,"cycleTotalKm":null,"cycleLoadedKm":null,"cycleDays":null},
+      {"resourceId":"US_TRACTOR","assetReference":"REFERENCE_US_TRACTOR_DISTINCT","profileReference":null,"assetQuantity":null,"totalKmPerMonth":null,"productiveAssetDaysPerMonth":null,"cycleTotalKm":null,"cycleLoadedKm":null,"cycleDays":null},
+      {"resourceId":"SHARED_TRAILER","assetReference":"REFERENCE_ONE_SHARED_DRY_VAN_53","profileReference":null,"assetQuantity":null,"totalKmPerMonth":null,"productiveAssetDaysPerMonth":null,"cycleTotalKm":null,"cycleLoadedKm":null,"cycleDays":null}
+    ],
+    "evidence": [], "trailerAttachment": null
+  },
+  "methodComparison": {
+    "adapt": "Same-scope resource fleet budget, kilometres and productive asset-days; normalize all three by the SAME asset count, then existing MAX allocation",
+    "reject": ["Whole fleet cost divided by one vehicle exposure", "Automatic annual average relabelled calendar-month productive capacity", "Box inherits complete tractor returns or full cost charged per leg", "Equal-thirds group allocation without supported driver"],
+    "newInfrastructure": false,
+    "existingModules": ["benchmark-binational-budget.ts", "benchmark-trailer-attachment.ts", "fixed-cost-allocation.ts"]
+  },
+  "completionPackages": [
+    {"id":"COMPATIBLE_FIXED_POOL","result":"Ten complete same-scope economic monthly amounts and conserved group pool","missing":"Capital residual/horizon and financing; matched insurance/permits; full employer/company overhead; no fragments promoted to full amounts"},
+    {"id":"RESOURCE_CAPACITY","result":"Three resource quantities, monthly distances and productive asset-days with matched group/profile/period","missing":"Physical service resource counts are not fleet quantities; historical exposure remains a contrast, not an accepted monthly denominator"},
+    {"id":"CASE_CYCLE","result":"Loaded/empty cycles for each tractor and one serial same-box cycle","missing":"Service date, compatible cycle-days, loaded/empty and return scope; route drive time is not cycle-days"},
+    {"id":"VARIABLES_AND_PILOT","result":"CFU bridge plus complete CVU, finance/risk/margin policy and one usable SaaS pilot","missing":"Integrate only eligible existing family inputs; wireframe MARKSMAN before UI changes"}
+  ],
+  "outputs": {"fixedAllocationUsd":null,"cvuUsd":null,"purchaseUsd":null,"sellUsd":null},
+  "calibrated": false, "quoteReady": false, "adoptedValues": 0,
+  "syntheticTestsAreNotBenchmarks": true,
+  "externalChanges": {"database":false,"auth":false,"users":false,"infrastructure":false,"deployment":false,"businessOperations":false,"applicationAi":false}
+}

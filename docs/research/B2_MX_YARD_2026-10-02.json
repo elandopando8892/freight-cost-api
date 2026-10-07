@@ -1,0 +1,20 @@
+{
+ "model":"FCM_MX_RESERVED_YARD_REFERENCE_V1","reviewedAt":"2026-10-02T22:58:37Z",
+ "scope":"ONE_RESERVED_MX_TRACTOR_SPACE_NOT_BOX_HANDOFF_OR_THIRD_DRAYAGE",
+ "pricing":{"publishedPatioDailyMxn":250,"conflictingSpecialDailyMxn":150,"periodHours":24,"fractionChargedAsFullPeriod":true,"sourceTaxes":"UNSPECIFIED","selectedTaxScenario":"NET_PLUS_16_PERCENT_RESERVE_NOT_VERIFIED_INVOICE","vatRateHypothesis":0.16,"sourceEffectiveDate":null,"contractedMonthlyPriceMxn":null},
+ "quantity":{"reservedTractorSpaces":1,"reservedMxTrailerSpaces":0,"annualReservedDaysHypothesis":365,"monthsPerYear":12,"monthlyProductiveDays":24,"basis":"CONTINUOUS_CAPACITY_RESERVATION_AT_DAILY_PUBLIC_PRICE_NOT_ACTUAL_DWELL_OR_MONTHLY_DISCOUNT"},
+ "source":{"id":"SIMACO_PRIMARY_PATIO","url":"https://pensionsimaco.com/","locator":"Primary supplier lists tractor parking and patio250MXN/unit/24h or fraction; separate undated special150 on same page. Km8.96 PiedrasNegras before PuenteIII access. VAT and price validity not specified.","archive":{"file":"docs/research/sources/SIMACO_YARD_20261002.html","sha256":"e40e013a5e03d577266986845183ae7ae305abd0abce3883d49e7f4729e8b009"}},
+ "reusedSourceRefs":["companyServicesCfu#/cycleAllocations","operatingFluids#/cash","operatingFluids#/financed","datedFx"],
+ "assumptions":[
+  "Reserve one MX tractor space continuously as prospective capacity. Daily parking is a standard service, not another custom facility or infrastructure. No actual monthly offer, negotiation, booking, capacity confirmation or carrier selected.",
+  "Use250patio table instead of150undated special on the same primary page. Conflict remains visible; not a range of market observations. Primary source establishes tractors as eligible service category, not compatible actual slot/VIN/security/cargo contract.",
+  "Monthly equivalent is250*365/12 for continuous daily capacity. It is not a250monthly price,24daily periods,30exact calendar days, rounded trip dwell, billed invoice or published monthly contract.",
+  "Source does not identify tax inclusion. Selected prospective cost reserve treats250as net plus16percent. Also show250gross sensitivity without claiming either is verified fiscal treatment. No tax-credit benefit presumed and no second IVA on the chosen gross amount.",
+  "Charge only MX_TRACTOR, using existing resource MAX(time,distance) capacity exposure; no fleet-pair doubling, shared-admin allocation, US bay or second MX box space. Same box stays within existing US-side relay hypothesis.",
+  "This capacity reserve is a conservative operating design, not proof of actual parking duration or the economic minimum. Do not also add the same MX tractor daily dwell at this site; monthly service and trip invoice are alternative quantity models.",
+  "Internet/fax/copier, office, driver accommodation, unloading500 and forklift750 published on page are not added. These are not a transload and do not substantiate matching handoff access/handling or public truck route.",
+  "SIMACO is a price reference in NuevoLaredo, not the selected yard/gate. No straight-line or embedded map geometry is used for truck/bobtail distance, queue time, wear or legal access; those remain pending, not zero.",
+  "Identical yard fixed addition across cash/financed equipment and both prior box-premium alternatives; CVU unchanged. Prior incomplete economics preserved, not canonical input adoption or full D2D estimate."
+ ],
+ "completeCfuUsd":null,"completeCvuUsd":null,"completeD2DCostUsd":null,"quoteReady":false,"adoptedValues":0
+}

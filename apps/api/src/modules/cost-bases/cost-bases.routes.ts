@@ -9,6 +9,10 @@ import { consultCostBase } from './cost-base-consultant.js'
 import { listRecommendedCostBasePresets } from './recommended-cost-base-presets.js'
 import { OPERATIONAL_SEGMENTS } from './operational-segments.js'
 import { SaveCostBaseCalibrationSchema } from './cost-base-calibration.js'
+import { versionWizard } from './cost-base-wizard-version.service.js'
+import { registerVersionPlanningRoutes } from './version-planning.routes.js'
+import {registerFamilyBaseRoutes} from './family-base.routes.js'
+import {familyBaseStore} from './family-base.service.js'
 import { applicabilitySummary } from './cost-base-applicability.js'
 import {
   ArchiveCostBaseSchema, ArchiveCostBaseVersionSchema, CostBaseApplicabilityPreviewSchema, CreateCostBaseSchema, CreateCostBaseVersionSchema,
@@ -22,6 +26,8 @@ import {
 
 export async function costBasesRoutes(app: FastifyInstance) {
   app.addHook('preHandler', authenticate)
+  registerVersionPlanningRoutes(app)
+  registerFamilyBaseRoutes(app,familyBaseStore)
 
   app.get('/cost-bases', async (request) => listCostBases((request.user as JwtPayload).orgId))
 
@@ -126,6 +132,18 @@ export async function costBasesRoutes(app: FastifyInstance) {
   app.get('/cost-bases/:id/versions/:versionId/calibration', async (request) => {
     const { id, versionId } = request.params as { id: string; versionId: string }
     return getCostBaseCalibration((request.user as JwtPayload).orgId, id, versionId)
+  })
+
+  app.get('/cost-bases/:id/versions/:versionId/wizard', async (request, reply) => {
+    const { id, versionId } = request.params as { id: string; versionId: string }
+    reply.header('Cache-Control', 'no-store')
+    return versionWizard.read(request.user as JwtPayload, id, versionId)
+  })
+
+  app.put('/cost-bases/:id/versions/:versionId/wizard', { bodyLimit: 64 * 1024, preHandler: requireRole('ADMIN') }, async (request, reply) => {
+    const { id, versionId } = request.params as { id: string; versionId: string }
+    reply.header('Cache-Control', 'no-store')
+    return versionWizard.save(request.user as JwtPayload, id, versionId, request.body)
   })
 
   app.post('/cost-bases/:id/versions/:versionId/calibration', { preHandler: requireRole('ADMIN') }, async (request) => {

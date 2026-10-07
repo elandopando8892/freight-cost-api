@@ -1,0 +1,437 @@
+{
+  "artifact": "FCM_B2_D2D_LINKED_PREFLIGHT_REVIEW",
+  "caseReference": "D2D_PUBLIC_REFERENCE_MEXICO_DF_FORT_SMITH_72916_DRAFT_20260930",
+  "baseHead": "4f5fc2de0c3d178dace917231e1092040dec21fd",
+  "cutDate": "2026-09-30",
+  "networkCallsThisReview": 0,
+  "tokenLoaded": false,
+  "readiness": {
+    "status": "INCOMPLETE",
+    "preflightIssueCount": 41,
+    "issuesByStage": {
+      "case": [
+        {
+          "field": "serviceDate",
+          "code": "MISSING_SERVICE_DATE"
+        },
+        {
+          "field": "allocationRationale",
+          "code": "MISSING_ALLOCATION_RATIONALE"
+        }
+      ],
+      "route": [],
+      "mx": [
+        {
+          "field": "mx.rates.monthlyFixedUsd",
+          "code": "MISSING_NATIONAL_BASE"
+        },
+        {
+          "field": "mx.rates.productiveKmPerMonth",
+          "code": "MISSING_NATIONAL_BASE"
+        },
+        {
+          "field": "mx.rates.productiveVehicleDaysPerMonth",
+          "code": "MISSING_NATIONAL_BASE"
+        },
+        {
+          "field": "mx.rates.maintenanceUsdPerKm",
+          "code": "MISSING_NATIONAL_BASE"
+        },
+        {
+          "field": "mx.rates.tiresUsdPerKm",
+          "code": "MISSING_NATIONAL_BASE"
+        },
+        {
+          "field": "mx.rates.driverUsdPerKm",
+          "code": "MISSING_NATIONAL_BASE"
+        },
+        {
+          "field": "mx.rates.dieselUsdPerLiter",
+          "code": "MISSING_NATIONAL_BASE"
+        },
+        {
+          "field": "mx.rates.loadedKmPerLiter",
+          "code": "MISSING_NATIONAL_BASE"
+        },
+        {
+          "field": "mx.rates.emptyKmPerLiter",
+          "code": "MISSING_NATIONAL_BASE"
+        },
+        {
+          "field": "mx.trip.loadedKm",
+          "code": "MISSING_TRIP_INPUT"
+        },
+        {
+          "field": "mx.trip.emptyKm",
+          "code": "MISSING_TRIP_INPUT"
+        },
+        {
+          "field": "mx.trip.cycleDays",
+          "code": "MISSING_TRIP_INPUT"
+        },
+        {
+          "field": "mx.trip.tollsUsd",
+          "code": "MISSING_TRIP_INPUT"
+        }
+      ],
+      "us": [
+        {
+          "field": "us.rates.monthlyFixedUsd",
+          "code": "MISSING_NATIONAL_BASE"
+        },
+        {
+          "field": "us.rates.productiveKmPerMonth",
+          "code": "MISSING_NATIONAL_BASE"
+        },
+        {
+          "field": "us.rates.productiveVehicleDaysPerMonth",
+          "code": "MISSING_NATIONAL_BASE"
+        },
+        {
+          "field": "us.rates.maintenanceUsdPerKm",
+          "code": "MISSING_NATIONAL_BASE"
+        },
+        {
+          "field": "us.rates.tiresUsdPerKm",
+          "code": "MISSING_NATIONAL_BASE"
+        },
+        {
+          "field": "us.rates.driverUsdPerKm",
+          "code": "MISSING_NATIONAL_BASE"
+        },
+        {
+          "field": "us.rates.dieselUsdPerLiter",
+          "code": "MISSING_NATIONAL_BASE"
+        },
+        {
+          "field": "us.rates.loadedKmPerLiter",
+          "code": "MISSING_NATIONAL_BASE"
+        },
+        {
+          "field": "us.rates.emptyKmPerLiter",
+          "code": "MISSING_NATIONAL_BASE"
+        },
+        {
+          "field": "us.trip.loadedKm",
+          "code": "MISSING_TRIP_INPUT"
+        },
+        {
+          "field": "us.trip.emptyKm",
+          "code": "MISSING_TRIP_INPUT"
+        },
+        {
+          "field": "us.trip.cycleDays",
+          "code": "MISSING_TRIP_INPUT"
+        },
+        {
+          "field": "us.trip.tollsUsd",
+          "code": "MISSING_TRIP_INPUT"
+        }
+      ],
+      "sharedTrailer": [
+        {
+          "field": "sharedTrailer.assetReference",
+          "code": "MISSING_SHARED_TRAILER"
+        },
+        {
+          "field": "sharedTrailer.allocationEvidence",
+          "code": "MISSING_SHARED_TRAILER"
+        },
+        {
+          "field": "sharedTrailer.costAgreement",
+          "code": "MISSING_SHARED_TRAILER"
+        },
+        {
+          "field": "sharedTrailer.monthlyFixedUsd",
+          "code": "MISSING_SHARED_TRAILER"
+        },
+        {
+          "field": "sharedTrailer.productiveKmPerMonth",
+          "code": "MISSING_SHARED_TRAILER"
+        },
+        {
+          "field": "sharedTrailer.productiveDaysPerMonth",
+          "code": "MISSING_SHARED_TRAILER"
+        },
+        {
+          "field": "sharedTrailer.maintenanceUsdPerKm",
+          "code": "MISSING_SHARED_TRAILER"
+        },
+        {
+          "field": "sharedTrailer.tiresUsdPerKm",
+          "code": "MISSING_SHARED_TRAILER"
+        },
+        {
+          "field": "sharedTrailer.totalKm",
+          "code": "MISSING_SHARED_TRAILER"
+        },
+        {
+          "field": "sharedTrailer.cycleDays",
+          "code": "MISSING_SHARED_TRAILER"
+        },
+        {
+          "field": "sharedTrailer.evidence",
+          "code": "MISSING_SHARED_TRAILER"
+        }
+      ],
+      "borderCharges": [
+        {
+          "field": "borderCharges.CROSSING",
+          "code": "BORDER_COST_UNDOCUMENTED"
+        },
+        {
+          "field": "borderCharges.INTERCHANGE",
+          "code": "BORDER_COST_UNDOCUMENTED"
+        }
+      ]
+    },
+    "nationalRequirements": [
+      {
+        "country": "MX",
+        "canonicalKeyCount": 125,
+        "assetCostScope": "TRACTOR_ONLY"
+      },
+      {
+        "country": "US",
+        "canonicalKeyCount": 124,
+        "assetCostScope": "TRACTOR_ONLY"
+      }
+    ],
+    "lineage": {
+      "model": "FCM_D2D_READINESS_V1",
+      "caseReference": "D2D_PUBLIC_REFERENCE_MEXICO_DF_FORT_SMITH_72916_DRAFT_20260930",
+      "direction": "MX_TO_US",
+      "serviceDate": null,
+      "route": {
+        "mxEndpoint": "Mexico, DF",
+        "mxGateway": "Nuevo Laredo",
+        "usGateway": "Laredo",
+        "usEndpoint": "Fort Smith, AR 72916"
+      },
+      "allocationRationale": null,
+      "mx": {
+        "parameters": null,
+        "trip": {
+          "loadedKm": null,
+          "emptyKm": null,
+          "cycleDays": null,
+          "tollsUsd": null
+        }
+      },
+      "us": {
+        "parameters": null,
+        "trip": {
+          "loadedKm": null,
+          "emptyKm": null,
+          "cycleDays": null,
+          "tollsUsd": null
+        }
+      },
+      "sharedTrailer": null,
+      "borderCharges": null
+    },
+    "compositorInvoked": false,
+    "costs": null
+  },
+  "supportingRouteEvidence": {
+    "artifact": "FCM_B2_D2D_ROUTE_EVIDENCE_LINK",
+    "status": "INCOMPLETE",
+    "mode": "RESEARCH_PARTIAL_NO_TRIP_ADOPTION",
+    "evidenceLinked": true,
+    "sourcePinsVerified": 3,
+    "pins": {
+      "case": {
+        "file": "docs/research/B2_D2D_READINESS_CASE_2026-09-30.json",
+        "sha256": "a897778d6f907b1041895f9bcace01cd91654cd2cb51dc9abc0570369024d28b"
+      },
+      "request": {
+        "file": "docs/research/B2_SAKBE_MX_COMPARISON_REQUEST_2026-09-30.json",
+        "sha256": "0070b004c76c07fbe6eb2d0b7c68dd492885eee44bcdab3e5393bb4c2f932f74"
+      },
+      "detail": {
+        "file": "docs/research/B2_SAKBE_MX_LIVE_DETAIL_2026-09-30.json",
+        "sha256": "731cb21c1f7bfe2196ab90b12d56a91d4ebd4b1ef5b698ce73209341958b2970"
+      }
+    },
+    "provider": "INEGI_SAKBE_V3_1",
+    "retrievedAt": "2026-09-30T17:18:33.152Z",
+    "attribution": "INEGI - API de Ruteo SAKBE",
+    "documentation": "https://www.inegi.org.mx/servicios/Ruteo/Default.html",
+    "researchBinding": {
+      "country": "MX",
+      "direction": "MX_TO_US",
+      "origin": {
+        "casePoint": "Mexico, DF",
+        "referenceId": 2656,
+        "referenceLabel": "Plaza de la Constitución, Cuauhtémoc"
+      },
+      "gateway": {
+        "casePoint": "Nuevo Laredo",
+        "referenceId": 301105,
+        "referenceLabel": "Puerto Fronterizo Nuevo Laredo III, Nuevo Laredo"
+      }
+    },
+    "operationalApproval": {
+      "operationalEndpointsConfirmed": false,
+      "bridgeChosen": false,
+      "equipmentConfirmed": false,
+      "tariffsApproved": false
+    },
+    "observedMxDetail": {
+      "currency": "MXN",
+      "segmentCount": 67,
+      "tollPointCount": 14,
+      "positiveTollCount": 13,
+      "rowSums": {
+        "distanceKm": 1124.5764209526735,
+        "idealMinutes": 709.8829924923754,
+        "observedTollsMxn": 4770
+      },
+      "summary": null,
+      "routeGeometry": null,
+      "unverifiedZeroTollPoints": [
+        {
+          "index": 43,
+          "instruction": "Cruce la caseta La Carbonera",
+          "distanceMeters": 305.913834295,
+          "idealMinutes": 0.1668620914336364,
+          "observedTollMxn": 0,
+          "tollPoint": {
+            "type": "Point",
+            "coordinates": [
+              -100.868181786,
+              25.510927645
+            ]
+          },
+          "observedExtraAxleChargeMxn": 0
+        }
+      ],
+      "chargedTollsWithoutPoint": []
+    },
+    "coverage": {
+      "mx": "DETAIL_ONLY_NOT_OPERATIONAL",
+      "border": "UNVERIFIED",
+      "us": "NO_EVIDENCE",
+      "operatingCycle": "NO_EVIDENCE"
+    },
+    "providerIssues": [
+      "SUMMARY_NOT_REQUESTED",
+      "ROUTE_GEOMETRY_UNAVAILABLE",
+      "SUMMARY_DETAIL_RECONCILIATION_PENDING",
+      "UNCONFIRMED_ENDPOINTS_BRIDGE_AND_EQUIPMENT",
+      "TRUCK_RESTRICTIONS_NOT_CERTIFIED",
+      "TOLL_VIGENCY_MOVEMENT_TAX_PAYMENT_PENDING",
+      "IDEAL_TIME_NOT_OPERATING_CYCLE",
+      "NOT_ADOPTED_TRIP_INPUTS",
+      "ZERO_AT_TOLL_POINT_UNVERIFIED"
+    ],
+    "gaps": [
+      {
+        "stage": "mx",
+        "code": "MX_SUMMARY_GEOMETRY_PENDING",
+        "fields": [
+          "mx.trip.loadedKm"
+        ],
+        "action": "Reconcile provider summary/route geometry; do not treat row sum as operational loaded distance."
+      },
+      {
+        "stage": "route",
+        "code": "OPERATIONAL_ROUTE_EQUIPMENT_PENDING",
+        "fields": [
+          "route.mxEndpoint",
+          "route.mxGateway"
+        ],
+        "action": "Confirm load address, commercial bridge/access and actual equipment/restrictions; reference points are not operational selection."
+      },
+      {
+        "stage": "mx",
+        "code": "MX_TOLL_VIGENCY_MOVEMENT_PENDING",
+        "fields": [
+          "mx.trip.tollsUsd"
+        ],
+        "action": "Verify operator tariff/date/movement/tax/payment and zero/coverage; no automatic conversion or adoption."
+      },
+      {
+        "stage": "borderCharges",
+        "code": "CROSSING_INTERCHANGE_COVERAGE_PENDING",
+        "fields": [
+          "borderCharges.CROSSING",
+          "borderCharges.INTERCHANGE"
+        ],
+        "action": "Document crossing/interchange amounts and inclusions once; reaching a named port does not prove bridge transit or free passage."
+      },
+      {
+        "stage": "us",
+        "code": "US_ROUTE_EVIDENCE_MISSING",
+        "fields": [
+          "us.trip.loadedKm",
+          "us.trip.tollsUsd"
+        ],
+        "action": "Obtain compatible commercial-truck route/tolls from Laredo to Fort Smith, AR 72916; MX evidence does not cover US."
+      },
+      {
+        "stage": "case",
+        "code": "EMPTY_DISTANCE_OPERATING_CYCLE_PENDING",
+        "fields": [
+          "mx.trip.emptyKm",
+          "mx.trip.cycleDays",
+          "us.trip.emptyKm",
+          "us.trip.cycleDays",
+          "sharedTrailer.totalKm",
+          "sharedTrailer.cycleDays"
+        ],
+        "action": "Document empty positioning, waits/rest/loading and one physical trailer cycle; ideal driving minutes are not productive cycle days."
+      },
+      {
+        "stage": "case",
+        "code": "SERVICE_DATE_FX_PENDING",
+        "fields": [
+          "serviceDate",
+          "mx.trip.tollsUsd"
+        ],
+        "action": "Confirm service date and governed FX only after tariff scope; MXN observations are not USD inputs."
+      }
+    ],
+    "gapCountsByStage": {
+      "case": 2,
+      "route": 1,
+      "mx": 2,
+      "us": 1,
+      "borderCharges": 1
+    },
+    "adoptionEligible": false,
+    "tripInputsChanged": false,
+    "calibrated": false,
+    "quoteReady": false,
+    "productionReady": false,
+    "adoptedValues": 0,
+    "compositorInvoked": false,
+    "networkAccessed": false,
+    "databaseAccessed": false
+  },
+  "checks": {
+    "sameLineage": true,
+    "sameIssues": true
+  },
+  "decision": {
+    "caseIntegrationComplete": true,
+    "economicCaseComplete": false,
+    "B1": "OPEN",
+    "B2": "PARTIAL",
+    "businessGatesClosed": 0,
+    "businessGatesTotal": 4,
+    "next": "COMPLETE_US_ROUTE_BORDER_CYCLE_AND_COMPATIBLE_RATES_THEN_SAAS_WIREFRAME",
+    "requiresRouteChoice": false,
+    "namedCorridorConfirmed": true,
+    "requiresDetailedItinerary": true,
+    "requiresBridgeSelection": true,
+    "itineraryValidated": false,
+    "sourceResearchReopened": false,
+    "businessPersisted": false,
+    "database": false,
+    "auth": false,
+    "deployment": false,
+    "businessOperations": false,
+    "applicationAi": false
+  }
+}

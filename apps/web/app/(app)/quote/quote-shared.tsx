@@ -45,6 +45,7 @@ export interface ResolvedMexLeg {
 export interface ResolvedUsaLeg {
   loadedMiles: number; transitDaysRaw?: number; driverExpenses?: number
   outState: string; dieselUsdGal: number; fscUsdMile: number
+  fuelReview?: { serviceDate: string; mode: 'REFERENCE' | 'MANUAL'; priceUsdGal: number; observationDate: string | null; sourceReference: string; provisional: boolean }
   originCondition: string; destCondition: string; marketRpm?: number
   operation: string; service: string
   equipment: { truckType: string; trailer: string; config: string; driver: string }
@@ -145,6 +146,7 @@ export const selectCls =
   'h-9 w-full rounded-md border border-input bg-background px-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
 
 export const INITIAL_FORM = {
+  serviceDate: '',
   outboundLocation: '',
   inboundLocation: '',
   mexBorder: 'Nuevo Laredo, Tamaulipas',
@@ -251,6 +253,11 @@ export function validate(f: FormFields): FormErrors {
   const e: FormErrors = {}
   if (!f.outboundLocation.trim()) e.outboundLocation = 'Required — ZIP, "City, ST", or a metro city'
   if (!f.inboundLocation.trim()) e.inboundLocation = 'Required — ZIP, "City, ST", or a metro city'
+  if (['D2D Export', 'D2D Import', 'Drayage'].includes(f.operation) && !f.serviceDate) e.serviceDate = 'Captura la fecha del servicio para revisar el combustible por viaje.'
+  if (f.serviceDate) {
+    const date = new Date(`${f.serviceDate}T00:00:00Z`)
+    if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== f.serviceDate) e.serviceDate = 'La fecha del servicio no es válida.'
+  }
   if (f.fxRate) {
     const n = Number(f.fxRate)
     if (!Number.isFinite(n) || n <= 0) e.fxRate = 'Must be a positive number'
@@ -272,6 +279,7 @@ export function quoteBody(form: FormFields): Record<string, unknown> {
   if (form.service) body.service = form.service
   if (form.costBaseId) body.costBaseId = form.costBaseId
   if (form.fxRate) body.fxRate = Number(form.fxRate)
+  if (form.serviceDate) body.serviceDate = form.serviceDate
   return body
 }
 
@@ -496,6 +504,11 @@ export function Result({ draft, r, snapshot }: { draft: QuoteDraft; r: QuoteResu
 
   return (
     <div className="grid gap-3">
+      {r.resolved.usaLeg?.fuelReview && <div className="rounded-md border bg-muted/20 p-3 text-sm">
+        <strong>Diésel USA congelado para este viaje</strong>
+        <p>{r.resolved.usaLeg.fuelReview.priceUsdGal} USD/gal US · {r.resolved.usaLeg.fuelReview.mode==='MANUAL'?'Precio propio declarado':'Referencia provisional'} · Servicio {r.resolved.usaLeg.fuelReview.serviceDate}</p>
+        <p className="break-words text-xs text-muted-foreground">Observación: {r.resolved.usaLeg.fuelReview.observationDate ?? 'desconocida'} · {r.resolved.usaLeg.fuelReview.sourceReference}. No modifica la base ni el FSC.</p>
+      </div>}
       <Card className="overflow-hidden">
         <CardHeader className="flex-row items-center justify-between gap-3 border-b px-4 py-3">
           <div>

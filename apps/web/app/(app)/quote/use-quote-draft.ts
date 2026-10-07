@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { fetcher } from '@/lib/fetcher'
+import { ClientApiError, fetcher, sessionExpiredEvent } from '@/lib/fetcher'
+import type { TripFuelReview, TripFuelSelection } from '@/lib/trip-fuel-contract'
 import { QuoteRequestGate } from '@/lib/quote-request-gate'
 import { type CostBaseOption, type FormFields, type QuoteResult, type ReopenQuote, initialFormForQuote, quoteBody } from './quote-shared'
 
@@ -15,14 +16,25 @@ export function useQuoteDraft(costBases: CostBaseOption[], initialQuote?: Reopen
   const [form, setFormState] = useState<FormFields>(() => initialFormForQuote(costBases, initialQuote))
   const formRef = useRef(form)
   const gate = useRef(new QuoteRequestGate())
+  const [fuelReview, setFuelReview] = useState<TripFuelReview | null>(null)
+  const fuelChoice = useRef<TripFuelSelection | null>(null)
+  const fuelReviewRef = useRef<TripFuelReview | null>(null)
   const [reviewed, setReviewed] = useState<ReviewedCalculation | null>(null)
   const reviewedRef = useRef<ReviewedCalculation | null>(null)
   const [saveState, setSaveState] = useState<SaveState | null>(null)
   const saveStateRef = useRef<SaveState | null>(null)
   const [requestState, setRequestState] = useState<RequestState>({ pending: false, error: null })
 
-  useEffect(() => () => {
-    gate.current.invalidate()
+  useEffect(() => {
+    const ownedGate = gate.current
+    const expire = () => {
+      ownedGate.invalidate(); fuelChoice.current = null; fuelReviewRef.current = null
+      reviewedRef.current = null; saveStateRef.current = null
+      setFuelReview(null); setReviewed(null); setSaveState(null)
+      setRequestState({ pending: false, error: new Error('Tu sesión venció. Inicia sesión de nuevo y revisa los inputs.') })
+    }
+    window.addEventListener(sessionExpiredEvent, expire)
+    return () => { ownedGate.invalidate(); window.removeEventListener(sessionExpiredEvent, expire) }
   }, [])
 
   const update = (next: FormFields | ((previous: FormFields) => FormFields)) => {
@@ -33,6 +45,7 @@ export function useQuoteDraft(costBases: CostBaseOption[], initialQuote?: Reopen
     setFormState(value)
     if (!effectiveChanged) return
     gate.current.invalidate()
+    fuelChoice.current = null; fuelReviewRef.current = null; setFuelReview(null)
     setReviewed(null)
     reviewedRef.current = null
     saveStateRef.current = null
@@ -42,6 +55,7 @@ export function useQuoteDraft(costBases: CostBaseOption[], initialQuote?: Reopen
 
   const reset = () => {
     gate.current.invalidate()
+    fuelChoice.current = null; fuelReviewRef.current = null; setFuelReview(null)
     const value = initialFormForQuote(costBases, initialQuote)
     formRef.current = value
     setFormState(value)
@@ -58,8 +72,16 @@ export function useQuoteDraft(costBases: CostBaseOption[], initialQuote?: Reopen
     const submittedForm = { ...formRef.current }
     setRequestState({ pending: true, error: null })
     try {
+      if (!fuelChoice.current) {
+        const inputs = await fetcher<{ fuel: TripFuelReview | null }>('/api/v1/engine/route-inputs', {
+          method: 'POST', json: quoteBody(submittedForm), silent: true,
+        })
+        if (!gate.current.isCurrent(ticket)) return
+        fuelReviewRef.current = inputs.fuel; setFuelReview(inputs.fuel)
+        if (inputs.fuel) { setRequestState({ pending: false, error: null }); return }
+      }
       const result = await fetcher<QuoteResult>('/api/v1/engine/quote-by-route', {
-        method: 'POST', json: quoteBody(submittedForm), silent: true,
+        method: 'POST', json: { ...quoteBody(submittedForm), ...(fuelChoice.current ? { tripFuel: fuelChoice.current } : {}) }, silent: true,
       })
       if (!gate.current.isCurrent(ticket)) return
       const nextReviewed = { result, form: submittedForm }
@@ -73,6 +95,9 @@ export function useQuoteDraft(costBases: CostBaseOption[], initialQuote?: Reopen
       toast.success('Cálculo listo para revisión')
     } catch (error) {
       if (!gate.current.isCurrent(ticket)) return
+      if (error instanceof ClientApiError && [401,403,409].includes(error.status)) {
+        fuelChoice.current = null; fuelReviewRef.current = null; setFuelReview(null)
+      }
       setReviewed(null)
       reviewedRef.current = null
       saveStateRef.current = null
@@ -81,6 +106,12 @@ export function useQuoteDraft(costBases: CostBaseOption[], initialQuote?: Reopen
     } finally {
       gate.current.finish(ticket)
     }
+  }
+
+  const acceptFuel = (choice: TripFuelSelection) => {
+    if (!fuelReviewRef.current || choice.contextHash !== fuelReviewRef.current.contextHash || requestState.pending) return
+    fuelChoice.current = choice
+    return calculate()
   }
 
   const setSaveLabel = (label: string) => {
@@ -111,7 +142,7 @@ export function useQuoteDraft(costBases: CostBaseOption[], initialQuote?: Reopen
   }
 
   return {
-    form, update, reset, reviewed, saveState, setSaveLabel, beginSave, recordSaved,
+    form, update, reset, reviewed, saveState, setSaveLabel, beginSave, recordSaved, fuelReview, acceptFuel,
     quote: {
       mutate: calculate,
       isPending: requestState.pending,

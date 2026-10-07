@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "reviewDate": "2026-09-30",
+  "reviewType": "PROVIDER_ACCESS_AND_PUBLIC_TARIFF_FEASIBILITY",
+  "corridor": "Mexico, DF - Fort Smith, AR 72916 via Nuevo Laredo / Laredo",
+  "usLeg": "Laredo - Fort Smith, AR 72916",
+  "scope": "Research only; no route request, tariff adoption or remote changes",
+  "workspace": {
+    "path": "D:/andre/worktrees/freight-cost-model/cost-tires-release-20260927",
+    "branch": "codex/cost-tires-release-s14",
+    "head": "4f5fc2de0c3d178dace917231e1092040dec21fd"
+  },
+  "priorEvidencePins": [
+    { "path": "B2_D2D_READINESS_CASE_2026-09-30.json", "sha256": "a897778d6f907b1041895f9bcace01cd91654cd2cb51dc9abc0570369024d28b" },
+    { "path": "B2_D2D_SAKBE_ROUTE_LINK_2026-09-30.json", "sha256": "7364257720572f9471beb4da250ca2cb2917821419c2cc742f9147099dcf2053" },
+    { "path": "B2_SAKBE_MX_LIVE_DETAIL_2026-09-30.json", "sha256": "731cb21c1f7bfe2196ab90b12d56a91d4ebd4b1ef5b698ce73209341958b2970" },
+    { "path": "B2_D2D_ROUTE_ITINERARY_EVIDENCE_2026-09-30.json", "sha256": "e883e06421e3042d82bc3eaac2d29ba30b3c257ae245ef1fcf6b71ef16c7bbfe" }
+  ],
+  "authenticatedConsoleReview": {
+    "date": "2026-09-30",
+    "evidenceKind": "MANUAL_BROWSER_OBSERVATION_NOT_RAW_EXPORT",
+    "projectId": "rateware",
+    "projectDisplayName": "Rateware",
+    "reauthenticationCompletedByUser": true,
+    "routesApiEnabled": true,
+    "billingPlanObserved": "Pay as you go",
+    "computeRoutesQuota": { "perMinute": 3000, "perDay": "Unlimited", "perMinutePerUser": "Unlimited" },
+    "computeRouteMatrixQuota": { "elementsPerMinute": 3000, "elementsPerDay": "Unlimited", "elementsPerMinutePerUser": "Unlimited" },
+    "dashboardPriorRequests": { "count": 2, "errorsPercent": 0, "interval": "1 day", "attribution": "UNKNOWN_NOT_THIS_REVIEW" },
+    "quotaCurrentUsageDisplayed": 0,
+    "usageInterpretation": "Quota snapshot differs from dashboard time-window metrics; neither proves free balance nor TRUCK provisioning",
+    "largeVehicleRoutingProvisioned": null,
+    "credentialUsableByFcm": null,
+    "remainingFreeUsage": null,
+    "effectiveTruckSkuPriceUsd": null,
+    "safeUrls": [
+      "https://console.cloud.google.com/apis/dashboard?project=rateware",
+      "https://console.cloud.google.com/google/maps-apis/api-list?project=rateware",
+      "https://console.cloud.google.com/google/maps-apis/quotas?project=rateware&api=routes.googleapis.com",
+      "https://console.cloud.google.com/google/maps-apis/billing?project=rateware"
+    ]
+  },
+  "localDiscovery": {
+    "gcloudOnPath": false,
+    "matchingProcessEnvVariableNamesFound": false,
+    "connectorFoundInScopedFcmAndRatewareCode": false,
+    "secretFilesInspected": false,
+    "interpretation": "Local absence does not prove remote credentials or LVR access absent"
+  },
+  "providerDecision": {
+    "mexico": "Retain existing SAKBE partial evidence; do not substitute ordinary Google DRIVE",
+    "unitedStates": "Conditionally adapt existing Google Routes project after LVR access and cost verification",
+    "truckRequestPrerequisites": ["LVR provisioning confirmed for rateware", "usable server credential without exposure", "cost and scoped call authorization", "precise origin/destination and vehicle dimensions, weight, axles, hazmat attributes"],
+    "requiredMode": "TRUCK",
+    "requiredRoutingPreference": "TRAFFIC_AWARE_OPTIMAL",
+    "reviewResponseFields": ["distanceMeters", "duration", "polyline", "legs", "travelAdvisory.routeRestrictionsPartiallyIgnored"],
+    "truckTollPricesSupported": false,
+    "provisioningFormViewedAuthenticated": true,
+    "provisioningFormSubmitted": false,
+    "emptyFormScreenshot": { "path": "sources/GOOGLE_LVR_FORM_REVIEW_20260930.jpg", "sha256": "dee4b7c3bda297275c166d0f5376982b6044f8c45e19e33afbedc3eaeca42c8d" },
+    "provisioningUrl": "https://developers.google.com/maps/documentation/routes/contact",
+    "reject": ["DRIVE toll estimate treated as commercial tariff", "universal axle/payment multiplier", "missing price treated as zero", "route marked partially ignored accepted as operational", "new paid provider before existing access clarified"]
+  },
+  "publicSources": [
+    { "id": "GOOGLE_LVR", "url": "https://developers.google.com/maps/documentation/routes/lvr", "path": "sources/GOOGLE_LVR_ACCESS_20260930.html", "sha256": "ee82b1e00e231287a47de3e0e81aabf21f1112df08aa642f510287669b918853" },
+    { "id": "GOOGLE_TOLLS", "url": "https://developers.google.com/maps/documentation/routes/calculate_toll_fees", "path": "sources/GOOGLE_TOLL_SCOPE_20260930.html", "sha256": "6e9994edd4127af9b71d767c81d4b43350d43dc3eaf888f62e4c9f888b815fe5" },
+    { "id": "GOOGLE_BILLING", "url": "https://developers.google.com/maps/documentation/routes/usage-and-billing", "path": "sources/GOOGLE_ROUTES_BILLING_20260930.html", "sha256": "53b99247c7f86995ab317a5a17f5e4ffb4b1e65499235f3e8d29e75ba1bb4f7d" },
+    { "id": "TXDOT_CTTS", "url": "https://www.txdot.gov/discover/toll-roads-managed-lanes/txdot-toll-roads/central-texas-turnpike-system-toll-rates.html", "path": "sources/TXDOT_CTTS_TARIFFS_20260930.html", "sha256": "b285ed0b7f6c29f860f1d6aa977b7495d30dbe8a611a9e341402667a4a8ccd25" },
+    { "id": "SH130_SOUTH", "url": "https://mysh130.com/traveler-info/toll-rates/", "path": "sources/SH130_SOUTH_TARIFFS_20260930.html", "sha256": "86b750f3a9bda86741b949c9f35a85e1aff13ce99a1bf3c9dafddbf4e9c67888" },
+    { "id": "NTTA", "url": "https://www.ntta.org/sites/default/files/2025-06/NTTAS_2025-2027_Toll%20Rate%20Tables.pdf", "path": "sources/NTTA_2025_2027_TARIFFS_20260930.pdf", "sha256": "525ab51c0fd47dc083e5a490dbfff0fb2f94fe11b545def465a6958f971a02cf", "visualPagesReviewed": [1, 2] }
+  ],
+  "conditionalTariffObservations": [
+    { "source": "TXDOT_CTTS", "facility": "Loop 1", "point": "Merrilltown LOP-MTOWN", "classBasis": "5 axles", "effectiveFrom": "2026-01-01", "effectiveThrough": null, "currency": "USD", "prices": { "tag": 5.44, "nonTag": 8.16 }, "onPilotRoute": null, "adoptionEligible": false },
+    { "source": "NTTA", "facility": "PGBT", "point": "Merritt Main Lane MLG5", "page": 1, "classBasis": "5 axles", "effectiveFrom": "2025-07-01", "effectiveThrough": "2027-06-30", "currency": "USD", "prices": { "tollTag": 8.92, "zipCash": 17.84 }, "onPilotRoute": null, "adoptionEligible": false },
+    { "source": "SH130_SOUTH", "facility": "SH130 segments 5-6", "point": "Skyline Plaza NB/SB", "classBasis": "Operator Class D, not a five-axle mapping", "effectiveFrom": null, "effectiveThrough": null, "currency": "USD", "prices": { "tag": 13.12, "mail": 16.18 }, "onPilotRoute": null, "adoptionEligible": false }
+  ],
+  "otherCoverage": {
+    "oklahoma": { "classificationUrl": "https://pikepass.com/vehicle-classifications", "calculatorUrl": "https://pikepass.com/plan-your-trip/toll-calculator", "evidence": "INDEXED_ONLY_NO_RATE_CAPTURE", "pilotRouteUsesOklahoma": null, "tollAmount": null },
+    "arkansas": "Historical toll proposals/studies excluded; no inference of current tariff or zero toll for an unknown itinerary",
+    "aggregationRule": "First identify actual facility, segment, movement, class, payment and effective date. Never add a corridor aggregate to its component plazas"
+  },
+  "pilotOutputs": { "originCoordinates": null, "destinationCoordinates": null, "vehicleProfile": null, "route": null, "loadedKm": null, "durationMinutes": null, "tollsUsd": null, "costUsd": null },
+  "effects": { "googleRouteRequests": 0, "remoteChanges": 0, "credentialsRead": false, "tripInputsChanged": false, "engineInvoked": false, "parametersAdopted": 0, "productionChanged": false },
+  "businessStatus": { "B1": "OPEN", "B2": "PARTIAL", "E1": "OPEN", "passedBusinessGates": 0, "totalBusinessGates": 4 },
+  "nextStep": "Confirm LVR provisioning and effective cost for rateware; obtain specific authorization before external access request or bounded live API call. Then obtain US route and match only actual commercial toll facilities",
+  "modelRecommendation": { "model": "GPT-6.1 Sol", "effort": "high", "selectorChanged": false }
+}

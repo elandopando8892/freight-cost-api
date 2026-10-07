@@ -1,0 +1,24 @@
+{
+  "model": "FCM_SHARED_BOX_MX_PERIODIC_REFERENCE_V1",
+  "verifiedAt": "2026-10-02T06:14:00Z",
+  "physicalBoxCount": 1,
+  "inspectionsPerYear": 1,
+  "monthsPerYear": 12,
+  "currency": "MXN",
+  "publishedPriceGrossMxn": 700,
+  "priceStatus": "UNDATED_PROVIDER_PAGE_WITH_2020_CALENDAR_NOT_2026_QUOTE",
+  "scope": "REMOLQUE_PROVIDER_LABEL_SEMITRAILER_EQUIVALENCE_UNCONFIRMED",
+  "recognitionDirection": "MX_NOM68_TO_US_PERIODIC_ONLY",
+  "sources": [
+    {"id":"MX_NOM68_ANNUAL","url":"https://dof.gob.mx/normasOficiales/5578/sct2a11_C/sct2a11_C.html","locator":"5.3.2.4 separate sticker per combination unit; 5.3.4 I and V annual inspection from fifth year","archive":null},
+    {"id":"FMCSA_NOM68_RECOGNITION","url":"https://csa.fmcsa.dot.gov/safetyplanner/myfiles/SubSections.aspx?ch=22&eta=26704&sec=65&sub=148","locator":"5.2.2 Equivalent to Periodic Inspection: Mexico NOM68 compliant; periodic report retained 14 months and current documentation on vehicle","archive":null},
+    {"id":"MX_PROVIDER_UNDATED_PRICE","url":"https://www.unidaddeverificacionfederal.com.mx/inspeccion-fisico-mecanica-y-verificacion-de-emisiones-contaminantes-para-autotransporte-federal.html","locator":"Costos: Remolque 700 MXN including IVA; page retains calendar2020; no dated2026 quote and no separate semitrailer price","archive":null}
+  ],
+  "limitations": [
+    "Published provider amount is historical or undated, not a current annual tariff or accepted pilot input",
+    "Remolque label does not establish identical price for the 53ft semitrailer",
+    "NOM68 recognition does not certify a particular vehicle or prove reciprocal Mexican acceptance of Texas inspection",
+    "Inspection is not full registration, customs, border, repair, reinspection or all binational permits",
+    "No unknown charge is zero; no invoice, inspection report, actual registration or service date inferred"
+  ]
+}

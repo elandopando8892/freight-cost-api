@@ -1,0 +1,30 @@
+{
+  "model": "FCM_MX_TRACTOR_PROSPECTIVE_CONDITIONAL_V1",
+  "reviewedAt": "2026-10-02T08:01:00Z",
+  "referencePeriod": "2026-10",
+  "profileReference": "MX_USED_CASCADIA2021_MANUAL_D2D_OWN_RELAY_REFERENCE_V1",
+  "permissionEvidence": "USER_AUTORIZO_CAMBIO_METODOLOGICO_2026_10_02",
+  "measurement": "NET_MARKET_VALUE_USE_NO_PURCHASE_OR_DISPOSAL_EVENT",
+  "conditionalPlanningOnly": true,
+  "holdingMonths": 24,
+  "offers": [
+    {"sourceId":"RODAL_2021","year":2021,"country":"MX","currency":"MXN","currencyBasis":"PUBLISHED_MXN","askingNet":1198275.86,"taxTreatment":"PLUS_IVA","brand":"Freightliner","model":"Cascadia","engine":"DD15","powerHp":450,"transmission":"MANUAL","speeds":18,"differentialLb":46000,"odometerKm":694920},
+    {"sourceId":"TODOCAMION_2019","year":2019,"country":"MX","currency":"MXN","currencyBasis":"DECLARED_MXN_HYPOTHESIS_FROM_MEXICO_LOCAL_AD","askingNet":750000,"taxTreatment":"PLUS_IVA","brand":"Freightliner","model":"Cascadia","engine":"DD15","powerHp":450,"transmission":"MANUAL","speeds":18,"differentialLb":46000,"odometerKm":null}
+  ],
+  "finance": {"rateKind":"EXPLICIT_PLANNING_NOMINAL_ANNUAL","annualNominalHypotheses":[0.115,0.157],"existingBalanceFractionHypothesis":0.8,"remainingTermHypothesisMonths":60,"publishedOfferExpired":true,"providerNominalBasisConfirmed":false,"newOriginationEvent":false},
+  "modelAssumptions": [
+    "Use the RODAL asking price as current net market-value proxy; not an appraisal or acquisition invoice.",
+    "Interpret the TodoCamion local Mexico ad's $750000 symbol as MXN explicitly for this conditional scenario; the vehicle ad does not print an ISO currency code. Do not cite platform-service fee terms as proof of vehicle VAT or currency.",
+    "Both ads state price plus IVA. Compare pre-tax market values without purchase, sale or VAT-recovery settlement events.",
+    "Use the two-model-year gap as a 24-month future market-use analogy. Assume future condition, mileage, generation, equipment and market are represented by the older listing; no age-only effect, statistically calibrated residual, remaining life or independent inspection is established.",
+    "The older ad's metadata was published/modified 12Aug2025; its page remains publicly readable with asking price and available label on 2Oct2026, but price update date and real availability are not verified.",
+    "For financed alternatives declare independent nominal11.5% and15.7% planning hypotheses with historical DTFS endpoints as context, not provider-confirmed nominal rates, current offers or CAT converted into interest.",
+    "Declare existing reference debt at80%of net current market value,60remaining level monthly payments, no grace or balloon in this remaining-debt scenario; mean interest over24months. No new loan origination, refinancing or upfront fee event is modeled. These are planning assumptions, not an actual loan.",
+    "Cash is debt-free. Debt principal and whole payment are not capital expense; equity required return is separate and unresolved. No US residual coefficients, new-asset book life, box capital or admin pool are transferred to this tractor."
+  ],
+  "sources": [
+    {"id":"RODAL_2021","url":"https://rodaltruckfinancials.com/catalogo/freightliner-cascadia-2021--vhc-f8668c8f02","locator":"DD15450HP, manual18, differential46000lb; description exact1198275.86MXN+IVA, not rounded headline; odometer694920km.","archive":{"file":"docs/research/sources/RODAL_CASCADIA2021_REVIEW_20261001.html","sha256":"2886f1a8b46d2ad65b64b4750158f634f890f82cfd14c8d0d5faf52bd8865878"}},
+    {"id":"TODOCAMION_2019","url":"https://www.todocamion.mx/listings/freightliner-cascadia-2019/","locator":"Vehicle details/seller note DD15450HP, manual18,46000lb; asking$750000, PRECIO MAS IVA; mileage not supplied (empty trade-in input is not vehicle mileage).","archive":{"file":"docs/research/sources/TODOCAMION_CASCADIA2019_20261002.html","sha256":"38b61ddcb6272059ca7561b8b399919c690f129770a57afe15d0d972e09077d3"}},
+    {"id":"DTFS_HISTORICAL_CONTEXT","url":"https://www.daimlertruck-financialservices.mx/legales/terminosycondiciones","locator":"Plan Especial Seminuevos Carga: expired31Aug2026; rates11.5/15.7basis unspecified,20%down,12-60months. Historical context only, no current financing quote.","archive":{"file":"docs/research/sources/DTFS_USED_CREDIT_TERMS_20261001.json","sha256":"5517fa2ca618310042ef9bc2cc0202f0569cc25dbba0ce2358977e87c2b3bb5c"}}
+  ]
+}

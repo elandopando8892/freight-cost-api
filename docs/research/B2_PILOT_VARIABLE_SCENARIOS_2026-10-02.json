@@ -1,0 +1,27 @@
+{
+  "model": "FCM_PILOT_VARIABLE_PUBLIC_SCENARIOS_V1",
+  "reviewedAt": "2026-10-02T15:29:00Z",
+  "scope": "OWN_MX_US_RELAY_SAME_TRAILER",
+  "mxFuelPriceId": "MX_NATIONAL_REPORTED",
+  "mxLitersPer1000Km": 483.92,
+  "usFuelPriceId": "US_PADD3_RETAIL",
+  "usPerformanceId": "US_ORNL_HEAVY_BIN",
+  "usDriverFleetGroup": "LT_26",
+  "performancePolicy": "SAME_RATE_LOADED_EMPTY_DECLARED_TRANSFER_NOT_MEASURED",
+  "compositePolicy": "ATTACHED_KM_ONLY_NO_SEPARATE_TRAILER_VARIABLE_CHARGE",
+  "paidToPhysicalKmRatio": 1,
+  "assumptions": [
+    "Reference one US tractor entity uses ATRI less-than26 truck group; not selection of an actual carrier.",
+    "MX IMT2025 flat-road40ft consumption is transferred to dryvan53ft loaded and bobtail empty as a constant prospective hypothesis, not calibration or guaranteed conservatism.",
+    "US ORNL2006-2008 heavy gross-weight bin7.9mpg is transferred to loaded and empty movement; no pilot payload or light-bin certified-empty claim.",
+    "MX national retail Sep25 and US PADD3 retail Sep28 are dated prices, not corridor receipts or discounts. Taxes included/unresolved recoverability are not normalized net economic prices.",
+    "Maintenance and tires preserve historical MX2025 net model and US2024 TTI estimated costs. This heterogeneous-period projection is not a jointly observed carrier cohort or inflation-adjusted benchmark.",
+    "MX bobtail recovery in network has no defensible tractor-only maintenance split; that missing amount stays null. Dedicated return is attached in both countries.",
+    "US maintenance lubricant inclusion is unresolved; do not add MX lube or invent US lube and DEF zero.",
+    "Physical movement km are assumed paid once. MX2.10 perkm is advertised pay, not full employer cost; US0.817 per mile is reported wages plus benefits excluding incentives/bonuses.",
+    "No weekly salary, ECEC payroll, extra federal taxes or separate shared-box mileage charge is added again.",
+    "Idle fuel, waiting pay, tolls, crossing services, full employer burden, missing fixed coverages and financed box remain unresolved, not zero."
+  ],
+  "adoptedValues": 0,
+  "quoteReady": false
+}

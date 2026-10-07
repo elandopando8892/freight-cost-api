@@ -1,0 +1,25 @@
+{
+  "model":"FCM_RECURRING_PERMIT_COMPONENT_SCENARIO_V1",
+  "reviewedAt":"2026-10-02T08:58:00Z",
+  "referencePeriod":"2026-10",
+  "planningUsRegistrants":1,
+  "planningUsPowerUnits":1,
+  "planningSharedBoxes":1,
+  "ucrRegistrationYear":2026,
+  "ucrBracket":"B1",
+  "hvutCategory":"V",
+  "irpBasis":"OFFICIAL_FEE_TEST_2_PROXY_NOT_APVD_OR_ACTUAL_DISTANCE_INVOICE",
+  "modelAssumptions":[
+    "One modeled US legal registrant with one US power unit, 2026 UCR0-2 bracket, paid once for the entity; this is not identified carrier fleet size or a charge per trailer or leg.",
+    "One nonsuspended nonlogging taxable US vehicle in categoryV, full July2026-June2027 covered period; annual expense divided by12, not first-use cash payment divided by12 regardless of coverage.",
+    "Use the sum of Texas reporter USD values in official2026 FeeTest2 as a registration component proxy: different2022 Kenworth, purchase136000USD/factory141000USD and equal1000 distance in each59jurisdictions. No matched2021 Cascadia, APVD or one-trip-distance claim; no second CAD conversion.",
+    "The IRP exercise expressly excludes base-jurisdiction administrative and miscellaneous fees. Keep them unresolved, not zero; this component subtotal cannot complete US_TRACTOR_PERMITS.",
+    "Keep the existing Texas/Webb annual token-box registration plus commercial-inspection scenario separate and once for one shared box. Not a Mexican/border permits package; do not add full box fees by country.",
+    "No authority opening, title/acquisition/replacement, special overweight/hazmat, fuel tax or route toll is inferred as a recurring monthly amount. Missing costs remain separate conditions, not included by these components.",
+    "Published2026 ATRI collection form excludes truck registration/CDL from permit costs. Reject it as a replacement for this registration budget; do not retrospectively assume identical definitions in every earlier survey."
+  ],
+  "sources":[
+    {"id":"IRP_INSTRUCTIONS_SCOPE","url":"https://cdn.ymaws.com/www.irponline.org/resource/resmgr/fee_test/2026_fee_test_instructions.pdf","locator":"Page1 point7 exclusions; page2 FeeTest2 for-hire conditions.","archive":{"file":"docs/research/sources/IRP_FEE_TEST_INSTRUCTIONS_2026_REVIEW_20261001.pdf","sha256":"baebfaf03c2236421161cc328bcc808a082961f5eb85339e1dbbd48020513701"}},
+    {"id":"ATRI_PERMIT_DEFINITION_2026","url":"https://truckingresearch.org/wp-content/uploads/2026/02/2026-Ops-Cost-Motor-Carrier-Form.pdf","locator":"Physicalpage2/question3 permit costs: oversize/overweight/HazMat; excludes truck registration andCDL. Blank collection instrument, not observed fees.","archive":{"file":"docs/research/sources/ATRI_MC_FORM2026.pdf","sha256":"a9be75541e94c031f71f4a7081cd06eab39bcea165202eddad199998ed8ad5d9"}}
+  ]
+}

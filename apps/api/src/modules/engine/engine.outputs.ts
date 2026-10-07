@@ -12,9 +12,11 @@
  *
  * Verified vs V3.0 Outputs: Monthly Fixed Cost 381,384.04 · Maint+Tires/km 0.2348385.
  */
-import { getParam, type ParamMap } from '../assumptions/assumptions.service.js'
+import type { ParamMap } from '../assumptions/assumptions.service.js'
 
-const P = (m: ParamMap, section: string, field: string, d: number) => getParam(m, section, field, d)
+// Arithmetic must not initialize persistence merely to read a parameter map.
+// Preserve getParam's exact nullish-fallback semantics, including explicit zero.
+const P = (m: ParamMap, section: string, field: string, d: number) => m[`${section}__${field}`] ?? d
 
 export interface MaintTiresOptions {
   includeTrailerTires?: boolean

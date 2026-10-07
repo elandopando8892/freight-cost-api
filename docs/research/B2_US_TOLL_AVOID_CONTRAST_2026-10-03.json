@@ -1,0 +1,104 @@
+{
+  "model": "FCM_US_TOLL_AVOID_ROUTE_CONTRAST_V1",
+  "recordedAt": "2026-10-03T02:07:28Z",
+  "scope": "PUBLIC_BROWSER_SCALAR_COMPARISON_NOT_TRUCK_ROUTE_OR_TARIFF_ADOPTION",
+  "origin": "18702 Metropolitan Road, Laredo, TX 78045",
+  "destination": "Fort Smith, AR 72916",
+  "actualTerminalsMatched": false,
+  "sameResolvedPostalPointAcrossProvidersVerified": false,
+  "baseline": {
+    "file": "docs/research/B2_US_POSTAL_ROUTE_REFERENCE_2026-10-03.json",
+    "sha256": "1698466636bfd6f4b400c5c8193576d127b7fee3031eec1b2b5f40f00da4f1ed",
+    "distanceMiles": 734.4,
+    "durationMinutes": 697,
+    "vehicleOption": "Commercial Truck",
+    "truckRestrictionsValidated": false,
+    "unchanged": true
+  },
+  "observations": [
+    {
+      "id": "FSK_COMMERCIAL_REOBSERVED",
+      "url": "https://freightsidekick.com/tools/route-planner",
+      "vehicleOption": "Commercial Truck",
+      "action": "CALCULATE_ROUTE_NOT_OPTIMIZE",
+      "distanceMiles": 734.4,
+      "durationMinutes": 696,
+      "avoidTollsObserved": null,
+      "itineraryAvailableAsText": false,
+      "truckRestrictionsValidated": false
+    },
+    {
+      "id": "GOOGLE_DRIVE_TOLL_AVOID",
+      "url": "https://www.google.com/maps/dir/18702+Metropolitan+Road,+Laredo,+TX+78045/72916,+Fort+Smith,+AR/",
+      "vehicleOption": "DRIVING_NOT_TRUCK",
+      "avoidTollsObserved": true,
+      "avoidHighwaysObserved": false,
+      "avoidFerriesObserved": false,
+      "distanceMiles": 693,
+      "durationMinutes": 655,
+      "timeBasis": "LEAVE_NOW_USUAL_TRAFFIC_NOT_TRUCK_DUTY",
+      "truckRestrictionsValidated": false,
+      "sourcePublishedTruckTollPriceUsd": null,
+      "tollAbsenceCertified": false
+    },
+    {
+      "id": "GOOGLE_DRIVE_EUFAULA_CONTROL_POINT",
+      "url": "https://www.google.com/maps/dir/18702+Metropolitan+Road,+Laredo,+TX+78045/Eufaula,+OK/Fort+Smith,+AR+72916/",
+      "controlPoint": "Eufaula, Oklahoma 74432",
+      "controlPointIsOperationalStop": false,
+      "vehicleOption": "DRIVING_NOT_TRUCK",
+      "avoidTollsObserved": null,
+      "distanceMiles": 714,
+      "durationMinutes": 667,
+      "timeBasis": "USUAL_TRAFFIC_NOT_TRUCK_DUTY",
+      "truckRestrictionsValidated": false,
+      "reproduces734Point4Miles": false
+    }
+  ],
+  "capufeRevalidation": {
+    "url": "https://pot.capufe.mx/gobmx/Transparencia/Doc/TransparenciaF/Tarifas/Vigentes/2026/Tarifas-vigentes-2026.pdf",
+    "sha256": "89166b501dd5b9f75bc9572e3da841b854e6942c35d89dae1d06747ac399cbf1",
+    "matchesExistingIaveOriginalBytes": true,
+    "visualPageReviewed": 1,
+    "ojoCalienteC5": null,
+    "cellState": "BLANK_NOT_ZERO",
+    "exemptionObserved": false
+  },
+  "sensitivity": {
+    "scope": "FOUR_US_MILEAGE_COMPONENTS_ONLY_NOT_TOTAL_CVU_OR_D2D_CHANGE",
+    "existingPublishedRates": {
+      "dieselUsdPerGallon": 5.955,
+      "performanceMilesPerGallon": 7.9,
+      "maintenanceUsdPerMile": 0.212,
+      "tiresUsdPerMile": 0.048,
+      "reportedDriverCompensationUsdPerMile": 0.817,
+      "internationalMileKm": 1.609344,
+      "networkEmptyShare": 0.0761
+    },
+    "formula": "deltaMiles * (diesel / mpg + maintenance + tires + compensation); network divide by (1-emptyShare); dedicated multiply2",
+    "alternatives": [
+      {"observationId":"GOOGLE_DRIVE_TOLL_AVOID","deltaMiles":-41.4,"deltaKm":-66.6268416,"outboundFourComponentsUsd":-75.79501518987338,"networkFourComponentsUsd":-82.03811580243898,"dedicatedFourComponentsUsd":-151.59003037974676},
+      {"observationId":"GOOGLE_DRIVE_EUFAULA_CONTROL_POINT","deltaMiles":-20.4,"deltaKm":-32.8306176,"outboundFourComponentsUsd":-37.34826835443034,"networkFourComponentsUsd":-40.42457880120179,"dedicatedFourComponentsUsd":-74.69653670886068}
+    ],
+    "changesAppliedToBudget": false,
+    "cfuRecalculated": false,
+    "fullCvuRecalculated": false
+  },
+  "decision": "KEEP_EXISTING_BENCHMARK_UNCHANGED_DO_NOT_TRANSFER_TOLL_AVOID_TO_DIFFERENT_ITINERARY",
+  "usInlandTollsUsd": null,
+  "completeD2DCostUsd": null,
+  "quoteReady": false,
+  "adoptedValues": 0,
+  "externalChanges": false,
+  "effects": {"mapsPlatformKeyRequests":0,"quoteRequests":0,"optimizations":0,"accountChanges":0,"publicReferenceCases":3,"publicComputationsIncludingTollToggle":4},
+  "rawDirectionsRetained": false,
+  "geometryRetained": false,
+  "limitations": [
+    "Avoid-tolls is an observed routing preference, not a published five-axle price, an actual trip or absence of every possible charge.",
+    "Identical address and ZIP strings do not establish identical postal centroid, itinerary or truck suitability across providers.",
+    "Eufaula is an investigative control point only. Its714mi does not explain or reproduce the734.4mi commercial reference, so that inferred explanation is rejected.",
+    "All distances and clocks retain displayed rounding. The one-minute FSK variation is not silently written over the dated697min source.",
+    "Four-component arithmetic excludes DEF, idle, calendars, capacity, fixed allocation, permits, tolls and crossing. It is not a completed cost reduction or market bound.",
+    "No raw routing instructions, polyline, account data or private browser state were exported. No provider integration or commercial redistribution permission is inferred from public UI access."
+  ]
+}

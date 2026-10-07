@@ -1,0 +1,2458 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <!-- CACHE_NO_CACHE_v1 (2026-05-28): evita que browsers/Meta IAB cacheen HTML viejo
+       cuando deplegamos cambios al chat. Especialmente importante para fase 2 (form único). -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="facebook-domain-verification" content="myirq5kcytosojvf2re8tkcem5lqsu" />
+
+  <!-- REPLAY_MODE_v1 (2026-09-07, pedido de Paco): ?replay=1 = esta página la está abriendo
+       el Admin dentro de un iframe para RE-PINTAR una conversación guardada con los mismos
+       renderers que vio el cliente (antes admin.html duplicaba el markup a mano y ya había
+       divergido). Va ANTES que GTM porque las tres etiquetas de abajo se saltan en ese modo:
+       revisar una conversación no es una visita, ni un lead, ni una compra. -->
+  <script>
+  window.__TIMI_REPLAY__ = (function(){ try { return new URLSearchParams(location.search).get('replay') === '1'; } catch(_) { return false; } })();
+  </script>
+
+  <!-- Google Tag Manager -->
+  <script>if(!window.__TIMI_REPLAY__){(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-5CVMV57Q');}</script>
+  <!-- End Google Tag Manager -->
+
+  <!-- Meta Pixel Code [META_PIXEL_v1 2026-05-22] -->
+  <script>
+  if(!window.__TIMI_REPLAY__){ /* REPLAY_MODE_v1 */
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+  n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+  document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '1329872425858649');
+  fbq('track', 'PageView');
+  }
+  </script>
+  <!-- End Meta Pixel Code -->
+  <!-- Microsoft UET [BING_UET_v1 2026-08-16] tag "Timi" id 97262538 · goal "Compra Timi" (evento purchase, revenue variable) -->
+  <script>if(!window.__TIMI_REPLAY__){/* REPLAY_MODE_v1 */(function(w,d,t,r,u){var f,n,i;w[u]=w[u]||[],f=function(){var o={ti:"97262538"};o.q=w[u],w[u]=new UET(o),w[u].push("pageLoad")},n=d.createElement(t),n.src=r,n.async=1,n.onload=n.onreadystatechange=function(){var s=this.readyState;s&&s!=="loaded"&&s!=="complete"||(f(),n.onload=n.onreadystatechange=null)},i=d.getElementsByTagName(t)[0],i.parentNode.insertBefore(n,i)})(window,document,"script","//bat.bing.com/bat.js","uetq");}</script>
+  <!-- End Microsoft UET -->
+
+  <!-- CLIENT_ERROR_REPORT_v1 2026-05-22 · captura errores runtime para diagnosticar TP v2 -->
+  <script>
+  (function(){
+    var REPORTED = 0, MAX = 5; // anti-flood: max 5 errores por sesión
+    function _reportClientErr(payload){
+      if (REPORTED >= MAX) return;
+      REPORTED++;
+      try {
+        var body = JSON.stringify(Object.assign({
+          url: location.href,
+          ts: new Date().toISOString(),
+          lastSocketEvent: (window.__TIMI_LASTSOCKET__ || null)
+        }, payload || {}));
+        fetch('/api/log-client-error', { method: 'POST', headers: {'Content-Type':'application/json'}, body: body, keepalive: true })
+          .catch(function(){});
+      } catch(_) {}
+    }
+    window.addEventListener('error', function(ev){
+      _reportClientErr({
+        message: (ev.error && ev.error.message) || ev.message || 'error',
+        stack:   (ev.error && ev.error.stack)   || '',
+        url:     ev.filename || '',
+        line:    ev.lineno, col: ev.colno
+      });
+    });
+    window.addEventListener('unhandledrejection', function(ev){
+      _reportClientErr({
+        message: 'unhandledrejection: ' + ((ev.reason && ev.reason.message) || String(ev.reason)),
+        stack:   (ev.reason && ev.reason.stack) || ''
+      });
+    });
+    window.__TIMI_REPORT_ERR__ = _reportClientErr; // exposed for try/catch usage
+  })();
+  </script>
+  <!-- End CLIENT_ERROR_REPORT_v1 -->
+
+  <!-- KEYBOARD_VIEWPORT_v2 (2026-08-08): maximum-scale=1 quita el auto-zoom de iOS al enfocar
+       inputs (WebKit lo respeta para el focus-zoom pero SIGUE permitiendo pinch-zoom manual,
+       así que no afecta accesibilidad). Era una de las causas del "se hace zoom" en móvil. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+  <meta name="theme-color" content="#0D1B2A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Seguro de Tractocamión: RC $22,772 al Año con Quálitas | Timi</title>
+  <meta name="description" content="Seguro de tractocamión con Quálitas: RC $22,771.95 al año en cualquier marca y Amplia de $109,492 a $170,998 según la unidad. Cotiza por chat.">
+  <meta name="keywords" content="seguro para tractocamión, seguro de camión de carga, seguro Qualitas tractocamión, seguro hombre camión, seguro carga pesada, seguro Kenworth, seguro Freightliner, Timi">
+  <meta property="og:title" content="Seguro de Tractocamión: RC $22,772 al Año con Quálitas | Timi">
+  <meta property="og:description" content="Seguro de tractocamión con Quálitas: RC $22,771.95 al año en cualquier marca y Amplia de $109,492 a $170,998 según la unidad. Cotiza por chat.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://timi.mx/seguro-tractocamion">
+  <meta property="og:image" content="https://timi.mx/img/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://timi.mx/seguro-tractocamion">
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon-kduiKI7B.svg">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon-AJD37Fg-.png">
+
+  <!-- Structured Data — GEO_IA_v1 (2026-07-26): entidad completa + FAQ citable por
+       asistentes de IA (ChatGPT/Perplexity/Gemini ya recomiendan Timi; ver /llms.txt) -->
+  
+  
+
+  <!-- Fonts -->
+  <!-- FUENTE_SIN_SALTO_v1 (2026-09-25, auditoría de landings en móvil): Plus Jakarta Sans llegaba
+       por la hoja de Google Fonts cargada en diferido (preload → onload → stylesheet) con
+       display=swap. La página se pintaba con la fuente del sistema y ~2 s después (4G lenta)
+       cambiaba a Jakarta: las líneas del hero se re-partían y todo lo de abajo brincaba. Ese era
+       el salto que se veía en el trust-bar y en productTrust — CLS 0.228 en /seguro-moto,
+       0.221 en /rc, 0.240 en /usa/por-dia y 0.026 en /carga, medido con Chromium a 390 px; con
+       la fuente web bloqueada el CLS bajaba a 0.0006, así que la causa era sólo el cambio de fuente.
+       Ahora el @font-face va en línea (se conoce al parsear, no cuando llega otra hoja), el archivo
+       se precarga desde el <head> y es display:optional: si llega a tiempo se pinta con Jakarta desde
+       el primer cuadro (medido: sí llega, también en 4G lenta, a costa de ~0.1 s de FCP) y si no,
+       se queda la del sistema sin cambiar después. Nunca hay intercambio a media lectura.
+       Jakarta es variable: UN solo woff2 (subconjunto latin, que trae á é í ó ú ñ ¿ ¡) sirve para
+       400–800. La URL es la que entrega la API css2 de Google Fonts (v12); para actualizarla:
+       curl -A 'Mozilla/5.0 … Chrome/140' 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;800'
+       Space Mono (sólo precios de la maqueta y de las tarjetas del chat) sigue por la hoja de Google. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="font" type="font/woff2" href="https://fonts.gstatic.com/s/plusjakartasans/v12/LDIoaomQNQcsA88c7O9yZ4KMCoOg4Ko20yygg_vb.woff2" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" onload="this.onload=null;this.rel='stylesheet'"><noscript><link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"></noscript>
+  <style>
+    /* FUENTE_SIN_SALTO_v1: latin (lo que usan ES y EN) y latin-ext (sólo se descarga si una
+       página trae esos caracteres). Mismos rangos que entrega Google Fonts. */
+    @font-face { font-family: 'Plus Jakarta Sans'; font-style: normal; font-weight: 200 800; font-display: optional;
+      src: url(https://fonts.gstatic.com/s/plusjakartasans/v12/LDIoaomQNQcsA88c7O9yZ4KMCoOg4Ko20yygg_vb.woff2) format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: 'Plus Jakarta Sans'; font-style: normal; font-weight: 200 800; font-display: optional;
+      src: url(https://fonts.gstatic.com/s/plusjakartasans/v12/LDIoaomQNQcsA88c7O9yZ4KMCoOg4Ko40yygg_vbd-E.woff2) format('woff2');
+      unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+  </style>
+
+  <style>
+    :root {
+      --coral: #FF6B5A;
+      --coral-light: #FF8A7D;
+      --coral-dark: #E5503F;
+      --navy: #0D1B2A;
+      --navy-mid: #1B2D45;
+      --navy-light: #243B53;
+      --teal: #00D4AA;
+      --teal-light: #33FFCC;
+      --teal-dark: #00B894;
+      --white: #FAFBFC;
+      --gray-100: #F0F2F5;
+      --gray-200: #E1E5EA;
+      --gray-300: #C4CAD4;
+      --gray-500: #7A8599;
+      --gray-700: #3D4F6F;
+      --font-main: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      --font-mono: 'Space Mono', monospace;
+      --radius: 16px;
+      --radius-sm: 10px;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+    body {
+      font-family: var(--font-main);
+      background: var(--navy);
+      color: var(--white);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* ENLACES_CONTRASTE_v1 (2026-09-25, auditoría de landings en móvil): los enlaces sin clase
+       («Verifica nuestra identidad y contacto», «Verify Timi and see how payment works», el
+       teléfono +1 424, las 36 rutas de /carga…) salían con el azul por defecto del navegador
+       (#0000EE) sobre el navy de la página: contraste 1.85:1, casi invisibles justo donde está
+       la confianza. Toman el color del texto que los rodea (que ya está pensado para su fondo:
+       gris claro sobre navy, oscuro sobre blanco) y se distinguen por el subrayado.
+       :where() deja la especificidad en cero: cualquier regla que ya pinte sus enlaces
+       (.timi-geo-inner a, .footer-links a, .nav-links a, estilos en línea…) sigue ganando. */
+    :where(a:not([class])) { color: inherit; text-decoration: underline; text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
+    :where(a:not([class])):hover { text-decoration-thickness: 2px; }
+
+    /* ═══ NOISE ═══ */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ═══ NAVBAR ═══ */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 16px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      background: rgba(13,27,42,0.8);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      transition: all 0.3s;
+    }
+    .navbar.scrolled { background: rgba(13,27,42,0.95); box-shadow: 0 4px 30px rgba(0,0,0,0.3); }
+
+    .nav-logo { font-size: 28px; font-weight: 800; letter-spacing: -1px; color: var(--white); text-decoration: none; }
+    .nav-logo span { color: var(--coral); }
+
+    .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+    .nav-links a { color: var(--gray-300); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--white); }
+
+    .nav-cta {
+      background: var(--coral); color: white !important; padding: 10px 24px;
+      border-radius: 100px; font-weight: 600 !important; transition: all 0.2s !important; cursor: pointer; border: none; font-size: 14px; font-family: var(--font-main);
+    }
+    .nav-cta:hover { background: var(--coral-dark) !important; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,107,90,0.3); }
+
+    .nav-mobile-btn { display: none; background: none; border: none; color: var(--white); font-size: 28px; cursor: pointer; }
+
+    /* ═══ HERO ═══ */
+    .hero {
+      min-height: 100vh; display: flex; align-items: center;
+      padding: 120px 24px 80px; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; width: 600px; height: 600px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,107,90,0.15), transparent 70%);
+      top: -200px; right: -100px; animation: float 8s ease-in-out infinite;
+    }
+    .hero::after {
+      content: ''; position: absolute; width: 500px; height: 500px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,212,170,0.1), transparent 70%);
+      bottom: -100px; left: -200px; animation: float 10s ease-in-out infinite reverse;
+    }
+    @keyframes float {
+      0%, 100% { transform: translate(0,0) scale(1); }
+      50% { transform: translate(30px,-20px) scale(1.05); }
+    }
+
+    .hero-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+      position: relative; z-index: 1;
+    }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(0,212,170,0.12); border: 1px solid rgba(0,212,170,0.25);
+      padding: 6px 16px; border-radius: 100px;
+      font-size: 13px; font-weight: 600; color: var(--teal);
+      margin-bottom: 24px; animation: fadeInUp 0.6s ease both;
+    }
+    .hero-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--teal); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
+
+    .hero h1 {
+      font-size: clamp(40px,5.5vw,68px); font-weight: 800;
+      line-height: 1.05; letter-spacing: -2px; margin-bottom: 20px;
+      animation: fadeInUp 0.6s ease 0.1s both;
+    }
+    .hero h1 .highlight {
+      background: linear-gradient(135deg, var(--coral), var(--coral-light));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    .hero-sub { font-size: 18px; color: var(--gray-300); max-width: 440px; line-height: 1.7; margin-bottom: 36px; animation: fadeInUp 0.6s ease 0.2s both; }
+
+    .hero-buttons { display: flex; gap: 16px; flex-wrap: wrap; animation: fadeInUp 0.6s ease 0.3s both; }
+
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--coral); color: white; padding: 16px 32px;
+      border-radius: 100px; font-size: 16px; font-weight: 700;
+      text-decoration: none; border: none; cursor: pointer;
+      transition: all 0.25s; box-shadow: 0 4px 20px rgba(255,107,90,0.25);
+      font-family: var(--font-main);
+    }
+    .btn-primary:hover { background: var(--coral-dark); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,107,90,0.35); }
+
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: transparent; color: var(--white); padding: 16px 32px;
+      border-radius: 100px; font-size: 16px; font-weight: 600;
+      text-decoration: none; border: 1px solid rgba(255,255,255,0.15);
+      transition: all 0.25s;
+    }
+    .btn-secondary:hover { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.05); }
+
+    /* ═══ CHAT MOCKUP (Hero) ═══ */
+    .chat-mockup-wrap { animation: fadeInUp 0.8s ease 0.4s both; perspective: 1000px; }
+    .chat-mockup {
+      background: var(--navy-mid); border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05), inset 0 1px 0 rgba(255,255,255,0.05);
+      overflow: hidden; max-width: 420px; margin-left: auto;
+      transform: rotateY(-3deg) rotateX(2deg); transition: transform 0.4s; cursor: pointer;
+    }
+    .chat-mockup:hover { transform: rotateY(0) rotateX(0); }
+    .chat-mockup-cta {
+      text-align: center; padding: 12px; background: rgba(255,107,90,0.1);
+      border-top: 1px solid rgba(255,107,90,0.2);
+      font-size: 13px; font-weight: 600; color: var(--coral);
+      transition: background 0.2s;
+    }
+    .chat-mockup:hover .chat-mockup-cta { background: rgba(255,107,90,0.18); }
+
+    .chat-header {
+      background: var(--navy-light); padding: 16px 20px;
+      display: flex; align-items: center; gap: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .chat-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--coral), var(--teal));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 800; color: white; flex-shrink: 0;
+    }
+    .chat-header-info h4 { font-size: 14px; font-weight: 700; color: var(--white); }
+    .chat-header-info span { font-size: 11px; color: var(--teal); font-weight: 500; }
+
+    .chat-body { padding: 20px; min-height: 320px; display: flex; flex-direction: column; gap: 12px; }
+
+    .chat-msg {
+      max-width: 85%; padding: 12px 16px; border-radius: 16px;
+      font-size: 13.5px; line-height: 1.5; opacity: 0; transform: translateY(10px);
+    }
+    .chat-msg.visible { opacity: 1; transform: translateY(0); transition: all 0.4s ease; }
+    .chat-msg.user { align-self: flex-end; background: var(--coral); color: white; border-bottom-right-radius: 4px; }
+    .chat-msg.bot { align-self: flex-start; background: var(--navy-light); color: var(--gray-100); border: 1px solid rgba(255,255,255,0.06); border-bottom-left-radius: 4px; }
+
+    .chat-result {
+      align-self: flex-start;
+      background: linear-gradient(135deg, rgba(0,212,170,0.1), rgba(0,212,170,0.05));
+      border: 1px solid rgba(0,212,170,0.2); border-radius: 16px;
+      padding: 16px; width: 90%; opacity: 0; transform: translateY(10px);
+    }
+    .chat-result.visible { opacity: 1; transform: translateY(0); transition: all 0.5s ease; }
+    .chat-result-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--teal); font-weight: 700; margin-bottom: 10px; }
+    .chat-result-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 13px; }
+    .chat-result-row .cia { color: var(--gray-300); font-weight: 500; }
+    .chat-result-row .precio { color: var(--white); font-weight: 700; font-family: var(--font-mono); font-size: 13px; }
+    .chat-result-row.best .cia { color: var(--teal); }
+    .chat-result-row.best .precio { color: var(--teal); }
+    .chat-result-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 8px 0; }
+
+    .typing-indicator { display: flex; gap: 4px; padding: 12px 16px; align-self: flex-start; opacity: 0; }
+    .typing-indicator.visible { opacity: 1; transition: opacity 0.3s; }
+    .typing-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gray-500); animation: typingBounce 1.4s infinite ease-in-out; }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingBounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+
+    .chat-input-mock {
+      padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.06);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .chat-input-mock input {
+      flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 100px; padding: 10px 16px; color: var(--gray-300);
+      font-size: 13px; font-family: var(--font-main); outline: none;
+    }
+    .chat-input-mock button {
+      width: 36px; height: 36px; border-radius: 50%; background: var(--coral);
+      border: none; color: white; font-size: 16px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+
+    @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ═══ TRUST BAR ═══ */
+    .trust-bar { padding: 40px 24px; text-align: center; position: relative; z-index: 1; }
+    .trust-label { font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: var(--gray-500); font-weight: 600; margin-bottom: 28px; }
+    .trust-logos { display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; max-width: 960px; margin: 0 auto; }
+    .trust-logo {
+      display: flex; align-items: center; justify-content: center;
+      height: 48px; padding: 0 20px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px; transition: all 0.3s;
+    }
+    .trust-logo:hover { background: rgba(255,255,255,0.08); border-color: var(--brand, rgba(255,255,255,0.12)); box-shadow: 0 0 12px color-mix(in srgb, var(--brand, transparent) 25%, transparent); }
+    .trust-logo img {
+      height: 28px; opacity: 0.95; transition: opacity 0.3s; object-fit: contain; max-width: 100px;
+      background: rgba(255,255,255,0.92); border-radius: 6px; padding: 4px 8px;
+    }
+    .trust-logo:hover img { opacity: 1; }
+    .trust-logo-text {
+      font-size: 13px; font-weight: 700; color: var(--gray-300); letter-spacing: 1px; opacity: 0.7;
+    }
+
+    /* ═══ SECTIONS ═══ */
+    .section { padding: 100px 24px; position: relative; }
+    .section-label { font-size: 12px; text-transform: uppercase; letter-spacing: 3px; color: var(--coral); font-weight: 700; margin-bottom: 12px; }
+    .section-title { font-size: clamp(32px,4vw,48px); font-weight: 800; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 16px; }
+    .section-sub { font-size: 17px; color: var(--gray-300); max-width: 500px; line-height: 1.7; }
+
+    .how-it-works { background: linear-gradient(180deg, var(--navy), var(--navy-mid)); }
+    .how-inner { max-width: 1100px; margin: 0 auto; }
+    .how-header { text-align: center; margin-bottom: 72px; }
+    .how-header .section-sub { margin: 0 auto; }
+
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+    .step {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: var(--radius); padding: 40px 32px; text-align: center;
+      transition: all 0.3s; position: relative; overflow: hidden;
+    }
+    .step::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--coral), var(--teal)); opacity: 0; transition: opacity 0.3s; }
+    .step:hover::before { opacity: 1; }
+    .step:hover { background: rgba(255,255,255,0.06); transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+
+    .step-num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 48px; height: 48px; border-radius: 14px;
+      font-family: var(--font-mono); font-size: 20px; font-weight: 700; margin-bottom: 20px;
+    }
+    .step:nth-child(1) .step-num { background: rgba(255,107,90,0.15); color: var(--coral); }
+    .step:nth-child(2) .step-num { background: rgba(0,212,170,0.15); color: var(--teal); }
+    .step:nth-child(3) .step-num { background: rgba(255,107,90,0.15); color: var(--coral-light); }
+
+    .step-icon { font-size: 36px; margin-bottom: 8px; }
+    .step h3 { font-size: 20px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.5px; }
+    .step p { font-size: 14px; color: var(--gray-300); line-height: 1.7; }
+
+    /* ═══ FEATURES ═══ */
+    .features { background: var(--navy-mid); }
+    .features-inner { max-width: 1100px; margin: 0 auto; }
+    .features-header { text-align: center; margin-bottom: 64px; }
+    .features-header .section-sub { margin: 0 auto; }
+
+    .feature-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    .feature-card {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: var(--radius); padding: 32px; display: flex; gap: 20px; align-items: flex-start; transition: all 0.3s;
+    }
+    .feature-card:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); }
+    .feature-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+    }
+    .feature-card:nth-child(1) .feature-icon { background: rgba(255,107,90,0.12); }
+    .feature-card:nth-child(2) .feature-icon { background: rgba(0,212,170,0.12); }
+    .feature-card:nth-child(3) .feature-icon { background: rgba(255,138,125,0.12); }
+    .feature-card:nth-child(4) .feature-icon { background: rgba(0,184,148,0.12); }
+
+    .feature-text h4 { font-size: 17px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.3px; }
+    .feature-text p { font-size: 14px; color: var(--gray-300); line-height: 1.6; }
+
+    /* ═══ CTA ═══ */
+    .cta-section { padding: 120px 24px; text-align: center; position: relative; overflow: hidden; }
+    .cta-section::before {
+      content: ''; position: absolute; width: 800px; height: 800px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,107,90,0.08), transparent 70%);
+      top: 50%; left: 50%; transform: translate(-50%,-50%);
+    }
+    .cta-inner { position: relative; z-index: 1; max-width: 600px; margin: 0 auto; }
+    .cta-inner .section-title { font-size: clamp(36px,5vw,56px); margin-bottom: 20px; }
+    .cta-inner .section-sub { margin: 0 auto 40px; max-width: 460px; }
+
+    /* ═══ FOOTER ═══ */
+    footer { padding: 48px 24px 32px; border-top: 1px solid rgba(255,255,255,0.06); }
+    /* FOOTER_LEGIBLE_v1 (2026-09-19, «se ve muy feo lo de abajo» — Paco): la lista era un
+       `display:flex` SIN wrap con 24 enlaces. Al no caber, flex encogía cada <li> a su ancho
+       mínimo y partía cada etiqueta en tres o cuatro renglones: columnas de una palabra, con
+       «Seguro de auto por estado» ocupando cuatro líneas. Ahora la lista envuelve por
+       renglones y cada enlace se queda en UNA línea (`white-space: nowrap`); la marca sube a
+       su propio renglón, centrada, igual que el bloque de redes y el de contacto que ya
+       estaban centrados debajo. */
+    .footer-inner { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 22px; }
+    .footer-brand { font-size: 22px; font-weight: 800; letter-spacing: -1px; }
+    .footer-brand span { color: var(--coral); }
+    .footer-links { display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
+      gap: 12px 22px; list-style: none; padding: 0; margin: 0; max-width: 920px; }
+    .footer-links li { white-space: nowrap; }
+    .footer-links a { color: var(--gray-500); text-decoration: none; font-size: 13px; line-height: 1.5; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--white); }
+    /* SOCIAL_FOOTER_v1 */
+    .footer-social { width: 100%; display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 22px; }
+    .footer-social-label { font-size: 13px; color: var(--gray-500); margin-right: 2px; }
+    .footer-social a {
+      display: flex; align-items: center; justify-content: center;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.10);
+      color: var(--gray-300); transition: background .2s, border-color .2s, color .2s, transform .2s;
+    }
+    .footer-social a:hover { background: rgba(45,212,191,0.12); border-color: rgba(45,212,191,0.5); color: var(--teal); transform: translateY(-2px); }
+    .footer-social svg { width: 18px; height: 18px; }
+    .footer-copy { width: 100%; text-align: center; font-size: 12px; color: var(--gray-500); margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.04); }
+
+    /* ═══ SCROLL ANIMATIONS ═══ */
+    .reveal { opacity: 0; transform: translateY(30px); transition: all 0.7s cubic-bezier(0.16,1,0.3,1); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       CHAT DRAWER — El chat embebido que se abre desde la landing
+    ═══════════════════════════════════════════════════════════════════ */
+    .chat-overlay {
+      position: fixed; inset: 0; z-index: 1000;
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+      opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    .chat-overlay.open { opacity: 1; pointer-events: all; }
+
+    /* ── DESKTOP: panel lateral derecho ── */
+    .chat-drawer {
+      position: fixed; z-index: 1001;
+      bottom: 0; right: 0;
+      /* CHAT_ANCHO_v2 (2026-08-27, pedido de Paco): el max-width de 820px (c9787dd, para
+         desktop angosto) capaba también las pantallas grandes y el chat abría a un tercio.
+         Se restaura el 70vw real; el tope queda solo para monitores ultra anchos. */
+      width: 70vw; min-width: 380px; max-width: 1400px; height: 100dvh;
+      background: var(--navy);
+      display: flex; flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
+      box-shadow: -8px 0 40px rgba(0,0,0,0.4);
+    }
+    .chat-drawer.open { transform: translateX(0); }
+
+    /* ── MÓVIL: pantalla completa, entra desde abajo ──
+       En móvil el chat ocupa toda la pantalla para evitar problemas
+       de teclado, overlay accidental y espacio insuficiente.
+       CSS maneja el teclado via interactive-widget=resizes-content
+       en el viewport meta — sin JS de altura. */
+    @media (max-width: 640px) {
+      .chat-drawer {
+        width: 100% !important;
+        min-width: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        transform: translateY(100%) !important;
+        transition: transform 0.32s cubic-bezier(0.16,1,0.3,1) !important;
+      }
+      /* KEYBOARD_VIEWPORT_v2 (2026-08-08): el drawer se dimensiona/posiciona con variables
+         CSS que alimenta el JS (visualViewport) — el JS solo reporta números, las reglas
+         viven aquí (acuerdo con Fabricio: no pisar estilos CSS desde JS).
+         --kb-inset = alto real visible (viewport - teclado). Fallback 100% cuando
+           interactive-widget=resizes-content sí aplica (Chrome/Android) o no hay teclado.
+         --kb-shift  = visualViewport.offsetTop. iOS "panea" el visual viewport al abrir el
+           teclado y un fixed anclado arriba se sale de la zona visible: el usuario quedaba
+           viendo solo el input hasta arriba y la landing atrás (reporte Francisco 8-ago,
+           iPhone). El translateY lo trae de vuelta a la zona visible. */
+      /* KEYBOARD_VIEWPORT_v3 (2026-08-08, feedback Francisco): con v2 (height = viewport
+         visible) la landing se asomaba en franjas arriba/abajo del drawer con el teclado
+         abierto. Ahora el drawer mide SIEMPRE el viewport completo (100%) y el teclado se
+         compensa con padding-bottom (--kb-inset = alto del teclado): el fondo navy cubre
+         todo — incluso lo que queda debajo del teclado — y el input aterriza exactamente
+         entre los mensajes y el teclado. */
+      .chat-drawer { height: 100%; box-sizing: border-box; padding-bottom: var(--kb-inset, 0px); }
+      .chat-drawer.open { transform: translateY(var(--kb-shift, 0px)) !important; }
+      /* Con el teclado abierto la transición de transform (0.32s) haría que el drawer
+         "persiguiera" al teclado con lag — se apaga mientras el teclado esté visible. */
+      .chat-drawer.kb-open { transition: none !important; }
+      /* SAFARI_PILL_CUSHION_v1 (2026-08-08): Safari iOS 26 flota su píldora "timi.mx" y la
+         barra de accesorios justo encima del teclado, tapando parte del campo de texto.
+         Con el teclado abierto el input se levanta un poco para respirar bajo esa píldora
+         (en Chrome/Android solo se ve como un margen inferior discreto). */
+      .chat-drawer.kb-open .chat-drawer-input { padding-bottom: 28px; }
+      /* CHAT_FULLSCREEN_M_v1 (2026-08-08, pedido Francisco): con el chat abierto en móvil
+         NADA de la landing debe verse ni moverse detrás (distraía y se asomaba en franjas
+         durante el pan del teclado). En vez de ocultar la página (visibility choca con los
+         `transition: all` de navbar/fab y dejaba elementos atorados), el drawer trae su
+         propio fondo opaco que SOBRESALE 120vh por arriba y por abajo: cualquier hueco que
+         el pan del teclado abra alrededor queda tapado en navy, sin tocar estilos ajenos.
+         El drawer es position:fixed con transform → es el containing block del ::before, y
+         su stacking context deja el fondo detrás del chat pero siempre encima de la página. */
+      body.chat-open-m { background: var(--navy); }
+      .chat-drawer.open::before {
+        content: '';
+        position: absolute;
+        left: 0; right: 0; top: -120vh; bottom: -120vh;
+        background: var(--navy);
+        z-index: -1;
+      }
+      /* Sin overlay en móvil — el chat cubre toda la pantalla */
+      .chat-overlay { display: none !important; }
+      /* CHAT_COMPACTO_MOVIL_v1 (2026-09-25, auditoría de landings en móvil): las ligas con
+         ?chat=1 (anuncios de Carga, Motos, «Just Chat» de SB, Marca y NB) y el clic pagado a NB
+         abrían el chat a pantalla completa desde el arranque: el visitante no veía el H1, el
+         precio ni quién es Timi, sólo un chat. Ahora ese chat automático abre como hoja desde
+         abajo: la landing se lee arriba (H1 + la cifra de la respuesta; el JS mide dónde termina y
+         la pone en --chat-compacto-top) y el chat ya está abierto y saludando abajo. Al primer
+         toque dentro de la hoja o en el campo de texto (el toque, no el foco que pone el bot al
+         preguntar) pasa a la pantalla completa de siempre (teclado, KEYBOARD_VIEWPORT_v3, fondo opaco). El JS sólo reporta el número; las
+         reglas viven aquí (mismo acuerdo que KEYBOARD_VIEWPORT_v2). */
+      .chat-drawer.chat-compacto {
+        top: var(--chat-compacto-top, 45vh) !important;
+        height: auto !important;
+        border-radius: 18px 18px 0 0 !important;
+        box-shadow: 0 -12px 40px rgba(0,0,0,0.45) !important;
+        overflow: hidden;
+      }
+      .chat-drawer.open.chat-compacto::before { display: none; }
+      .chat-drawer.chat-compacto .chat-drawer-header { position: relative; padding-top: 18px; cursor: pointer; }
+      .chat-drawer.chat-compacto .chat-drawer-header::before {
+        content: ''; position: absolute; top: 7px; left: 50%; width: 40px; height: 4px; margin-left: -20px;
+        border-radius: 2px; background: rgba(255,255,255,0.3);
+      }
+      .chat-drawer.chat-compacto .chat-drawer-messages { overscroll-behavior: contain; }
+    }
+
+    .chat-drawer-header {
+      background: var(--navy-mid); padding: 16px 20px;
+      display: flex; align-items: center; gap: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      flex-shrink: 0;
+    }
+    /* RESTART_BTN_v2 (2026-08-01): antes era un 🔄 pelón que nadie sabía qué hacía.
+       Ahora dice lo que hace. En pantallas angostas se queda solo el icono. */
+    .chat-restart-btn {
+      margin-left: auto; background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.14);
+      color: var(--gray-300); font-size: 12px; font-weight: 600; cursor: pointer;
+      height: 32px; padding: 0 12px; border-radius: 16px;
+      display: flex; align-items: center; gap: 6px; white-space: nowrap;
+      transition: background .2s, border-color .2s, color .2s;
+    }
+    .chat-restart-btn:hover {
+      background: rgba(45,212,191,0.12); border-color: rgba(45,212,191,0.5); color: var(--teal);
+    }
+    .chat-restart-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+    /* RESTART_BTN_v3 (2026-08-08, pedido Francisco): en móvil el icono solo no dice nada —
+       el texto se queda SIEMPRE visible, solo más compacto en pantallas angostas. */
+    @media (max-width: 420px) {
+      .chat-restart-btn { padding: 0 10px; font-size: 11px; }
+      .chat-restart-btn svg { width: 12px; height: 12px; }
+    }
+    .chat-drawer-close {
+      background: none; border: none;
+      color: var(--gray-300); font-size: 22px; cursor: pointer;
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    .chat-drawer-close:hover { background: rgba(255,255,255,0.08); }
+
+    .chat-drawer-messages {
+      flex: 1;
+      min-height: 0;           /* CRÍTICO: flex + overflow sin esto = contenido sin límite de altura */
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 20px;
+      display: flex; flex-direction: column; gap: 12px;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      /* CONTAINER_QUERY_DRAWER_v1: el drawer mide 70vw (min 380px, sin tope) —
+         un layout lado-a-lado (quote-card + sidebar) puede quedar apretado en
+         ventanas de escritorio angostas (~761-1000px) aunque el viewport no
+         sea "móvil". Medir el ancho REAL del contenedor, no el viewport. */
+      container-type: inline-size;
+      container-name: chatmsgs;
+    }
+
+    /* Message bubbles in drawer */
+    .chat-drawer-messages .msg {
+      max-width: 88%; padding: 12px 16px; border-radius: 18px;
+      font-size: 14px; line-height: 1.55; animation: msgSlide 0.3s ease;
+    }
+    .chat-drawer-messages .msg.bot {
+      align-self: flex-start; background: var(--navy-light);
+      color: var(--white); border-bottom-left-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+    .chat-drawer-messages .msg.user {
+      align-self: flex-end; background: var(--coral);
+      color: white; border-bottom-right-radius: 4px;
+    }
+    /* HUMANO_VISIBLE_v1: mensaje escrito por una persona desde el panel (teal, como en el Admin) */
+    .chat-drawer-messages .msg.bot.human {
+      background: #122b2b; border: 1px solid rgba(20,184,166,.55);
+      box-shadow: 0 0 0 1px rgba(20,184,166,.12);
+    }
+    .chat-drawer-messages .msg.bot.human .human-chip {
+      display: flex; width: max-content; align-items: center; gap: 4px; margin: -2px 0 6px;
+      padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 700;
+      letter-spacing: .2px; color: #2DD4BF; background: rgba(20,184,166,.14);
+      border: 1px solid rgba(20,184,166,.45);
+    }
+    /* ELECCION_VISIBLE_v1: lo que el cliente eligió con un botón, como píldora discreta */
+    .chat-drawer-messages .msg.choice {
+      align-self: flex-end; display: inline-flex; align-items: center; gap: 7px;
+      max-width: 80%; padding: 5px 13px 5px 6px; border-radius: 999px;
+      background: rgba(255,107,90,.12); border: 1px solid rgba(255,107,90,.45);
+      color: #FFD9D4; font-size: 13px; font-weight: 600; line-height: 1.35;
+    }
+    .chat-drawer-messages .msg.choice .choice-ic {
+      flex: none; width: 18px; height: 18px; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--coral); color: #fff; font-size: 11px; font-weight: 800;
+    }
+    .chat-drawer-messages .msg.typing-msg {
+      background: var(--navy-light); border: 1px solid rgba(255,255,255,0.04);
+      padding: 14px 18px;
+    }
+
+    @keyframes msgSlide { from{opacity:0;transform:translateY(8px)scale(0.97)} to{opacity:1;transform:translateY(0)scale(1)} }
+
+    /* ═══ QUOTE CARDS ═══ */
+    /* ═══ COB_3PAQ_v1 — escalera de coberturas ═══ */
+    .tier-card {
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.10);
+      border-radius: 12px; padding: 13px 15px; margin-bottom: 9px; cursor: pointer;
+      transition: border-color .18s ease, background .18s ease;
+    }
+    .tier-card:hover { border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.06); }
+    .tier-hero { border: 2px solid #2DD4BF; }
+    /* DISEÑO_TIERS_v1 (30-ago): la cobertura recomendada se distingue con coral (la marca de
+       compra), precio con sufijo /año y badge propio — pedida para elevar la tarjeta de motos */
+    .tier-reco { border: 2px solid #FF6B5A; background: rgba(255,107,90,.06); }
+    .tier-reco:hover { border-color: #FF8A65; }
+    .tier-reco .tier-total { color: #FF8A65; }
+    .tier-badge-reco { background: linear-gradient(135deg,#FF6B5A,#FF8A65); color: #fff; }
+    .tier-sufijo { font-size: 10px; font-weight: 600; color: var(--gray-500); margin-left: 2px; }
+    .tier-open { background: rgba(255,255,255,.07); }
+    .tier-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .tier-info { min-width: 0; }
+    .tier-name { font-size: 15px; font-weight: 700; color: var(--white); display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+    .tier-badge { font-size: 10px; font-weight: 700; letter-spacing: .3px; background: #2DD4BF; color: #04342C; padding: 2px 7px; border-radius: 20px; }
+    .tier-nota { font-size: 12px; color: var(--gray-400); margin-top: 3px; }
+    .tier-price { text-align: right; white-space: nowrap; }
+    .tier-total { font-size: 19px; font-weight: 700; color: var(--white); font-variant-numeric: tabular-nums; }
+    .tier-hero .tier-total { color: #2DD4BF; }
+    .tier-cia { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+    .tier-cia b { color: var(--gray-300); font-weight: 700; }
+    .tier-body { margin-top: 13px; border-top: 1px solid rgba(255,255,255,.10); padding-top: 13px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(148px, 1fr)); gap: 9px; }
+    .tier-opt { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.10); border-radius: 10px; padding: 11px; }
+    .tier-opt-best { background: rgba(45,212,191,.10); border-color: rgba(45,212,191,.45); }
+    .tier-opt-head { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+    .tier-opt-logo { height: 17px; width: auto; background: #fff; border-radius: 3px; padding: 1px 3px; }
+    .tier-opt-cia { font-size: 11px; color: var(--gray-400); }
+    .tier-opt-total { font-size: 16px; font-weight: 700; color: var(--white); font-variant-numeric: tabular-nums; }
+    .tier-opt-best .tier-opt-total { color: #2DD4BF; }
+    .tier-opt-neta { font-size: 10px; color: var(--gray-500); margin-top: 2px; }
+    .tier-opt-btn { margin-top: 9px; width: 100%; padding: 9px; border: none; border-radius: 8px;
+      background: linear-gradient(135deg,#FF6B5A,#FF8A65); color: #fff; font-weight: 700; font-size: 12px; cursor: pointer; }
+    .tier-opt-link { margin-top: 6px; width: 100%; padding: 7px; border: 1px solid rgba(255,255,255,.16);
+      border-radius: 8px; background: transparent; color: var(--gray-400); font-size: 11px; cursor: pointer;
+      transition: color .18s, border-color .18s; }
+    .tier-opt-link:hover { color: var(--gray-300); border-color: rgba(255,255,255,.30); }
+    .tier-lead { font-size: 12px; color: var(--gray-400); margin: 12px 2px 9px; letter-spacing: .2px; }
+    .tier-chevron { font-size: 10px; color: var(--gray-500); margin-top: 8px; letter-spacing: .3px; }
+    .tier-open .tier-chevron { color: var(--teal); }
+    .tier-opt-chip { font-size: 9px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase;
+      background: #2DD4BF; color: #04342C; padding: 2px 6px; border-radius: 20px; }
+    .tier-body-solo { grid-template-columns: 1fr; }
+
+    /* DETALLE_INLINE_v1 — coberturas dentro de la tarjeta, con salida siempre visible */
+    .tier-detail { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px; padding: 13px; }
+    .tier-det-head { display: flex; align-items: center; gap: 9px; margin-bottom: 11px;
+      padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,.10); }
+    .tier-det-back { background: rgba(255,255,255,.07); border: none; color: var(--gray-300);
+      width: 26px; height: 26px; border-radius: 8px; cursor: pointer; font-size: 14px; line-height: 1;
+      flex-shrink: 0; transition: background .18s, color .18s; }
+    .tier-det-back:hover { background: rgba(45,212,191,.16); color: var(--teal); }
+    .tier-det-cia { font-size: 13px; font-weight: 700; color: var(--white); }
+    .tier-det-tier { font-size: 11px; color: var(--gray-400); margin-top: 1px; }
+    .tier-det-list { display: flex; flex-direction: column; }
+    .tier-det-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+      padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.05); }
+    .tier-det-row:last-child { border-bottom: none; }
+    .tier-det-n { font-size: 11.5px; color: var(--gray-300); line-height: 1.4; }
+    .tier-det-v { font-size: 11px; color: var(--gray-400); text-align: right; white-space: nowrap;
+      font-variant-numeric: tabular-nums; }
+    .tier-det-v em { display: block; font-style: normal; font-size: 10px; color: var(--gray-500); margin-top: 1px; }
+    .tier-det-empty { font-size: 11px; color: var(--gray-500); padding: 8px 0; }
+
+    /* ═══ TARJETA_HERO_v1 (7-sep-2026): una recomendación grande + selector de nivel ═══ */
+    .qt-card { background: var(--navy-mid); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; overflow: hidden; }
+    .qt-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 11px 14px;
+      background: linear-gradient(135deg, rgba(0,212,170,.12), rgba(0,212,170,.05)); border-bottom: 1px solid rgba(0,212,170,.18); }
+    .qt-veh { font-size: 14px; font-weight: 800; color: var(--white); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .qt-edit { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--teal); background: rgba(0,212,170,.15);
+      padding: 3px 9px; border-radius: 100px; font-weight: 700; border: none; cursor: pointer; font-family: var(--font-main); flex-shrink: 0; }
+    .qt-details { padding: 8px 14px; font-size: 11px; color: var(--gray-500); background: var(--navy-light); display: flex; gap: 10px; flex-wrap: wrap; }
+    .qt-seg { display: flex; gap: 4px; background: rgba(255,255,255,.05); border-radius: 12px; padding: 4px; margin: 10px 12px 0; }
+    .qt-seg button { flex: 1; border: none; border-radius: 9px; padding: 8px 4px; background: transparent; color: var(--gray-500);
+      font-family: var(--font-main); font-weight: 700; font-size: 11.5px; cursor: pointer; display: flex; flex-direction: column; gap: 1px; align-items: center; line-height: 1.2; }
+    .qt-seg button span { font-size: 10.5px; font-weight: 600; color: var(--gray-500); font-variant-numeric: tabular-nums; }
+    .qt-seg button.on { background: var(--navy-light); color: var(--white); box-shadow: 0 2px 8px rgba(0,0,0,.3); }
+    .qt-seg button.on span { color: var(--teal); }
+    .qt-hero { margin: 10px 12px 0; background: linear-gradient(160deg, rgba(255,107,90,.10), rgba(255,255,255,.03)); border: 1px solid rgba(255,107,90,.35); border-radius: 14px; padding: 14px; }
+    .qt-hero.rc { background: linear-gradient(160deg, rgba(0,212,170,.10), rgba(255,255,255,.03)); border-color: rgba(0,212,170,.35); }
+    .qt-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+    .qt-name { font-size: 15px; font-weight: 800; color: var(--white); }
+    .qt-sub { font-size: 11.5px; color: var(--gray-300); margin-top: 2px; }
+    .qt-badge { font-size: 9px; font-weight: 700; letter-spacing: .3px; background: #2DD4BF; color: #04342C; padding: 2px 7px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+    .qt-badge.reco { background: linear-gradient(135deg, #FF6B5A, #FF8A65); color: #fff; }
+    .qt-price { font-size: 27px; letter-spacing: -.02em; margin-top: 10px; font-variant-numeric: tabular-nums; font-weight: 800; line-height: 1; color: var(--white); }
+    .qt-price small { font-size: 12px; color: var(--gray-500); font-weight: 600; letter-spacing: 0; }
+    .qt-msi { font-size: 11.5px; color: var(--teal); margin-top: 5px; font-weight: 600; }
+    .qt-list { list-style: none; padding: 0; margin: 12px 0 0; display: flex; flex-direction: column; gap: 7px; }
+    .qt-list li { display: grid; grid-template-columns: 16px minmax(0,1fr) fit-content(46%); gap: 8px; font-size: 12px; align-items: baseline; color: var(--white); }
+    .qt-list li .ic { color: var(--teal); font-weight: 800; }
+    .qt-list li.no, .qt-list li.no .ic, .qt-list li.no .v { color: var(--gray-500); }
+    .qt-list li .v { font-size: 11px; color: var(--gray-300); font-variant-numeric: tabular-nums; text-align: right; line-height: 1.35; }
+    .qt-cia { display: flex; align-items: center; gap: 7px; margin-top: 12px; font-size: 11px; color: var(--gray-300); flex-wrap: wrap; }
+    .qt-cia img { height: 12px; width: auto; background: #fff; border-radius: 3px; padding: 1px 4px; }
+    .qt-alt { border: 1px solid rgba(255,255,255,.16); background: transparent; color: var(--gray-300); border-radius: 100px; padding: 2px 8px; font-size: 10.5px; cursor: pointer; font-family: var(--font-main); }
+    .qt-alt:hover { border-color: var(--teal); color: var(--white); }
+    .qt-tog { display: flex; gap: 6px; margin: 10px 12px 0; }
+    .qt-tog button { flex: 1; border: 1px solid rgba(255,255,255,.14); background: transparent; color: var(--gray-300); border-radius: 9px; padding: 7px 6px;
+      font-family: var(--font-main); font-size: 11px; font-weight: 600; cursor: pointer; line-height: 1.25; }
+    .qt-tog button.on { border-color: var(--teal); color: var(--white); background: rgba(0,212,170,.10); }
+    .qt-tog button span { display: block; font-size: 10px; color: var(--gray-500); font-weight: 500; }
+    .qt-act { margin: 12px 12px 0; display: flex; flex-direction: column; gap: 6px; }
+    .qt-btn { display: block; width: 100%; border: none; border-radius: 11px; padding: 12px; font-family: var(--font-main); font-weight: 800; font-size: 14px; color: #fff;
+      background: linear-gradient(135deg, #FF6B5A, #FF8A65); cursor: pointer; box-shadow: 0 6px 18px rgba(255,107,90,.25); transition: transform .15s; }
+    .qt-btn:hover { transform: translateY(-1px); }
+    .qt-btn.ghost { background: transparent; border: 1px solid rgba(255,255,255,.16); color: var(--gray-300); font-weight: 600; font-size: 12px; padding: 9px; box-shadow: none; }
+    .qt-save { margin: 10px 12px 12px; display: flex; gap: 6px; }
+    .qt-save input { flex: 1; min-width: 0; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12); border-radius: 9px; color: var(--white); padding: 9px 10px; font-family: var(--font-main); font-size: 12px; }
+    .qt-save input::placeholder { color: var(--gray-500); }
+    .qt-save button { border: 1px solid rgba(255,255,255,.16); background: transparent; color: var(--gray-300); border-radius: 9px; padding: 0 10px; font-family: var(--font-main); font-size: 11.5px; font-weight: 700; cursor: pointer; }
+    .qt-saved { margin: 10px 12px 12px; font-size: 11.5px; color: var(--teal); }
+    .qt-edit:focus-visible, .qt-seg button:focus-visible, .qt-tog button:focus-visible, .qt-btn:focus-visible, .qt-alt:focus-visible, .qt-save button:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+
+    .quote-cards-wrap {
+  align-self: flex-start; width: 95%; animation: msgSlide 0.4s ease;
+    }
+    .quote-cards-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px;
+      background: linear-gradient(135deg, rgba(0,212,170,0.12), rgba(0,212,170,0.06));
+      border: 1px solid rgba(0,212,170,0.2); border-bottom: none;
+      border-radius: 16px 16px 0 0;
+    }
+    .quote-cards-vehicle { font-size: 14px; font-weight: 700; color: var(--white); }
+    .quote-cards-paquete {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--teal); font-weight: 700;
+      background: rgba(0,212,170,0.15); padding: 3px 10px; border-radius: 100px;
+    }
+    .quote-cards-meta {
+      padding: 8px 16px; background: var(--navy-light);
+      border-left: 1px solid rgba(255,255,255,0.06);
+      border-right: 1px solid rgba(255,255,255,0.06);
+      display: flex; gap: 12px; flex-wrap: wrap;
+    }
+    .quote-cards-meta span {
+      font-size: 11px; color: var(--gray-500);
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    /* Grid de tarjetas estilo FiTi */
+    .quote-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+      padding: 8px;
+      background: var(--navy-mid);
+      border-left: 1px solid rgba(255,255,255,0.06);
+      border-right: 1px solid rgba(255,255,255,0.06);
+    }
+    .qcard {
+      background: var(--navy-light); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px; padding: 14px; cursor: pointer;
+      transition: all 0.2s; position: relative; overflow: hidden;
+      display: flex; gap: 10px;
+    }
+    .qcard:hover { border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); }
+    .qcard.best { border-color: var(--teal); background: rgba(0,212,170,0.05); }
+    .qcard.best::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--teal), var(--teal-light));
+    }
+    .qcard-left { flex: 1; min-width: 0; }
+    .qcard-logo {
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      width: 80px; height: 80px;
+      background: rgba(255,255,255,0.92); border-radius: 12px;
+      padding: 8px;
+    }
+    .qcard-logo img {
+      width: 100%; height: 100%; object-fit: contain;
+    }
+
+    .qcard-rank {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 13px; font-weight: 700; color: var(--white);
+      margin-bottom: 6px;
+    }
+    .qcard-rank .badge-mejor {
+      font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px;
+      color: var(--navy); background: var(--teal);
+      padding: 2px 7px; border-radius: 100px; font-weight: 700;
+    }
+
+    .qcard-total {
+      font-family: var(--font-mono); font-size: 20px; font-weight: 700;
+      color: var(--white); margin-bottom: 2px;
+    }
+    .qcard.best .qcard-total { color: var(--teal); }
+
+    .qcard-neta { font-size: 11px; color: var(--gray-500); margin-bottom: 8px; }
+
+    .qcard-deducs {
+      font-size: 10px; color: var(--gray-500);
+      display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px;
+    }
+
+    .qcard-coberturas {
+      font-size: 11px; color: var(--teal); cursor: pointer;
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    /* Coberturas SIEMPRE visibles (A-frontend fix 2026-04-17) */
+    .qcard-detail {
+      display: block; margin-top: 10px; padding: 10px 8px 6px;
+      background: rgba(255,255,255,0.02);
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .qcard-detail-title {
+      font-size: 9px; text-transform: uppercase; letter-spacing: 1px;
+      color: var(--teal); font-weight: 700; margin-bottom: 6px; padding-left: 2px;
+    }
+    .qcard.expanded .qcard-detail { display: block; } /* legacy compat */
+    .qcard-detail-row {
+      display: flex; justify-content: space-between; gap: 8px; padding: 4px 2px;
+      font-size: 11px; color: var(--gray-300);
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+    .qcard-detail-row:last-child { border-bottom: none; }
+    .qcard-detail-row span:first-child {
+      flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
+    }
+    .qcard-detail-row span:last-child {
+      color: var(--white); font-weight: 600; font-family: var(--font-mono);
+      font-size: 10px; flex-shrink: 0; text-align: right;
+    }
+    .qcard-expand-hint {
+      font-size: 10px; color: var(--gray-500); margin-top: 6px; text-align: center;
+    }
+    .qcard.expanded .qcard-expand-hint { display: none; }
+
+    /* Single contratar button at bottom */
+    .quote-contratar-wrap {
+      padding: 12px 16px; text-align: center;
+      background: var(--navy-mid);
+      border-left: 1px solid rgba(255,255,255,0.06);
+      border-right: 1px solid rgba(255,255,255,0.06);
+    }
+    .quote-contratar-btn {
+      display: block; width: 100%; padding: 16px;
+      background: linear-gradient(135deg, var(--coral), var(--coral-dark));
+      color: white; border: none; border-radius: 14px;
+      font-size: 17px; font-weight: 800; cursor: pointer;
+      font-family: var(--font-main); transition: all 0.25s;
+      box-shadow: 0 4px 20px rgba(255,107,90,0.3);
+      letter-spacing: -0.3px;
+    }
+    .quote-contratar-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,107,90,0.4); }
+    .quote-contratar-btn:active { transform: scale(0.98); }
+
+    /* Footer con mejor precio */
+    .quote-cards-footer {
+      padding: 14px 16px;
+      background: linear-gradient(135deg, rgba(0,212,170,0.08), rgba(0,212,170,0.03));
+      border: 1px solid rgba(0,212,170,0.15); border-top: none;
+      border-radius: 0 0 16px 16px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .quote-footer-best {
+      font-size: 11px; color: var(--gray-500); text-transform: uppercase; letter-spacing: 1px;
+    }
+    .quote-footer-best strong { display: block; font-size: 15px; color: var(--teal); letter-spacing: 0; text-transform: none; margin-top: 2px; }
+    .quote-footer-ahorro { text-align: right; font-size: 11px; color: var(--gray-500); text-transform: uppercase; letter-spacing: 1px; }
+    .quote-footer-ahorro strong { display: block; font-size: 15px; color: var(--coral); letter-spacing: 0; text-transform: none; margin-top: 2px; }
+
+    /* ═══ DOCUMENT CARDS (Factura, INE, Contratación) ═══ */
+    .doc-card {
+      align-self: flex-start; width: 95%; animation: msgSlide 0.4s ease;
+      border-radius: 16px; overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .doc-card-header {
+      padding: 14px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .doc-card-header.factura { background: linear-gradient(135deg, rgba(255,107,90,0.15), rgba(255,138,125,0.08)); border-bottom: 1px solid rgba(255,107,90,0.2); }
+    .doc-card-header.contratacion { background: linear-gradient(135deg, rgba(0,212,170,0.15), rgba(0,184,148,0.08)); border-bottom: 1px solid rgba(0,212,170,0.2); }
+    .doc-card-header .doc-title { font-size: 13px; font-weight: 700; color: var(--white); display: flex; align-items: center; gap: 8px; }
+    .doc-card-header .doc-badge {
+      font-size: 9px; text-transform: uppercase; letter-spacing: 1px;
+      padding: 3px 10px; border-radius: 100px; font-weight: 700;
+    }
+    .doc-badge.factura-badge { background: rgba(255,107,90,0.2); color: var(--coral); }
+    .doc-badge.ok-badge { background: rgba(0,212,170,0.2); color: var(--teal); }
+
+    .doc-card-body { padding: 14px 16px; background: var(--navy-light); }
+    .doc-card-vehicle {
+      font-size: 15px; font-weight: 700; color: var(--coral-light);
+      margin-bottom: 8px; line-height: 1.3;
+    }
+    .doc-card-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px;
+    }
+    .doc-card-field {
+      padding: 4px 0; font-size: 12px;
+    }
+    .doc-card-field .label { color: var(--gray-500); font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .doc-card-field .value { color: var(--white); font-weight: 600; margin-top: 1px; }
+    .doc-card-field .value.highlight { color: var(--coral); }
+    .doc-card-field .value.teal { color: var(--teal); }
+    .doc-card-field.full { grid-column: 1 / -1; }
+
+    .doc-card-warning {
+      margin-top: 8px; padding: 8px 12px;
+      background: rgba(255,170,0,0.1); border: 1px solid rgba(255,170,0,0.2);
+      border-radius: 8px; font-size: 11px; color: #ffaa00;
+    }
+    .doc-card-footer {
+      padding: 12px 16px; background: var(--navy-mid);
+      border-top: 1px solid rgba(255,255,255,0.04);
+      display: flex; gap: 8px;
+    }
+    .doc-card-btn {
+      flex: 1; padding: 12px; border: none; border-radius: 10px;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      font-family: var(--font-main); transition: all 0.2s; text-align: center;
+    }
+    .doc-card-btn.primary { background: var(--coral); color: white; }
+    .doc-card-btn.primary:hover { background: var(--coral-dark); }
+    .doc-card-btn.secondary { background: rgba(255,255,255,0.06); color: var(--gray-300); border: 1px solid rgba(255,255,255,0.1); }
+    .doc-card-btn.secondary:hover { background: rgba(255,255,255,0.1); }
+    .doc-card-btn.teal { background: var(--teal-dark); color: white; }
+    .doc-card-btn.teal:hover { background: var(--teal); }
+
+    /* Version buttons */
+    .version-buttons { align-self: flex-start; width: 95%; animation: msgSlide 0.3s ease; }
+    .version-btn {
+      display: block; width: 100%; text-align: left;
+      padding: 12px 16px; margin-bottom: 6px;
+      background: var(--navy-light); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px; color: var(--white); font-size: 13px;
+      font-family: var(--font-main); cursor: pointer; transition: all 0.2s;
+    }
+    .version-btn:hover { background: rgba(255,255,255,0.08); border-color: var(--coral); }
+    .version-btn span { color: var(--coral); font-weight: 700; margin-right: 8px; }
+
+    /* Opciones ya respondidas: sin listas tachadas ni etiquetas repetidas. */
+    #chatMessages [hidden], .timi-btn-stale button { display: none !important; }
+    .version-btn.timi-primary-action {
+      background: var(--coral); border-color: var(--coral); color: white; font-weight: 700;
+    }
+    .version-btn.timi-primary-action:hover { background: var(--coral-dark); border-color: var(--coral-dark); }
+
+    /* REPLAY_MODE_v1 (2026-09-07): estilos que solo existen dentro del iframe del Admin. */
+    .timi-replay-system {
+      align-self: center; max-width: 92%; margin: 10px auto; padding: 6px 12px;
+      border-radius: 10px; background: rgba(255,255,255,0.05); color: #94a3b8;
+      font-size: 11.5px; line-height: 1.5; text-align: center;
+    }
+    .timi-replay-clicked { outline: 2px solid var(--teal, #00D4AA) !important; outline-offset: 2px; border-radius: 10px; }
+    .timi-replay-clicked-stale { outline-color: #FF6B5A !important; }
+    /* El botón que el cliente tocó se ve entero aunque su grupo ya estuviera vencido — es
+       justo lo que el Admin necesita distinguir (si no, el marcado se pierde bajo el gris). */
+    .timi-btn-stale button.timi-replay-clicked { opacity: 1; filter: none; }
+    /* En replay nada es clickeable (lo corta un guard en JS); el cursor lo dice también. */
+    html.timi-replay button, html.timi-replay a { cursor: default; }
+
+    /* Typing animation in drawer */
+    .typing-dots { display: inline-flex; gap: 4px; }
+    .typing-dots .dot {
+      width: 7px; height: 7px; border-radius: 50%; background: var(--gray-500);
+      animation: typingBounce 1.4s infinite ease-in-out;
+    }
+    .typing-dots .dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots .dot:nth-child(3) { animation-delay: 0.4s; }
+
+    .chat-drawer-input {
+      padding: 14px 16px;
+      padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+      border-top: 1px solid rgba(255,255,255,0.06);
+      background: var(--navy-mid);
+      display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+    }
+    .chat-drawer-input input {
+      flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 100px; padding: 12px 18px; color: var(--white);
+      font-size: 14px; font-family: var(--font-main); outline: none; transition: border-color 0.2s;
+    }
+    .chat-drawer-input input:focus { border-color: rgba(255,255,255,0.18); }
+    .chat-drawer-input input::placeholder { color: var(--gray-500); }
+
+    .chat-drawer-send {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--coral); border: none; color: white;
+      font-size: 18px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: all 0.2s;
+    }
+    .chat-drawer-send:hover { background: var(--coral-dark); }
+    .chat-drawer-send:active { transform: scale(0.95); }
+
+    .chat-drawer-attach {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: none; border: 1px solid rgba(255,255,255,0.1);
+      color: var(--gray-300); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: all 0.2s;
+    }
+    .chat-drawer-attach:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.2); color: var(--white); }
+
+    /* File preview in chat */
+    .file-preview-wrap { align-self: flex-end; max-width: 88%; animation: msgSlide 0.3s ease; }
+    .file-preview {
+      background: var(--coral); border-radius: 18px; border-bottom-right-radius: 4px;
+      padding: 8px; overflow: hidden;
+    }
+    .file-preview img {
+      max-width: 100%; max-height: 200px; border-radius: 12px;
+      display: block; object-fit: cover;
+    }
+    .file-preview-name {
+      padding: 6px 10px 4px; font-size: 12px; color: rgba(255,255,255,0.8);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .file-preview-name svg { flex-shrink: 0; }
+
+    .upload-progress {
+      align-self: flex-start; padding: 10px 16px;
+      background: var(--navy-light); border: 1px solid rgba(255,255,255,0.04);
+      border-radius: 18px; border-bottom-left-radius: 4px;
+      font-size: 13px; color: var(--gray-300); animation: msgSlide 0.3s ease;
+    }
+
+    /* ═══ FAB ═══ */
+    .fab {
+      position: fixed; bottom: 28px; right: 28px; z-index: 90;
+      width: 60px; height: 60px; border-radius: 50%;
+      background: var(--coral); color: white; border: none;
+      font-size: 26px; cursor: pointer;
+      box-shadow: 0 6px 24px rgba(255,107,90,0.4), 0 0 0 4px rgba(255,107,90,0.15);
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.3s; animation: fabPulse 3s infinite;
+    }
+    .fab:hover { transform: scale(1.08); box-shadow: 0 8px 32px rgba(255,107,90,0.5), 0 0 0 6px rgba(255,107,90,0.2); }
+    .fab.hidden { opacity: 0; pointer-events: none; transform: scale(0.5); }
+    @keyframes fabPulse {
+      0%,100% { box-shadow: 0 6px 24px rgba(255,107,90,0.4), 0 0 0 4px rgba(255,107,90,0.15); }
+      50% { box-shadow: 0 6px 24px rgba(255,107,90,0.4), 0 0 0 12px rgba(255,107,90,0.05); }
+    }
+
+    
+    /* ═══ TOURIST MODE ═══ */
+    body.tourist-mode { --accent: #0891B2; --accent-light: #22D3EE; --accent-dark: #0E7490; }
+    body.tourist-mode .hero-badge { background: rgba(8,145,178,0.15); border-color: rgba(8,145,178,0.3); }
+    body.tourist-mode .hero-badge::before { background: var(--teal); }
+    body.tourist-mode .hero h1 .highlight { background: linear-gradient(135deg, #22D3EE, #00D4AA); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    body.tourist-mode .btn-primary { background: linear-gradient(135deg, #0891B2, #0E7490); }
+    body.tourist-mode .btn-primary:hover { background: linear-gradient(135deg, #0E7490, #064E63); box-shadow: 0 8px 30px rgba(8,145,178,0.35); }
+    body.tourist-mode .fab { background: #0891B2; box-shadow: 0 6px 24px rgba(8,145,178,0.4), 0 0 0 4px rgba(8,145,178,0.15); animation: fabPulseTourist 3s infinite; }
+    body.tourist-mode .fab:hover { box-shadow: 0 8px 32px rgba(8,145,178,0.5), 0 0 0 6px rgba(8,145,178,0.2); }
+    @keyframes fabPulseTourist { 0%,100% { box-shadow: 0 6px 24px rgba(8,145,178,0.4), 0 0 0 4px rgba(8,145,178,0.15); } 50% { box-shadow: 0 6px 24px rgba(8,145,178,0.4), 0 0 0 12px rgba(8,145,178,0.05); } }
+    body.tourist-mode .nav-cta { background: #0891B2; }
+    body.tourist-mode .chat-result-row.best .precio { color: #22D3EE; }
+    body.tourist-mode .cta-section h2 .highlight { background: linear-gradient(135deg, #22D3EE, #00D4AA); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .lang-toggle { display: none; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 4px; cursor: pointer; font-size: 16px; line-height: 1; }
+    .lang-toggle .lang-opt { padding: 4px 8px; border-radius: 16px; transition: all 0.2s; opacity: 0.5; cursor: pointer; }
+    .lang-toggle .lang-opt.active { background: rgba(255,255,255,0.15); opacity: 1; }
+    body.tourist-mode .lang-toggle { display: inline-flex; align-items: center; gap: 2px; }
+    .tourist-banner { display: none; background: linear-gradient(135deg, #0891B2, #0E7490); border: none; border-radius: 100px; padding: 14px 28px; margin-bottom: 28px; font-size: 15px; color: white; align-items: center; gap: 12px; font-weight: 600; letter-spacing: 0.3px; box-shadow: 0 4px 20px rgba(8,145,178,0.4); transition: all 0.3s; cursor: default; }
+    .tourist-banner .flag { font-size: 24px; }
+    .tourist-banner .flag { font-size: 20px; }
+    body.tourist-mode .tourist-banner { display: inline-flex; }
+
+    /* Cross-link banner: visible on MAIN page to redirect to /tourist */
+    /* ═══ PRODUCT SWITCHER BAR ═══ */
+    .prod-switcher { position: fixed; top: 0; left: 0; right: 0; z-index: 101; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 16px; background: rgba(10,14,23,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.07); }
+    /* PROD_SWITCHER_MARQUEE_v1: .ps-track envuelve los tabs (ver bloque móvil más abajo,
+       donde se anima como marquee) -- en desktop debe verse igual que antes, como una
+       fila flex normal dentro de .prod-switcher. */
+    .ps-track { display: flex; align-items: center; gap: 6px; }
+    .prod-switcher-tab { display: flex; align-items: center; gap: 7px; padding: 7px 16px; border-radius: 100px; font-size: 12px; font-weight: 700; cursor: pointer; text-decoration: none; border: 1.5px solid transparent; transition: all 0.2s; white-space: nowrap; color: #7A8599; background: none; }
+    .prod-switcher-tab:hover { color: #E1E5EA; background: rgba(255,255,255,0.05); }
+    .prod-switcher-tab .ps-icon { font-size: 15px; }
+    .prod-switcher-tab .ps-sub { font-size: 10px; font-weight: 400; opacity: 0.7; display: block; line-height: 1; margin-top: 1px; }
+    .prod-switcher-tab.active-timi { color: #FF6B5A; background: rgba(255,107,90,0.1); border-color: rgba(255,107,90,0.3); }
+    .prod-switcher-tab.active-rc   { color: #60A5FA; background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.3); }
+    .prod-switcher-tab.active-tourist { color: #22D3EE; background: rgba(8,145,178,0.1); border-color: rgba(8,145,178,0.3); }
+    .prod-switcher-tab.active-carga { color: #F59E0B; background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3); }
+    .ps-divider { width: 1px; height: 20px; background: rgba(255,255,255,0.08); }
+    .prod-switcher-close { margin-left: 8px; background: none; border: none; color: rgba(255,255,255,0.25); font-size: 16px; cursor: pointer; padding: 4px 6px; border-radius: 6px; line-height: 1; transition: color .2s; }
+    .prod-switcher-close:hover { color: rgba(255,255,255,0.6); }
+    body.switcher-hidden .prod-switcher { display: none; }
+    /* Offset navbar/hero when switcher visible (42px bar height) */
+    body:not(.switcher-hidden) .navbar { top: 42px; }
+    body:not(.switcher-hidden) .hero { padding-top: calc(140px + 42px); }
+    @media (max-width: 900px) { body:not(.switcher-hidden) .hero { padding-top: calc(110px + 42px); } }
+    @media (max-width: 480px) {
+      body:not(.switcher-hidden) .hero { padding-top: calc(90px + 42px); }
+      .prod-switcher { padding: 6px 10px; gap: 4px; }
+      .prod-switcher-tab { padding: 6px 10px; font-size: 11px; }
+      .prod-switcher-tab .ps-sub { display: none; }
+    }
+    /* MOBILE_MARQUEE_CONVEYOR_v1 (2026-08-07, reporte Fabricio): el enfoque anterior
+       (duplicar el contenido y animar con CSS translateX -50%) se desincronizaba y la
+       segunda tanda de tabs se sobreponía a la primera. Ahora el JS mueve .ps-track a
+       mano con requestAnimationFrame, y en cuanto un tab sale completo por la izquierda
+       se reinserta al final del track -- circula de verdad, sin salto ni traslape, a
+       velocidad constante y lenta (da tiempo de ver y tocar). Ver script mas abajo.
+       margin-right en cada tab evita que se vean pegadas. */
+    @media (max-width: 600px) {
+      .prod-switcher {
+        justify-content: flex-start;
+        overflow: hidden;
+        gap: 0;
+        padding: 5px 40px 5px 8px;
+      }
+      .ps-track {
+        display: flex;
+        align-items: center;
+        width: max-content;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .prod-switcher { overflow-x: auto; }
+      }
+      .prod-switcher-tab {
+        flex: 0 0 auto;
+        justify-content: flex-start;
+        padding: 5px 8px;
+        gap: 5px;
+        margin-right: 10px;
+      }
+      .prod-switcher-tab .ps-icon { font-size: 14px; }
+      .prod-switcher-tab .ps-sub { display: none; }
+      .prod-switcher-tab span > span:first-child { font-size: 11px; }
+      .ps-divider { display: none; }
+      .prod-switcher-close { position: fixed; top: 6px; right: 6px; background: rgba(10,14,23,0.92); z-index: 102; padding: 2px 5px; }
+      body:not(.switcher-hidden) .navbar { top: 38px; }
+      body:not(.switcher-hidden) .hero { padding-top: calc(90px + 38px); }
+    }
+    @supports (padding-top: env(safe-area-inset-top)) {
+      .prod-switcher { padding-top: calc(8px + env(safe-area-inset-top, 0px)); }
+    }
+    /* ═══ RC MODE ═══ */
+    body.rc-mode { --accent: #3B82F6; --accent-light: #60A5FA; --accent-dark: #2563EB; }
+    body.rc-mode .hero-badge { background: rgba(59,130,246,0.15); border-color: rgba(59,130,246,0.3); }
+    body.rc-mode .hero-badge::before { background: #3B82F6; }
+    body.rc-mode .hero h1 .highlight { background: linear-gradient(135deg, #60A5FA, #3B82F6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    body.rc-mode .btn-primary { background: linear-gradient(135deg, #3B82F6, #2563EB); }
+    body.rc-mode .btn-primary:hover { background: linear-gradient(135deg, #2563EB, #1D4ED8); box-shadow: 0 8px 30px rgba(59,130,246,0.35); }
+    body.rc-mode .fab { background: #3B82F6; box-shadow: 0 6px 24px rgba(59,130,246,0.4), 0 0 0 4px rgba(59,130,246,0.15); }
+    body.rc-mode .fab:hover { box-shadow: 0 8px 32px rgba(59,130,246,0.5), 0 0 0 6px rgba(59,130,246,0.2); }
+    body.rc-mode .nav-cta { background: #3B82F6; }
+    body.rc-mode .chat-result-row.best .precio { color: #60A5FA; }
+    body.rc-mode .cta-section h2 .highlight { background: linear-gradient(135deg, #60A5FA, #3B82F6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    body.rc-mode .lang-toggle { display: inline-flex; }
+    body.selector-mode .lang-toggle { display: inline-flex; } /* PORTADA_SELECTOR_v1: /?chat=1 sin producto también es bilingüe */
+    /* keep old crosslink classes as no-ops to avoid JS errors */
+    .crosslink-wrap { display: none; }
+    body.crosslink-hidden .crosslink-wrap { display: none; }
+
+    
+    /* ═══ TOURIST PLAN BUTTONS ═══ */
+    .ta-plan-buttons { display: flex; flex-direction: column; gap: 8px; margin: 4px 0; max-width: 320px; }
+    .ta-plan-btn { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: var(--gray-300); font-size: 14px; font-family: var(--font-main); cursor: pointer; transition: all 0.2s; text-align: left; }
+    .ta-plan-btn:hover { background: rgba(8,145,178,0.12); border-color: rgba(8,145,178,0.4); color: white; }
+    .ta-plan-btn .plan-num { width: 28px; height: 28px; border-radius: 8px; background: rgba(8,145,178,0.2); color: #22D3EE; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex-shrink: 0; }
+    .ta-plan-btn .plan-info { flex: 1; }
+    .ta-plan-btn .plan-name { font-weight: 600; color: white; font-size: 14px; }
+    .ta-plan-btn .plan-detail { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+    .ta-plan-btn:disabled { opacity: 0.4; cursor: default; }
+    /* ═══ TOURIST QUOTE CARD ═══ */
+    .ta-quote-card { background: linear-gradient(145deg, rgba(8,145,178,0.12), rgba(0,212,170,0.06)); border: 1px solid rgba(8,145,178,0.25); border-radius: 16px; padding: 20px; max-width: 360px; margin: 8px 0; }
+    .ta-quote-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .ta-quote-logo { width: 48px; height: 48px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; padding: 4px; }
+    .ta-quote-logo img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .ta-quote-title { font-size: 16px; font-weight: 700; color: #22D3EE; }
+    .ta-quote-subtitle { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+    .ta-quote-vehicle { font-size: 15px; font-weight: 600; color: white; margin-bottom: 12px; }
+    .ta-quote-coverages { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .ta-quote-cov { background: rgba(255,255,255,0.06); border-radius: 8px; padding: 6px 10px; font-size: 12px; color: var(--gray-300); }
+    .ta-quote-breakdown { margin-bottom: 16px; }
+    .ta-quote-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 13px; color: var(--gray-300); }
+    .ta-quote-divider { height: 1px; background: rgba(255,255,255,0.1); margin: 8px 0; }
+    .ta-quote-total { display: flex; justify-content: space-between; padding: 8px 0; font-size: 18px; font-weight: 800; color: #22D3EE; }
+    .ta-quote-actions { display: flex; gap: 8px; margin-top: 12px; }
+    .ta-quote-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-family: var(--font-main); font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .ta-quote-btn.primary { background: linear-gradient(135deg, #0891B2, #0E7490); color: white; }
+    .ta-quote-btn.primary:hover { background: linear-gradient(135deg, #0E7490, #064E63); }
+    .ta-quote-btn.secondary { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: var(--gray-300); }
+    .ta-quote-btn.secondary:hover { background: rgba(255,255,255,0.1); }
+    /* ═══ TOURIST CUSTOMIZE PANEL ═══ */
+    .ta-customize-panel { background: linear-gradient(135deg, #0d1b2a 0%, #1b3a4b 100%); border: 1px solid rgba(8,145,178,0.3); border-radius: 16px; padding: 20px; margin: 8px 0; max-width: 380px; font-family: var(--font-main); transition: opacity 0.3s; }
+    .ta-cust-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .ta-cust-icon { font-size: 24px; }
+    .ta-cust-title { color: #fff; font-size: 16px; font-weight: 700; letter-spacing: -0.02em; }
+    .ta-cust-subtitle { color: rgba(255,255,255,0.5); font-size: 12px; margin-top: 2px; }
+    .ta-cust-section { margin-bottom: 16px; }
+    .ta-cust-label { display: block; color: rgba(255,255,255,0.7); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+    .ta-cust-options { display: flex; flex-wrap: wrap; gap: 6px; }
+    .ta-opt-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: rgba(255,255,255,0.8); font-size: 13px; font-weight: 600; padding: 8px 14px; cursor: pointer; transition: all 0.2s; font-family: var(--font-mono); }
+    .ta-opt-btn:hover:not(:disabled) { background: rgba(8,145,178,0.15); border-color: rgba(8,145,178,0.4); }
+    .ta-opt-btn.active { background: rgba(8,145,178,0.25); border-color: #0891b2; color: #67e8f9; box-shadow: 0 0 12px rgba(8,145,178,0.2); }
+    .ta-opt-btn.platinum-opt { position: relative; }
+    .ta-opt-btn.platinum-opt::after { content: '\2b50'; font-size: 8px; position: absolute; top: 2px; right: 4px; }
+    .ta-opt-btn.locked { opacity: 0.3; cursor: not-allowed; }
+    .ta-opt-btn.locked::after { content: '\1f512'; font-size: 8px; }
+    .ta-cust-toggles { margin: 16px 0; display: flex; flex-direction: column; gap: 10px; }
+    .ta-toggle-row { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.04); border-radius: 10px; padding: 10px 14px; }
+    .ta-toggle-info { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+    .ta-toggle-label { color: #fff; font-size: 13px; font-weight: 600; }
+    .ta-toggle-desc { color: rgba(255,255,255,0.4); font-size: 11px; }
+    .ta-toggle { width: 44px; height: 24px; background: rgba(255,255,255,0.15); border-radius: 12px; cursor: pointer; position: relative; transition: background 0.25s; flex-shrink: 0; margin-left: 12px; }
+    .ta-toggle.on { background: #0891b2; }
+    .ta-toggle-knob { width: 20px; height: 20px; background: #fff; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: transform 0.25s; box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+    .ta-toggle.on .ta-toggle-knob { transform: translateX(20px); }
+    .ta-plat-note { color: rgba(255,255,255,0.4); font-size: 11px; text-align: center; padding: 6px 0; }
+    .ta-cust-actions { display: flex; gap: 8px; margin-top: 16px; }
+    .ta-cust-btn { flex: 1; border: none; border-radius: 10px; padding: 12px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: var(--font-main); transition: all 0.2s; }
+    .ta-cust-btn.cancel { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); }
+    .ta-cust-btn.cancel:hover { background: rgba(255,255,255,0.12); }
+    .ta-cust-btn.requote { background: linear-gradient(135deg, #0891b2, #06b6d4); color: #fff; }
+    .ta-cust-btn.requote:hover { box-shadow: 0 4px 16px rgba(8,145,178,0.4); transform: translateY(-1px); }
+    .ta-plat-badge { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; margin-left: auto; white-space: nowrap; }
+    .ta-quote-cov.premium { background: rgba(245,158,11,0.15) !important; border-color: rgba(245,158,11,0.3) !important; color: #fbbf24 !important; }
+    .ta-quote-cov.off { opacity: 0.4; text-decoration: line-through; }
+    /* ═══ MOBILE MENU ═══ */
+    .mobile-menu {
+      display: none; position: fixed; inset: 0; z-index: 99;
+      background: rgba(13,27,42,0.98); backdrop-filter: blur(20px);
+      flex-direction: column; align-items: center; justify-content: center; gap: 28px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { color: var(--white); text-decoration: none; font-size: 22px; font-weight: 600; padding: 8px 0; }
+    .mobile-menu .close-menu { position: absolute; top: 16px; right: 20px; background: none; border: none; color: var(--white); font-size: 32px; cursor: pointer; padding: 8px; }
+    .mobile-menu .menu-cta { margin-top: 12px; background: var(--coral); padding: 14px 40px; border-radius: 100px; font-weight: 700; font-size: 17px; cursor: pointer; border: none; color: white; font-family: var(--font-main); }
+
+    /* ═══ RESPONSIVE ═══ */
+    @media (max-width: 900px) {
+      .hero-inner { grid-template-columns: 1fr; gap: 40px; text-align: center; }
+      .hero { min-height: auto; padding: 110px 24px 60px; }
+      .hero-sub { margin: 0 auto 36px; }
+      .hero-buttons { justify-content: center; }
+      .chat-mockup { margin: 0 auto; transform: none; max-width: 360px; }
+      .chat-mockup:hover { transform: none; }
+      .steps { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
+      .feature-grid { grid-template-columns: 1fr; max-width: 500px; margin: 0 auto; }
+      .nav-links { display: none; }
+      .nav-mobile-btn { display: block; }
+      .section { padding: 80px 24px; }
+      .chat-drawer { width: 100%; min-width: 0; }
+    }
+
+    @media (max-width: 480px) {
+      .navbar { padding: 12px 16px; padding-top: calc(12px + env(safe-area-inset-top, 0px)); }
+      .nav-logo { font-size: 24px; }
+      .hero { padding: 90px 16px 40px; }
+      .hero h1 { font-size: 34px; letter-spacing: -1.5px; }
+      .hero-badge { font-size: 11px; padding: 5px 12px; margin-bottom: 18px; }
+      .hero-sub { font-size: 15px; margin-bottom: 28px; }
+      .hero-buttons { flex-direction: column; align-items: stretch; gap: 10px; }
+      .btn-primary, .btn-secondary { justify-content: center; padding: 14px 24px; font-size: 15px; }
+      .chat-mockup-wrap { margin-top: 8px; }
+      .chat-mockup { max-width: 100%; border-radius: 20px; }
+      .chat-header { padding: 12px 16px; }
+      .chat-avatar { width: 32px; height: 32px; font-size: 15px; }
+      .chat-body { padding: 14px; min-height: 260px; gap: 10px; }
+      .chat-msg { padding: 10px 13px; font-size: 12.5px; max-width: 88%; }
+      .chat-result { padding: 12px; width: 94%; }
+      .chat-result-title { font-size: 10px; }
+      .chat-result-row { font-size: 12px; }
+      .chat-input-mock { padding: 12px 14px; }
+      .chat-input-mock input { padding: 9px 14px; font-size: 12px; }
+      .chat-input-mock button { width: 32px; height: 32px; font-size: 14px; }
+      .trust-bar { padding: 32px 16px; }
+      .trust-label { font-size: 10px; margin-bottom: 20px; }
+      .trust-logos { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; justify-content: flex-start; gap: 10px; }
+      .trust-logos::-webkit-scrollbar { display: none; }
+      .trust-logo { flex-shrink: 0; height: 40px; padding: 0 14px; border-radius: 8px; }
+      .section { padding: 64px 16px; }
+      .section-label { font-size: 11px; }
+      .section-title { font-size: 28px; }
+      .section-sub { font-size: 15px; }
+      .how-header { margin-bottom: 48px; }
+      .steps { gap: 16px; max-width: 100%; }
+      .step { padding: 28px 24px; }
+      .step-icon { font-size: 28px; }
+      .step-num { width: 40px; height: 40px; font-size: 16px; }
+      .step h3 { font-size: 18px; }
+      .step p { font-size: 13px; }
+      .feature-grid { gap: 12px; max-width: 100%; }
+      .feature-card { padding: 24px 20px; gap: 16px; }
+      .feature-icon { width: 44px; height: 44px; }
+      .feature-text h4 { font-size: 15px; }
+      .feature-text p { font-size: 13px; }
+      .cta-section { padding: 80px 16px; }
+      .cta-inner .section-title { font-size: 30px; }
+      .cta-inner .btn-primary { width: 100%; justify-content: center; }
+      footer { padding: 36px 16px 24px; }
+      .footer-inner { text-align: center; }
+      .footer-links { gap: 10px 16px; }
+      .fab { bottom: 20px; right: 16px; width: 56px; height: 56px; font-size: 24px; }
+
+      /* ═══ CHAT DRAWER — mobile (fullscreen) optimizations ═══ */
+      /* Header: espacio para notch / Dynamic Island */
+      .chat-drawer-header {
+        padding: 14px 16px;
+        padding-top: max(14px, env(safe-area-inset-top, 14px));
+      }
+      .chat-drawer-messages { padding: 14px 12px; gap: 10px; }
+      .chat-drawer-messages .msg { font-size: 14px; max-width: 92%; }
+      /* Input bar: espacio para home indicator */
+      .chat-drawer-input {
+        padding: 10px 12px;
+        padding-bottom: max(10px, env(safe-area-inset-bottom, 10px));
+        gap: 8px;
+      }
+      .chat-drawer-input input { padding: 11px 16px; font-size: 16px; }
+      .chat-drawer-send { width: 42px; height: 42px; }
+      .chat-drawer-attach { width: 38px; height: 38px; }
+      .quote-card { padding: 12px 14px; }
+      .quote-card-cia { font-size: 13px; }
+      .quote-card-price { font-size: 13px; }
+
+      /* Fix tarjetas cotización en móvil — logos no se encimen */
+      .quote-grid { grid-template-columns: 1fr; gap: 6px; padding: 6px; }
+      .qcard { flex-direction: row; gap: 10px; padding: 12px; position: relative; }
+      .qcard-logo { width: 50px; height: 50px; flex-shrink: 0; border-radius: 8px; padding: 4px; position: static; align-self: center; }
+      .qcard-logo img { width: 100%; height: 100%; object-fit: contain; }
+      .qcard-left { min-width: 0; flex: 1; }
+      .qcard-total { font-size: 18px; }
+      .qcard-rank { font-size: 12px; }
+      .qcard-neta { font-size: 10px; }
+      .qcard-deducs { font-size: 9px; }
+      .qcard-coberturas-toggle { font-size: 10px; }
+      .qcard-contratar-btn { font-size: 12px; padding: 8px; }
+
+      /* ═══ QUOTE CARDS & PANELS — fluid width on mobile ═══ */
+      .quote-cards-wrap { width: 100%; }
+      .ta-quote-card { max-width: 100%; padding: 16px; }
+      .ta-customize-panel { max-width: 100%; padding: 16px; }
+      .rc-quote-card { max-width: 100%; padding: 16px; }
+      .rc-customize-panel { max-width: 100%; padding: 16px; }
+      .ta-plan-buttons { max-width: 100%; }
+
+      /* ═══ RC/TA button grids — prevent overflow ═══ */
+      .rc-state-grid { grid-template-columns: 1fr; gap: 6px; }
+      .rc-cust-options { gap: 5px; }
+      .rc-opt-btn { padding: 7px 12px; font-size: 12px; }
+      .rc-opt-btn.sm { padding: 6px 8px; font-size: 11px; min-width: 32px; }
+      .rc-quote-actions { flex-direction: column; gap: 6px; }
+      .rc-cust-actions { flex-direction: column; gap: 6px; }
+      .ta-quote-actions { flex-direction: column; gap: 6px; }
+
+      /* Version buttons — better touch targets */
+      .version-btn { padding: 14px 16px; font-size: 14px; }
+      .version-buttons { width: 100%; }
+
+      /* Product switcher — safe area handled in @supports block above */
+    }
+
+    /* ═══ EXTRA SMALL — iPhone SE, narrow phones ═══ */
+    @media (max-width: 375px) {
+      .hero { padding: 84px 14px 32px; }
+      .hero h1 { font-size: 30px; }
+      .hero-sub { font-size: 14px; }
+      .section { padding: 56px 14px; }
+      .section-title { font-size: 26px; }
+      .chat-drawer-messages { padding: 14px 10px; }
+      .chat-drawer-messages .msg { font-size: 13px; max-width: 92%; }
+      .chat-drawer-input input { padding: 10px 14px; }
+      .ta-quote-card { padding: 14px; }
+      .rc-quote-card { padding: 14px; }
+      .ta-customize-panel { padding: 14px; }
+      .rc-customize-panel { padding: 14px; }
+      .rc-quote-pills { gap: 4px; }
+      .rc-quote-pill { padding: 3px 8px; font-size: 10px; }
+      .qcard { padding: 10px; gap: 8px; }
+      .qcard-logo { width: 44px; height: 44px; }
+      .qcard-total { font-size: 16px; }
+    }
+
+    /* ═══ TINY — 320px screens ═══ */
+    @media (max-width: 360px) {
+      .hero { padding: 80px 12px 28px; }
+      .hero h1 { font-size: 28px; }
+      .section { padding: 48px 12px; }
+      .chat-drawer-messages .msg { font-size: 13px; }
+      .version-btn { padding: 12px 14px; font-size: 13px; }
+    }
+
+    /* ═══ SAFE AREA — notch, Dynamic Island, home indicator ═══ */
+    @supports (padding: env(safe-area-inset-bottom)) {
+      .fab { bottom: calc(20px + env(safe-area-inset-bottom)); }
+      footer { padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
+      /* CASCADE_FIX_v1: quitado el padding-bottom de .chat-drawer-input de aqui — esta regla
+         @supports no tiene @media, asi que siempre gana sobre el ajuste movil de la linea
+         ~1264 (max-width:640px) y lo dejaba muerto. El valor base (linea ~930) ya cubre
+         desktop con el mismo calc(); el ajuste movil ahora si aplica. */
+    }
+
+    /* FAB_MOBILE_CLEARANCE_v1: en móvil el FAB a bottom:20px se solapaba con
+       .rc-exp-chip (bottom:60px, banda ~60-90px) y, en varios navegadores
+       Android (Chrome/Brave) con la propia barra inferior del navegador
+       cuando está expandida — el resultado reportado era "el botón no se ve".
+       Se sube por encima de ambas franjas. */
+    @media (max-width: 600px) {
+      .fab { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
+    }
+
+    /* ═══ PREVENT ZOOM on iOS inputs (font-size < 16px triggers auto-zoom) ═══ */
+    /* IOS_ZOOM_FIX_v1: extender a ≤768px (antes solo ≤480px). iOS hace auto-zoom en inputs
+       con font-size < 16px. Tablets y teléfonos grandes quedaban fuera del fix anterior. */
+    @media (max-width: 768px) {
+      .chat-drawer-input input,
+      .rc-days-input,
+      input[type="text"],
+      input[type="number"],
+      input[type="email"],
+      input[type="tel"],
+      input[type="date"],
+      select,
+      textarea {
+        /* IOS_ZOOM_FIX_v2 (2026-08-08): select y textarea también disparan el auto-zoom
+           de iOS si su fuente es <16px — faltaban en la lista. */
+        font-size: 16px;
+      }
+    }
+
+/* ═══════════════════════════════════════════════
+   RC NORTHBOUND — Blue Theme Styles
+   ═══════════════════════════════════════════════ */
+
+/* State Selector */
+.rc-state-selector { margin: 8px 0; }
+.rc-state-title { font-size: 14px; color: var(--text-secondary, #94a3b8); margin-bottom: 8px; }
+.rc-state-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.rc-state-btn {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; border: 1.5px solid rgba(59,130,246,0.25);
+  border-radius: 12px; background: rgba(59,130,246,0.06);
+  color: #e2e8f0; font-size: 14px; cursor: pointer;
+  transition: all 0.2s ease;
+}
+.rc-state-btn:hover { border-color: #3B82F6; background: rgba(59,130,246,0.15); transform: translateY(-1px); }
+.rc-state-btn.selected { border-color: #3B82F6; background: rgba(59,130,246,0.2); box-shadow: 0 0 12px rgba(59,130,246,0.2); }
+.rc-state-btn:disabled { cursor: default; }
+.rc-state-icon { font-size: 20px; }
+.rc-state-name { font-weight: 600; }
+
+/* Quote Card — Blue */
+.rc-quote-card {
+  background: linear-gradient(135deg, rgba(59,130,246,0.08) 0%, rgba(30,64,175,0.12) 100%);
+  border: 1.5px solid rgba(59,130,246,0.25);
+  border-radius: 16px; padding: 20px; margin: 8px 0;
+  max-width: 380px;
+}
+.rc-quote-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.rc-quote-logo {
+  width: 52px; height: 52px; border-radius: 12px;
+  background: rgba(255,255,255,0.95); display: flex; align-items: center; justify-content: center;
+  padding: 6px; flex-shrink: 0;
+}
+.rc-quote-logo img { width: 100%; height: 100%; object-fit: contain; }
+.rc-quote-title { font-size: 15px; font-weight: 700; color: #e2e8f0; }
+.rc-quote-subtitle { font-size: 12px; color: #93c5fd; margin-top: 2px; }
+
+.rc-quote-vehicle {
+  font-size: 13px; color: #94a3b8; padding: 8px 12px;
+  background: rgba(30,41,59,0.5); border-radius: 8px; margin-bottom: 12px;
+}
+
+/* Info pills */
+.rc-quote-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.rc-quote-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border-radius: 20px;
+  background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2);
+  font-size: 11px; color: #93c5fd;
+}
+.rc-pill-icon { font-size: 12px; }
+.rc-pill-label { color: #64748b; }
+.rc-pill-value { font-weight: 600; color: #bfdbfe; }
+
+/* Breakdown */
+.rc-quote-breakdown { padding: 0 4px; }
+.rc-quote-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; color: #94a3b8; }
+.rc-quote-divider { height: 1px; background: rgba(59,130,246,0.2); margin: 6px 0; }
+.rc-quote-total {
+  display: flex; justify-content: space-between; padding: 8px 0 4px;
+  font-size: 18px; font-weight: 800; color: #60a5fa;
+}
+
+/* Action buttons */
+.rc-quote-actions { display: flex; gap: 8px; margin-top: 16px; }
+.rc-quote-btn {
+  flex: 1; padding: 11px; border: none; border-radius: 10px;
+  font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+}
+.rc-quote-btn.primary { background: #3B82F6; color: white; }
+.rc-quote-btn.primary:hover { background: #2563EB; transform: translateY(-1px); box-shadow: 0 4px 15px rgba(59,130,246,0.4); }
+.rc-quote-btn.secondary { background: rgba(59,130,246,0.12); color: #93c5fd; border: 1px solid rgba(59,130,246,0.3); }
+.rc-quote-btn.secondary:hover { background: rgba(59,130,246,0.2); }
+
+/* Customize Panel — Blue */
+.rc-customize-panel {
+  background: linear-gradient(135deg, rgba(59,130,246,0.06) 0%, rgba(30,64,175,0.1) 100%);
+  border: 1.5px solid rgba(59,130,246,0.2);
+  border-radius: 16px; padding: 20px; margin: 8px 0;
+  max-width: 400px;
+}
+.rc-cust-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.rc-cust-icon { font-size: 20px; }
+.rc-cust-title { font-size: 15px; font-weight: 700; color: #e2e8f0; }
+.rc-cust-subtitle { font-size: 12px; color: #64748b; }
+.rc-cust-section { margin-bottom: 14px; }
+.rc-cust-label { display: block; font-size: 12px; font-weight: 600; color: #93c5fd; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+.rc-cust-options { display: flex; flex-wrap: wrap; gap: 6px; }
+.rc-cust-options.vertical { flex-direction: column; }
+.rc-cust-options.days { gap: 4px; }
+
+.rc-opt-btn {
+  padding: 8px 14px; border: 1.5px solid rgba(59,130,246,0.2);
+  border-radius: 8px; background: rgba(59,130,246,0.05);
+  color: #94a3b8; font-size: 13px; cursor: pointer;
+  transition: all 0.15s ease;
+}
+.rc-opt-btn.sm { padding: 6px 10px; font-size: 12px; min-width: 36px; text-align: center; }
+.rc-opt-btn:hover { border-color: #3B82F6; color: #bfdbfe; }
+.rc-opt-btn.active {
+  border-color: #3B82F6; background: rgba(59,130,246,0.2);
+  color: #60a5fa; font-weight: 600;
+}
+
+.rc-days-wrap { display: flex; flex-direction: column; gap: 8px; }
+.rc-days-input {
+  width: 100%; padding: 8px 12px; border: 1.5px solid rgba(59,130,246,0.2);
+  border-radius: 8px; background: rgba(15,23,42,0.6);
+  color: #e2e8f0; font-size: 13px; outline: none;
+  transition: border-color 0.2s;
+}
+.rc-days-input:focus { border-color: #3B82F6; }
+.rc-days-input::placeholder { color: #475569; }
+
+.rc-cust-actions { display: flex; gap: 8px; margin-top: 16px; }
+.rc-cust-btn {
+  flex: 1; padding: 10px; border: none; border-radius: 10px;
+  font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+}
+.rc-cust-btn.requote { background: #3B82F6; color: white; }
+.rc-cust-btn.requote:hover { background: #2563EB; }
+.rc-cust-btn.cancel { background: rgba(59,130,246,0.1); color: #64748b; border: 1px solid rgba(59,130,246,0.15); }
+.rc-cust-btn.cancel:hover { background: rgba(59,130,246,0.15); }
+
+
+    /* RC_CTA_SIDEBAR_v1 (2026-05-11): quote-card + invitación lado a lado en desktop */
+    .quote-card-wrap {
+      display: flex; flex-direction: row; gap: 12px; align-items: stretch;
+      width: 100%; margin: 8px 0; align-self: flex-start; max-width: 100%;
+    }
+    .quote-card-wrap .rc-quote-card,
+    .quote-card-wrap .ta-quote-card { flex: 1 1 60%; min-width: 0; max-width: none; }
+    .quote-cta-sidebar {
+      flex: 1 1 38%; min-width: 0;
+      padding: 16px 18px;
+      background: linear-gradient(135deg, rgba(96,165,250,0.08), rgba(34,211,238,0.04));
+      border: 1px solid rgba(96,165,250,0.18);
+      border-radius: 14px;
+      color: var(--gray-200, #cbd5e1);
+      font-size: 13px; line-height: 1.55;
+      /* CTA_SIDEBAR_STACK_v1 (2026-08-13): iba en `flex` con dirección `row` (la de por
+         defecto) asumiendo que adentro venía UN <div> envolvente. El JS de RC y Tourist mete
+         el texto pelón con <br>, así que flex convertía cada trozo entre <br> en una columna
+         y el mensaje se leía cruzado: "Lowest price to drive legally in Mexico." de un lado,
+         "— A++ (A.M. Best)" en otro. En celular quedaban tres columnas ilegibles, y es la
+         pantalla de la cotización. En columna funciona con o sin div envolvente. */
+      display: flex; flex-direction: column; justify-content: center; align-items: stretch;
+    }
+    .quote-cta-sidebar > div { width: 100%; }
+    @media (max-width: 760px) {
+      .quote-card-wrap { flex-direction: column; }
+      .quote-cta-sidebar { font-size: 12px; padding: 12px 14px; }
+    }
+    /* CONTAINER_QUERY_DRAWER_v1: apila quote-card + sidebar cuando el ANCHO REAL
+       del panel de chat es angosto, sin importar el viewport (cubre ventanas de
+       escritorio no maximizadas donde el drawer de 70vw queda apretado). */
+    @container chatmsgs (max-width: 480px) {
+      .quote-card-wrap { flex-direction: column; }
+      .quote-cta-sidebar { font-size: 12px; padding: 12px 14px; }
+    }
+</style>
+  <!-- dual-form removed: all buyer data captured conversationally now -->
+<style id="timi-fast-public-20260912">
+/* Public text is visible at first paint, including with JavaScript unavailable. */
+.hero-badge,.hero h1,.hero-sub,.hero-buttons,.chat-mockup-wrap{animation:none!important}
+.reveal{opacity:1;transform:none;transition:none}
+.trust-logo img{width:auto;height:28px;max-width:100px;object-fit:contain}
+@media(max-width:600px){.chat-mockup-wrap{display:none}.hero::before,.hero::after{animation:none}.timi-geo table{display:block;max-width:100%;overflow-x:auto}.timi-geo th,.timi-geo td{min-width:110px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+</style>  <script type="module" crossorigin src="/assets/main-ClXsYEnP.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/homeReferrer-C77kczuR.js">
+  <link rel="stylesheet" crossorigin href="/assets/main-BmXnle1T.css">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"FAQPage","@id":"https://timi.mx/seguro-tractocamion#faq","isPartOf":{"@id":"https://timi.mx/seguro-tractocamion#webpage"},"about":{"@id":"https://timi.mx/#organizacion"},"mainEntity":[{"@type":"Question","name":"¿Por qué la RC cuesta lo mismo en un Kenworth que en un Volvo?","acceptedAnswer":{"@type":"Answer","text":"Porque la responsabilidad civil no asegura tu tractocamión: responde por lo que tu unidad le haga a otros, y Quálitas tarifica ese riesgo por categoría del catálogo, no por marca. Todos los tractos de quinta rueda caen en la misma categoría, así que la RC sale en $22,771.95 al año para cualquiera. Lo que sí cambia con la marca, el año y la versión es la Amplia, porque ahí se asegura el valor de la unidad."}},{"@type":"Question","name":"¿La RC del tracto trae asistencia vial?","acceptedAnswer":{"@type":"Answer","text":"No. El paquete de solo RC de carga pesada trae Responsabilidad Civil por Daños a Terceros por $3,000,000 (deducible 50 UMA), Gastos Legales por $3,500,000 y RC Complementaria por $15,000. La asistencia vial ($45,000) y los gastos médicos de ocupantes ($250,000) vienen en la Limitada y en la Amplia. Lo decimos así porque es lo que devuelve el sistema de Quálitas al cotizar (medido el 26 de septiembre de 2026)."}},{"@type":"Question","name":"¿Cuánto cuesta la Limitada de un tractocamión?","acceptedAnswer":{"@type":"Answer","text":"En un Freightliner Cascadia 2022 valuado en $2,018,000, la Limitada (RC más robo total con deducible de 20%) cuesta $70,218.91 al año, contra $22,771.95 de solo RC y $130,784.01 de Amplia (medido el 26 de septiembre de 2026). Como la Amplia, sube o baja con el valor de tu unidad."}},{"@type":"Question","name":"¿Puedo asegurar un tracto que está a nombre de mi empresa?","acceptedAnswer":{"@type":"Answer","text":"Sí. La póliza se emite a nombre de la persona física o moral que indiques como contratante; si el tracto está a nombre de una empresa o de un socio, dilo en el chat para que el asegurado y el RFC salgan como deben, sobre todo si la vas a presentar en un trámite de la SICT."}},{"@type":"Question","name":"¿El precio cambia si trabajo en otra ciudad?","acceptedAnswer":{"@type":"Answer","text":"Para carga pesada no lo vimos cambiar: el mismo tracto cotizó igual en las 10 ciudades que medimos el 24 de septiembre de 2026 (de Tijuana a Mérida). Lo que mueve tu precio es la cobertura, el valor de la unidad y su año."}},{"@type":"Question","name":"¿Qué hago si el cliente me pide «seguro» para darme la carga?","acceptedAnswer":{"@type":"Answer","text":"Casi siempre te está pidiendo el seguro de la mercancía, no el del tracto. Ese se contrata por viaje en timi.mx/carga (0.45% del valor declarado, más derecho e IVA: una mercancía de $850,000 paga $4,727.00 por viaje) y su número de póliza va en el campo de aseguradora de la Carta Porte."}},{"@type":"Question","name":"¿Me cubre si el operador no es el dueño?","acceptedAnswer":{"@type":"Answer","text":"La póliza protege la unidad y la responsabilidad civil de quien la maneja con tu autorización, siempre que traiga la licencia federal que corresponde al tipo de unidad y la use para el fin declarado (carga). Un operador sin licencia vigente o bajo efectos del alcohol es de las exclusiones que más siniestros tumban."}}]},{"@context":"https://schema.org","@type":"BreadcrumbList","@id":"https://timi.mx/seguro-tractocamion#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Timi","item":"https://timi.mx/"},{"@type":"ListItem","position":2,"name":"Seguro de tractocamión","item":"https://timi.mx/seguro-tractocamion"}]},{"@context":"https://schema.org","@type":"WebPage","@id":"https://timi.mx/seguro-tractocamion#webpage","url":"https://timi.mx/seguro-tractocamion","name":"Seguro de Tractocamión: RC $22,772 al Año con Quálitas | Timi","description":"Seguro de tractocamión con Quálitas: RC $22,771.95 al año en cualquier marca y Amplia de $109,492 a $170,998 según la unidad. Cotiza por chat.","inLanguage":"es-MX","dateModified":"2026-09-26","isPartOf":{"@id":"https://timi.mx/#organizacion"},"publisher":{"@id":"https://timi.mx/#organizacion"}},{"@context":"https://schema.org","@type":"Service","@id":"https://timi.mx/seguro-tractocamion#servicio","name":"Seguro de tractocamión","serviceType":"Seguro de tractocamión (RC, Limitada y Amplia)","provider":{"@id":"https://timi.mx/#organizacion"},"areaServed":{"@type":"Country","name":"México"},"offers":[{"@type":"Offer","name":"Responsabilidad Civil anual de tractocamión","price":"22771.95","priceCurrency":"MXN","url":"https://timi.mx/seguro-tractocamion","availability":"https://schema.org/InStock"},{"@type":"Offer","name":"Cobertura Amplia anual · Kenworth 2020","price":"148956.67","priceCurrency":"MXN","url":"https://timi.mx/seguro-tractocamion#kenworth","availability":"https://schema.org/InStock"},{"@type":"Offer","name":"Cobertura Amplia anual · Freightliner 2022","price":"121693.05","priceCurrency":"MXN","url":"https://timi.mx/seguro-tractocamion#freightliner","availability":"https://schema.org/InStock"},{"@type":"Offer","name":"Cobertura Amplia anual · International 2020","price":"170997.97","priceCurrency":"MXN","url":"https://timi.mx/seguro-tractocamion#international","availability":"https://schema.org/InStock"},{"@type":"Offer","name":"Cobertura Amplia anual · Volvo 2020","price":"148116.28","priceCurrency":"MXN","url":"https://timi.mx/seguro-tractocamion#volvo","availability":"https://schema.org/InStock"},{"@type":"Offer","name":"Cobertura Amplia anual · Scania 2020","price":"109492.2","priceCurrency":"MXN","url":"https://timi.mx/seguro-tractocamion#scania","availability":"https://schema.org/InStock"},{"@type":"Offer","name":"Cobertura Amplia anual · Mack 2020","price":"135150.14","priceCurrency":"MXN","url":"https://timi.mx/seguro-tractocamion#mack","availability":"https://schema.org/InStock"}],"description":"Seguro anual de tractocamión con Quálitas, cotizado por chat: RC $22,771.95 para cualquier marca y Amplia según el valor de la unidad, con 30% de convenio incluido."},{"@context":"https://schema.org","@type":"InsuranceAgency","@id":"https://timi.mx/#organizacion","name":"Timi","url":"https://timi.mx","logo":"https://timi.mx/img/logo.png"}]</script>
+  <script>
+    window.__TIMI_LANDING__ = {"slug":"tractocamion","type":"tracto","mode":"auto","name":"Tractocamiones"};
+    (function(){ try { var u = new URL(window.location.href); if (!u.searchParams.has('mode')) { u.searchParams.set('mode','auto'); window.history.replaceState({}, '', u.pathname + u.search + u.hash); } } catch(e){} })();
+  </script>
+  <style>
+    .timi-geo {
+      --lg-ink: #0D1B2A; --lg-body: #3D4F6F; --lg-muted: #6B7C99;
+      --lg-surface: #FFFFFF; --lg-ground: #F7F9FB; --lg-line: #E4EAF1; --lg-line-soft: #EFF3F8;
+      --lg-accent: #0F766E; --lg-accent-soft: #E9F7F5; --lg-cta: #FF6B5A;
+      background: var(--lg-ground);
+      color: var(--lg-body); /* 🐛 sin esto se heredaba el blanco del body oscuro */
+      padding: 64px 20px;
+      border-top: 1px solid var(--lg-line);
+      border-bottom: 1px solid var(--lg-line);
+    }
+    .timi-geo-inner {
+      max-width: 720px; margin: 0 auto;
+      color: var(--lg-body); font-size: 17px; line-height: 1.72;
+      -webkit-font-smoothing: antialiased;
+    }
+    .timi-geo-inner h2 {
+      font-size: 30px; line-height: 1.22; font-weight: 800; letter-spacing: -0.022em;
+      color: var(--lg-ink); margin: 0 0 14px; text-wrap: balance;
+    }
+    .timi-geo-inner h3 {
+      font-size: 21px; line-height: 1.32; font-weight: 700; letter-spacing: -0.012em;
+      color: var(--lg-ink); margin: 34px 0 8px; text-wrap: balance;
+    }
+    .timi-geo-inner h4 { font-size: 17px; font-weight: 700; color: var(--lg-ink); margin: 22px 0 6px; }
+    .timi-geo-inner p { margin: 0 0 15px; }
+    .timi-geo-inner ul, .timi-geo-inner ol { margin: 0 0 16px 20px; padding: 0; }
+    .timi-geo-inner li { margin-bottom: 8px; }
+    .timi-geo-inner b, .timi-geo-inner strong { color: var(--lg-ink); font-weight: 700; }
+    .timi-geo-inner a { color: var(--lg-accent); text-decoration: none; border-bottom: 1px solid rgba(15,118,110,.3); }
+    .timi-geo-inner a:hover { border-bottom-color: var(--lg-accent); }
+    .timi-geo-inner a:focus-visible, .timi-geo-inner button:focus-visible { outline: 2px solid var(--lg-accent); outline-offset: 2px; border-radius: 4px; }
+
+    /* La respuesta con el número: es lo primero que lee una persona y lo que cita una IA. */
+    .timi-geo-inner .geo-intro {
+      font-size: 19.5px; line-height: 1.6; font-weight: 500; color: var(--lg-ink);
+      margin: 0 0 26px; padding: 0 0 0 18px; border-left: 3px solid var(--lg-accent);
+      text-wrap: pretty;
+    }
+
+    /* TABLA_SCROLL_MOVIL_v1 (2026-09-20): las tablas de precios de 5-6 columnas (motos de
+       reparto, las 49 motos, autos chinos) no caben a 375 px y desbordaban el ancho de la
+       página en vez de desplazarse solas. El envoltorio ya lo ponía el HTML; le faltaba el CSS. */
+    .timi-geo-inner .auto-tabla-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 0 20px; }
+    .timi-geo-inner .auto-tabla-wrap .auto-tabla { margin-bottom: 0; }
+
+    /* Tabla de coberturas como tarjeta: el precio es el elemento con más peso del bloque. */
+    .timi-geo-inner .auto-tabla {
+      width: 100%; border-collapse: separate; border-spacing: 0;
+      margin: 0 0 20px; font-size: 15.5px;
+      background: var(--lg-surface); border: 1px solid var(--lg-line);
+      border-radius: 14px; overflow: hidden;
+      box-shadow: 0 1px 2px rgba(13,27,42,.04), 0 8px 24px -16px rgba(13,27,42,.18);
+    }
+    .timi-geo-inner .auto-tabla th {
+      background: var(--lg-surface); color: var(--lg-muted);
+      font-size: 11.5px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+      text-align: left; padding: 14px 18px 10px; border-bottom: 1px solid var(--lg-line);
+    }
+    .timi-geo-inner .auto-tabla th:last-child { text-align: right; }
+    .timi-geo-inner .auto-tabla td {
+      padding: 15px 18px; border-bottom: 1px solid var(--lg-line-soft); vertical-align: top;
+    }
+    .timi-geo-inner .auto-tabla tr:last-child td { border-bottom: 0; }
+    .timi-geo-inner .auto-tabla td b { display: block; color: var(--lg-ink); font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+    .timi-geo-inner .auto-tabla td span { display: block; color: var(--lg-muted); font-size: 13.5px; line-height: 1.5; }
+    .timi-geo-inner .auto-precio {
+      text-align: right; white-space: nowrap; vertical-align: middle;
+      font-size: 21px; font-weight: 800; letter-spacing: -0.02em;
+      color: var(--lg-ink); font-variant-numeric: tabular-nums;
+    }
+    /* La RC es la de entrada: se marca, no se esconde. */
+    .timi-geo-inner .auto-row-rc td { background: var(--lg-accent-soft); box-shadow: inset 3px 0 0 var(--lg-accent); }
+    .timi-geo-inner .auto-row-rc .auto-precio { color: var(--lg-accent); }
+    .timi-geo-inner .auto-cia { color: var(--lg-muted); font-size: 13px; font-weight: 600; }
+    .timi-geo-inner .auto-ahorro { color: var(--lg-accent); font-weight: 700; }
+    .timi-geo-inner .auto-fuente { color: var(--lg-muted); font-size: 13px; margin: -8px 0 22px; }
+
+    /* PRECIOS_MATRIZ_v1 (20-sep-2026): tablas de año y de ciudad. Son 4 columnas de cifras —
+       en un teléfono no caben sin apretujar los precios hasta hacerlos ilegibles, así que la
+       tabla scrollea DENTRO de su caja y la página nunca scrollea en horizontal. */
+    .timi-geo-inner .auto-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 0 6px; }
+    .timi-geo-inner .auto-scroll .auto-tabla { margin-bottom: 14px; }
+    .timi-geo-inner .auto-tabla-matriz { min-width: 460px; font-size: 15px; }
+    .timi-geo-inner .auto-tabla-matriz th { padding: 13px 14px 9px; }
+    .timi-geo-inner .auto-tabla-matriz th:last-child,
+    .timi-geo-inner .auto-tabla-matriz th:nth-last-child(2),
+    .timi-geo-inner .auto-tabla-matriz th:nth-last-child(3) { text-align: right; }
+    .timi-geo-inner .auto-tabla-matriz td { padding: 12px 14px; vertical-align: middle; }
+    .timi-geo-inner .auto-tabla-matriz td b { font-size: 15px; margin-bottom: 1px; }
+    .timi-geo-inner .auto-tabla-matriz td span { font-size: 12.5px; }
+    .timi-geo-inner .auto-tabla-matriz .auto-precio { font-size: 16.5px; font-weight: 700; }
+    /* El renglón entero es la liga al chat: el precio es la referencia, el clic es la venta. */
+    .timi-geo-inner .auto-tabla-matriz td b a {
+      color: var(--lg-ink); text-decoration: none;
+      border-bottom: 1px dashed var(--lg-line); padding-bottom: 1px;
+    }
+    .timi-geo-inner .auto-tabla-matriz td b a:hover { color: var(--lg-accent); border-bottom-color: var(--lg-accent); }
+    .timi-geo-inner .auto-tabla-matriz tr:hover td { background: var(--lg-accent-soft); }
+    .timi-geo-inner .auto-ficha {
+      color: var(--lg-muted); font-size: 12.5px; line-height: 1.75;
+      background: var(--lg-surface); border: 1px solid var(--lg-line);
+      border-radius: 12px; padding: 16px 18px; margin: 18px 0 26px;
+    }
+    .timi-geo-inner .auto-ficha b { color: var(--lg-ink); font-weight: 700; }
+
+    .timi-geo-inner .geo-faq-h { margin-top: 44px; padding-top: 30px; border-top: 1px solid var(--lg-line); }
+    .timi-geo-inner .geo-faq { margin-bottom: 8px; }
+
+    /* Llamada a la acción */
+    .timi-geo-inner .auto-cta {
+      margin: 34px 0 8px; padding: 26px 24px; text-align: center;
+      background: var(--lg-surface); border: 1px solid var(--lg-line); border-radius: 16px;
+    }
+    .timi-geo-inner .auto-cta-btn {
+      appearance: none; border: 0; cursor: pointer;
+      font-family: inherit; font-size: 16.5px; font-weight: 700; color: #fff;
+      background: var(--lg-cta); padding: 15px 32px; border-radius: 14px;
+      box-shadow: 0 6px 18px rgba(255,107,90,.32);
+      transition: transform .14s ease, box-shadow .14s ease;
+    }
+    .timi-geo-inner .auto-cta-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(255,107,90,.38); }
+    .timi-geo-inner .auto-cta-btn:active { transform: translateY(1px); }
+    .timi-geo-inner .auto-cta-sub { display: block; font-size: 13px; color: var(--lg-muted); margin-top: 12px; }
+
+    /* Enlaces a hermanas como chips: se reconocen como "más páginas", no como texto corrido. */
+    .timi-geo-inner .geo-links {
+      margin: 30px 0 0; padding-top: 24px; border-top: 1px solid var(--lg-line);
+      font-size: 0; line-height: 0; color: transparent;
+    }
+    .timi-geo-inner .geo-links b {
+      display: block; font-size: 12px; line-height: 1.6; letter-spacing: .07em; text-transform: uppercase;
+      color: var(--lg-muted); margin-bottom: 12px; font-weight: 700;
+    }
+    .timi-geo-inner .geo-links a {
+      display: inline-block; font-size: 13.5px; line-height: 1.35; font-weight: 600;
+      color: var(--lg-body); background: var(--lg-surface);
+      border: 1px solid var(--lg-line); border-bottom-color: var(--lg-line); border-radius: 999px;
+      padding: 7px 14px; margin: 0 7px 8px 0; transition: border-color .14s ease, color .14s ease;
+    }
+    .timi-geo-inner .geo-links a:hover { color: var(--lg-accent); border-color: var(--lg-accent); }
+
+    @media (max-width: 640px) {
+      .timi-geo { padding: 44px 16px; }
+      .timi-geo-inner { font-size: 16px; }
+      .timi-geo-inner h2 { font-size: 24px; }
+      .timi-geo-inner h3 { font-size: 19px; margin-top: 28px; }
+      .timi-geo-inner .geo-intro { font-size: 17.5px; padding-left: 14px; }
+      .timi-geo-inner .auto-tabla { font-size: 14.5px; }
+      .timi-geo-inner .auto-tabla td { padding: 13px 13px; }
+      .timi-geo-inner .auto-tabla th { padding: 12px 13px 9px; }
+      .timi-geo-inner .auto-precio { font-size: 18px; }
+      .timi-geo-inner .auto-tabla td b { font-size: 15px; }
+      .timi-geo-inner .auto-cta { padding: 22px 16px; }
+      .timi-geo-inner .auto-cta-btn { width: 100%; padding: 15px 18px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .timi-geo-inner .auto-cta-btn { transition: none; }
+      .timi-geo-inner .auto-cta-btn:hover { transform: none; }
+    }</style>
+  <meta name="timi-public-revision" content="2026-09-12"><script id="timi-product-copy" type="application/json">{"es":{"version":"TIMI_ADS_ESTABILIZACION_v1","product":"auto","lang":"es","ids":{"heroCta":"Cotizar mi tractocamión","ctaBtn":"Cotizar mi tractocamión","trustLabel":"Seguro para tractocamión con Quálitas · Timi, tu agente","msg1":"¿Qué unidad quieres asegurar y cómo la utilizas?","msg2":"Quiero comparar coberturas para mi vehículo","msg3":"Revisemos vehículo, domicilio y uso para consultar el precio.","msgResult":"\u003cdiv class=\"chat-result-title\">Compara antes de elegir\u003c/div>\u003cdiv class=\"chat-result-row\">\u003cspan class=\"cia\">Responsabilidad civil\u003c/span>\u003cspan class=\"precio\">Daños a terceros\u003c/span>\u003c/div>\u003cdiv class=\"chat-result-row\">\u003cspan class=\"cia\">Robo y daños propios\u003c/span>\u003cspan class=\"precio\">Según el plan\u003c/span>\u003c/div>\u003cp style=\"font-size:12px\">Ejemplo de las opciones a revisar. Cotiza para obtener precios, límites y deducibles.\u003c/p>","chatMockupCta":"Cotizar mi unidad →","productTrust":"Timi, tu agente de seguros. \u003ca href=\"/quienes-somos\">Verifica nuestra identidad y contacto\u003c/a>. Revisa aseguradora y coberturas en tu cotización antes de contratar.","heroSub":"La responsabilidad civil de un tractocamión cuesta $22,771.95 al año con Quálitas, igual para las seis marcas que medimos y con el 30% de convenio ya incluido. La Amplia va de $109,492.20 a $170,997.97 según el valor de la unidad (medido el 26 de septiembre de 2026).","heroTitle":"Seguro de tractocamión: RC \u003cspan class=\"highlight\">$22,771.95\u003c/span> al año con Quálitas"},"steps":[["Describe tu vehículo","Indica modelo, año, código postal y uso real para consultar las opciones disponibles."],["Compara la protección","Revisa prima total, responsabilidad civil, robo, daños materiales y deducibles del mismo vehículo."],["Continúa a contratar","Completa los datos requeridos y confirma los documentos y el estado de tu contratación. Puedes pedir ayuda."]],"features":[["Coberturas claras","La RC protege frente a daños a terceros. Robo y daños propios dependen del plan elegido."],["Cotización para tu vehículo","Usa tu domicilio y actividad reales para comparar las opciones que correspondan."],["Revisa el detalle","Consulta límites, deducibles, vigencia y prima total antes de elegir."],["Ayuda de Timi","Te acompañamos en la cotización y contratación del seguro."]],"insurer":"qualitas"},"en":{"version":"TIMI_ADS_ESTABILIZACION_v1","product":"auto","lang":"en","ids":{"heroCta":"Cotizar mi tractocamión","ctaBtn":"Cotizar mi tractocamión","trustLabel":"Seguro para tractocamión con Quálitas · Timi, tu agente","msg1":"¿Qué unidad quieres asegurar y cómo la utilizas?","msg2":"Quiero comparar coberturas para mi vehículo","msg3":"Revisemos vehículo, domicilio y uso para consultar el precio.","msgResult":"\u003cdiv class=\"chat-result-title\">Compara antes de elegir\u003c/div>\u003cdiv class=\"chat-result-row\">\u003cspan class=\"cia\">Responsabilidad civil\u003c/span>\u003cspan class=\"precio\">Daños a terceros\u003c/span>\u003c/div>\u003cdiv class=\"chat-result-row\">\u003cspan class=\"cia\">Robo y daños propios\u003c/span>\u003cspan class=\"precio\">Según el plan\u003c/span>\u003c/div>\u003cp style=\"font-size:12px\">Ejemplo de las opciones a revisar. Cotiza para obtener precios, límites y deducibles.\u003c/p>","chatMockupCta":"Cotizar mi unidad →","productTrust":"Timi, your Mexican insurance agent. \u003ca href=\"/about\">Verify our identity and contact details\u003c/a>. Review the insurer and coverage in your quote before buying.","heroSub":"La responsabilidad civil de un tractocamión cuesta $22,771.95 al año con Quálitas, igual para las seis marcas que medimos y con el 30% de convenio ya incluido. La Amplia va de $109,492.20 a $170,997.97 según el valor de la unidad (medido el 26 de septiembre de 2026).","heroTitle":"Seguro de tractocamión: RC \u003cspan class=\"highlight\">$22,771.95\u003c/span> al año con Quálitas"},"steps":[["Describe tu vehículo","Indica modelo, año, código postal y uso real para consultar las opciones disponibles."],["Compara la protección","Revisa prima total, responsabilidad civil, robo, daños materiales y deducibles del mismo vehículo."],["Continúa a contratar","Completa los datos requeridos y confirma los documentos y el estado de tu contratación. Puedes pedir ayuda."]],"features":[["Coberturas claras","La RC protege frente a daños a terceros. Robo y daños propios dependen del plan elegido."],["Cotización para tu vehículo","Usa tu domicilio y actividad reales para comparar las opciones que correspondan."],["Revisa el detalle","Consulta límites, deducibles, vigencia y prima total antes de elegir."],["Ayuda de Timi","Te acompañamos en la cotización y contratación del seguro."]],"insurer":"qualitas"}}</script></head>
+<body>
+  <!-- Los píxeles sin JavaScript van en body para conservar válido el head. -->
+  <noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=1329872425858649&ev=PageView&noscript=1"/></noscript>
+  <noscript><img src="//bat.bing.com/action/0?ti=97262538&Ver=2" height="0" width="0" style="display:none; visibility: hidden;" /></noscript>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5CVMV57Q"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <!-- EARLY_STUBS_v1: define stubs for functions used in onclick handlers below.
+       Real definitions load later in the main <script> block. Prevents "not defined"
+       errors when users on slow connections (FB in-app browser) click before full load. -->
+  <script>
+    function openChat()  { document.addEventListener('DOMContentLoaded', function(){ openChat(); }, {once:true}); }
+    function setLang(l)  { document.addEventListener('DOMContentLoaded', function(){ setLang(l); }, {once:true}); }
+  </script>
+
+  <!-- NAVBAR -->
+  <!-- Cross-link banners (visible only on main page timi.mx) -->
+  <div class="prod-switcher" id="prodSwitcher">
+    <!-- PROD_SWITCHER_MARQUEE_v1 (2026-08-06): .ps-track envuelve los tabs para poder
+         animarlos como una sola tira (marquee) en móvil sin mover el botón de cerrar,
+         que queda fixed fuera del track. El JS de abajo duplica el contenido del track
+         una vez más SOLO en el breakpoint móvil, para que la animación (translateX -50%)
+         cierre el ciclo sin salto visible (loop infinito real, no solo scroll manual). -->
+    <div class="ps-track" id="psTrack">
+    <!-- PROD_SWITCHER_CHAT1_v1 (2026-08-06, reporte Francisco): estos tabs llevaban a la
+         página del producto sin abrir el chat solo — el cliente llegaba y tenía que darle
+         clic manual al botón "chatear". Se agrega ?chat=1, mismo mecanismo que ya usan los
+         botones de selector dentro del chat (AUTO_OPEN_CHAT_v1, línea ~2162). -->
+    <a href="/?mode=auto&chat=1" class="prod-switcher-tab" id="ps-timi" title="Auto MX — Auto en México"><!-- SWITCHER_AUTO_MODE_v1 (2026-05-17): forzar ?mode=auto porque / es RC por default tras RC_DEFAULT_EXPERIMENT_v1 -->
+      <span class="ps-icon">🚗</span>
+      <span><span>Auto MX</span><span class="ps-sub">Auto en México</span></span>
+    </a>
+    <div class="ps-divider"></div>
+    <!-- MOTO_SWITCHER_v1 (2026-08-27): Motos como producto de primera clase en el switcher,
+         junto a Auto MX (pedido de Paco: pegarle duro a motos). -->
+    <a href="/seguro-moto?chat=1" class="prod-switcher-tab" id="ps-motos" title="Motos — Seguro de moto en México">
+      <span class="ps-icon">🏍️</span>
+      <span><span>Motos</span><span class="ps-sub">Seguro de moto</span></span>
+    </a>
+    <div class="ps-divider"></div>
+    <a href="/rc?chat=1" class="prod-switcher-tab" id="ps-rc" title="Northbound — Auto mexicano en USA">
+      <span class="ps-icon">🛡️</span>
+      <span><span>Northbound</span><span class="ps-sub">Auto mexicano en USA</span></span>
+    </a>
+    <div class="ps-divider"></div>
+    <a href="/tourist?chat=1" class="prod-switcher-tab" id="ps-tourist" title="Southbound — Placas extranjeras en México">
+      <span class="ps-icon">🚙</span>
+      <span><span>Southbound</span><span class="ps-sub">Placas extranjeras en México</span></span>
+    </a>
+    <div class="ps-divider"></div>
+    <!-- CARGA_SWITCHER_v1 (2026-08-02): Carga vive arriba como producto de primera clase;
+         el globo de carga se quitó del selector dentro del chat (pedido de Francisco). -->
+    <a href="/carga?chat=1" class="prod-switcher-tab" id="ps-carga" title="Carga — Mercancía por viaje">
+      <span class="ps-icon">📦</span>
+      <span><span>Carga</span><span class="ps-sub">Mercancía por viaje</span></span>
+    </a>
+    <div class="ps-divider"></div>
+    <!-- TRACTOS_SWITCHER_v1 (2026-09-07, pedido Fabricio): Tractocamión tenía landing/hub
+         completos (/seguro-tractocamion, /tractos) pero no aparecía en el switcher visible
+         de la home — solo se descubría por SEO/footer. Se agrega como producto de primera
+         clase junto a los demás. -->
+    <a href="/seguro-tractocamion?chat=1" class="prod-switcher-tab" id="ps-tractos" title="Tractocamión — RC con 30% de descuento">
+      <span class="ps-icon">🚛</span>
+      <span><span>Tractocamión</span><span class="ps-sub">30% de descuento</span></span>
+    </a>
+    </div>
+    <button class="prod-switcher-close" onclick="document.body.classList.add('switcher-hidden')" title="Cerrar">✕</button>
+  </div>
+  <script>
+  // MOBILE_MARQUEE_CONVEYOR_v1 (2026-08-07): reemplaza el marquee CSS anterior (duplicar
+  // contenido + translateX -50%), que se desincronizaba y hacia que la segunda tanda de
+  // tabs se sobrepusiera a la primera. Ahora se mueve .ps-track a mano con rAF a velocidad
+  // constante; en cuanto un tab (cualquier producto) sale completo por la izquierda del
+  // switcher visible, se quita del DOM y se vuelve a agregar al final -- reaparece por la
+  // derecha, circulando de verdad y sin salto, todos los productos, sin parar.
+  (function () {
+    try {
+      if (window.__TIMI_REPLAY__) return; // REPLAY_MODE_v1: sin timers en el iframe del Admin
+      if (!window.matchMedia('(max-width: 600px)').matches) return;
+      var track = document.getElementById('psTrack');
+      var switcher = document.getElementById('prodSwitcher');
+      if (!track || !switcher) return;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        switcher.style.overflowX = 'auto';
+        return;
+      }
+
+      var SPEED_PX_S = 28; // lento a propósito -- da tiempo de ver y tocar un tab
+      var originals = Array.prototype.slice.call(track.children).filter(function (el) {
+        return el.classList && el.classList.contains('prod-switcher-tab');
+      });
+      // BUFFER_DOBLE_v1 (2026-08-07, pedido Fabricio): duplicar la lista una vez mas para
+      // que siempre haya contenido de sobra por delante -- los clones no se ven de
+      // inmediato, pero ya estan listos en el DOM para cuando les toque su turno, sin
+      // depender de que el respawn alcance a "generar" a tiempo. Se les quita el id para
+      // no duplicar los que usa el resto de la pagina para marcar la pestaña activa
+      // (getElementById('ps-rc') etc. solo debe tocar el juego original).
+      var clones = originals.map(function (el) {
+        var c = el.cloneNode(true);
+        c.removeAttribute('id');
+        c.querySelectorAll('[id]').forEach(function (n) { n.removeAttribute('id'); });
+        track.appendChild(c);
+        return c;
+      });
+      var items = originals.concat(clones);
+
+      var offset = 0;
+      var paused = false;
+      ['touchstart', 'mouseenter'].forEach(function (ev) {
+        switcher.addEventListener(ev, function () { paused = true; }, { passive: true });
+      });
+      ['touchend', 'touchcancel', 'mouseleave'].forEach(function (ev) {
+        switcher.addEventListener(ev, function () { paused = false; }, { passive: true });
+      });
+
+      var lastT = null;
+      function tick(t) {
+        if (lastT === null) lastT = t;
+        var dt = Math.min((t - lastT) / 1000, 0.1); // cap por si la pestaña estuvo en background
+        lastT = t;
+        if (!paused && !document.hidden && items.length) {
+          offset += SPEED_PX_S * dt;
+          track.style.transform = 'translateX(' + (-offset) + 'px)';
+
+          var first = items[0];
+          var rect = first.getBoundingClientRect();
+          var containerLeft = switcher.getBoundingClientRect().left;
+          if (rect.right < containerLeft) {
+            var cs = getComputedStyle(first);
+            var fullWidth = first.offsetWidth + parseFloat(cs.marginLeft || 0) + parseFloat(cs.marginRight || 0);
+            track.removeChild(first);
+            track.appendChild(first);
+            items.push(items.shift());
+            offset -= fullWidth;
+            track.style.transform = 'translateX(' + (-offset) + 'px)';
+          }
+        }
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    } catch (_) {}
+  })();
+  </script>
+
+  <nav class="navbar" id="navbar">
+    <a href="#" class="nav-logo">timi<span>.</span></a>
+    <ul class="nav-links">
+      <li><a href="#como-funciona">Cómo funciona</a></li>
+      <li><a href="#aseguradoras">Aseguradoras</a></li>
+      <li><div class="lang-toggle" id="langToggle"><span class="lang-opt" data-lang="en" onclick="setLang('en')">EN</span><span class="lang-opt active" data-lang="es" onclick="setLang('es')">ES</span></div></li>
+        <li><button class="nav-cta" onclick="openChat()" id="navCta">Cotizar ahora</button></li>
+    </ul>
+    <button class="nav-mobile-btn" onclick="document.getElementById('mobileMenu').classList.add('open')">☰</button>
+  </nav>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <button class="close-menu" onclick="this.parentElement.classList.remove('open')">✕</button>
+    <a href="#como-funciona" onclick="this.parentElement.classList.remove('open')">Cómo funciona</a>
+    <a href="#aseguradoras" onclick="this.parentElement.classList.remove('open')">Aseguradoras</a>
+    <button class="menu-cta" onclick="document.getElementById('mobileMenu').classList.remove('open');openChat()">💬 Cotizar ahora</button>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <div class="tourist-banner" id="touristBanner"><span class="flag">🇺🇸</span> <span class="flag">🇲🇽</span> <span id="touristBannerText">Driving to Mexico? Get insured in seconds</span></div>
+          <div class="hero-badge" id="heroBadge">🚛 Tractocamiones y carga pesada · 30% de descuento Quálitas</div>
+        <h1 id="heroTitle">Seguro de tractocamión: RC <span class="highlight">$22,771.95</span> al año con Quálitas</h1>
+        <p class="hero-sub" id="heroSub">La responsabilidad civil de un tractocamión cuesta $22,771.95 al año con Quálitas, igual para las seis marcas que medimos y con el 30% de convenio ya incluido. La Amplia va de $109,492.20 a $170,997.97 según el valor de la unidad (medido el 26 de septiembre de 2026).</p>
+        <div class="hero-buttons">
+          <button class="btn-primary" onclick="openChat()" id="heroCta">Cotizar mi tractocamión</button>
+          <a href="#como-funciona" class="btn-secondary" id="heroSecondary">Cómo funciona ↓</a>
+        </div><p id="productTrust" style="font-size:12px;line-height:1.7;color:var(--gray-300);margin:18px 0 0;max-width:520px">Timi, tu agente de seguros. <a href="/quienes-somos">Verifica nuestra identidad y contacto</a>. Revisa aseguradora y coberturas en tu cotización antes de contratar.</p>
+      </div>
+
+      <div class="chat-mockup-wrap" onclick="openChat()">
+        <div class="chat-mockup">
+          <div class="chat-header">
+            <div class="chat-avatar">T</div>
+            <div class="chat-header-info">
+              <h4>Timi</h4>
+              <span>● En línea</span>
+            </div>
+          </div>
+          <div class="chat-body" id="chatDemo">
+            <div class="chat-msg bot" id="msg1">¿Qué unidad quieres asegurar y cómo la utilizas?</div>
+            <div class="chat-msg user" id="msg2">Quiero comparar coberturas para mi vehículo</div>
+            <div class="typing-indicator" id="typing">
+              <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+            </div>
+            <div class="chat-msg bot" id="msg3">Revisemos vehículo, domicilio y uso para consultar el precio.</div>
+            <!-- MOCKUP_SIN_HDI_v1 (25-sep-2026): ejemplo de Auto MX sin precios inventados y sólo con las
+                 aseguradoras que cotizan autos. Cada producto pone el suyo desde lib/landingProductCopy.js
+                 (replaceId, no texto exacto). Se conserva la forma (3 filas + divisor + fila final) que leen
+                 applyRCTexts y los regex de las landings. -->
+            <div class="chat-result" id="msgResult"><div class="chat-result-title">Compara antes de elegir</div><div class="chat-result-row"><span class="cia">Responsabilidad civil</span><span class="precio">Daños a terceros</span></div><div class="chat-result-row"><span class="cia">Robo y daños propios</span><span class="precio">Según el plan</span></div><p style="font-size:12px">Ejemplo de las opciones a revisar. Cotiza para obtener precios, límites y deducibles.</p></div></div></div><div class="chat-mockup-cta" id="chatMockupCta">Cotizar mi unidad →</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <style>.tf-cta{margin:20px 0 26px}.timi-geo-inner .tf-cta a.tf-cta-btn{display:inline-block;border-bottom:0;color:#fff;text-decoration:none}.timi-geo-inner h2{scroll-margin-top:72px}.timi-geo-inner h2:not(:first-child){margin-top:44px}</style>
+  <!-- TRACTOS_FASE1_v1 · timi-geo (server-side, legible sin JS) -->
+  <section class="timi-geo" id="timi-geo">
+    <div class="timi-geo-inner">
+
+      <h2 id="precio">Cuánto cuesta asegurar un tractocamión</h2>
+      <p class="geo-intro">La responsabilidad civil de un tractocamión cuesta $22,771.95 al año con Quálitas, igual para las seis marcas que medimos y con el 30% de convenio ya incluido. La Amplia va de $109,492.20 a $170,997.97 según el valor de la unidad (medido el 26 de septiembre de 2026).</p>
+      <p>La cuenta tiene dos mitades que conviene separar. La primera es la responsabilidad civil: protege a los demás y es la que exige la carretera federal, así que ningún tracto debería circular sin ella; su precio no depende de lo que valga tu unidad. La segunda es la protección de tu propio patrimonio —robo y daños—, que se calcula sobre el valor comercial del tracto y por eso cambia tanto entre un Scania y un International.</p>
+      <div id="tractos"><div class="auto-tabla-wrap"><table class="auto-tabla"><caption>Seguro anual de tractocamión por marca: Quálitas, CP de Guadalajara, 30% de convenio y derecho de póliza incluidos, con IVA. Medido el 26 de septiembre de 2026.</caption><thead><tr><th>Marca</th><th>Unidad de referencia</th><th>Solo RC</th><th>Amplia</th><th>Valor comercial</th></tr></thead><tbody><tr id="kenworth"><td>Kenworth</td><td>KENWORTH T680 CUMMINS X15 6X4 450HP DORM 52&quot; 2020</td><td>$22,771.95</td><td>$148,956.67</td><td>$2,366,000</td></tr><tr id="freightliner"><td>Freightliner</td><td>FREIGHTLINER CASCADIA 58K 48&quot; XT CUM 2022</td><td>$22,771.95</td><td>$121,693.05</td><td>$1,835,000</td></tr><tr id="international"><td>International</td><td>INTERNATIONAL LT625 CUMMINS 450HP CAB DIURNA 2020</td><td>$22,771.95</td><td>$170,997.97</td><td>$1,943,000</td></tr><tr id="volvo"><td>Volvo</td><td>VOLVO VNL 64T 670 2020</td><td>$22,771.95</td><td>$148,116.28</td><td>$1,676,000</td></tr><tr id="scania"><td>Scania</td><td>SCANIA R 410 A 6X2NA 2020</td><td>$22,771.95</td><td>$109,492.20</td><td>$2,153,000</td></tr><tr id="mack"><td>Mack</td><td>MACK ANTHEM 64TX SLEEPER 70 MP8 405HP 2020</td><td>$22,771.95</td><td>$135,150.14</td><td>$2,122,000</td></tr></tbody></table></div></div>
+      <p class="auto-fuente">Cotizaciones reales del sistema de Quálitas para una unidad insignia de cada marca. El catálogo con el que cotizamos trae 2,779 versiones de estas seis marcas, de varios años: tu precio exacto sale de tu versión, tu año y tu código postal.</p>
+      <p class="tf-cta"><a class="btn-primary tf-cta-btn" href="/seguro-tractocamion?chat=1" onclick="if(window.openChat){openChat();return false}">🚛 Cotizar mi tracto por chat</a></p>
+
+      <h2 id="que-cubre">Qué cubre cada paquete: RC, Limitada y Amplia</h2>
+      <p>Estas son las coberturas tal como las devuelve Quálitas al cotizar un Freightliner Cascadia 2022 (26 de septiembre de 2026). Ninguna es un «extra» que se agrega después: vienen armadas en el paquete, con los deducibles del segmento de carga pesada.</p>
+      <div class="auto-tabla-wrap"><table class="auto-tabla"><caption>Coberturas por paquete para tractocamión (Freightliner Cascadia 2022, valor $2,018,000). Quálitas, 26 de septiembre de 2026.</caption><thead><tr><th>Cobertura</th><th>Solo RC</th><th>Limitada</th><th>Amplia</th></tr></thead><tbody><tr><td>Responsabilidad Civil por Daños a Terceros</td><td>Sí, $3,000,000 · deducible 50 UMA</td><td>Sí, $3,000,000 · deducible 50 UMA</td><td>Sí, $3,000,000 · deducible 50 UMA</td></tr><tr><td>Gastos Legales</td><td>Sí, $3,500,000</td><td>Sí, $3,500,000</td><td>Sí, $3,500,000</td></tr><tr><td>RC Complementaria</td><td>Sí, $15,000</td><td>Sí, $15,000</td><td>Sí, $15,000</td></tr><tr><td>Robo Total</td><td>No</td><td>Sí, $2,018,000 · deducible 20%</td><td>Sí, $2,018,000 · deducible 20%</td></tr><tr><td>Gastos Médicos Ocupantes</td><td>No</td><td>Sí, $250,000</td><td>Sí, $250,000</td></tr><tr><td>Asistencia Vial Quálitas</td><td>No</td><td>Sí, $45,000</td><td>Sí, $45,000</td></tr><tr><td>Daños Materiales</td><td>No</td><td>No</td><td>Sí, $2,018,000 · deducible 7%</td></tr><tr><td>Precio anual con IVA</td><td>$22,771.95</td><td>$70,218.91</td><td>$130,784.01</td></tr></tbody></table></div>
+      <p><b>Solo RC.</b> Responde hasta $3,000,000 por los daños que el tracto cause a personas y bienes de terceros, con un deducible de 50 UMA. Suma los gastos legales de tu defensa (hasta $3,500,000) y una RC complementaria de $15,000. No paga nada de tu unidad: ni robo, ni volcadura, ni cristales.</p>
+      <p><b>Limitada.</b> Agrega el robo total del tracto con deducible de 20%, gastos médicos para ocupantes hasta $250,000 y asistencia vial hasta $45,000. Es el escalón pensado para quien teme más al robo en ruta que a un golpe propio.</p>
+      <p><b>Amplia.</b> Todo lo de la Limitada más los daños materiales de tu unidad —choque, volcadura, incendio, fenómenos naturales— con deducible de 7% sobre el valor asegurado.</p>
+      <p><b>Lo que ningún paquete paga:</b> la mercancía que llevas, el remolque si no tiene su propia póliza, las fallas mecánicas y el desgaste, y los daños cuando el operador maneja sin la licencia federal que corresponde, bajo efectos del alcohol o con la unidad dedicada a un uso distinto al que dice la póliza (la de tracto se emite con uso de carga).</p>
+      <p class="tf-cta"><a class="btn-primary tf-cta-btn" href="/seguro-tractocamion?chat=1" onclick="if(window.openChat){openChat();return false}">Comparar RC, Limitada y Amplia de mi unidad</a></p>
+
+      <h2 id="rc-limitada-o-amplia">¿RC, Limitada o Amplia? Cómo decidir sin pagar de más</h2>
+      <p>Cada peso de seguro sale del flete, así que la pregunta útil no es cuál paquete es «el completo», sino qué pérdida no podrías pagar tú. Tres situaciones cubren a casi todos los transportistas:</p>
+      <ul>
+        <li><b>Tracto reciente o con crédito encima:</b> Amplia. Perder una unidad de $1,943,000 por un robo o una volcadura no se repone con fletes, y la financiera normalmente la exige.</li>
+        <li><b>Tracto pagado que opera en rutas con robo:</b> Limitada. Protege contra lo que más duele en carretera sin pagar el daño propio, que en unidades con años encima muchas veces cuesta más asegurar que reparar.</li>
+        <li><b>Unidad veterana y pagada:</b> solo RC ($22,771.95 al año) y la diferencia al mantenimiento, que en un tracto viejo es el riesgo de todos los días.</li>
+      </ul>
+      <p>Si dudas entre dos, pide los tres precios en el chat: ver la diferencia en pesos para tu unidad decide más rápido que cualquier regla.</p>
+
+      <h2 id="deducibles">Deducibles: cuánto pagarías tú en un siniestro</h2>
+      <p>En tractocamión los deducibles no se parecen a los de un coche: 7% en daños materiales, 20% en robo total —en unidades de alto riesgo la aseguradora no acepta menos— y 50 UMA en responsabilidad civil, que con la UMA 2026 de $117.31 son $5,865.50. El detalle que más sorprende: el porcentaje se calcula sobre el <b>valor de la unidad</b>, no sobre el tamaño del golpe.</p>
+      <div class="auto-tabla-wrap"><table class="auto-tabla"><caption>Deducible en pesos para las unidades de la tabla de precios (valores de catálogo de Quálitas, 26 de septiembre de 2026).</caption><thead><tr><th>Unidad (valor)</th><th>Daños materiales (7%)</th><th>Robo total (20%)</th><th>Te pagan en robo total</th><th>RC (50 UMA)</th></tr></thead><tbody><tr><td>Kenworth 2020 ($2,366,000)</td><td>$165,620</td><td>$473,200</td><td>$1,892,800</td><td>$5,865.50</td></tr><tr><td>Freightliner 2022 ($1,835,000)</td><td>$128,450</td><td>$367,000</td><td>$1,468,000</td><td>$5,865.50</td></tr><tr><td>International 2020 ($1,943,000)</td><td>$136,010</td><td>$388,600</td><td>$1,554,400</td><td>$5,865.50</td></tr><tr><td>Volvo 2020 ($1,676,000)</td><td>$117,320</td><td>$335,200</td><td>$1,340,800</td><td>$5,865.50</td></tr><tr><td>Scania 2020 ($2,153,000)</td><td>$150,710</td><td>$430,600</td><td>$1,722,400</td><td>$5,865.50</td></tr><tr><td>Mack 2020 ($2,122,000)</td><td>$148,540</td><td>$424,400</td><td>$1,697,600</td><td>$5,865.50</td></tr></tbody></table></div>
+      <p>Un ejemplo con el International: si te sales en una curva y la reparación queda en medio millón, tú pones $136,010 y Quálitas el resto; si el golpe fuera de un millón, tu parte sería la misma. Por eso un raspón chico casi nunca conviene reclamarlo y por eso la Amplia se contrata pensando en el golpe grande. En responsabilidad civil pasa lo contrario: el deducible es chico y fijo, y la aseguradora paga a los terceros hasta $3,000,000.</p>
+      <p>Si una cotización de tracto te ofrece deducibles de auto (5% y 10%), pregunta dos veces: o no es una póliza de carga pesada o no está bien armada.</p>
+      <p class="tf-cta"><a class="btn-primary tf-cta-btn" href="/seguro-tractocamion?chat=1" onclick="if(window.openChat){openChat();return false}">Ver el deducible de mi unidad en el chat</a></p>
+
+      <h2 id="remolque">¿El seguro del tracto cubre el remolque?</h2>
+      <p>No como bien propio. Para la aseguradora el remolque —caja seca, cama baja, tolva, nodriza— es otro vehículo, con su serie, su valor y su propia categoría en el catálogo, así que su robo o sus daños sólo los paga su propia póliza. Lo que sí hace la RC del tracto es responder por los daños a terceros que cause el conjunto mientras circula acoplado; confirma que tu carátula lo diga.</p>
+      <p>Hoy los remolques no se cotizan en línea: el sistema los rechaza con la suma de RC del paquete de carga. En el mismo chat escribe «también traigo caja seca» (o lo que jales) y un asesor te arma su póliza con el mismo convenio y los deducibles del segmento.</p>
+
+      <h2 id="mercancia">¿Y la mercancía que llevo?</h2>
+      <p>Tampoco va en la póliza del tracto. Si la caja se voltea, la Amplia paga el tracto menos su deducible y la RC paga a los terceros; el producto que iba adentro sólo lo paga un seguro de carga contratado para ese viaje. En Timi ese seguro lo emite HDI y cuesta 0.45% del valor declarado, más derecho e IVA: una mercancía de $850,000 paga $4,727.00 por viaje. Puede contratarlo el dueño de la mercancía o tú como transportista; lo importante es que exista antes de salir.</p>
+      <p>La responsabilidad que te toca como transportista cuando no hay seguro depende del contrato y del valor declarado (artículos 66 y 67 de la Ley de Caminos): no hay un importe fijo que te libere, así que no conviene apostar a ella. <a href="/carga">Cotiza la mercancía por viaje</a> y consulta <a href="/carga/carta-porte">qué pide la Carta Porte</a>.</p>
+      <p class="tf-cta"><a class="btn-primary tf-cta-btn" href="/seguro-tractocamion?chat=1" onclick="if(window.openChat){openChat();return false}">Cotizar el tracto y preguntar por la carga</a></p>
+
+      <h2 id="estados-unidos">¿Sirve para cruzar a Estados Unidos?</h2>
+      <p>No. La póliza mexicana responde en territorio nacional; del otro lado la FMCSA exige responsabilidad financiera con una aseguradora admitida en Estados Unidos y el endoso MCS-90, con mínimos del 49 CFR 387.9: 750,000 dólares en carga general, un millón en petróleo y derivados y cinco millones en materiales peligrosos. Para los transfers de la franja fronteriza, el 49 CFR 387.7(b)(3) permite cumplir con cobertura por periodos de 24 horas o más.</p>
+      <p>El seguro RC para Estados Unidos que Timi vende en línea es para vehículos particulares y excluye la carga comercial, así que no aplica a un tracto. El cruce se arma con un asesor (programa Cross Border de Quálitas Insurance Company), sin precio de lista: se cotiza por transportista y por unidad. Déjalo dicho en el chat junto con tu número USDOT.</p>
+
+      <h2 id="requisitos">Requisitos: unidad usada, papeles y datos para emitir</h2>
+      <p>Para ver el precio basta la marca, el modelo, el año y el código postal donde trabaja la unidad —o la foto de la tarjeta de circulación y el chat saca los datos—. Para emitir se piden el número de serie, el de motor, las placas y los datos del contratante (nombre o razón social, RFC y domicilio). No se piden estados financieros ni antigüedad de la empresa: es una póliza por unidad, no un trámite de flotilla, y puedes asegurar un solo tracto.</p>
+      <p>Una unidad usada se asegura igual. Lo que cambia con los años es la suma asegurada: se toma el valor comercial que el catálogo registra para tu versión, y con él baja la prima de la Limitada y la Amplia; la RC sigue en $22,771.95. Si tu unidad es tan veterana que ya no aparece con valor, la Amplia puede no estar disponible en línea y el chat te lo dice de entrada, sin darte vueltas. Para la RC no se pide inspección; para coberturas con daño propio la aseguradora puede pedirla según su política vigente.</p>
+      <p class="tf-cta"><a class="btn-primary tf-cta-btn" href="/seguro-tractocamion?chat=1" onclick="if(window.openChat){openChat();return false}">Cotizar mi tracto usado</a></p>
+
+      <h2 id="que-aseguradora">¿Qué aseguradora conviene para un tractocamión?</h2>
+      <p>Más que la marca, compara tres cosas que puedes verificar: que la red de ajustadores responda en carretera el día del percance, que la cotización traiga los deducibles del segmento y cuánto tardan en darte un precio. Aquí cotizamos con Quálitas, la aseguradora con más presencia en camiones y carga pesada del país, y el precio sale en el chat en un minuto en lugar de esperar días a un agente.</p>
+      <p>Y cuándo no somos la mejor opción, dicho de frente: si manejas una flotilla grande con un esquema negociado por siniestralidad, tu corredor de siempre puede conseguir condiciones que una póliza individual no iguala; si buscas unidad y mercancía en una sola póliza, ese producto no existe con nosotros (son dos); y si la unidad transporta pasajeros, no es este seguro.</p>
+
+      <h2 id="como-se-compra">Cómo se cotiza, se contrata y se paga</h2>
+      <ol>
+        <li>Abres el chat y escribes tu unidad («Cascadia 2022», «Kenworth T680 2020») o mandas la foto de la tarjeta de circulación.</li>
+        <li>Ves los tres paquetes con precio anual real de Quálitas, el 30% de convenio ya aplicado y el derecho de póliza incluido ($790).</li>
+        <li>Eliges, capturas los datos de emisión y dejas tu tarjeta en una liga cifrada. El cargo lo hace directamente Quálitas; si tu banco tiene meses sin intereses vigentes, aparecen en esa misma liga.</li>
+        <li>La póliza llega en PDF a tu correo. Si algo no cuadra, hay una persona detrás del mismo chat.</li>
+      </ol>
+      <p class="tf-cta"><a class="btn-primary tf-cta-btn" href="/seguro-tractocamion?chat=1" onclick="if(window.openChat){openChat();return false}">Empezar mi cotización</a></p>
+
+      <h2 id="siniestro">Qué hacer si tienes un siniestro</h2>
+      <ol>
+        <li>Pon a salvo al operador y señaliza la unidad. Si hay lesionados, llama al 911.</li>
+        <li>Reporta a la cabina de Quálitas al 800 800 2880 (o 800 288 6700) con tu número de póliza y la ubicación exacta (el kilómetro de la carretera ayuda).</li>
+        <li>No aceptes culpa ni firmes convenios con el tercero antes de que llegue el ajustador; toma fotos de los vehículos, la carga y el lugar.</li>
+        <li>Si te roban el tracto, repórtalo al 911 y a la cabina de inmediato y levanta la denuncia ante el Ministerio Público: sin ella no avanza la reclamación de robo total.</li>
+        <li>Escríbenos por el chat para acompañarte en el seguimiento. El deducible se paga sólo cuando la reclamación procede sobre tu unidad.</li>
+      </ol>
+
+      <h2 id="camion-unitario">¿Tu unidad es un rabón, un tórton o una grúa?</h2>
+      <p>Entonces no es un tractocamión para Quálitas: los camiones unitarios están en otras categorías del catálogo y pagan otra RC ($9,775.89 el rabón y $12,271.13 el tórton al año). Tienen su propia página, con volteo, grúa y revolvedora: <a href="/tractos/rabon">seguro para rabón y tórton</a>. Si lo que necesitas es saber si la ley te obliga, está en <a href="/tractos/es-obligatorio">¿es obligatorio el seguro para tractocamión?</a>, y la tabla completa por año en <a href="/guias/cuanto-cuesta-seguro-tractocamion">cuánto cuesta el seguro de un tractocamión</a>.</p>
+
+      <h2 id="preguntas">Preguntas frecuentes</h2><h3>¿Por qué la RC cuesta lo mismo en un Kenworth que en un Volvo?</h3><p>Porque la responsabilidad civil no asegura tu tractocamión: responde por lo que tu unidad le haga a otros, y Quálitas tarifica ese riesgo por categoría del catálogo, no por marca. Todos los tractos de quinta rueda caen en la misma categoría, así que la RC sale en $22,771.95 al año para cualquiera. Lo que sí cambia con la marca, el año y la versión es la Amplia, porque ahí se asegura el valor de la unidad.</p><h3>¿La RC del tracto trae asistencia vial?</h3><p>No. El paquete de solo RC de carga pesada trae Responsabilidad Civil por Daños a Terceros por $3,000,000 (deducible 50 UMA), Gastos Legales por $3,500,000 y RC Complementaria por $15,000. La asistencia vial ($45,000) y los gastos médicos de ocupantes ($250,000) vienen en la Limitada y en la Amplia. Lo decimos así porque es lo que devuelve el sistema de Quálitas al cotizar (medido el 26 de septiembre de 2026).</p><h3>¿Cuánto cuesta la Limitada de un tractocamión?</h3><p>En un Freightliner Cascadia 2022 valuado en $2,018,000, la Limitada (RC más robo total con deducible de 20%) cuesta $70,218.91 al año, contra $22,771.95 de solo RC y $130,784.01 de Amplia (medido el 26 de septiembre de 2026). Como la Amplia, sube o baja con el valor de tu unidad.</p><h3>¿Puedo asegurar un tracto que está a nombre de mi empresa?</h3><p>Sí. La póliza se emite a nombre de la persona física o moral que indiques como contratante; si el tracto está a nombre de una empresa o de un socio, dilo en el chat para que el asegurado y el RFC salgan como deben, sobre todo si la vas a presentar en un trámite de la SICT.</p><h3>¿El precio cambia si trabajo en otra ciudad?</h3><p>Para carga pesada no lo vimos cambiar: el mismo tracto cotizó igual en las 10 ciudades que medimos el 24 de septiembre de 2026 (de Tijuana a Mérida). Lo que mueve tu precio es la cobertura, el valor de la unidad y su año.</p><h3>¿Qué hago si el cliente me pide «seguro» para darme la carga?</h3><p>Casi siempre te está pidiendo el seguro de la mercancía, no el del tracto. Ese se contrata por viaje en <a href="/carga">timi.mx/carga</a> (0.45% del valor declarado, más derecho e IVA: una mercancía de $850,000 paga $4,727.00 por viaje) y su número de póliza va en el campo de aseguradora de la Carta Porte.</p><h3>¿Me cubre si el operador no es el dueño?</h3><p>La póliza protege la unidad y la responsabilidad civil de quien la maneja con tu autorización, siempre que traiga la licencia federal que corresponde al tipo de unidad y la use para el fin declarado (carga). Un operador sin licencia vigente o bajo efectos del alcohol es de las exclusiones que más siniestros tumban.</p>
+      <p class="tf-cta"><a class="btn-primary tf-cta-btn" href="/seguro-tractocamion?chat=1" onclick="if(window.openChat){openChat();return false}">🚛 Cotizar mi tractocamión ahora</a></p>
+      <p class="geo-links"><b>Sigue leyendo:</b> <a href="/tractos/rabon">Rabón, tórton y camiones unitarios</a> · <a href="/tractos/es-obligatorio">¿Es obligatorio?</a> · <a href="/guias/cuanto-cuesta-seguro-tractocamion">¿Cuánto cuesta? Tabla por año</a> · <a href="/carga">Seguro de carga por viaje</a> · <a href="/carga/carta-porte">Carta Porte</a> · <a href="/guias">Todas las guías</a></p>
+    </div>
+  </section>
+
+  <!-- TRUST BAR -->
+  <section class="trust-bar" id="aseguradoras">
+    <p class="trust-label" id="trustLabel">Seguro para tractocamión con Quálitas · Timi, tu agente</p>
+    <div class="trust-logos">
+      
+      <div class="trust-logo"><img src="/assets/qualitas-small-20260912-CDZn3sgw.webp" alt="Qualitas" width="210" height="64" loading="lazy" decoding="async"></div>
+      
+      <!-- ASEGURADORAS_REALES_v1 (2026-09-17, Paco): aqui SOLO van las aseguradoras con las
+           que de verdad cotizamos, porque la etiqueta dice "Cotizamos con las mejores aseguradoras
+           de Mexico". Quitados GNP, AXA y Zurich (esta ademas deshabilitada: ZURICH_HABILITADO=false)
+           y ABA, que es Chubb desde la adquisicion y no debe volver a usarse como marca. -->
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section how-it-works" id="como-funciona">
+    <div class="how-inner">
+      <div class="how-header reveal">
+        <p class="section-label">Cómo funciona</p>
+        <h2 class="section-title">Tres pasos. Cero vueltas.</h2>
+        <p class="section-sub">Sin agente que te visite ni formularios de flotilla. Cotizas tu unidad como si le mandaras un mensaje a un amigo.</p>
+      </div>
+      <div class="steps">
+        <div class="step reveal">
+          <div class="step-icon">💬</div><div class="step-num">01</div>
+          <h3>Describe tu vehículo</h3><p>Indica modelo, año, código postal y uso real para consultar las opciones disponibles.</p>
+        </div>
+        <div class="step reveal">
+          <div class="step-icon">⚡</div><div class="step-num">02</div>
+          <h3>Compara la protección</h3><p>Revisa prima total, responsabilidad civil, robo, daños materiales y deducibles del mismo vehículo.</p>
+        </div>
+        <div class="step reveal">
+          <div class="step-icon">🛡️</div><div class="step-num">03</div>
+          <h3>Continúa a contratar</h3><p>Completa los datos requeridos y confirma los documentos y el estado de tu contratación. Puedes pedir ayuda.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOME_PRODUCTS_START -->
+  <!-- PRODUCTOS_HOME_v1: sección visible con las 6 líneas de producto — cada una al chat del
+       producto y a su hub de contenido. Estilo scoped con los tokens de marca (coral/teal/cyan/navy),
+       un acento por producto. SOLO en la home: renderLanding retira todo el bloque en las landings. -->
+  <section class="section" id="productos" aria-label="Nuestros seguros">
+    <style>
+      #productos .features-inner{max-width:1120px;margin:0 auto;padding:0 24px}
+      #productos .prod-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin-top:36px}
+      #productos .prod-card{position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(var(--ct),.12),var(--navy-mid) 46%);border:1px solid rgba(var(--ct),.28);border-top:3px solid var(--c);border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:12px;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+      #productos .prod-card:hover{transform:translateY(-4px);border-color:rgba(var(--ct),.6);box-shadow:0 18px 42px rgba(0,0,0,.4)}
+      #productos .prod-ic{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;line-height:1;background:rgba(var(--ct),.20);box-shadow:0 0 0 1px rgba(var(--ct),.25) inset}
+      #productos .prod-card h4{margin:0;font-size:17px;font-weight:800;color:#fff;letter-spacing:-.2px}
+      #productos .prod-card p{margin:0;font-size:14px;line-height:1.55;color:var(--gray-300);flex:1}
+      #productos .prod-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:4px}
+      #productos .prod-cta{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--coral),var(--coral-dark));color:#fff;font-weight:700;font-size:13.5px;padding:10px 18px;border-radius:100px;text-decoration:none;transition:filter .15s;box-shadow:0 4px 14px rgba(255,107,90,.3)}
+      #productos .prod-cta:hover{filter:brightness(1.08)}
+      #productos .prod-hub{color:var(--c);font-weight:700;font-size:13.5px;text-decoration:none}
+      #productos .prod-hub:hover{text-decoration:underline}
+    </style>
+    <div class="features-inner">
+      <div class="features-header reveal">
+        <p class="section-label">Nuestros seguros</p>
+        <h2 class="section-title">Un seguro para cada camino</h2>
+        <p class="section-sub">Auto en México, cruces a USA/Canadá, autos extranjeros, motos, carga y tractocamión. Cotiza por chat, o explora precios y coberturas por ciudad, estado, marca o modelo.</p>
+      </div>
+      <div class="prod-grid">
+        <div class="prod-card reveal" style="--c:#FF6B5A;--ct:255,107,90">
+          <div class="prod-ic">🚗</div>
+          <h4>Auto en México</h4>
+          <p>Quálitas y Chubb: responsabilidad civil, limitada y amplia.</p>
+          <div class="prod-actions"><a class="prod-cta" href="/?mode=auto&amp;chat=1">Cotizar</a><a class="prod-hub" href="/auto">Por estado →</a></div>
+        </div>
+        <div class="prod-card reveal" style="--c:#00D4AA;--ct:0,212,170">
+          <div class="prod-ic">🏍️</div>
+          <h4>Motos</h4>
+          <p>Seguro de moto con Quálitas, precio real en 60 segundos.</p>
+          <div class="prod-actions"><a class="prod-cta" href="/seguro-moto?chat=1">Cotizar</a><a class="prod-hub" href="/motos">Por marca y modelo →</a></div>
+        </div>
+        <div class="prod-card reveal" style="--c:#22D3EE;--ct:34,211,238">
+          <div class="prod-ic">🛡️</div>
+          <h4>Northbound · Auto mexicano en USA</h4>
+          <p>Responsabilidad civil Chubb para cruzar a USA, desde 1 día (Canadá, sólo con estancia extendida).</p>
+          <div class="prod-actions"><a class="prod-cta" href="/rc?chat=1">Cotizar</a><a class="prod-hub" href="/usa">Por ciudad y estado →</a></div>
+        </div>
+        <div class="prod-card reveal" style="--c:#FF8A7D;--ct:255,138,125">
+          <div class="prod-ic">🚙</div>
+          <h4>Southbound · Placas extranjeras</h4>
+          <p>Seguro mexicano Chubb para autos de USA/Canadá que entran a México.</p>
+          <div class="prod-actions"><a class="prod-cta" href="/tourist?chat=1">Cotizar</a><a class="prod-hub" href="/mx">Por destino →</a></div>
+        </div>
+        <div class="prod-card reveal" style="--c:#00D4AA;--ct:0,212,170">
+          <div class="prod-ic">📦</div>
+          <h4>Carga</h4>
+          <p>Seguro de mercancía por viaje con HDI, sin formularios.</p>
+          <div class="prod-actions"><a class="prod-cta" href="/carga?chat=1">Cotizar</a><a class="prod-hub" href="/carga">Por tipo de carga →</a></div>
+        </div>
+        <div class="prod-card reveal" style="--c:#22D3EE;--ct:34,211,238">
+          <div class="prod-ic">🚛</div>
+          <h4>Tractocamión</h4>
+          <p>Cobertura para tracto y remolque con Quálitas, 30% de descuento.</p>
+          <div class="prod-actions"><a class="prod-cta" href="/seguro-tractocamion?chat=1">Cotizar</a><a class="prod-hub" href="/seguro-tractocamion#tractos">Por marca →</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- HOME_PRODUCTS_END -->
+
+  <!-- FEATURES -->
+  <section class="section features">
+    <div class="features-inner">
+      <div class="features-header reveal">
+        <p class="section-label">Por qué Timi</p>
+        <h2 class="section-title">Seguros sin complicaciones</h2>
+        <p class="section-sub">Elige la cobertura para tu unidad y recibe ayuda para contratar.</p>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card reveal">
+          <div class="feature-icon">🤖</div>
+          <div class="feature-text"><h4>Coberturas claras</h4><p>La RC protege frente a daños a terceros. Robo y daños propios dependen del plan elegido.</p></div>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">💰</div>
+          <div class="feature-text"><h4>Cotización para tu vehículo</h4><p>Usa tu domicilio y actividad reales para comparar las opciones que correspondan.</p></div>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">📄</div>
+          <div class="feature-text"><h4>Revisa el detalle</h4><p>Consulta límites, deducibles, vigencia y prima total antes de elegir.</p></div>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">🔒</div>
+          <div class="feature-text"><h4>Ayuda de Timi</h4><p>Te acompañamos en la cotización y contratación del seguro.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-inner reveal">
+      <p class="section-label">¿Listo?</p>
+      <h2 class="section-title">Cotiza tu seguro<br><span style="color:var(--coral)">ahora mismo</span></h2>
+      <p class="section-sub">Es gratis, toma menos de un minuto y no necesitas registrarte.</p>
+      <button class="btn-primary" onclick="openChat()" style="font-size:18px;padding:18px 40px" id="ctaBtn">Cotizar mi tractocamión</button>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">timi<span>.</span></div>
+      <ul class="footer-links">
+        <li><a href="#como-funciona">Cómo funciona</a></li>
+        <li><a href="#aseguradoras">Aseguradoras</a></li>
+        <li><a href="#" onclick="openChat();return false">Cotizar</a></li>
+        <li><a href="/guias">Guías</a></li>
+        <li><a href="/guides">Guides (EN)</a></li>
+        <li><a href="/carga">Seguro de carga</a></li>
+        <li><a href="/seguro-tractocamion">Seguro de tractocamión</a></li>
+        <li><a href="/seguro-moto">Seguro de moto</a></li>
+        <li><a href="/rc">Seguro USA (Northbound)</a></li>
+        <li><a href="/tourist">Seguro turista México (Southbound)</a></li>
+        <li><a href="/?mode=auto">Seguro de auto en México</a></li>
+        <!-- HUBS_FOOTER_v1: enlaces a los hubs de contenido (ciudades, estados, marcas, modelos)
+             para que cada página del sitio conecte con todos los clusters — antes solo se
+             descubrían por sitemap. En páginas EN (sbWrapperEn) estos se retiran (audiencia SB). -->
+        <li><a href="/usa">Seguro USA por ciudad y estado</a></li>
+        <li><a href="/mx">Seguro turista por destino</a></li>
+        <li><a href="/auto">Seguro de auto por estado</a></li>
+        <li><a href="/motos">Seguro de moto por marca y modelo</a></li>
+        <li><a href="/seguro-tractocamion#tractos">Tractocamión por marca</a></li>
+        <!-- HUBS_FOOTER_v1: páginas sueltas que quedaban solo en el sitemap -->
+        <li><a href="/seguro-motorhome-placas-americanas">Seguro para motorhome (placas USA)</a></li>
+        <li><a href="/seguro-atv-placas-americanas">Seguro para ATV (placas USA)</a></li>
+        <li><a href="/legalizados">Seguro para auto legalizado</a></li>
+        <li><a href="/legalizados#chocolate">Seguro para auto chocolate</a></li>
+        <li><a href="/paisano">Seguro para el viaje del paisano</a></li>
+        <li><a href="/rc#donde-comprar">Compara: agente, garita, portal y Timi</a></li>
+        <li><a href="/agents">For US insurance agents</a></li>
+        <li><a href="/quienes-somos">Quiénes somos</a></li>
+        <li><a href="/aviso-de-privacidad" target="_blank">Aviso de Privacidad</a></li>
+      </ul>
+      <!-- SOCIAL_FOOTER_v1 (2026-08-01): Instagram estaba perdido entre los enlaces de texto
+           y Facebook no estaba. Handle confirmado contra la API de Meta: la página se llama
+           "Timi" (id 1169276099885400) con usuario timiseguros, el mismo que Instagram. -->
+      <div class="footer-social">
+        <span class="footer-social-label">Síguenos</span>
+        <a href="https://www.facebook.com/timiseguros" target="_blank" rel="noopener" aria-label="Timi en Facebook" title="Timi en Facebook">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.52 1.49-3.91 3.77-3.91 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.78-1.63 1.57v1.89h2.78l-.45 2.91h-2.33V22c4.78-.76 8.44-4.92 8.44-9.94Z"/></svg>
+        </a>
+        <a href="https://www.instagram.com/timi.seguros/" target="_blank" rel="noopener" aria-label="Timi en Instagram" title="Timi en Instagram">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41-.56-.22-.96-.48-1.38-.9-.42-.42-.68-.82-.9-1.38-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16Zm0 1.98c-3.14 0-3.51.01-4.75.07-1.15.05-1.77.24-2.18.4-.55.21-.94.47-1.35.88-.41.41-.67.8-.88 1.35-.16.41-.35 1.03-.4 2.18-.06 1.24-.07 1.61-.07 4.75s.01 3.51.07 4.75c.05 1.15.24 1.77.4 2.18.21.55.47.94.88 1.35.41.41.8.67 1.35.88.41.16 1.03.35 2.18.4 1.24.06 1.61.07 4.75.07s3.51-.01 4.75-.07c1.15-.05 1.77-.24 2.18-.4.55-.21.94-.47 1.35-.88.41-.41.67-.8.88-1.35.16-.41.35-1.03.4-2.18.06-1.24.07-1.61.07-4.75s-.01-3.51-.07-4.75c-.05-1.15-.24-1.77-.4-2.18-.21-.55-.47-.94-.88-1.35-.41-.41-.8-.67-1.35-.88-.41-.16-1.03-.35-2.18-.4-1.24-.06-1.61-.07-4.75-.07Zm0 3.37a4.49 4.49 0 1 1 0 8.98 4.49 4.49 0 0 1 0-8.98Zm0 7.4a2.91 2.91 0 1 0 0-5.82 2.91 2.91 0 0 0 0 5.82Zm5.72-7.6a1.05 1.05 0 1 1-2.1 0 1.05 1.05 0 0 1 2.1 0Z"/></svg>
+        </a>
+        <!-- TRUSTPILOT_v1 (2026-09-18): Michel reclamó el perfil (timi.mx) este día. Va aquí y en el
+             "sameAs" del JSON-LD de InsuranceAgency para que Google y los asistentes de IA amarren
+             la entidad. El PEDIDO de reseña se queda en Google (decisión de Paco 18-sep): 190 correos
+             dieron 6 clics y dos botones lo parten. En Trustpilot se INVITA, no se copian reseñas. -->
+        <a href="https://www.trustpilot.com/review/timi.mx" target="_blank" rel="noopener" aria-label="Timi en Trustpilot" title="Timi en Trustpilot">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.9-4.8 4.7 1.2 6.7L12 17.7 6.1 20.9l1.2-6.7L2.5 9.5l6.6-.9L12 2.5Z"/></svg>
+        </a>
+        <!-- SOCIAL_FOOTER_v1 · TikTok y YouTube: descomentar cuando existan las cuentas.
+             Al 1-ago-2026 no existen. YouTube /@timiseguros estaba LIBRE; TikTok no se pudo
+             confirmar desde servidor. Acuérdate de agregarlos también al "sameAs" del
+             JSON-LD de InsuranceAgency. Ver docs/REDES_SOCIALES.md.
+        <a href="https://www.tiktok.com/@timiseguros" target="_blank" rel="noopener" aria-label="Timi en TikTok" title="Timi en TikTok">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5 2.59 2.59 0 0 1 0-5.18c.27 0 .52.04.76.12v-3.2a5.74 5.74 0 0 0-.76-.05A5.72 5.72 0 0 0 4.14 15.3 5.72 5.72 0 0 0 9.86 21a5.72 5.72 0 0 0 5.72-5.72V9.01a7.35 7.35 0 0 0 4.28 1.37V7.3a4.28 4.28 0 0 1-3.26-1.48Z"/></svg>
+        </a>
+        <a href="https://www.youtube.com/@timiseguros" target="_blank" rel="noopener" aria-label="Timi en YouTube" title="Timi en YouTube">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.51a3.02 3.02 0 0 0-2.12-2.14C19.5 3.86 12 3.86 12 3.86s-7.5 0-9.38.51A3.02 3.02 0 0 0 .5 6.51C0 8.4 0 12.35 0 12.35s0 3.95.5 5.84a3.02 3.02 0 0 0 2.12 2.14c1.88.51 9.38.51 9.38.51s7.5 0 9.38-.51a3.02 3.02 0 0 0 2.12-2.14c.5-1.89.5-5.84.5-5.84s0-3.95-.5-5.84ZM9.55 15.93V8.77l6.27 3.58-6.27 3.58Z"/></svg>
+        </a>
+        -->
+      </div>
+      <!-- CONTACTO_FOOTER_v1 (2026-09-07, Paco): teléfono y correo visibles — la auditoría de competencia
+           encontró que ningún competidor gana sin un humano al que llamar. MX 33 3359 1100; en páginas en
+           inglés (landings.js, rama tourist) se voltea a USA/CAN +1 424 438 9592 primero. -->
+      <p class="footer-copy" id="footerContacto">Tel. México <a href="tel:+523333591100" style="color:inherit;text-decoration:none">33 3359 1100</a> · USA/Canadá <a href="tel:+14244389592" style="color:inherit;text-decoration:none">+1 424 438 9592</a> · <a href="mailto:timi@timi.mx" style="color:inherit;text-decoration:none">timi@timi.mx</a></p>
+      <p class="footer-copy">© 2026 TIMI Agente de Seguros y de Fianzas, S.A. de C.V. · Aristóteles 3116, Col. Vallarta San Jorge, Guadalajara, Jalisco, C.P. 44690 · Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- FAB -->
+  <button class="fab" id="fab" onclick="openChat()" title="Cotizar ahora">💬</button>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       CHAT DRAWER
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="chat-overlay" id="chatOverlay" onclick="closeChat()"></div>
+  <!-- dual-form panel removed: buyer data is now conversational -->
+
+<div class="chat-drawer" id="chatDrawer">
+    <div class="chat-drawer-header">
+      <div class="chat-avatar">T</div>
+      <div class="chat-header-info">
+        <h4>Timi</h4>
+        <span id="chatStatus">● En línea</span>
+      </div>
+      <!-- panel-open-btn removed: no more dual-form -->
+      <button class="chat-restart-btn" onclick="restartChat()" title="Volver a empezar la cotización">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+        <span class="crb-label">Volver a empezar</span>
+      </button>
+      <button class="chat-drawer-close" onclick="closeChat()">✕</button>
+    </div>
+    <div class="chat-drawer-messages" id="chatMessages"></div>
+    <div class="chat-drawer-input">
+      <input type="file" id="fileInput" accept="image/*,application/pdf,.pdf" style="display:none" multiple onchange="handleFiles(this)">
+      <button class="chat-drawer-attach" onclick="document.getElementById('fileInput').click()" title="Adjuntar archivo o foto">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+      </button>
+      <input type="text" id="chatInput" placeholder="Dime tu auto... ej: Toyota RAV4 2023" autocomplete="off" maxlength="500">
+      <input type="date" id="hiddenDatePicker" style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;">
+      <button class="chat-drawer-calendar" id="calendarBtn" onclick="document.getElementById('hiddenDatePicker').showPicker?document.getElementById('hiddenDatePicker').showPicker():document.getElementById('hiddenDatePicker').click()" title="Seleccionar fecha" style="display:none;background:none;border:none;cursor:pointer;font-size:18px;padding:4px 6px;">📅</button>
+      <button class="chat-drawer-send" id="chatSend" onclick="sendMessage()">→</button>
+    </div>
+  </div>
+
+  <!-- SOCKET.IO -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/tourist-ui.js?v=rc-sin-platinum-20260926"></script>
+  <!-- dual-form.js removed: conversational buyer data flow -->
+
+<!-- PRODUCT_SWITCHER_CHIP_v1 (2026-05-18, antes RC_DEFAULT_EXPERIMENT_v1 cerrado): chip discreto cambio producto - permanente, default / = RC -->
+<style>
+  .rc-exp-chip { position: fixed; left: 0; right: 0; bottom: 64px; padding: 6px 12px; font-size: 11px; color: #7A8599; text-align: center; background: rgba(13,27,42,0.88); border-top: 1px solid rgba(255,255,255,0.05); z-index: 50; backdrop-filter: blur(8px); pointer-events: auto; }
+  .rc-exp-chip a { text-decoration: none; margin: 0 6px; font-weight: 600; }
+  .rc-exp-chip a.auto { color: #FF6B5A; }
+  .rc-exp-chip a.tourist { color: #22D3EE; }
+  .rc-exp-chip a.rc { color: #60a5fa; }
+  .rc-exp-chip a:hover { text-decoration: underline; }
+  .rc-exp-chip .sep { color: #3D4F6F; margin: 0 2px; }
+  @media (max-width: 600px) { .rc-exp-chip { bottom: 60px; font-size: 10px; padding: 5px 8px; } }
+</style>
+<script>
+  (function() {
+    try {
+      var qp = new URLSearchParams(window.location.search);
+      var mode = qp.get('mode') || 'rc';
+      var path = window.location.pathname;
+      // CARGA_LANDING_v1: en la landing de mercancías NO hay cross-sell de autos (ramos y
+      // audiencias distintas — separación radical)
+      if (path === '/carga' || path === '/transportes' || mode === 'carga') return;
+      var active;
+      if (path === '/tourist' || mode === 'tourist') active = 'tourist';
+      else if (mode === 'auto') active = 'auto';
+      else active = 'rc';
+      var isEN = (document.documentElement.lang || navigator.language || 'es').toLowerCase().startsWith('en');
+      var label = isEN ? 'Looking for something else?' : '¿Buscabas otra cosa?';
+      var lblAuto = isEN ? '🚗 Mexican Auto' : '🚗 Auto en México';
+      var lblTourist = isEN ? '🚙 Foreign Auto in MX' : '🚙 Auto extranjero en MX';
+      var lblRC = isEN ? '🛡️ RC for USA/Canada' : '🛡️ RC para cruzar a USA';
+      var html = '<span>' + label + '</span>';
+      if (active !== 'auto') html += '<span class="sep">·</span><a class="auto" href="/?mode=auto">' + lblAuto + '</a>';
+      if (active !== 'tourist') html += '<span class="sep">·</span><a class="tourist" href="/tourist?chat=1">' + lblTourist + '</a>';
+      if (active !== 'rc') html += '<span class="sep">·</span><a class="rc" href="/?mode=rc">' + lblRC + '</a>';
+      var div = document.createElement('div');
+      div.className = 'rc-exp-chip';
+      div.innerHTML = html;
+      document.body.appendChild(div);
+    } catch (e) { console.warn('[RC_EXP] chip err', e.message); }
+  })();
+</script>
+</body>
+</html>

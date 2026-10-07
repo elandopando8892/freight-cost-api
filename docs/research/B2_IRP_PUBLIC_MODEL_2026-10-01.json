@@ -1,0 +1,71 @@
+{
+  "artifact": "FCM_B2_IRP_PUBLIC_MODEL",
+  "observedAt": "2026-10-01",
+  "status": "PARTIAL_CONDITIONAL_JURISDICTION_COMPONENT_NOT_FULL_IRP",
+  "sources": [
+    {"id":"TX_APVD_2026","url":"https://www.txdmv.gov/sites/default/files/form_files/MCD_APVD_2025_2026.pdf","locator":"Page 1, 2026 column, all jurisdictions and Total; form revision 04/26","archive":{"file":"docs/research/sources/TX_APVD_2025_2026_REVIEW_20261001.pdf","sha256":"1db4a6ff338818776eee4689c15dc0121ad7b539ea9159ec5fc4f9083aabc69a"}},
+    {"id":"TX_COMBINATION_FEES","url":"https://www.txdmv.gov/sites/default/files/body-files/FeeSchedule_CombinationAndTokenTrailer.pdf","locator":"Page 1, 70001-80000 annual fee and emissions/additional fees notes; Rev 6/17, still linked from current TxDMV fee hub","archive":{"file":"docs/research/sources/TX_COMBINATION_FEES_REVIEW_20261001.pdf","sha256":"4e3774508ca26c969e11d1dda2ba73d9fd5d87cedd24ab08f6da5217190e0439"}},
+    {"id":"TX_IRP_PACKET","url":"https://www.txdmv.gov/sites/default/files/body-files/TxIRP_Information_Packet_Booklet.pdf","locator":"Pages 7-8: no actual distance, Apportioned Fees, excluded fees","archive":{"file":"docs/research/sources/TX_IRP_PACKET_REVIEW_20261001.pdf","sha256":"9e8521200d18f71ddd98c5303745fb72366851af5216f3f394fdcd3ea48ecf73"}},
+    {"id":"TX_IRP_TERPGUIDE","url":"https://comptroller.texas.gov/taxes/publications/96-254/interstate-mv.php","locator":"Interstate Motor Vehicles / IRP trucks TERP annual 10 percent registration fee","archive":{"file":"docs/research/sources/TX_IRP_TERPGUIDE_REVIEW_20261001.html","sha256":"3aeaecf25aa1f969fbb0f2851a484a252a76e83f853a881e207e69489b542d56"}}
+  ],
+  "distanceBasis": {
+    "kind": "TEXAS_APVD_NO_ACTUAL_FLEET_REPORTING_DISTANCE_ONLY",
+    "applicationEffectiveYear": 2026,
+    "publishedTotalDistance": 82631,
+    "unit": "PUBLISHED_CHART_DISTANCE_UNITS_NOT_MONTHLY_CAPACITY",
+    "jurisdictions": [
+      {"id":"AL","distance":2186},{"id":"AB","distance":175},{"id":"AZ","distance":2161},
+      {"id":"AR","distance":2897},{"id":"BC","distance":74},{"id":"CA","distance":2451},
+      {"id":"CO","distance":1172},{"id":"CT","distance":201},{"id":"DE","distance":51},
+      {"id":"DC","distance":5},{"id":"FL","distance":1810},{"id":"GA","distance":1787},
+      {"id":"ID","distance":293},{"id":"IL","distance":2047},{"id":"IN","distance":1289},
+      {"id":"IA","distance":567},{"id":"KS","distance":932},{"id":"KY","distance":908},
+      {"id":"LA","distance":3375},{"id":"ME","distance":81},{"id":"MB","distance":11},
+      {"id":"MD","distance":313},{"id":"MA","distance":188},{"id":"MI","distance":471},
+      {"id":"MN","distance":280},{"id":"MS","distance":1439},{"id":"MO","distance":1620},
+      {"id":"MT","distance":194},{"id":"NE","distance":420},{"id":"NV","distance":390},
+      {"id":"NB","distance":7},{"id":"NH","distance":32},{"id":"NJ","distance":334},
+      {"id":"NM","distance":3133},{"id":"NY","distance":550},{"id":"NL","distance":0},
+      {"id":"NC","distance":1019},{"id":"ND","distance":262},{"id":"NS","distance":30},
+      {"id":"OH","distance":1189},{"id":"OK","distance":2681},{"id":"ON","distance":75},
+      {"id":"OR","distance":295},{"id":"PA","distance":1108},{"id":"PE","distance":26},
+      {"id":"QC","distance":24},{"id":"RI","distance":33},{"id":"SK","distance":29},
+      {"id":"SC","distance":815},{"id":"SD","distance":153},{"id":"TN","distance":2117},
+      {"id":"TX","distance":35179},{"id":"UT","distance":773},{"id":"VT","distance":38},
+      {"id":"VA","distance":1346},{"id":"WA","distance":252},{"id":"WV","distance":256},
+      {"id":"WI","distance":407},{"id":"WY","distance":680}
+    ],
+    "actualFleetHasNoDistance": null,
+    "selectedForPilot": false,
+    "routeLegPercentagesUsed": false,
+    "rationale": "Public model branch for absence of actual fleet reporting distance, not a convenience substitute for accrued distance. Texas base and eligibility are assumptions, not established by Laredo crossing or seller location."
+  },
+  "texasFeeComponent": {
+    "conditionalBaseJurisdiction": "TX",
+    "resourceId": "US_TRACTOR",
+    "currency": "USD",
+    "conditionalRegisteredCombinationWeightLb": 80000,
+    "band": {"minimumLbInclusive":70001,"maximumLbInclusive":80000},
+    "annualUnapportionedBaseUsd": 840,
+    "terpFraction": 0.1,
+    "analyticalTermMonths": 12,
+    "registeredWeightIsNotHvutTaxableWeight": true,
+    "formula": "Texas base * (TX chart distance / all chart distance); conditional TERP = Texas apportioned base * 0.10",
+    "terpAllocationIsAnalyticalNotInvoice": true,
+    "cashInvoiceRoundingAndProration": null,
+    "fullIrpAnnualUsd": null,
+    "completeMonthlyPermitUsd": null,
+    "selected": false,
+    "eligibleForBudget": false
+  },
+  "remaining": [
+    "Comparable jurisdiction-specific fee schedules, registered weight and vehicle class; missing is null, not zero",
+    "Authorized currency conversion for Canadian fees, term and invoice rounding/proration",
+    "Local/process/handling/REG-DPS fees, payment method and applicable registration conditions",
+    "Explicit public-model legal registrant/base, actual-distance versus no-distance eligibility and application period",
+    "Separate HVUT/UCR/entity allocation and one trailer registration; IRP excludes fuel taxes, oversize permits, operating authority and nonmember fees"
+  ],
+  "quoteReady": false,
+  "adoptedValues": 0,
+  "externalChanges": false
+}

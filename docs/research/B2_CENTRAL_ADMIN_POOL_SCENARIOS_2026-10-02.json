@@ -1,0 +1,39 @@
+{
+  "model":"FCM_CENTRAL_ADMIN_PUBLIC_POOL_V1",
+  "reviewedAt":"2026-10-02T09:18:00Z",
+  "referencePeriod":"2026-10",
+  "payrollLocationHypothesis":"US_CENTRAL_ADMIN_PROXY_NOT_MX_ROSTER",
+  "monthlyWorkedHoursPerFullEquivalent":160,
+  "hoursBasis":"DECLARED_WORKED_HOURS_NOT_PAID_HOURS_OR_2080_DIVIDED_BY12",
+  "roleQuantities":[
+    {"role":"DISPATCHER","fte":1,"group":"OFFICE_ADMIN","rationale":"Planning160worked hours dedicated to dispatch, not a measured trucks-per-dispatcher ratio."},
+    {"role":"TRAFFIC_MANAGER","fte":0.2,"group":"MANAGEMENT_BUSINESS_FINANCIAL","rationale":"Planning32worked hours for traffic supervision, distinct from dispatch hours."},
+    {"role":"OPERATIONS_MANAGER","fte":0.2,"group":"MANAGEMENT_BUSINESS_FINANCIAL","rationale":"Planning32worked hours for operations oversight, not another full manager."},
+    {"role":"SALES_MANAGER","fte":0.1,"group":"MANAGEMENT_BUSINESS_FINANCIAL","rationale":"Planning16worked hours for commercial management, no customer acquisition event or commission assumed included."},
+    {"role":"SAFETY_MANAGER","fte":0.2,"group":"PROFESSIONAL_RELATED","rationale":"Planning32worked hours with specialist occupation-group proxy; not certified safety-manager staffing."},
+    {"role":"TRACKING_CS","fte":1,"group":"OFFICE_ADMIN","rationale":"Planning160worked hours for tracking/customer service; not satellite monitoring24/7 or a substitute for the separate MX continuous-seat model."},
+    {"role":"BILLING_ADMIN","fte":1,"group":"OFFICE_ADMIN","rationale":"Planning160worked hours for billing administration; monthly compensation includes model benefits, no second statutory charge."}
+  ],
+  "fleetScenarios":[
+    {"id":"ONE_PAIR_SHARED_ADMIN","pairs":1,"mxTractors":1,"usTractors":1,"sharedBoxes":1},
+    {"id":"TEN_PAIRS_SHARED_ADMIN","pairs":10,"mxTractors":10,"usTractors":10,"sharedBoxes":10}
+  ],
+  "allocationDriver":"EQUAL_POWER_UNIT_COUNT_NOT_ARBITRARY_THIRDS",
+  "trailerPayrollShareHypothesis":"NO_ADDITIONAL_DEDICATED_BOX_ADMIN_ALL_SHARED_ADMIN_ON_POWER_UNITS",
+  "tms":{"plan":"BASIC","licensedUsers":7,"quantityBasis":"ONE_NAMED_ACCOUNT_PER_FUNCTION_NOT_PER_FTE_DRIVER_TRUCK_OR_LEG","publishedMonthlyUsdPerUser":69,"taxTreatment":"UNKNOWN_NOT_ZERO"},
+  "sources":[
+    {"id":"BLS_ECEC_ADMIN_READOUT","url":"https://www.bls.gov/news.release/ecec.t04.htm","locator":"First private-industry Occupational group block and technical-note worked-hour definition; source readout, not original HTTP.","archive":{"file":"docs/research/sources/BLS_ECEC_ADMIN_READOUT_20261002.json","sha256":"28a5286c1d6f11d148096ba3852d587971c94d3c4bde8a1050abcec354eb3e82"}},
+    {"id":"ASCENDTMS_PRICING","url":"https://www.thefreetms.com/pricing","locator":"Basic69USD per named user/month, no truck/driver/load charge; extra third-party subscriptions and tax not determined.","archive":{"file":"docs/research/sources/ASCENDTMS_PRICING_20261001.html","sha256":"b5f8a2f056dce186b195a0a1fe70890c55a21f43896d41cac82000400b03bd11"}}
+  ],
+  "modelAssumptions":[
+    "Both fleet sizes are prospective sensitivity scenarios, neither selected or attributed to XBF or a carrier; keep the same3.7functional full-equivalents to show scale impact, not certified workload capacity.",
+    "All payroll in this alternative uses US national private-industry ECEC occupation groups. Do not transplant US benefits to MX staff, geographically adjust wages without evidence, or add the separate Mexican monitor salary/contribution model.",
+    "Use published total compensation per hour worked times explicitly declared worked hours and role quantities; do not add wages, paid leave, FICA/FUTA/SUTA/workers compensation or benefit insurance again.",
+    "Seven functional quantities are distinct allocations of592worked hours/month, not proof of seven hires, a feasible roster or continuous human coverage. The same individual's hours must not be duplicated across roles when a real roster is later supplied.",
+    "One monthly payroll pool and one TMS license pool are conserved across all pairs first, then two tractor cost centres by equal power-unit count. Box payroll share is explicitly excluded from this driver, not an unknown box-administration expense assumed zero.",
+    "TMS named account count is seven despite fractional role hours; subscriptions/licenses are one cost identity, not two canonical-field charges. No free trial, bulk discount or extra load-board membership used.",
+    "All other company concepts, including office/yard/mobile/professional services, remain outside these components, not free. No whole admin-and-company budget family is filled by this model.",
+    "Reference monthOctober2026 uses June2026 survey rates as a prospective proxy without an invented inflation factor; no guarantee of observed October prices or BLS sample confidence for this scenario."
+  ],
+  "decision":"REVIEWED_COMPENSATION_AND_LICENSE_COMPONENTS_WITH_CONSERVED_SCALE_ALLOCATION_NOT_COMPLETE_OVERHEAD"
+}

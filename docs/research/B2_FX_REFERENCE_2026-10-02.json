@@ -1,0 +1,14 @@
+{
+  "model": "FCM_DATED_FIX_VALUATION_REFERENCE_V1",
+  "reviewedAt": "2026-10-02T07:43:00Z",
+  "observationDate": "2026-10-01",
+  "column": "FIX_DETERMINATION",
+  "mxnPerUsd": 18.3688,
+  "use": "DATED_RESEARCH_VALUATION_NOT_PAYMENT_OR_FORECAST",
+  "source": {
+    "id": "BANXICO_FIX_20261001",
+    "url": "https://www.banxico.org.mx/tipcamb/tipCamMIAction.do?idioma=sp",
+    "locator": "Fecha 01/10/2026, FIX 18.3688; DOF 18.0692 and Para pagos 18.0710 are different columns. On 02/10/2026 the FIX determination is N/E.",
+    "archive": {"file":"docs/research/sources/BANXICO_FIX_MARKET_20261002.html","sha256":"fb1668ff76adf95c18236c659a059ee93d2008b4526c86ac2789a340c6c2a5fd"}
+  }
+}

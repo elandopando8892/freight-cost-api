@@ -1,0 +1,10 @@
+:root { font-family: "New Black Typeface", Arial, sans-serif; color: #efefef; background: #1e1e1e; font-synthesis: none; }
+* { box-sizing: border-box; } body { margin: 0; } button,input,select { font: inherit; }
+button { cursor: pointer; background: #ea5e27; color: #1e1e1e; border: 1px solid #484848; border-radius: 4px; padding: .65rem 1rem; min-height: 44px; }
+button:disabled { opacity: .55; cursor: default; } input,select { min-height: 44px; max-width: 100%; background: #1e1e1e; color: #efefef; border: 1px solid #484848; padding: .5rem; }
+p { margin: .5rem 0; } h1,h2,h3,h4 { margin: .5rem 0; } small { display: block; } a { color: #ea5e27; }
+.qa-banner { padding: .65rem; text-align: center; background: #484848; font-size: .8rem; }
+.qa-brand { background: #efefef; color: #1e1e1e; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; padding: 1.3rem 4vw; }
+.qa-brand img { width: 280px; max-width: 70%; height: auto; }
+.qa-controls { display: flex; flex-wrap: wrap; gap: 1rem; align-items: end; max-width: 1240px; margin: auto; padding: 1rem 4vw; border-bottom: 1px solid #484848; }
+main { max-width: 1240px; margin: auto; padding: 1.5rem 4vw; } :focus-visible { outline: 2px solid #ea5e27; outline-offset: 3px; }

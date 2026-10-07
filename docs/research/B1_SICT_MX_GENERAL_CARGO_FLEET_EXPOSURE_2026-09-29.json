@@ -1,0 +1,107 @@
+{
+  "artifact": "B1_SICT_MX_GENERAL_CARGO_FLEET_EXPOSURE",
+  "asOf": "2026-09-29",
+  "purpose": "Evaluate public Mexican fleet and vehicle-kilometer denominators for the 2024 SCIAN 4841 expense benchmark and the D2D tractor-trailer pilot.",
+  "adopted": false,
+  "calibrated": false,
+  "quoteReady": false,
+  "sources": [
+    {
+      "publisher": "Dirección General de Autotransporte Federal, SICT",
+      "title": "Estadística Básica del Autotransporte Federal 2024",
+      "url": "https://micrs.sct.gob.mx/images/DireccionesGrales/DGAF/EST_BASICA/EST_BASICA_2024/Estad%C3%ADstica%20B%C3%A1sica%20del%20Autotransporte%20Federal%202024.pdf",
+      "dataYear": 2024,
+      "tables": ["1.1.3", "1.1.6.1", "1.1.7.1"],
+      "scope": "Federal public freight service; cargo general and specialized split; motor units, trailers, industrial cranes, and vehicle classes."
+    },
+    {
+      "publisher": "Dirección General de Autotransporte Federal, SICT",
+      "title": "Estadística Básica del Autotransporte Federal 2025",
+      "url": "https://micrs.sct.gob.mx/images/DireccionesGrales/DGAF/EST_BASICA/EST_BASICA_2025/Estadistica%20Basica%20del%20Autotransporte%20Federal%202025.pdf",
+      "dataYear": 2025,
+      "tables": ["1.1.3", "1.1.6.1", "1.1.7.1"],
+      "scope": "Federal public freight service; cargo general and specialized split; motor units, trailers, industrial cranes, and vehicle classes."
+    },
+    {
+      "publisher": "Dirección General de Servicios Técnicos, SICT",
+      "title": "Vehículos-kilómetro 2024",
+      "url": "https://micrs.sct.gob.mx/images/DireccionesGrales/DGST/Vehiculos_Kilometro/V-Km_DV2025-ENT.pdf",
+      "dataYear": 2024,
+      "tables": ["Red carretera nacional estudiada", "Régimen operacional"],
+      "scope": "Estimated vehicle-kilometers by broad traffic class (automobiles, buses, trucks) across studied federal/state and toll/free roads."
+    },
+    {
+      "publisher": "INEGI",
+      "title": "EAT 2024, SCIAN 4841 expenses",
+      "url": "https://www.inegi.org.mx/app/tabulados/interactivos/?bd=EAT&px=EAT_2",
+      "dataYear": 2024,
+      "scope": "National economic-activity survey tabulation for general cargo road transport enterprises/establishments; not restricted to SICT federal permits."
+    }
+  ],
+  "fleet": [
+    {
+      "year": 2024,
+      "cargoGeneralAllVehicles": 1231482,
+      "motorUnits": 621681,
+      "tractorT3": 401923,
+      "trailersAndDrawbarUnits": 609707,
+      "industrialCranes": 94,
+      "compositionCheck": 0,
+      "compositionCheckFormula": "motorUnits + trailersAndDrawbarUnits + industrialCranes - cargoGeneralAllVehicles",
+      "generalCargoShareOfCargoFleetPct": 85.764,
+      "motorUnitsPerGeneralFleetUnitPct": 50.482,
+      "t3ShareOfMotorUnitsPct": 64.651,
+      "trailersPerMotorUnit": 0.9807
+    },
+    {
+      "year": 2025,
+      "cargoGeneralAllVehicles": 1300107,
+      "motorUnits": 656399,
+      "tractorT3": 428200,
+      "trailersAndDrawbarUnits": 643613,
+      "industrialCranes": 95,
+      "compositionCheck": 0,
+      "compositionCheckFormula": "motorUnits + trailersAndDrawbarUnits + industrialCranes - cargoGeneralAllVehicles",
+      "generalCargoShareOfCargoFleetPct": 85.858,
+      "motorUnitsPerGeneralFleetUnitPct": 50.489,
+      "t3ShareOfMotorUnitsPct": 65.235,
+      "trailersPerMotorUnit": 0.9808
+    }
+  ],
+  "yearOverYear2025Vs2024Pct": {
+    "cargoGeneralAllVehicles": 5.573,
+    "motorUnits": 5.585,
+    "tractorT3": 6.538,
+    "trailersAndDrawbarUnits": 5.561,
+    "industrialCranes": 1.064
+  },
+  "vehicleKilometers2024": {
+    "unit": "vehicle-kilometers",
+    "nationalStudiedRoadNetworkAllVehicles": 272771959675.368,
+    "nationalStudiedRoadNetworkTrucks": 41404037329.032,
+    "trucksShareOfAllVehicleKilometersPct": 15.179,
+    "federalFreeRoadNetworkTrucks": 22377105797.682,
+    "federalTollRoadNetworkTrucks": 12706364158.458,
+    "stateFreeRoadNetworkTrucks": 4962128986.752,
+    "stateTollRoadNetworkTrucks": 1358438386.14,
+    "networkSumCheck": 0,
+    "networkSumCheckFormula": "federalFreeRoadNetworkTrucks + federalTollRoadNetworkTrucks + stateFreeRoadNetworkTrucks + stateTollRoadNetworkTrucks - nationalStudiedRoadNetworkTrucks"
+  },
+  "fitness": {
+    "fleetCount": "CONTEXT_ONLY",
+    "fleetSizeByClass": "CONDITIONAL_REFERENCE_FOR_SELECTING_ASSET_COHORT",
+    "annualKmPerTractor": "MISSING",
+    "productiveVehicleDays": "MISSING",
+    "kmByGeneralCargoOrEquipmentWithinSICTVehicleKm": "MISSING",
+    "perVehicleExpenseFromEATDividedBySICTFleet": "PROHIBITED_INCOMPATIBLE_POPULATION_AND_GRAIN",
+    "perKmExpenseFromEATDividedBySICTVehicleKm": "PROHIBITED_INCOMPATIBLE_POPULATION_AND_GRAIN",
+    "pilotLaneOrCarrierExposure": "MISSING"
+  },
+  "limitations": [
+    "EAT SCIAN 4841 and SICT federal-permit fleet have different statistical and legal populations; a shared year does not establish a valid join.",
+    "The SICT cargo-general fleet count combines motor units, trailers, and industrial cranes; these cannot all be used as an interchangeable fixed-cost denominator.",
+    "The SICT T3 and S2/S3 equipment distributions are marginal counts, not linked tractor-trailer combinations; do not infer a dominant matched combination.",
+    "SICT vehicle-kilometers are for broad truck traffic on the studied road network, not identified freight carriers, cargo-general service, equipment cohorts, or productive carrier mileage.",
+    "No public measure retrieved here gives productive days, loaded/empty mileage by the pilot segment, or annual mileage per individual fleet unit."
+  ]
+}

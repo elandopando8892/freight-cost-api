@@ -1,0 +1,36 @@
+# B2 · perfil público de valor del tractor
+
+Antes: fórmulas del ejercicio IRP 2022 sin correspondencia con el Cascadia de referencia 2021. Ahora: compra hipotética, MSRP, adquisición capitalizable y base fiscal separados; Maine incorpora base de registro **837 USD** (877 menos crédito 40) y factor de valor **0.004** para modelos 2021 o anteriores. Son **46 bases de registro sustentadas y 13 pendientes**, no 46 cuotas completas. Cero adopciones/partidas completas; CFU/CVU/precios y total IRP siguen null.
+
+## Benchmark, decisión y objetivo
+
+Se verificaron historial/perfil/lector/consolidado existentes y se reutilizó el [contraste moneda/valor](B2_IRP_CURRENCY_VALUE_RULES_2026-10-01.md). Alternativas: sustituir todo por precio de anuncio, rechazado; buscar otro activo/estimar MSRP sin dato publicado, rechazado por perder comparabilidad; conservar el mismo activo y calcular sensibilidades sólo bajo hipótesis explícita, recomendado. Sin infraestructura, librería, motor, asesor duplicado ni proveedores nuevos. La integración conserva relevo propio MX/US y una caja.
+
+El [anuncio oficial Ryder VEH-526505](https://www.ryder.com/en-us/used-trucks/inventory/oklahoma/oklahoma-city/tractor/tandem-axle-sleeper-tractor/2021/freightliner-mercedes/new-cascadia-px12664/526505) consultado muestra USD 40,495, modelo 2021 y VIN concordante. El lector indica contenido rastreado cuatro días antes; no acredita disponibilidad en tiempo real. Impuestos y cargos no están incluidos y precio/millaje pueden cambiar. No se contactó vendedor ni se certificó transacción, estado o MSRP. Original ya conservado y fijado por hash; registro de revisión/celdas en `B2_IRP_ASSET_VALUE_PROFILE_2026-10-01.json`, pin 23, SHA-256 `77f1b126fc404ae732ac977f4ee5300a1e3d83cec68c690eb8308e89ef176c65`.
+
+Objetivo/aceptación: enlazar valor a la identidad del activo, comprobar qué concepto requiere cada cargo, usar factor de año correcto cuando esté sustentado, mantener costos reales null y pasar pruebas afectadas. Se integra al consolidado local, no se llena la base publicada ni se cambia UI/persistencia; no necesita wireframe nuevo. UI futura mantiene manual MARKSMAN/wireframes.
+
+## Hallazgos y cálculos condicionales
+
+Fuente de reglas: [IRP Guidelines 2026](https://www.irponline.org/resource/collection/A35CA2A0-300D-4785-B21C-329509828DD9/2026_Fee_Test_Guidelines__06_08_26.xlsx), original SHA-256 `5db191bc435844030366c5edd0b44401b7f832f73edc67ef587b30475b3f9df1`. Maine F39:F41 y J51:K51 cotejados. **40495 × 0.004 = 161.98 USD/año** antes de APVD, sólo para sensibilidad que supone compra igual a precio anunciado. No usa factor 2022 de 0.0065, ni trata un factor de impuesto como depreciación de capital. Precio observado y tarifas de ejercicio no son un mismo periodo observado; no es factura actual ni subtotal mínimo de permisos.
+
+Cinco sensibilidades (ME/BC/MB/SK/SC) hacen explícitos precio, moneda/factor/multiplicador y participación APVD. Sólo Maine acredita en esta tabla el intervalo de modelo 2021; los factores BC/MB/SK/SC siguen sin aplicación al 2021 confirmada. Sus resultados son contrafactuales si ese factor aplicara, nunca cuota compatible certificada. Manitoba conserva el trayecto hipotético USD→CAD→USD; las dos referencias no son recíprocos exactos. Saskatchewan conserva base CAD y conversión histórica separada. No se mezcla este cálculo con la columna USD de la factura del ejercicio.
+
+Kentucky deriva año del factor desde la **fecha de compra** en sus ejemplos (2026 menos año de compra más uno), no desde año del VIN. Por eso 2021 del modelo no autoriza factor 0.00446 de una fila 2021. CO requiere MSRP de usado; NV fábrica/tabla y año compatibles; WV depende de primer año sin fecha acreditada; CA necesita base fiscal/edad/redondeo. Todos permanecen sin base adoptada. Sin búsqueda ilimitada de MSRP ni sustitución por precio de anuncio.
+
+Pendientes exactamente de registro: CA, CO, FL, ID, KY, MS, NE, NV, SC, UT, VT, WV, WY. Persisten valor fiscal/precio compatible, fechas, conflictos, cargos/vigencia de toda la familia y presupuesto/exposición/ciclo completos. Próximo agrupado: resolver condiciones/registro pendientes y escenario público económicamente compatible; no nuevos validadores/sprints por cada cuota ni pedir históricos privados. Este corte cierra clasificación y sensibilidades, no B2/MVP.
+
+## Ledger, verificación y rollback
+
+Responsable único Codex; inicio 2026-10-01 17:56:12 MX. Presupuesto anunciado ocho minutos, una consulta pública de fuente (apertura y localización en la misma página), una reparación máxima. Recomendación OpenAI GPT-6.1 Sol high para conceptos de valor, medium integración/QA; principal/esfuerzo sin cambio. Catálogo desktop no demuestra ID/modelo ejecutado ni acceso efectivo. No se asignó Claude: no hay pregunta independiente que justifique duplicar cotejos. Fable no seleccionado/invocado; exigencia acotada no justifica contexto adicional. Sin wrapper/lectores instalados/credenciales/sesiones privadas.
+
+Cuota Codex automática soportada al inicio, 17:56:12–17:56:15: semanal 10,080 minutos **96% usado**, reposición 6 octubre 13:08 -06:00; secundaria no disponible. La diferencia con 95% del corte anterior no se atribuye a esta tarea: cuenta compartida/uso concurrente. Claude Max x5 declarado por usuario, ventanas cinco horas/semanal/Fable/uso extra/reposiciones desconocidos; sin lectura manual reciente. Reserva no cuantificable por tarea: acotar tiempo/llamadas/contexto, sin duplicación o build general. Consumo tokens/list-price/cargos del corte no observable; no convertir unidades de créditos o cuota a dinero. Beneficio esperado de reutilización menor contexto/latencia, no ahorro medido. No inferencias auxiliares ni intentos fallidos; sin cargos activados ni IA de aplicación. Se mantiene modelo suficiente para la próxima integración y se reevalúa ante reglas no demostradas, no por falta de acceso o datos.
+
+- **180/180 pruebas**: consolidado 129, presupuesto 30, registro 21. Perfil/identidad/precio, año/factor Maine vs 2022, cinco sensibilidades y no adopción; hashes anteriores conservados.
+- Typecheck estricto PASS, sin reparación. Cuatro celdas Maine originales, cero diferencias. Sin ejecutar macros/fórmulas.
+- CLI salida 2 esperada por economía incompleta: 23 pins, 46 bases, 13 pendientes, sensibilidad Maine 161.98; cero partidas completas/adopciones y seis salidas null.
+- `git diff --check` PASS, advertencias CRLF previas no modificadas. Pruebas después de la última modificación de código. Sólo evidencia pública y cálculo local, no recorrido autenticado/persistencia productiva/despliegue/aceptación.
+
+Worktree físico `D:\andre\worktrees\freight-cost-model\cost-tires-release-20260927`, rama `codex/cost-tires-release-s14`, HEAD `4f5fc2de0c3d178dace917231e1092040dec21fd`, verificados antes de editar. Sin Auth/usuarios/Neon/DB/migración/infraestructura/producción/operaciones. Originales/cambios ajenos preservados; ningún archivo eliminado.
+
+Rollback por hunks: quitar pin/referencias/proyección `irpAssetValue`, restaurar Maine desconocido/14 bases pendientes/45 conocidas y retirar pruebas añadidas; preservar dossier/JSON primero. No restaurar archivos enteros/reset/checkout: contienen entregas previas. No hay rollback externo.

@@ -1,0 +1,36 @@
+{
+  "model": "FCM_US_POSTAL_ROAD_PLANNING_REFERENCE_V1",
+  "observedOn": "2026-10-03",
+  "recordedAt": "2026-10-03T00:15:53Z",
+  "scope": "PUBLIC_REFERENCE_YARD_TO_POSTAL_POINT_NOT_ACTUAL_TERMINALS",
+  "origin": "18702 Metropolitan Road, Laredo, TX 78045",
+  "destination": "72916, Fort Smith, AR",
+  "distanceMiles": 734.4,
+  "internationalMileKm": 1.609344,
+  "durationMinutes": 697,
+  "vehicleOption": "Commercial Truck",
+  "action": "CALCULATE_ROUTE_NOT_OPTIMIZE",
+  "captureKind": "DIRECT_PUBLIC_BROWSER_UI_NO_ACCOUNT",
+  "sourceUrl": "https://freightsidekick.com/tools/route-planner",
+  "evidenceArchive": {
+    "file": "docs/research/B2_BORDER_APPROACH_CONTRAST_2026-10-02.md",
+    "sha256": "e5bf512cd0fc6577adce879ec488404ab00184dd631ca58317dbda1ba89d25b3"
+  },
+  "destinationPostalPointMatched": true,
+  "actualDeliveryAddressMatched": false,
+  "bridgeCrossingIncluded": false,
+  "truckRestrictionsValidated": false,
+  "planningTransfer": "NOMINAL_DRIVING_CLOCK_AND_SYMMETRIC_EMPTY_DISTANCE_NOT_OBSERVED_TRUCK_PERFORMANCE",
+  "providerWarning": "Route may not account for height, weight, or commercial vehicle restrictions. Verify route suitability before travel.",
+  "assumptions": [
+    "Public Outpost address is a reference handoff yard, not the user's contracted site. ZIP point is not the delivery gate.",
+    "Route distance is rounded to0.1mi and time to1min; conversion does not increase source precision.",
+    "Provider Commercial Truck option does not prove53ft dry-van eligibility, weight/height/axle/access compliance or correct truck-road geometry.",
+    "697minutes are transferred as nominal driving for the existing explicit US day-block model; not measured driving, appointment schedule or HOS certification.",
+    "Network empty factor7.61percent and dedicated reverse distance/time symmetry remain declared hypotheses. No second box or administration pool is introduced.",
+    "Crossing, MX approach and mandatory bobtail recovery are outside this US yard-to-postal-point reference. Do not label it complete D2D or add it to the old US city distance."
+  ],
+  "selectedForPlanningComparisonOnly": true,
+  "quoteReady": false,
+  "adoptedOperationalValues": 0
+}

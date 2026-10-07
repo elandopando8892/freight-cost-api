@@ -1,0 +1,465 @@
+{
+  "schema": "fcm.b1.used-capital-evidence.v1",
+  "cutDate": "2026-09-29",
+  "head": "4f5fc2de0c3d178dace917231e1092040dec21fd",
+  "status": "METHOD_RECONCILED_PILOT_CAPITAL_INCOMPLETE",
+  "calibrated": false,
+  "quoteReady": false,
+  "adoptedValues": 0,
+  "businessGatesComplete": 0,
+  "businessGatesTotal": 4,
+  "canonicalInventory": {
+    "required": 135,
+    "documented": 135,
+    "candidate": 3,
+    "contrast": 47,
+    "missingEvidence": 85,
+    "adopted": 0
+  },
+  "sources": [
+    {
+      "id": "IMT_PT630_2021",
+      "url": "https://www.imt.mx/archivos/Publicaciones/PublicacionTecnica/pt630.pdf",
+      "type": "HISTORICAL_ILLUSTRATIVE_MODEL",
+      "country": "MX",
+      "observationYear": 2021,
+      "locator": "Section 2.2.10; printed p.19 / PDF p.35; Figure 2.1",
+      "capture": "DIRECT_PUBLIC_PDF_TEXT_AND_VISUAL",
+      "sha256": "96d6b5eaded68e0bbaa6bc58e90c7bbbc2dc4d234662f0fef6755a5c77145590",
+      "equipment": "T3_S2_REFRIGERATED",
+      "pilotApplicable": false,
+      "limitation": "No current price, observed resale, net disposal costs, separate tractor/trailer value or dry-van remaining life.",
+      "retrievedDate": "2026-09-29",
+      "rawResponseArchived": false
+    },
+    {
+      "id": "IMT_PT462_2016",
+      "url": "https://www.imt.mx/archivos/Publicaciones/PublicacionTecnica/pt462.pdf",
+      "type": "HISTORICAL_METHOD_AND_DEFINITIONS",
+      "country": "MX",
+      "observationYear": 2016,
+      "locator": "Annex 1; printed p.49 / PDF p.62; executive summary PDF p.11",
+      "capture": "DIRECT_PUBLIC_PDF_TEXT_AND_VISUAL",
+      "sha256": "f88bdce8d1000c1ccd9c1fad59f126b68e8f5c0771772c56f871461628c88ba5",
+      "pilotApplicable": false,
+      "limitation": "Definitions and renewal inputs, not remaining-life measurement for the pilot assets.",
+      "retrievedDate": "2026-09-29",
+      "rawResponseArchived": false
+    },
+    {
+      "id": "SCHNEIDER_FY2025",
+      "url": "https://www.sec.gov/Archives/edgar/data/1692063/000169206326000013/sndr-20251231.htm",
+      "type": "CARRIER_ACCOUNTING_POLICY",
+      "country": "US",
+      "observationYear": 2025,
+      "locator": "Property and Equipment; printed p.48",
+      "capture": "PUBLIC_WEB_FULL_RELEVANT_SECTION",
+      "sha256": null,
+      "pilotApplicable": false,
+      "limitation": "Fleet-wide ranges; original-cost residual basis and certain new-equipment agreements; not a used-asset life or guaranteed resale price.",
+      "retrievedDate": "2026-09-29",
+      "rawResponseArchived": false
+    },
+    {
+      "id": "COVENANT_FY2025",
+      "url": "https://www.sec.gov/Archives/edgar/data/928658/000143774926006086/cvti20251231_10k.htm",
+      "type": "CARRIER_ACCOUNTING_POLICY",
+      "country": "US",
+      "observationYear": 2025,
+      "locator": "Property and Equipment / Inventories and Supplies; printed p.61",
+      "capture": "PUBLIC_WEB_FULL_RELEVANT_SECTION",
+      "sha256": null,
+      "pilotApplicable": false,
+      "limitation": "New-asset accounting, segment-dependent residual, not an offered used acquisition or future market value.",
+      "retrievedDate": "2026-09-29",
+      "rawResponseArchived": false
+    },
+    {
+      "id": "RYDER_Q2_2026",
+      "url": "https://www.sec.gov/Archives/edgar/data/85961/000162828026049417/r-20260630.htm",
+      "type": "CARRIER_ACCOUNTING_POLICY_UNAUDITED_INTERIM",
+      "country": "US",
+      "observationDate": "2026-06-30",
+      "locator": "Note 6, Revenue Earning Equipment; printed p.13",
+      "capture": "PUBLIC_WEB_FULL_RELEVANT_SECTION",
+      "sha256": null,
+      "pilotApplicable": false,
+      "limitation": "Broad asset classes, not dry-van/VIN matched; market and residual review, no pilot residual amount.",
+      "retrievedDate": "2026-09-29",
+      "rawResponseArchived": false
+    },
+    {
+      "id": "IAS16_OVERVIEW",
+      "url": "https://www.ifrs.org/issued-standards/list-of-standards/ias-16-property-plant-and-equipment/",
+      "type": "STANDARD_SETTER_PUBLIC_OVERVIEW",
+      "country": null,
+      "locator": "About / asset cost components",
+      "capture": "PUBLIC_WEB_RELEVANT_OVERVIEW_ONLY",
+      "sha256": null,
+      "pilotApplicable": false,
+      "limitation": "Cost boundary reference only; no assertion that this reporting framework governs every pilot carrier.",
+      "retrievedDate": "2026-09-29",
+      "rawResponseArchived": false
+    }
+  ],
+  "historicalModel": {
+    "sourceId": "IMT_PT630_2021",
+    "currency": "MXN",
+    "valueKind": "HISTORICAL_ILLUSTRATION_NOT_MARKET_OBSERVATION",
+    "equipment": "T3_S2_REFRIGERATED",
+    "dryVanPilotApplicable": false,
+    "originalModeledValueMxn": 3000000,
+    "firstYearLossFraction": 0.2,
+    "subsequentYearLossFraction": 0.07,
+    "endpointAgeYears": 9,
+    "endpointIsCertifiedEconomicLife": false,
+    "printedEndpointValueMxn": 1342996.34,
+    "reconstructedEndpointValueMxn": 1342996.3431960968,
+    "printedResidualDifferenceMxn": 0.003196096746250987,
+    "residualBasis": "ORIGINAL_MODELED_VALUE",
+    "residualFractionOfOriginalModeledValue": 0.44766544773203226,
+    "formula": "V(0)=P; V(y)=P*(1-d1)*(1-d)^(y-1), y=1..9",
+    "series": [
+      {
+        "ageYear": 0,
+        "modeledValueMxn": 3000000
+      },
+      {
+        "ageYear": 1,
+        "modeledValueMxn": 2400000
+      },
+      {
+        "ageYear": 2,
+        "modeledValueMxn": 2232000
+      },
+      {
+        "ageYear": 3,
+        "modeledValueMxn": 2075760.0000000002
+      },
+      {
+        "ageYear": 4,
+        "modeledValueMxn": 1930456.8000000003
+      },
+      {
+        "ageYear": 5,
+        "modeledValueMxn": 1795324.8240000005
+      },
+      {
+        "ageYear": 6,
+        "modeledValueMxn": 1669652.0863200005
+      },
+      {
+        "ageYear": 7,
+        "modeledValueMxn": 1552776.4402776004
+      },
+      {
+        "ageYear": 8,
+        "modeledValueMxn": 1444082.0894581687
+      },
+      {
+        "ageYear": 9,
+        "modeledValueMxn": 1342996.3431960968
+      }
+    ],
+    "rebasedCases": [
+      {
+        "modeledAcquisitionAgeYears": 1,
+        "modeledAcquisitionValueMxn": 2400000,
+        "remainingModelHorizonMonths": 96,
+        "endpointValueMxn": 1342996.3431960968,
+        "endpointFractionOfModeledAcquisition": 0.5595818096650403,
+        "monthlyStraightLineLossMxn": 11010.454758373991,
+        "classification": "DERIVED_ARITHMETIC_WITHIN_HISTORICAL_MODEL_NOT_USED_MARKET_OR_LIFE_ESTIMATE",
+        "netDisposalCostsMxn": null,
+        "fxMxnPerUsd": null,
+        "monthlyDepreciationUsd": null,
+        "pilotApplicable": false
+      },
+      {
+        "modeledAcquisitionAgeYears": 2,
+        "modeledAcquisitionValueMxn": 2232000,
+        "remainingModelHorizonMonths": 84,
+        "endpointValueMxn": 1342996.3431960968,
+        "endpointFractionOfModeledAcquisition": 0.6017008706075703,
+        "monthlyStraightLineLossMxn": 10583.376866713133,
+        "classification": "DERIVED_ARITHMETIC_WITHIN_HISTORICAL_MODEL_NOT_USED_MARKET_OR_LIFE_ESTIMATE",
+        "netDisposalCostsMxn": null,
+        "fxMxnPerUsd": null,
+        "monthlyDepreciationUsd": null,
+        "pilotApplicable": false
+      },
+      {
+        "modeledAcquisitionAgeYears": 3,
+        "modeledAcquisitionValueMxn": 2075760.0000000002,
+        "remainingModelHorizonMonths": 72,
+        "endpointValueMxn": 1342996.3431960968,
+        "endpointFractionOfModeledAcquisition": 0.6469901834490002,
+        "monthlyStraightLineLossMxn": 10177.273011165325,
+        "classification": "DERIVED_ARITHMETIC_WITHIN_HISTORICAL_MODEL_NOT_USED_MARKET_OR_LIFE_ESTIMATE",
+        "netDisposalCostsMxn": null,
+        "fxMxnPerUsd": null,
+        "monthlyDepreciationUsd": null,
+        "pilotApplicable": false
+      },
+      {
+        "modeledAcquisitionAgeYears": 4,
+        "modeledAcquisitionValueMxn": 1930456.8000000003,
+        "remainingModelHorizonMonths": 60,
+        "endpointValueMxn": 1342996.3431960968,
+        "endpointFractionOfModeledAcquisition": 0.6956883693000002,
+        "monthlyStraightLineLossMxn": 9791.007613398391,
+        "classification": "DERIVED_ARITHMETIC_WITHIN_HISTORICAL_MODEL_NOT_USED_MARKET_OR_LIFE_ESTIMATE",
+        "netDisposalCostsMxn": null,
+        "fxMxnPerUsd": null,
+        "monthlyDepreciationUsd": null,
+        "pilotApplicable": false
+      },
+      {
+        "modeledAcquisitionAgeYears": 5,
+        "modeledAcquisitionValueMxn": 1795324.8240000005,
+        "remainingModelHorizonMonths": 48,
+        "endpointValueMxn": 1342996.3431960968,
+        "endpointFractionOfModeledAcquisition": 0.7480520100000001,
+        "monthlyStraightLineLossMxn": 9423.510016747992,
+        "classification": "DERIVED_ARITHMETIC_WITHIN_HISTORICAL_MODEL_NOT_USED_MARKET_OR_LIFE_ESTIMATE",
+        "netDisposalCostsMxn": null,
+        "fxMxnPerUsd": null,
+        "monthlyDepreciationUsd": null,
+        "pilotApplicable": false
+      },
+      {
+        "modeledAcquisitionAgeYears": 6,
+        "modeledAcquisitionValueMxn": 1669652.0863200005,
+        "remainingModelHorizonMonths": 36,
+        "endpointValueMxn": 1342996.3431960968,
+        "endpointFractionOfModeledAcquisition": 0.8043570000000001,
+        "monthlyStraightLineLossMxn": 9073.770642330657,
+        "classification": "DERIVED_ARITHMETIC_WITHIN_HISTORICAL_MODEL_NOT_USED_MARKET_OR_LIFE_ESTIMATE",
+        "netDisposalCostsMxn": null,
+        "fxMxnPerUsd": null,
+        "monthlyDepreciationUsd": null,
+        "pilotApplicable": false
+      },
+      {
+        "modeledAcquisitionAgeYears": 7,
+        "modeledAcquisitionValueMxn": 1552776.4402776004,
+        "remainingModelHorizonMonths": 24,
+        "endpointValueMxn": 1342996.3431960968,
+        "endpointFractionOfModeledAcquisition": 0.8649000000000001,
+        "monthlyStraightLineLossMxn": 8740.837378395983,
+        "classification": "DERIVED_ARITHMETIC_WITHIN_HISTORICAL_MODEL_NOT_USED_MARKET_OR_LIFE_ESTIMATE",
+        "netDisposalCostsMxn": null,
+        "fxMxnPerUsd": null,
+        "monthlyDepreciationUsd": null,
+        "pilotApplicable": false
+      },
+      {
+        "modeledAcquisitionAgeYears": 8,
+        "modeledAcquisitionValueMxn": 1444082.0894581687,
+        "remainingModelHorizonMonths": 12,
+        "endpointValueMxn": 1342996.3431960968,
+        "endpointFractionOfModeledAcquisition": 0.9299999999999999,
+        "monthlyStraightLineLossMxn": 8423.81218850599,
+        "classification": "DERIVED_ARITHMETIC_WITHIN_HISTORICAL_MODEL_NOT_USED_MARKET_OR_LIFE_ESTIMATE",
+        "netDisposalCostsMxn": null,
+        "fxMxnPerUsd": null,
+        "monthlyDepreciationUsd": null,
+        "pilotApplicable": false
+      }
+    ],
+    "rebasingDerivation": "For every integer a=1..8, replace the model start with V(a), preserve endpoint V(9), use 12*(9-a) months. Linear loss is a documentary equivalent average, not the source's annual declining curve or economic life of a real used asset.",
+    "notReconciledOrUsed": [
+      "Figure per-trip labels / route allocation",
+      "Separate tractor and trailer costs",
+      "Actual disposal expenses",
+      "Current acquisition or current remaining life"
+    ]
+  },
+  "accountingContrasts": [
+    {
+      "sourceId": "SCHNEIDER_FY2025",
+      "assetClass": "TRACTOR",
+      "lifeRangeYears": [
+        3,
+        8
+      ],
+      "residualFractionRange": [
+        0,
+        0.3
+      ],
+      "residualBasis": "ORIGINAL_COST",
+      "condition": "NOT_USED_SPECIFIC",
+      "pilotApplicable": false
+    },
+    {
+      "sourceId": "SCHNEIDER_FY2025",
+      "assetClass": "TRAILING_EQUIPMENT_NOT_DRY_VAN_ONLY",
+      "lifeRangeYears": [
+        6,
+        20
+      ],
+      "residualFractionRange": [
+        0,
+        0.25
+      ],
+      "residualBasis": "ORIGINAL_COST",
+      "condition": "NOT_USED_SPECIFIC",
+      "pilotApplicable": false
+    },
+    {
+      "sourceId": "COVENANT_FY2025",
+      "assetClass": "TRACTOR",
+      "lifeYears": 5,
+      "residualFractionRange": [
+        0,
+        0.35
+      ],
+      "residualBasis": "COST_OF_NEW_ASSET",
+      "condition": "NEW",
+      "pilotApplicable": false
+    },
+    {
+      "sourceId": "COVENANT_FY2025",
+      "assetClass": "DRY_VAN_TRAILER",
+      "lifeYears": 10,
+      "residualFractionApprox": 0.25,
+      "residualBasis": "COST_OF_NEW_ASSET",
+      "condition": "NEW",
+      "pilotApplicable": false
+    },
+    {
+      "sourceId": "RYDER_Q2_2026",
+      "assetClass": "TRACTOR",
+      "lifeRangeYears": [
+        4,
+        7.5
+      ],
+      "residualFraction": null,
+      "condition": "NOT_USED_SPECIFIC",
+      "pilotApplicable": false
+    },
+    {
+      "sourceId": "RYDER_Q2_2026",
+      "assetClass": "TRAILERS_AND_OTHER_NOT_DRY_VAN_ONLY",
+      "lifeRangeYears": [
+        9.5,
+        13
+      ],
+      "residualFraction": null,
+      "condition": "NOT_USED_SPECIFIC",
+      "pilotApplicable": false
+    }
+  ],
+  "pilotAssets": [
+    {
+      "id": "MX_TRACTOR_USED_2021",
+      "country": "MX",
+      "assetClass": "TRACTOR",
+      "priorOfferRegister": "B1_PILOT_ASSET_LABOR_EVIDENCE_2026-09-29.json",
+      "offerSourceId": "RODAL",
+      "offerRepresentsActualPilotAsset": false,
+      "condition": "USED",
+      "tenure": null,
+      "capitalizableAcquisitionUsd": null,
+      "remainingLifeMonths": null,
+      "netResidualUsd": null,
+      "residualBasis": null,
+      "monthlyInterestUsd": null,
+      "fleetQuantity": null,
+      "allocationAcrossLegs": null,
+      "status": "INSUFFICIENT_PILOT_ECONOMIC_EVIDENCE"
+    },
+    {
+      "id": "MX_DRY_VAN_USED_2015",
+      "country": "MX",
+      "assetClass": "DRY_VAN_TRAILER",
+      "priorOfferRegister": "B1_PILOT_ASSET_LABOR_EVIDENCE_2026-09-29.json",
+      "offerSourceId": "PRICESALES",
+      "offerRepresentsActualPilotAsset": false,
+      "condition": "USED",
+      "tenure": null,
+      "capitalizableAcquisitionUsd": null,
+      "remainingLifeMonths": null,
+      "netResidualUsd": null,
+      "residualBasis": null,
+      "monthlyInterestUsd": null,
+      "fleetQuantity": null,
+      "allocationAcrossLegs": null,
+      "status": "INSUFFICIENT_PILOT_ECONOMIC_EVIDENCE"
+    },
+    {
+      "id": "US_TRACTOR_USED_2021",
+      "country": "US",
+      "assetClass": "TRACTOR",
+      "priorOfferRegister": "B1_PILOT_ASSET_LABOR_EVIDENCE_2026-09-29.json",
+      "offerSourceId": "SELECTRUCKS",
+      "offerRepresentsActualPilotAsset": false,
+      "condition": "USED",
+      "tenure": null,
+      "capitalizableAcquisitionUsd": null,
+      "remainingLifeMonths": null,
+      "netResidualUsd": null,
+      "residualBasis": null,
+      "monthlyInterestUsd": null,
+      "fleetQuantity": null,
+      "allocationAcrossLegs": null,
+      "status": "INSUFFICIENT_PILOT_ECONOMIC_EVIDENCE"
+    },
+    {
+      "id": "US_DRY_VAN_NEW_2027",
+      "country": "US",
+      "assetClass": "DRY_VAN_TRAILER",
+      "priorOfferRegister": "B1_PILOT_ASSET_LABOR_EVIDENCE_2026-09-29.json",
+      "offerSourceId": "GREATDANE",
+      "offerRepresentsActualPilotAsset": false,
+      "condition": "NEW",
+      "tenure": null,
+      "capitalizableAcquisitionUsd": null,
+      "remainingLifeMonths": null,
+      "netResidualUsd": null,
+      "residualBasis": null,
+      "monthlyInterestUsd": null,
+      "fleetQuantity": null,
+      "allocationAcrossLegs": null,
+      "status": "INSUFFICIENT_PILOT_ECONOMIC_EVIDENCE"
+    }
+  ],
+  "engineBridge": {
+    "canonicalKeys": [
+      "fcm.v3.cost-capital.pu-tracto",
+      "fcm.v3.cost-capital.pu-remolque",
+      "fcm.v3.cost-capital.pu-rescue-tracto",
+      "fcm.v3.cost-capital.pu-rescue-remolque",
+      "fcm.v3.cost-capital.periodo-depreciacion"
+    ],
+    "legacySingleHorizonMayRepresentDifferentAssetLives": false,
+    "automaticConversionOrAdoption": false,
+    "activeFormulaChanged": false,
+    "quoteOutputs": {
+      "monthlyFixedUsd": null,
+      "cfuUsd": null,
+      "cvuUsd": null,
+      "purchaseUsd": null,
+      "saleUsd": null
+    },
+    "controls": [
+      "Used-asset horizon starts at acquisition, not manufacture",
+      "Original-cost residual percentage does not automatically use purchase price of a used asset",
+      "No MXN-to-USD conversion without compatible FX",
+      "No deduction of disposal costs twice",
+      "No full trailer charge in both interchange legs",
+      "Original tires capitalized versus tire CVU requires an explicit non-overlap allocation"
+    ]
+  },
+  "nextDelivery": "Insurance evidence by country: premium, coverage, deductible, equipment/responsibility and matching exposure denominator; relate to the pilot family worksheet and CFU/CVU before overhead/exposure. Do not repeat generic asset searches.",
+  "externalChanges": {
+    "database": false,
+    "auth": false,
+    "users": false,
+    "infrastructure": false,
+    "deployment": false,
+    "businessOperations": false,
+    "applicationAi": false,
+    "ui": false
+  }
+}

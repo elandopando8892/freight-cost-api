@@ -1,0 +1,264 @@
+{
+  "schemaVersion": "fcm.sanitized-evidence.v1",
+  "transformation": "GOOGLE_KEY_ASCII_REDACTION_V1",
+  "baseCommit": "4f5fc2de0c3d178dace917231e1092040dec21fd",
+  "intendedUse": "REVIEW_DERIVATIVES_NOT_CANONICAL_ECONOMIC_SOURCES",
+  "readyForProduction": false,
+  "originalsIncludedInGit": false,
+  "records": [
+    {
+      "originalPath": "docs/research/sources/ANKER_CHARGER_BUNDLE_20261002.html",
+      "originalSha256": "3c5f9b6c7715b83177bd86f3be522c5a17d960530d6871f77a73194d24d238a3",
+      "originalBytes": 1964717,
+      "derivedPath": "docs/research/sources-sanitized/ANKER_CHARGER_BUNDLE_20261002.html",
+      "derivedSha256": "deb11c94e47589687b8cef5c564b2fab3f05b8f6eaccdabe739b8033d68896b4",
+      "derivedBytes": 1964703,
+      "redactions": [
+        {
+          "offset": 799184,
+          "length": 39
+        }
+      ]
+    },
+    {
+      "originalPath": "docs/research/sources/GOOGLE_LVR_ACCESS_20260930.html",
+      "originalSha256": "ee82b1e00e231287a47de3e0e81aabf21f1112df08aa642f510287669b918853",
+      "originalBytes": 205603,
+      "derivedPath": "docs/research/sources-sanitized/GOOGLE_LVR_ACCESS_20260930.html",
+      "derivedSha256": "3ad4679014a93c24d9322354bc4ccdcfeb25e680e9a431c681577d0d072a4d64",
+      "derivedBytes": 205477,
+      "redactions": [
+        {
+          "offset": 198214,
+          "length": 39
+        },
+        {
+          "offset": 198256,
+          "length": 39
+        },
+        {
+          "offset": 198322,
+          "length": 39
+        },
+        {
+          "offset": 198364,
+          "length": 39
+        },
+        {
+          "offset": 201979,
+          "length": 39
+        },
+        {
+          "offset": 202079,
+          "length": 39
+        },
+        {
+          "offset": 205216,
+          "length": 39
+        },
+        {
+          "offset": 205258,
+          "length": 39
+        },
+        {
+          "offset": 205428,
+          "length": 39
+        }
+      ]
+    },
+    {
+      "originalPath": "docs/research/sources/GOOGLE_ROUTES_BILLING_20260930.html",
+      "originalSha256": "53b99247c7f86995ab317a5a17f5e4ffb4b1e65499235f3e8d29e75ba1bb4f7d",
+      "originalBytes": 198971,
+      "derivedPath": "docs/research/sources-sanitized/GOOGLE_ROUTES_BILLING_20260930.html",
+      "derivedSha256": "f5f21ff5c2a33e67c089812b7f571162937525d1358df2b315a47bb866d9c5f9",
+      "derivedBytes": 198845,
+      "redactions": [
+        {
+          "offset": 191582,
+          "length": 39
+        },
+        {
+          "offset": 191624,
+          "length": 39
+        },
+        {
+          "offset": 191690,
+          "length": 39
+        },
+        {
+          "offset": 191732,
+          "length": 39
+        },
+        {
+          "offset": 195347,
+          "length": 39
+        },
+        {
+          "offset": 195447,
+          "length": 39
+        },
+        {
+          "offset": 198584,
+          "length": 39
+        },
+        {
+          "offset": 198626,
+          "length": 39
+        },
+        {
+          "offset": 198796,
+          "length": 39
+        }
+      ]
+    },
+    {
+      "originalPath": "docs/research/sources/GOOGLE_TOLL_SCOPE_20260930.html",
+      "originalSha256": "6e9994edd4127af9b71d767c81d4b43350d43dc3eaf888f62e4c9f888b815fe5",
+      "originalBytes": 208404,
+      "derivedPath": "docs/research/sources-sanitized/GOOGLE_TOLL_SCOPE_20260930.html",
+      "derivedSha256": "67f9d66e0eb10618f19204683ea0619ddd0c1e9b47d42897504fc4c585d8c8af",
+      "derivedBytes": 208278,
+      "redactions": [
+        {
+          "offset": 201015,
+          "length": 39
+        },
+        {
+          "offset": 201057,
+          "length": 39
+        },
+        {
+          "offset": 201123,
+          "length": 39
+        },
+        {
+          "offset": 201165,
+          "length": 39
+        },
+        {
+          "offset": 204780,
+          "length": 39
+        },
+        {
+          "offset": 204880,
+          "length": 39
+        },
+        {
+          "offset": 208017,
+          "length": 39
+        },
+        {
+          "offset": 208059,
+          "length": 39
+        },
+        {
+          "offset": 208229,
+          "length": 39
+        }
+      ]
+    },
+    {
+      "originalPath": "docs/research/sources/MRO_TARIFFS_REVIEW_20260930.html",
+      "originalSha256": "78e1cac105159ac8a8d3150ef519792186487edd08ff62dcf9a0d60e42a7f66f",
+      "originalBytes": 203146,
+      "derivedPath": "docs/research/sources-sanitized/MRO_TARIFFS_REVIEW_20260930.html",
+      "derivedSha256": "3231eedd096ba03189ed48fa5016488e78b70ea6b208f798f31e9d3da7d9f6f7",
+      "derivedBytes": 203132,
+      "redactions": [
+        {
+          "offset": 195611,
+          "length": 39
+        }
+      ]
+    },
+    {
+      "originalPath": "docs/research/sources/OUTPOST_LAREDO_YARD_20261001.html",
+      "originalSha256": "016a154ca9f4b526990adca3174f4a3cde90f82d1c1461e70bc1356e6f0f1afa",
+      "originalBytes": 60660,
+      "derivedPath": "docs/research/sources-sanitized/OUTPOST_LAREDO_YARD_20261001.html",
+      "derivedSha256": "4e4f467a395402c04363b04cfdbf52807c453c5afd88c837ebc7ade922dd1570",
+      "derivedBytes": 60646,
+      "redactions": [
+        {
+          "offset": 58085,
+          "length": 39
+        }
+      ]
+    },
+    {
+      "originalPath": "docs/research/sources/RYDER_BIRMINGHAM_REVIEW_20261001.html",
+      "originalSha256": "d300ff11dd4ba724ba46d09cb31e3e559022d6663ec9c7ea4a84877cc4d7e709",
+      "originalBytes": 1140499,
+      "derivedPath": "docs/research/sources-sanitized/RYDER_BIRMINGHAM_REVIEW_20261001.html",
+      "derivedSha256": "f7588b78fb78192bfc2a99504d4daf9cef516007b2d166f1ed4ffdb9d08a4f3c",
+      "derivedBytes": 1140485,
+      "redactions": [
+        {
+          "offset": 344026,
+          "length": 39
+        }
+      ]
+    },
+    {
+      "originalPath": "docs/research/sources/SIMACO_YARD_20261002.html",
+      "originalSha256": "e40e013a5e03d577266986845183ae7ae305abd0abce3883d49e7f4729e8b009",
+      "originalBytes": 20935,
+      "derivedPath": "docs/research/sources-sanitized/SIMACO_YARD_20261002.html",
+      "derivedSha256": "3d81aee3283788877baedca6bd1780ba779a871838599a95dd36ea7b267746dd",
+      "derivedBytes": 20921,
+      "redactions": [
+        {
+          "offset": 17651,
+          "length": 39
+        }
+      ]
+    },
+    {
+      "originalPath": "docs/research/sources/WALMART_SUPERTECH_DEF_20261002.html",
+      "originalSha256": "bba9a8441f8834378f9610d7a86aae6a930c7e6438ffece99bb7dbf413edeae2",
+      "originalBytes": 392247,
+      "derivedPath": "docs/research/sources-sanitized/WALMART_SUPERTECH_DEF_20261002.html",
+      "derivedSha256": "101e2327c61f39e3def0ab8b105b15d322749424c86cfa2de3dff59147009109",
+      "derivedBytes": 392121,
+      "redactions": [
+        {
+          "offset": 383615,
+          "length": 39
+        },
+        {
+          "offset": 383673,
+          "length": 39
+        },
+        {
+          "offset": 383733,
+          "length": 39
+        },
+        {
+          "offset": 383801,
+          "length": 39
+        },
+        {
+          "offset": 383856,
+          "length": 39
+        },
+        {
+          "offset": 383922,
+          "length": 39
+        },
+        {
+          "offset": 383977,
+          "length": 39
+        },
+        {
+          "offset": 384045,
+          "length": 39
+        },
+        {
+          "offset": 384100,
+          "length": 39
+        }
+      ]
+    }
+  ]
+}
