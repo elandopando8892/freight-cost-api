@@ -259,7 +259,7 @@ model Organization {
 model User {
   id           String   @id @default(cuid())
   orgId        String
-  supabaseId   String   @unique // Supabase Auth user UUID; required after the controlled cutover
+  supabaseId   String?  @unique // Null preserves historical authors; login requires an approved real Auth subject.
   email        String   @unique
   passwordHash String? // null for identities managed by an external auth provider
   role         Role     @default(OPERATOR)
@@ -700,7 +700,7 @@ model TireCohortV2ResearchHead {
   updatedAt         DateTime @updatedAt
 
   org             Organization                 @relation(fields: [orgId], references: [id], onDelete: Restrict)
-  currentSnapshot TireCohortV2ResearchSnapshot @relation("TireCohortV2ResearchCurrentSnapshot", fields: [orgId, comparisonKey, currentSnapshotId], references: [orgId, comparisonKey, id], onDelete: Restrict)
+  currentSnapshot TireCohortV2ResearchSnapshot @relation("TireCohortV2ResearchCurrentSnapshot", fields: [orgId, comparisonKey, currentSnapshotId], references: [orgId, comparisonKey, id], onDelete: Restrict, map: "TireCohortV2ResearchHead_currentSnapshot_fkey")
   updatedBy       User                         @relation("TireCohortV2ResearchHeadUpdater", fields: [orgId, updatedById], references: [orgId, id], onDelete: Restrict)
 
   @@unique([orgId, comparisonKey])

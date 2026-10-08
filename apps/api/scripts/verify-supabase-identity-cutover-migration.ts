@@ -7,6 +7,7 @@ const migrationFile = resolve(
   root,
   "apps/api/prisma/migrations/20260830000200_finalize_supabase_identity/migration.sql",
 );
+const historicalMigrationFile = resolve(root, 'apps/api/prisma/migrations/20261008052054_preserve_historical_authors/migration.sql');
 
 const findings: string[] = [];
 let schema = "";
@@ -26,13 +27,20 @@ try {
 
 if (schema) {
   const userModel = /model User \{[\s\S]*?\n\}/.exec(schema)?.[0] ?? "";
-  if (!/^\s*supabaseId\s+String\s+@unique/m.test(userModel)) {
-    findings.push("User.supabaseId debe ser obligatorio y único después del corte.");
+  if (!/^\s*supabaseId\s+String\?\s+@unique/m.test(userModel)) {
+    findings.push("User.supabaseId debe admitir autores históricos sin login y conservar unicidad de vínculos reales.");
   }
   if (/^\s*kindeId\s+/m.test(userModel)) {
     findings.push("User.kindeId todavía existe en el esquema Prisma activo.");
   }
 }
+
+try {
+  const historical = readFileSync(historicalMigrationFile, 'utf8').replace(/^\s*--.*$/gm, '').trim();
+  if (historical !== 'ALTER TABLE "User" ALTER COLUMN "supabaseId" DROP NOT NULL;') {
+    findings.push('La extensión de autores históricos debe limitarse a la nulabilidad, sin borrar filas, índices o relaciones.');
+  }
+} catch { findings.push('Falta la extensión de persistencia para autores históricos.'); }
 
 if (migration) {
   const guard = migration.indexOf('WHERE "supabaseId" IS NULL');
@@ -60,6 +68,6 @@ if (findings.length) {
   process.exitCode = 1;
 } else {
   console.log(
-    "Contrato de corte Supabase Auth correcto: conciliación obligatoria, supabaseId requerido y Kinde retirado.",
+    "Contrato de autores históricos correcto: vínculo Supabase opcional y único; guard/atomicidad del retiro legado preservados. Esto no acredita aplicación remota ni permite saltar el retiro pendiente.",
   );
 }

@@ -48,7 +48,7 @@ export function assertFcmAccess(claims: { sub?: unknown; email?: unknown }, env:
   return binding
 }
 
-export function assertFcmUserLink(binding: FcmAccessBinding | null, row: { supabaseId?: string; email?: string }): void {
+export function assertFcmUserLink(binding: FcmAccessBinding | null, row: { supabaseId?: string | null; email?: string }): void {
   if (binding && (row.supabaseId !== binding.subject || canonicalEmail(row.email) !== binding.email))
     throw new FcmAccessPolicyError('FCM_SCOPED_IDENTITY_LINK_MISMATCH')
 }
