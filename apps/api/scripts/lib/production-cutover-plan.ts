@@ -61,12 +61,11 @@ const copyArtifact = (file: CutoverMigrationArtifact): CutoverMigrationArtifact 
 });
 
 /**
- * Pure inventory reconciliation, never SQL execution or authorization. No DB,
+ * Shared migration inventory inspection, never SQL execution or authorization. No DB,
  * Auth client, filesystem, clock, random IDs, defaults, or account creation.
- * The caller must separately prove the full inventory's provenance, backup,
- * reconciliation transaction and authorization before applying this plan.
+ * The caller must separately prove source provenance, backup and authority.
  */
-export function buildProductionCutoverPlan(input: ProductionCutoverPlanInput): ProductionCutoverPlan {
+function inspectMigrationInventory(input: Pick<ProductionCutoverPlanInput, 'artifacts' | 'ledger'>) {
   const issues: CutoverPlanIssue[] = [];
   const issue = (code: string, key: string) => { issues.push({ code, key }); };
   const files = new Map<string, CutoverMigrationArtifact>();
@@ -116,6 +115,30 @@ export function buildProductionCutoverPlan(input: ProductionCutoverPlanInput): P
       issue('LEDGER_CHECKSUM_MISMATCH', row.migration_name);
     }
   }
+
+  return { issues, files, applied, ledgerProjection };
+}
+
+/** Shared migration reconciliation only; no user filtering or fabricated Auth
+ * matches are needed to validate the immutable ledger. Preparation, not consent. */
+export function buildMigrationInventoryPlan(input: Pick<ProductionCutoverPlanInput, 'artifacts' | 'ledger'>) {
+  const { issues, files, applied, ledgerProjection } = inspectMigrationInventory(input);
+  const orderedIssues = canonicalSort([...new Map(issues.map(i => [JSON.stringify(i), i])).values()]);
+  const ready = orderedIssues.length === 0;
+  const pending = ready ? [...files.values()].filter(f => !applied.has(f.name)).sort((a, b) => compare(a.name, b.name)) : [];
+  const finalize = pending.find(f => f.name === FINALIZE_SUPABASE_IDENTITY);
+  return { ready, issues: orderedIssues,
+    pendingMigrations: pending.filter(f => f.name !== FINALIZE_SUPABASE_IDENTITY).map(copyArtifact),
+    deferredFinalize: finalize ? copyArtifact(finalize) : null,
+    fingerprint: digest({ version: 1, artifacts: canonicalSort(input.artifacts.map(f => ({
+      name: f.name, sqlHash: sha256(f.sql), checksum: lower(f.checksum),
+      checksumVariants: [...new Set((f.checksumVariants ?? []).map(lower))].sort(compare),
+    }))), ledger: canonicalSort(ledgerProjection), issues: orderedIssues }), writesAuthorized: false as const };
+}
+
+export function buildProductionCutoverPlan(input: ProductionCutoverPlanInput): ProductionCutoverPlan {
+  const { issues, files, applied, ledgerProjection } = inspectMigrationInventory(input);
+  const issue = (code: string, key: string) => { issues.push({ code, key }); };
 
   const userIds = new Set<string>();
   const userHashes = new Set<string>();

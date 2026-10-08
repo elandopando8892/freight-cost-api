@@ -34,9 +34,10 @@ export function buildViewerMembershipBundle(input: ViewerMembershipInput) {
   const header = `BEGIN; SET LOCAL standard_conforming_strings=on; SET LOCAL search_path=pg_catalog,public;
 SET LOCAL lock_timeout='5s'; SET LOCAL statement_timeout='30s'; SELECT pg_advisory_xact_lock(72707370);
 LOCK TABLE public."User" IN EXCLUSIVE MODE;`
-  const expected = input.users.map(u => `(${q(u.id)},${q(u.identityFingerprint)})`).join(',')
+  const expected = input.users.map(u => `(${q(u.id)},${q(u.identityFingerprint)},${q(u.emailHash)},${q(u.orgId)},${q(u.role)})`).join(',')
   const originalGuard = guard(`(SELECT count(*) FROM public."User")<>${input.users.length}
-OR EXISTS(WITH expected(id,hash) AS (VALUES ${expected}) SELECT 1 FROM expected e LEFT JOIN public."User" u ON u.id=e.id WHERE u.id IS NULL OR ${pgHash('to_jsonb(u)::text')}<>e.hash)`, 'MEMBERSHIP_INVENTORY_CHANGED')
+OR EXISTS(WITH expected(id,hash,email_hash,org_id,role) AS (VALUES ${expected}) SELECT 1 FROM expected e LEFT JOIN public."User" u ON u.id=e.id WHERE u.id IS NULL OR ${pgHash('to_jsonb(u)::text')}<>e.hash
+OR ${pgHash('lower(btrim(u.email))')} IS DISTINCT FROM e.email_hash OR u."orgId" IS DISTINCT FROM e.org_id OR u.role::text IS DISTINCT FROM e.role)`, 'MEMBERSHIP_INVENTORY_CHANGED')
   const backupGuard = `${guard(`to_regclass('fcm_viewer_membership_backup.manifest') IS NULL`, 'MEMBERSHIP_BACKUP_REQUIRED')}
 LOCK TABLE ${b}.manifest,${b}.users IN EXCLUSIVE MODE;
 ${guard(`(SELECT count(*) FROM ${b}.manifest)<>1 OR NOT EXISTS(SELECT 1 FROM ${b}.manifest WHERE fingerprint=${q(fingerprint)} AND restore_verified)
@@ -46,7 +47,7 @@ OR EXISTS(SELECT 1 FROM ${b}.users WHERE hash<>${pgHash('row_data::text')})`, 'M
 OR EXISTS(SELECT 1 FROM ${b}.users b LEFT JOIN public."User" u ON u.id=b.id WHERE u.id IS NULL OR
 CASE WHEN b.id=${q(owner.id)} THEN (to_jsonb(u)-'supabaseId') IS DISTINCT FROM (b.row_data-'supabaseId') ELSE to_jsonb(u) IS DISTINCT FROM b.row_data END)
 OR NOT EXISTS(SELECT 1 FROM public."User" WHERE id=${q(owner.id)} AND "supabaseId"=${q(owner.supabaseId)})
-OR NOT EXISTS(SELECT 1 FROM public."User" u,${b}.manifest m WHERE u.id=${q(member.id)} AND ${pgHash('to_jsonb(u)::text')}=m.member_hash)`, 'MEMBERSHIP_POSTCONDITION_CHANGED')
+OR NOT EXISTS(SELECT 1 FROM public."User" u,${b}.manifest m,public."User" owner WHERE owner.id=${q(owner.id)} AND u.id=${q(member.id)} AND u."orgId"=owner."orgId" AND ${pgHash('to_jsonb(u)::text')}=m.member_hash)`, 'MEMBERSHIP_POSTCONDITION_CHANGED')
   const backupSql = `${header}\n${originalGuard}
 CREATE SCHEMA ${b}; REVOKE ALL ON SCHEMA ${b} FROM PUBLIC;
 CREATE TABLE ${b}.users AS SELECT id,to_jsonb(u) AS row_data,${pgHash('to_jsonb(u)::text')} AS hash FROM public."User" u;
@@ -64,7 +65,7 @@ ${guard(`EXISTS(SELECT 1 FROM public."User" WHERE id=${q(member.id)} OR lower(bt
 OR EXISTS(SELECT 1 FROM public."User" WHERE id=${q(owner.id)} AND "supabaseId" IS NOT NULL AND "supabaseId"<>${q(owner.supabaseId)})`, 'MEMBERSHIP_IDENTITY_CONFLICT')}
 DO $legacy$ BEGIN IF EXISTS(SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='User' AND column_name='kindeId') THEN ALTER TABLE public."User" ALTER COLUMN "kindeId" DROP NOT NULL; END IF; END $legacy$;
 UPDATE public."User" SET "supabaseId"=${q(owner.supabaseId)} WHERE id=${q(owner.id)};
-INSERT INTO public."User"(id,"orgId",email,role,"supabaseId","createdAt","updatedAt") VALUES(${q(member.id)},${q(member.orgId)},${q(member.email)},'VIEWER',${q(member.supabaseId)},clock_timestamp(),clock_timestamp());
+INSERT INTO public."User"(id,"orgId",email,role,"supabaseId","createdAt","updatedAt") SELECT ${q(member.id)},"orgId",${q(member.email)},'VIEWER',${q(member.supabaseId)},clock_timestamp(),clock_timestamp() FROM public."User" WHERE id=${q(owner.id)};
 UPDATE ${b}.manifest SET phase='APPLIED',member_hash=(SELECT ${pgHash('to_jsonb(u)::text')} FROM public."User" u WHERE id=${q(member.id)});
 ${postGuard} COMMIT;`
   const rollbackSql = `${header}\n${backupGuard}
@@ -72,7 +73,7 @@ ${guard(`NOT EXISTS(SELECT 1 FROM ${b}.manifest WHERE phase='APPLIED')`, 'MEMBER
 ${postGuard}
 DO $references$ DECLARE r record; predicate text; linked boolean; BEGIN
 FOR r IN SELECT c.oid,c.conrelid,c.conkey,c.confkey,n.nspname,t.relname FROM pg_constraint c JOIN pg_class t ON t.oid=c.conrelid JOIN pg_namespace n ON n.oid=t.relnamespace WHERE c.contype='f' AND c.confrelid='public."User"'::regclass LOOP
-SELECT string_agg(format('c.%I IS NOT DISTINCT FROM u.%I',a.attname,p.attname),' AND ' ORDER BY k.ordinality) INTO predicate FROM unnest(r.conkey,r.confkey) WITH ORDINALITY k(child,parent,ordinality) JOIN pg_attribute a ON a.attrelid=r.conrelid AND a.attnum=k.child JOIN pg_attribute p ON p.attrelid='public."User"'::regclass AND p.attnum=k.parent;
+SELECT string_agg(format('c.%I = u.%I',a.attname,p.attname),' AND ' ORDER BY k.ordinality) INTO predicate FROM unnest(r.conkey,r.confkey) WITH ORDINALITY k(child,parent,ordinality) JOIN pg_attribute a ON a.attrelid=r.conrelid AND a.attnum=k.child JOIN pg_attribute p ON p.attrelid='public."User"'::regclass AND p.attnum=k.parent;
 EXECUTE format('SELECT EXISTS(SELECT 1 FROM %I.%I c JOIN public."User" u ON %s WHERE u.id=$1)',r.nspname,r.relname,predicate) INTO linked USING ${q(member.id)};
 IF linked THEN RAISE EXCEPTION 'MEMBERSHIP_ROLLBACK_REFERENCES_EXIST'; END IF; END LOOP; END $references$;
 DELETE FROM public."User" WHERE id=${q(member.id)};
