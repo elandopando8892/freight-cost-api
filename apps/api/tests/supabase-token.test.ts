@@ -25,6 +25,9 @@ describe("Supabase access-token verification", () => {
     process.env.SUPABASE_URL = "https://fcm-auth.supabase.co";
     delete process.env.SUPABASE_EXPECTED_PROJECT_REF;
     process.env.SUPABASE_JWT_AUDIENCE = "authenticated";
+    delete process.env.FCM_AUTH_ACCESS_SCOPE;
+    delete process.env.FCM_AUTH_SCOPE_REQUIRED;
+    delete process.env.VERCEL_ENV;
     jwtVerify.mockResolvedValue({ payload: permanentClaims });
   });
 
@@ -68,4 +71,11 @@ describe("Supabase access-token verification", () => {
     );
     expect(jwtVerify).not.toHaveBeenCalled();
   });
+  it('does not accept an excluded signed Supabase subject for FCM', async () => {
+    process.env.FCM_AUTH_ACCESS_SCOPE = JSON.stringify({ version: 1, users: [
+      { email: 'sales@heymarksman.com', subject: '00000000-0000-4000-8000-000000000001' },
+      { email: 'jgonzalez@xbfreight.com', subject: '00000000-0000-4000-8000-000000000002' },
+    ] })
+    await expect(verifySupabaseToken('signed-but-excluded')).rejects.toThrow('FCM_ACCESS_NOT_AUTHORIZED')
+  })
 });

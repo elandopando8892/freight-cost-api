@@ -1,5 +1,13 @@
 # Recuperación acotada de contactos históricos
 
+## Corrección de alcance posterior del usuario
+
+La instrucción humana posterior «solo son sales y jgonzalez» sustituye el plan de invitar a los contactos históricos: los únicos accesos FCM incluidos son `sales@heymarksman.com` y `jgonzalez@xbfreight.com`. No enviar invitaciones a las cuentas fr8hub ni activar otras cuentas históricas. La solicitud de confirmación de esas invitaciones queda sin efecto aunque permanezca visible en el chat.
+
+El inventario histórico se conserva como evidencia, no como lista de personas que deban tener acceso. No borrar, reasignar autores ni inventar sujetos Supabase para satisfacer el guard de finalización. El modelo actual exige `User.supabaseId` no nulo y la finalización anterior exige vincular cada fila: antes de ejecutarla, el plan deberá distinguir registros históricos preservados de identidades habilitadas para login. Esta nota corrige el alcance; **no implementa** baja de acceso, cambia roles, migra la base ni modifica Auth. Los roles de los dos accesos no se cambian por una instrucción que sólo delimita sus correos.
+
+El resto del documento describe el intento previo, cancelado en su parte de invitaciones; no concede autoridad vigente para enviarlas.
+
 Estado: identidades identificadas; altas/invitaciones **no ejecutadas**, sprint productivo todavía abierto. La autorización humana «autorizo» de este corte responde a incorporar exclusivamente las dos cuentas históricas de FCM a Supabase, previa identificación y verificación de correo, conservando IDs, organizaciones y roles. No autoriza marcar un correo verificado por conveniencia, copiar cuentas, dar acceso adicional a Rateware ni cambiar su Site URL.
 
 ## Desarrollo y evidencia

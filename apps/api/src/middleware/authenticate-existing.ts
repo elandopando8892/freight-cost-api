@@ -2,6 +2,7 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import { prisma } from "../config/prisma.js";
 import { verifySupabaseToken } from "../modules/auth/supabase.service.js";
 import type { JwtPayload } from "../modules/auth/auth.schema.js";
+import { assertFcmAccess, assertFcmUserLink, FcmAccessPolicyError } from '../modules/auth/fcm-access-scope.js';
 
 /**
  * Read-only staging authentication. Unlike the normal application middleware,
@@ -19,13 +20,14 @@ export async function authenticateExisting(
     const claims = await verifySupabaseToken(auth.slice("Bearer ".length).trim());
     const user = await prisma.user.findUnique({
       where: { supabaseId: claims.sub },
-      select: { id: true, orgId: true, role: true, supabaseId: true },
+      select: { id: true, orgId: true, role: true, supabaseId: true, email: true },
     });
     if (!user?.supabaseId) {
       return reply.status(403).send({
         error: "Staging actor must be provisioned before read-only preflight.",
       });
     }
+    assertFcmUserLink(assertFcmAccess(claims, process.env), user);
     request.user = {
       sub: user.id,
       orgId: user.orgId,
@@ -37,6 +39,8 @@ export async function authenticateExisting(
       { err: (err as Error).message },
       "read-only staging auth failed",
     );
+    if (err instanceof FcmAccessPolicyError)
+      return reply.status(err.httpStatus).send({ error: 'Freight Cost Model workspace access unavailable.' });
     return reply.status(401).send({ error: "Unauthorized" });
   }
 }

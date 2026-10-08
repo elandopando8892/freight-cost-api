@@ -35,7 +35,7 @@ function claims(sub = "new-supabase-subject") {
 
 describe("Supabase identity resolution", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
     prisma.$queryRaw.mockResolvedValue([]);
     prisma.user.findUnique.mockResolvedValue(null);
     prisma.user.findFirst.mockResolvedValue(null);
@@ -45,6 +45,8 @@ describe("Supabase identity resolution", () => {
     delete process.env.SUPABASE_EXPECTED_PROJECT_REF;
     delete process.env.FCM_PREVIEW_EXISTING_USERS_ONLY;
     delete process.env.VERCEL_ENV;
+    delete process.env.FCM_AUTH_ACCESS_SCOPE;
+    delete process.env.FCM_AUTH_SCOPE_REQUIRED;
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue(
@@ -59,6 +61,52 @@ describe("Supabase identity resolution", () => {
       ),
     );
   });
+
+  it('rejects an excluded historical actor before any DB, invitation or provisioning call', async () => {
+    process.env.FCM_AUTH_ACCESS_SCOPE = JSON.stringify({ version: 1, users: [
+      { email: 'sales@heymarksman.com', subject: '00000000-0000-4000-8000-000000000001' },
+      { email: 'jgonzalez@xbfreight.com', subject: '00000000-0000-4000-8000-000000000002' },
+    ] })
+    prisma.user.findUnique.mockResolvedValueOnce({ id: 'historic', orgId: 'historic-org', role: 'ADMIN' })
+    await expect(resolveUser(claims(), 'token')).rejects.toThrow('FCM_ACCESS_NOT_AUTHORIZED')
+    expect(prisma.user.findUnique).not.toHaveBeenCalled()
+    expect(prisma.$queryRaw).not.toHaveBeenCalled()
+    expect(prisma.user.create).not.toHaveBeenCalled()
+    expect(prisma.assumptionSet.findFirst).not.toHaveBeenCalled()
+    expect(acceptPendingOrganizationInvitation).not.toHaveBeenCalled()
+    expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it('preserves a scoped actor tenant and role without touching economic defaults', async () => {
+    const subject = '00000000-0000-4000-8000-000000000001'
+    process.env.FCM_AUTH_ACCESS_SCOPE = JSON.stringify({ version: 1, users: [
+      { email: 'sales@heymarksman.com', subject },
+      { email: 'jgonzalez@xbfreight.com', subject: '00000000-0000-4000-8000-000000000002' },
+    ] })
+    prisma.user.findUnique.mockResolvedValueOnce({ id: 'original-user', orgId: 'original-org', role: 'OPERATOR',
+      email: 'sales@heymarksman.com', supabaseId: subject })
+    await expect(resolveUser({ ...claims(subject), email: 'sales@heymarksman.com' }, 'token')).resolves.toEqual({
+      id: 'original-user', orgId: 'original-org', role: 'OPERATOR', supabaseId: subject,
+    })
+    expect(prisma.assumptionSet.findFirst).not.toHaveBeenCalled()
+    expect(prisma.user.create).not.toHaveBeenCalled()
+    expect(prisma.$queryRaw).not.toHaveBeenCalled()
+    expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it('does not self-provision an approved subject whose app membership is still missing', async () => {
+    const subject = '00000000-0000-4000-8000-000000000002'
+    process.env.FCM_AUTH_ACCESS_SCOPE = JSON.stringify({ version: 1, users: [
+      { email: 'sales@heymarksman.com', subject: '00000000-0000-4000-8000-000000000001' },
+      { email: 'jgonzalez@xbfreight.com', subject },
+    ] })
+    await expect(resolveUser({ ...claims(subject), email: 'jgonzalez@xbfreight.com' }, 'token'))
+      .rejects.toThrow('FCM_SCOPED_MEMBERSHIP_REQUIRED')
+    expect(prisma.user.create).not.toHaveBeenCalled()
+    expect(prisma.$queryRaw).not.toHaveBeenCalled()
+    expect(acceptPendingOrganizationInvitation).not.toHaveBeenCalled()
+    expect(fetch).not.toHaveBeenCalled()
+  })
 
   it("never reassigns an email already linked to another Supabase subject", async () => {
     prisma.$queryRaw.mockResolvedValueOnce([

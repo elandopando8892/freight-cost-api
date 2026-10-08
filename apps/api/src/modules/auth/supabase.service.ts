@@ -4,6 +4,7 @@ import { prisma } from "../../config/prisma.js";
 import { DEFAULT_ASSUMPTIONS } from "../../data/default-assumptions.js";
 import { acceptPendingOrganizationInvitation } from "../org/organization-invitations.service.js";
 import { normalizeInvitationEmail } from "../org/organization-invitations.js";
+import { assertFcmAccess, assertFcmUserLink, FcmAccessPolicyError } from './fcm-access-scope.js';
 
 function configuredIssuer() {
   const projectUrl = (process.env.SUPABASE_URL ?? "").replace(/\/$/, "");
@@ -70,6 +71,7 @@ export async function verifySupabaseToken(token: string): Promise<SupabaseClaims
   ) {
     throw new Error("Supabase token is missing permanent authenticated-user claims");
   }
+  assertFcmAccess({ sub: payload.sub, email: payload.email }, process.env);
   return payload as SupabaseClaims;
 }
 
@@ -148,15 +150,18 @@ export async function resolveUser(
   claims: SupabaseClaims,
   token: string,
 ): Promise<ResolvedUser> {
+  const scopedAccess = assertFcmAccess(claims, process.env);
   const supabaseId = claims.sub;
   const existingPreviewUsersOnly = process.env.VERCEL_ENV === "preview"
     && process.env.FCM_PREVIEW_EXISTING_USERS_ONLY === "true";
   const existing = await prisma.user.findUnique({ where: { supabaseId } });
   if (existing) {
-    if (!existingPreviewUsersOnly) await ensureActiveSet(existing.orgId);
+    assertFcmUserLink(scopedAccess, existing);
+    if (!scopedAccess && !existingPreviewUsersOnly) await ensureActiveSet(existing.orgId);
     return { id: existing.id, orgId: existing.orgId, role: existing.role, supabaseId };
   }
 
+  if (scopedAccess) throw new FcmAccessPolicyError('FCM_SCOPED_MEMBERSHIP_REQUIRED');
   if (existingPreviewUsersOnly) throw new Error("PREVIEW_IDENTITY_NOT_PROVISIONED");
 
   const email = await verifiedEmailForFirstLink(token, claims);

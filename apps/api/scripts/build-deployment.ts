@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { buildOnly } from './build-only.js'
 import { reviewProductionSchema } from './review-production-schema.js'
 import { encodeCutoverEvidence } from './lib/cutover-evidence.js'
+import { parseFcmAccessScope } from '../src/modules/auth/fcm-access-scope.js'
 
 /** Normal builds retain the database-free builder. A explicitly requested
  * Production review must pass BEFORE compilation; it never applies migrations.
@@ -12,6 +13,7 @@ export function buildDeployment(
   build: () => void = () => buildOnly(undefined, env),
   inspect: () => unknown = () => reviewProductionSchema(undefined, env),
 ) {
+  if (env.VERCEL_ENV === 'production') parseFcmAccessScope(env.FCM_AUTH_ACCESS_SCOPE ?? '')
   if (env.FCM_PRODUCTION_SCHEMA_REVIEW === 'true') inspect()
   build()
 }
