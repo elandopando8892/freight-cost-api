@@ -93,6 +93,16 @@ configuración inválida bloquea la entrega antes de que salga una solicitud.
 
 ## 3. Migrar Neon con respaldo
 
+> Excepción histórica FCM (2026-10-08): si sigue pendiente
+> `20260830000200_finalize_supabase_identity` y existen autores que no deben
+> tener acceso Auth, **no ejecutar el migrate deploy genérico de esta sección**.
+> No activar históricos, inventar sujetos ni marcar ese retiro aplicado.
+> El paquete histórico conserva las migraciones originales, difiere únicamente
+> ese archivo y verifica el ledger y la diferencia de esquema exacta. El
+> ejecutor actualmente comprobado es sólo local, con Docker propio/loopback;
+> no es autorización ni una herramienta de escritura para Neon.
+> Véase [el ensayo del ejecutor](../../../docs/reviews/FCM_LOCAL_HISTORICAL_EXECUTOR_2026-10-08.md).
+
 1. Crea y verifica un respaldo recuperable de la base objetivo.
 2. Con la `DATABASE_URL` del entorno objetivo cargada sólo en una sesión
    autorizada, comprueba primero la conectividad y el historial sin escribir:
