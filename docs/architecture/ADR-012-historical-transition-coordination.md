@@ -1,6 +1,7 @@
 # ADR-012: coordinar el corte histórico y evaluar su aceptación
 
 Estado: implementado localmente; conexión productiva pendiente.
+Actualización 2026-10-09: [fuente Git e inspección PostgreSQL reales](../reviews/FCM_POSTGRES_INSPECTION_2026-10-09.md) implementadas y ensayadas localmente. El transporte de escritura sigue pendiente.
 Fecha: 2026-10-08. Decisor de activación remota: propietario del producto.
 
 ## Contexto y benchmark
