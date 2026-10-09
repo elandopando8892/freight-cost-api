@@ -30,6 +30,8 @@ SIMULATION_COMPLETE nunca equivale a OBSERVATIONS_COMPLETE. Incluso este último
 
 ## Consecuencias y cierre
 
+Continuación local: [transporte de respaldo y recuperación](../reviews/FCM_POSTGRES_BACKUP_TRANSPORT_2026-10-09.md), con archivo exportado y restauración comprobada en PostgreSQL sintético. No establece mantenimiento ni autoriza migraciones; roles globales, configuración de base y aceptación remota siguen pendientes.
+
 No librerías, infraestructura, suscripciones, OAuth ni gasto nuevos. No cambios a las 47 migraciones o al esquema. El adaptador remoto deberá comprobar procedencia del paquete desde Git, target vivo, autoridad vigente, mantenimiento, respaldo/restauración (incluyendo las consideraciones de roles/ACL), cierre de procesos y ledger real. La promoción del par y membresía siguen siendo operaciones separadas gobernadas. El coordinador no las ejecuta.
 
 Aceptación local: detención antes de una fase inválida, una sola ejecución simultánea, recuperación sin relanzar, errores redactados, deadline/reloj, y rechazo de evidencias incompletas de OAuth. La aceptación externa pendiente sigue exigiendo el recorrido real; esta decisión no declara producción terminada.

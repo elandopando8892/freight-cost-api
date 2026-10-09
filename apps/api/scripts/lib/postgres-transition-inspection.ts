@@ -16,7 +16,7 @@ const sha = (value: string) => createHash('sha256').update(value).digest('hex')
  * NOLOGIN does not disconnect existing sessions. Reject both login-capable
  * roles and remaining sessions; never ALTER ROLE, terminate clients or infer
  * that a quiet pg_stat_activity proves all app writers are stopped. */
-export async function inspectPostgresTransition(raw: TransitionInspectionOptions, signal?: AbortSignal) {
+export function validateTransitionInspectionOptions(raw: TransitionInspectionOptions) {
   let options: TransitionInspectionOptions, url: URL
   try {
     options = optionsSchema.parse(raw); url = new URL(options.databaseUrl)
@@ -35,6 +35,11 @@ export async function inspectPostgresTransition(raw: TransitionInspectionOptions
     } else if (!['localhost', '127.0.0.1'].includes(url.hostname) || !/^\/fcm_adapter_[a-z0-9_]+$/.test(url.pathname)) throw new Error()
     if (sha(url.hostname + url.pathname) !== options.expectedTargetFingerprint) throw new Error()
   } catch { throw new Error('TRANSITION_INSPECTION_TARGET_INVALID') }
+  return { options, url }
+}
+
+export async function inspectPostgresTransition(raw: TransitionInspectionOptions, signal?: AbortSignal) {
+  const { options, url } = validateTransitionInspectionOptions(raw)
   if (signal?.aborted) throw new Error('TRANSITION_INSPECTION_ABORTED')
   url.searchParams.set('connection_limit', '1'); url.searchParams.set('connect_timeout', '10'); url.searchParams.set('pool_timeout', '10')
   const db = new PrismaClient({ datasourceUrl: url.toString(), log: [] })
