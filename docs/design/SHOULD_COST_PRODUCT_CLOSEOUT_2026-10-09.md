@@ -45,3 +45,7 @@ La creación de un ledger exige inventario global cerrado en policy_budget.py:26
 ## Límites del corte
 
 Entregado: conciliación vigente, plan finito de producto y continuidad del encargo preparado. No nueva implementación Opus, diseño Fable ejecutado, publicación, calibración, fuentes actualizadas o aceptación económica/auth certificadas. Astra revisó estáticamente el transporte anterior en el corte previo; no se repitió ni se convirtió en aprobación del código futuro. No tests UI o API repetidos por un cambio documental. Rollback: revertir únicamente este documento/checkpoint preservando evidencia y archivos ajenos. No cambio externo del producto que revertir.
+
+## Checkpoint posterior: ejecución de modelos y siguiente dependencia
+
+El estado anterior queda histórico, sustituido por [recibo de ejecución del 9oct](../reviews/RECOVERY_MODEL_EXECUTION_2026-10-09.md). Diseño Fable5.1 ejecutado/completado y lease liberado. Opus5.5 ejecutó el encargo inicial, se detuvo por falta de contexto de la inspección en su contrato y no escribió código; el host comprobó archivos ausentes. Contexto corregido y precisiones de Astra preparados. El registro del kit ahora tiene64asignaciones y rechazó el candidato65con registry entity limit; reencargo no registrado/lanzado. Propuesta concreta de [ampliación técnica64→128](../reviews/KIT_REGISTRY_CAPACITY_REQUEST_2026-10-09.md) pendiente de autorización específica. No es cuota Claude, ni falta de elección del usuario. S1/S2/S3 permanecen abiertos; el diseño local de recuperación es sólo parte del gate de release.
