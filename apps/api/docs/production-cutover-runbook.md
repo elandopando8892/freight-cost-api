@@ -102,6 +102,9 @@ configuración inválida bloquea la entrega antes de que salga una solicitud.
 > ejecutor actualmente comprobado es sólo local, con Docker propio/loopback;
 > no es autorización ni una herramienta de escritura para Neon.
 > Véase [el ensayo del ejecutor](../../../docs/reviews/FCM_LOCAL_HISTORICAL_EXECUTOR_2026-10-08.md).
+> La [coordinación local y evaluación de login](../../../docs/reviews/FCM_COORDINATION_AND_LOGIN_ACCEPTANCE_2026-10-08.md)
+> ya están implementadas. Su adaptador remoto sigue pendiente; no habilitan el
+> comando genérico siguiente para el caso histórico ni acreditan OAuth real.
 
 1. Crea y verifica un respaldo recuperable de la base objetivo.
 2. Con la `DATABASE_URL` del entorno objetivo cargada sólo en una sesión
