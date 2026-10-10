@@ -1,5 +1,6 @@
 import { cleanEnv, str, num, makeValidator } from "envalid";
 import { resolveDatabaseUrl } from "./database-url.js";
+import { parseServiceApiClients } from "./service-clients.js";
 
 const nodeEnv = makeValidator((x) => {
   if (!["development", "production", "test"].includes(x))
@@ -19,6 +20,9 @@ const positiveInteger = makeValidator((x) => {
   }
   return value;
 });
+// Zod-backed: malformed entries abort startup (fail closed) instead of being
+// silently ignored. See src/config/service-clients.ts for the format.
+const serviceApiClients = makeValidator((x) => parseServiceApiClients(x));
 const releaseIdentifier = makeValidator((x) => {
   if (!/^[A-Za-z0-9._-]{1,128}$/.test(x)) {
     throw new Error("Invalid RELEASE_SHA");
@@ -54,6 +58,11 @@ export const env = cleanEnv(
   // and (optionally) checks the audience. Empty issuer → auth fails closed.
   KINDE_ISSUER_URL: str({ default: "" }),
   KINDE_AUDIENCE: str({ default: "" }),
+  // Machine-to-machine clients (contract fcm.quote-by-route.v1), accepted only
+  // on POST /engine/quote-by-route and GET /catalog/*. Comma-separated
+  // `<client_id>:<sha256_hex>:<organization_id>:<VIEWER|OPERATOR>`.
+  // Empty → service authentication disabled (Kinde only).
+  SERVICE_API_CLIENTS: serviceApiClients({ default: [] }),
   // Rateware receives a human-authorized RateBook package using the same Kinde
   // bearer token. Empty means delivery is disabled and fails closed.
   RATEWARE_API_URL: str({ default: "" }),

@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import { authenticate } from '../../middleware/authenticate.js'
+import { authenticateServiceOrKinde } from '../../middleware/authenticate-service.js'
 import type { JwtPayload } from '../auth/auth.schema.js'
 import { buildParamMap, type ParamMap } from '../assumptions/assumptions.service.js'
 import { calculate } from './engine.calculator.js'
@@ -81,7 +82,12 @@ const CalculateSchema = z.object({
 })
 
 export async function engineRoutes(app: FastifyInstance) {
-  app.addHook('preHandler', authenticate)
+  // Kinde for every engine route, except quote-by-route which also accepts a
+  // SERVICE_API_CLIENTS credential (contract fcm.quote-by-route.v1).
+  app.addHook('preHandler', (request, reply) =>
+    request.routeOptions.config.allowServiceClient
+      ? authenticateServiceOrKinde(request, reply)
+      : authenticate(request, reply))
 
   app.post('/engine/calculate', async (request, reply) => {
     const { orgId } = request.user as JwtPayload
@@ -165,7 +171,7 @@ export async function engineRoutes(app: FastifyInstance) {
     fxRate: z.number().positive().optional(),
   })
 
-  app.post('/engine/quote-by-route', async (request, reply) => {
+  app.post('/engine/quote-by-route', { config: { allowServiceClient: true } }, async (request, reply) => {
     const { orgId } = request.user as JwtPayload
     const body = ByRouteSchema.parse(request.body)
     const service = body.service ?? defaultService(body.operation)

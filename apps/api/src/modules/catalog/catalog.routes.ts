@@ -1,11 +1,18 @@
 import { FastifyInstance } from 'fastify'
 import { authenticate } from '../../middleware/authenticate.js'
+import { authenticateServiceOrKinde } from '../../middleware/authenticate-service.js'
 import { prisma } from '../../config/prisma.js'
 import { PARAMETER_DEFINITIONS, ParameterKind, summarizeParameterCatalog } from '../../data/parameter-catalog.js'
 import { getCostBaseCoverage } from './coverage.service.js'
 
 export async function catalogRoutes(app: FastifyInstance) {
-  app.addHook('preHandler', authenticate)
+  // Read-only catalog: Kinde or a SERVICE_API_CLIENTS credential
+  // (contract fcm.quote-by-route.v1) on GET only; any future mutating catalog
+  // route keeps requiring Kinde.
+  app.addHook('preHandler', (request, reply) =>
+    request.method === 'GET' || request.method === 'HEAD'
+      ? authenticateServiceOrKinde(request, reply)
+      : authenticate(request, reply))
 
   app.get('/catalog/equipment', async () => {
     return prisma.equipmentConfig.findMany({ orderBy: [{ truckType: 'asc' }, { trailerType: 'asc' }] })
