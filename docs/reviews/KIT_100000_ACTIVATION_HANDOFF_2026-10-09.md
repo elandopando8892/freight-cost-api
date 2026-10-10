@@ -1,0 +1,27 @@
+# Activación autorizada: capacidad de100000encargos
+
+Decisión humana directa: «Autorizo activar la versión de100,000encargos y reconectar el MCP. Adelante continúa con Fable5.1,Opus5.5yAstra6para cerrar los sprints». Registro observado2026-10-10T02:39:37Z,9oct2026enAmerica/Mexico_City; es referencia auditable, no firma. HEADinicio5807aca0bb1e0156b857af70fc1efb954be2b891, checkoutD:/andre/worktrees/freight-cost-model/cost-tires-release-20260927,45archivos ajenos preservados.
+
+Encontrada candidata `assignment-capacity-100000-20261010T020421Z`, preparada desde personal-usage. No se implementó otra ampliación128ni se modificó caché del plugin. Backendnuevo: MAX_ASSIGNMENTS=100000,64raíces,JSONregistro256MiB; user_managed intacto. No100000llamadas disponibles ni garantía para contratos arbitrariamente grandes. La referencia anterior al límite64describía correctamente la versión activa entonces, no esta candidata posterior.
+
+Referencia: [guía de activación](D:/andre/apps/codex-home/integrations/claude-review/releases/assignment-capacity-100000-20261010T020421Z/GUIA-RAPIDA.md). Evidencia previa de candidato: catálogo533tests, primera corrida2fallos; corrección de metadata y revalidaciones de cancelación1/registro39más activación/rollback23PASS. No se repitió ese catálogo en FCM ni se declara aceptación nueva de modelos por sus tests offline.
+
+Verificación actual del paquete: verify_package.py confirmó152archivos,failures[]. activate_checked.py --apply verificó integridad y rechazó preflight antes de mutar:28procesos bloqueantes,0inciertos; Codex/servidores abiertos. No pointer/config/registry/jobs/leases modificados. kit_info sigue loaded/activepersonal-usage,restart_required=false en esta conexión vieja. Se conserva la guardia de cierre normal; no se mata ningún proceso.
+
+## Handoff de una sola ejecución
+
+Se preparó ayudante de activaciónadministrativa `D:/andre/validation/fcm_activate_100000_after_close.py`, externo a release/cache. Sólo espera el cierre normal y llama una vez al activate_checked.py --apply existente. No bypass, guardas nuevas de permiso, servidor nuevo, inferencia, reintentos o procesos terminados. Usa el inventario/criterio de cierre del activador; exige3observaciones limpias, timeout15min. Si otro proceso/lease/estado/hashes impide aplicar, detiene el intento y guarda evidencia. No altera paquete sellado.
+
+Tres tests propios del handoff aprobaron: esperar cierre estable; no reintentar activación fallida; expirar ante proceso incierto sin mutación. Son tests unitarios del ayudante, no nueva activación/rollback real. Los límites SQL/roles/Auth/costos/infraestructura de Should-Cost no cambiaron.
+
+Lanzado oculto mediante mecanismo normal Start-Process. PIDpropio52604, carpeta `D:/andre/validation/fcm-kit-activation-100000-ije0g_az`. Observación2026-10-10T02:43:25Z(9oct20:43CDMX):vivo,estadoWAITING_FOR_NORMAL_CLOSE,32bloqueantes,0inciertos. Registro append+fsync state.jsonl; output de activador en activation-output.txt cuando se ejecute. Cambio de32vs28corresponde a otra observación, no garantiza cuáles procesos siguen abiertos. No se leen ni muestran prompts/credenciales.
+
+Usuario cierra Codex normalmente dentro de15min; el ayudante intenta activar después del cierre. Usuario abre Codex tras dar tiempo al activador y vuelve a este chat. No hay APIsoportada disponible aquí para cerrar/reabrir la app/reconectar servidores en vivo; no se inventa hot-swap. La reconexión sólo se acredita posteriormente con kit_info mostrando loaded/activeassignment-capacity-100000yrestart_required=false. Abrir antes de completar puede bloquear el preflight; el ayudante no reintentará la activación fallida.
+
+Estado de resultado se toma de su state.jsonl: ACTIVATED_RECONNECT_PENDING sólo si activador devuelve exit0yreceiptcompletey pointerexacto; STOPPED_REVIEW_REQUIRED retiene error/evidencia sin repetir; EXPIRED_WITHOUT_ACTIVATIONsi no hubo cierre. El receipt exacto queda dentro de la carpeta activation-backup de la release nueva. Rollback sólo mediante rollback_release.py --receipt <reciboexacto> --applybajo guardas de cierre, conservando history/ledger/registry. Nunca restaurar JSONconfiga ciegas ni borrar locks.
+
+## Continuación del producto
+
+No repetir diseño Fableejecutado ni reactivar sesión Opuscerrada. Tras descubrimiento nuevo: registrar/atestarel encargo corregido del mismo problema con contexto completoyprecisiones de Astra, conservar todos contadores/leases/evidencia, ejecutar Opus5.5/high dentro del alcance local, probar origenapagado→archivo→receptorindependiente y revisar con Astra6/high. Fable5.1/high queda para los diseños pendientes de arquitectura/UIUXsegún los tres gates del MVP. Fin de cada gate exige resultado funcional/pruebas, no contar archivos o llamadas.
+
+Skillsaplicadas: [mantener-kit](D:/andre/apps/codex-home/plugins/cache/created-by-me-remote/claude-kit/0.3.1/skills/mantener-kit/SKILL.md) y [configurar-kit](D:/andre/apps/codex-home/plugins/cache/created-by-me-remote/claude-kit/0.3.1/skills/configurar-kit/SKILL.md). Mantienen fuente canónica, identidad privada, activación/reconexión separadasy recuperación de runs en su release. No publican duplicado ni activan gasto. La pausa operativa aquí la causa el preflight concreto del activador, no falta de consentimiento ni cuota.
