@@ -1,5 +1,7 @@
 # Propuesta concreta: capacidad del registro de Claude Kit
 
+> **Archivada como decisión histórica.** La alternativa64→128 de este documento ya no es trabajo pendiente: el usuario autorizó y se activó `assignment-capacity-100000-20261010T020421Z`. `kit_info` confirma release cargada/activa, `restart_required: false` y modo `user_managed`. El límite de100,000 corresponde a entradas técnicas del registro, no a consumo disponible de Claude. Para el procedimiento vigente consulte [OPERATING.md](D:/andre/apps/codex-home/integrations/claude-review/OPERATING.md); para el plan de producto, [cierre Should-Cost](../design/SHOULD_COST_PRODUCT_CLOSEOUT_2026-10-09.md). Todo lo siguiente describe el diagnóstico y la propuesta de aquel momento.
+
 ## Problema observado
 
 Release activa/cargada personal-usage-20261009T153439Z, modo user_managed. Los bloqueos anteriores de cierre global desaparecieron en este turno. Se pudo autorizar el ledger local-isolated-recovery-20261009 y ejecutar diseño Fable más encargo Opus. El encargo Opus se cerró sin cambios por contexto incompleto del coordinador; para el reencargo diagnosticado, el helper allowlist.py plan rechazó el candidato de65entradas con `registry entity limit`. No registro/ampliación/launch aplicado. No es cuota ni límite del proveedor. No eliminar historia ni reutilizar contrato ejecutado para liberar espacio.
